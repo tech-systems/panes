@@ -1,0 +1,26 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-title [ngClass]="{'scrolled' : HScrolled }">
+      Cupertino Pane
+    </ion-title>
+    <ion-buttons slot="start">
+      <ion-back-button text="" icon="back-custom"></ion-back-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content scrollEvents="true"  
+          (ionScroll)="HScrolled = $event.detail.scrollTop > 44 ? true : false;">
+<!-- Header -->
+<h1 header>Cupertino Pane</h1>
+
+<div class="slide-over">
+  <div class="pane">
+    <div class="draggable">
+      <div class="move"></div>
+    </div>
+
+    <h2 header>Content</h2>
+  </div>
+</div>
+</ion-content>
