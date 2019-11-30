@@ -28,7 +28,7 @@ export class CupertinoPane {
   };
 
   private screen_height: number = window.screen.height;
-  private steps: any[] = []; 
+  private steps: any[] = [];
   private startP: any;
   private currentBreak: number;
   private topper: number;
@@ -43,14 +43,14 @@ export class CupertinoPane {
   private parentEl: HTMLElement;
   private wrapperEl: HTMLDivElement;
   private paneEl: HTMLDivElement;
-  private draggableEl: HTMLDivElement; 
-  private moveEl: HTMLDivElement; 
+  private draggableEl: HTMLDivElement;
+  private moveEl: HTMLDivElement;
   private headerEl: HTMLHeadingElement;
   private contentEl: HTMLHeadingElement;
   private backdropEl: HTMLDivElement;
   private closeEl: HTMLDivElement;
 
-  constructor(private el, conf:any = {}) {
+  constructor(private el, conf: any = {}) {
     this.settings = {...this.settings, ...conf};
     this.el = <HTMLDivElement>document.querySelector(this.el);
 
@@ -58,8 +58,8 @@ export class CupertinoPane {
       this.settings.parentElement = <HTMLElement>document.querySelector(
         this.settings.parentElement
       );
-    } else { 
-      this.settings.parentElement = this.el.parentElement; 
+    } else {
+      this.settings.parentElement = this.el.parentElement;
     }
 
     ['top', 'middle', 'bottom'].forEach((val) => {
@@ -72,7 +72,7 @@ export class CupertinoPane {
 
       // Add offsets
       if (this.settings.breaks[val]
-          && this.settings.breaks[val].enabled 
+          && this.settings.breaks[val].enabled
           && this.settings.breaks[val].offset) {
         this.breaks[val] -= this.settings.breaks[val].offset;
       }
@@ -89,38 +89,35 @@ export class CupertinoPane {
       this.parentEl = this.settings.parentElement;
 
       // Wrapper
-      this.wrapperEl = document.createElement("div"); 
+      this.wrapperEl = document.createElement('div');
       this.wrapperEl.className = `cupertino-pane-wrapper ${this.el.className}`;
-      this.wrapperEl.style.position = "absolute";
-      this.wrapperEl.style.top = "0";
+      this.wrapperEl.style.position = 'absolute';
+      this.wrapperEl.style.top = '0';
 
       // Panel
-      this.paneEl = document.createElement("div"); 
-      this.paneEl.className = "pane";
+      this.paneEl = document.createElement('div');
+      this.paneEl.className = 'pane';
       this.paneEl.style.position = 'fixed';
       this.paneEl.style.zIndex = '11';
       this.paneEl.style.width = '100%';
       this.paneEl.style.height = '100%';
       this.paneEl.style.background = '#ffffff';
       this.paneEl.style.borderTopLeftRadius = '20px';
-      this.paneEl.style.webkitBorderTopLeftRadius = '20px';
       this.paneEl.style.borderTopRightRadius = '20px';
-      this.paneEl.style.webkitBorderTopRightRadius = '20px';
       this.paneEl.style.boxShadow = '0 4px 16px rgba(0,0,0,.12)';
-      this.paneEl.style.webkitBoxShadow = '0 4px 16px rgba(0,0,0,.12)';
       this.paneEl.style.overflow = 'hidden';
       this.paneEl.style.transform = `translateY(${
-        this.settings.initialShow ? 
+        this.settings.initialShow ?
         this.breaks[this.settings.initialBreak] : this.screen_height}px)`;
 
       // Draggable
-      this.draggableEl = document.createElement("div"); 
-      this.draggableEl.className = "draggable";
+      this.draggableEl = document.createElement('div');
+      this.draggableEl.className = 'draggable';
       this.draggableEl.style.padding = '5px';
 
       // Move
-      this.moveEl = document.createElement("div"); 
-      this.moveEl.className = "move";
+      this.moveEl = document.createElement('div');
+      this.moveEl.className = 'move';
       this.moveEl.style.margin = '0 auto';
       this.moveEl.style.height = '5px';
       this.moveEl.style.background = '#c0c0c0';
@@ -134,12 +131,12 @@ export class CupertinoPane {
       this.contentEl = this.el.childNodes[1];
       this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
       this.contentEl.style.overflowX = 'hidden';
-      this.contentEl.style.height = `${this.screen_height 
-        - this.breaks['top'] - 51 
+      this.contentEl.style.height = `${this.screen_height
+        - this.breaks['top'] - 51
         - this.settings.topperOverflowOffset}px`;
 
       // Backdrop
-      this.backdropEl = document.createElement("div"); 
+      this.backdropEl = document.createElement('div');
       this.backdropEl.className = 'backdrop';
       this.backdropEl.style.overflow = 'hidden';
       this.backdropEl.style.position = 'fixed';
@@ -152,7 +149,7 @@ export class CupertinoPane {
       this.backdropEl.style.zIndex = '10';
 
       // Close button
-      this.closeEl = document.createElement("div");
+      this.closeEl = document.createElement('div');
       this.closeEl.className = 'close-button';
       this.closeEl.style.width = '26px';
       this.closeEl.style.height = '26px';
@@ -166,10 +163,10 @@ export class CupertinoPane {
   present() {
       if (document.querySelector(
         `.cupertino-pane-wrapper.${this.el.className.split(' ').join('.')}`)
-      ) { 
+      ) {
         this.moveToBreak(this.settings.initialBreak);
-        return; 
-      } 
+        return;
+      }
 
       // Emit event
       this.settings.onWillPresent();
@@ -202,7 +199,7 @@ export class CupertinoPane {
         if (this.settings.backdropClose) {
           this.backdropEl.addEventListener('click', (t) => this.closePane(this.backdropEl));
         }
-      } 
+      }
 
       if (!this.settings.showDraggable) {
         this.draggableEl.style.opacity = '0';
@@ -212,7 +209,7 @@ export class CupertinoPane {
         this.paneEl.style.background = '#1c1c1d';
         this.paneEl.style.color = '#ffffff';
         this.moveEl.style.background = '#5a5a5e';
-      }    
+      }
 
       if (this.settings.buttonClose) {
         this.paneEl.appendChild(this.closeEl);
@@ -237,9 +234,9 @@ export class CupertinoPane {
         this.settings.breaks.bottom.enabled = true;
       }
 
-      let brs = [];
+      const brs = [];
       ['top', 'middle', 'bottom'].forEach((val) => {
-        if (this.settings.breaks[val].enabled) { 
+        if (this.settings.breaks[val].enabled) {
           brs.push(this.breaks[val]);
         }
       });
@@ -250,16 +247,16 @@ export class CupertinoPane {
       // Determinate bottomer point
       this.bottomer = brs.reduce((prev, curr) => {
         return (Math.abs(curr) > Math.abs(prev) ? curr : prev);
-      });  
+      });
 
-      if (this.currentBreak === this.topper 
+      if (this.currentBreak === this.topper
           && this.settings.topperOverflow) {
-            this.contentEl.style.overflowY = 'auto'; 
+            this.contentEl.style.overflowY = 'auto';
         // headerEl.style.borderBottom = '1px solid #ebebeb';
       }
-      
+
       /****** Events *******/
-      
+
       // Touchstart
       this.paneEl.addEventListener('touchstart', (t) => {
         // Event emitter
@@ -275,9 +272,9 @@ export class CupertinoPane {
         const translateYRegex = /\.*translateY\((.*)px\)/i;
         const p = parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
         // Delta
-        let n = (<any>t).touches[0].screenY;
-        let diff = n - this.steps[this.steps.length - 1];
-        let newVal = p + diff;
+        const n = (<any>t).touches[0].screenY;
+        const diff = n - this.steps[this.steps.length - 1];
+        const newVal = p + diff;
 
         // Not allow move panel with overflow scroll
         let noScroll = false;
@@ -287,12 +284,12 @@ export class CupertinoPane {
               noScroll = true;
             }
           });
-          if (noScroll && this.contentEl.scrollTop > 20) return;
-          if ((p + diff) <= this.topper && noScroll) return;
+          if (noScroll && this.contentEl.scrollTop > 20) { return; }
+          if ((p + diff) <= this.topper && noScroll) { return; }
         }
 
         // Not allow drag upper than topper point
-        // Not allow drag lower than bottom if free mode 
+        // Not allow drag lower than bottom if free mode
         if (((p + diff) <= this.topper - 20)
             || (this.settings.freeMode && !this.settings.bottomClose && ((p + diff) >= this.bottomer + 20))) {
           return;
@@ -310,10 +307,10 @@ export class CupertinoPane {
         // Determinate nearest point
         let closest = brs.reduce((prev, curr) => {
           return (Math.abs(curr - p) < Math.abs(prev - p) ? curr : prev);
-        });  
+        });
 
         // Swipe - next (if differ > 10)
-        let diff =  this.steps[this.steps.length - 1] - this.steps[this.steps.length - 2];
+        const diff =  this.steps[this.steps.length - 1] - this.steps[this.steps.length - 2];
         const maxDiff = 4;
         if (Math.abs(diff) >= maxDiff) {
           closest = this.swipeNextPoint(diff, maxDiff, closest);
@@ -321,8 +318,8 @@ export class CupertinoPane {
 
         // Click to bottom - open middle
         if (this.currentBreak === this.breaks['bottom'] && isNaN(diff)) {
-          closest = this.settings.breaks['middle'].enabled 
-          ? this.breaks['middle'] : this.settings.breaks['top'].enabled 
+          closest = this.settings.breaks['middle'].enabled
+          ? this.breaks['middle'] : this.settings.breaks['top'].enabled
           ? this.breaks['top'] : this.breaks['bottom'];
         }
 
@@ -341,7 +338,7 @@ export class CupertinoPane {
           this.contentEl.style.opacity = '1';
         }
 
-        if (this.currentBreak === this.topper 
+        if (this.currentBreak === this.topper
             && this.settings.topperOverflow) {
           this.contentEl.style.overflowY = 'auto';
         } else {
@@ -351,7 +348,7 @@ export class CupertinoPane {
         if (!this.settings.freeMode) {
           this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
           this.paneEl.style.transform = `translateY(${closest}px)`;
-          let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
+          let initTransitionEv = this.paneEl.addEventListener('transitionend', () => {
             this.paneEl.style.transition = `initial`;
             initTransitionEv = undefined;
           });
@@ -366,19 +363,19 @@ export class CupertinoPane {
       this.contentEl.style.opacity = '1';
     }
 
-    if (this.breaks[val] === this.topper 
+    if (this.breaks[val] === this.topper
         && this.settings.topperOverflow) {
       this.contentEl.style.overflowY = 'auto';
     } else {
       this.contentEl.style.overflowY = 'hidden';
     }
-    
+
     this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
     this.paneEl.style.transform = `translateY(${this.breaks[val]}px)`;
     let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
       this.paneEl.style.transition = `initial`;
       initTransitionEv = undefined;
-    });    
+    });
   }
 
   hide() {
@@ -387,7 +384,7 @@ export class CupertinoPane {
     let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
       this.paneEl.style.transition = `initial`;
       initTransitionEv = undefined;
-    });   
+    });
   }
 
   private closePane(backdropEl) {
@@ -396,17 +393,17 @@ export class CupertinoPane {
 
       this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
       this.paneEl.style.transform = `translateY(${this.screen_height}px)`;
-      
+
       backdropEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
       backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
-      
+
       // Return dynamic content
       this.el.appendChild(this.headerEl);
       this.el.appendChild(this.contentEl);
 
       this.paneEl.addEventListener('transitionend', (t) => {
         this.parentEl.removeChild(this.wrapperEl);
-        
+
         // Emit event
         this.settings.onDidDismiss();
       });
@@ -415,26 +412,26 @@ export class CupertinoPane {
   private swipeNextPoint = (diff, maxDiff, closest) => {
       if (this.currentBreak === this.breaks['top']) {
         if (diff > maxDiff) {
-          if (this.settings.breaks['middle'].enabled) return this.breaks['middle'];
-          if (this.settings.breaks['bottom'].enabled) return this.breaks['bottom'];
+          if (this.settings.breaks['middle'].enabled) { return this.breaks['middle']; }
+          if (this.settings.breaks['bottom'].enabled) { return this.breaks['bottom']; }
         }
         return this.breaks['top'];
       }
 
       if (this.currentBreak === this.breaks['middle']) {
         if (diff < -maxDiff) {
-          if (this.settings.breaks['top'].enabled) return this.breaks['top'];
+          if (this.settings.breaks['top'].enabled) { return this.breaks['top']; }
         }
         if (diff > maxDiff) {
-          if (this.settings.breaks['bottom'].enabled) return this.breaks['bottom'];
+          if (this.settings.breaks['bottom'].enabled) { return this.breaks['bottom']; }
         }
         return this.breaks['middle'];
       }
 
       if (this.currentBreak === this.breaks['bottom']) {
         if (diff < -maxDiff) {
-          if (this.settings.breaks['middle'].enabled) return this.breaks['middle'];
-          if (this.settings.breaks['top'].enabled) return this.breaks['top'];
+          if (this.settings.breaks['middle'].enabled) { return this.breaks['middle']; }
+          if (this.settings.breaks['top'].enabled) { return this.breaks['top']; }
         }
         return this.breaks['bottom'];
       }
