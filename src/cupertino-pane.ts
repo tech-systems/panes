@@ -257,6 +257,26 @@ export class CupertinoPane {
 
       /****** Events *******/
 
+      // Click
+      this.paneEl.addEventListener('click', (t) => {
+        if (t.target['className'].includes('close-button')) {
+          this.closePane(this.backdropEl);
+          return;
+        }
+
+        // Click to bottom - open middle
+        if (this.currentBreak === this.breaks['bottom']) {
+          if (this.settings.breaks['middle'].enabled) {
+            this.moveToBreak('middle');
+            return;
+          } 
+          if (this.settings.breaks['top'].enabled) {
+            this.moveToBreak('top');
+            return;
+          }
+        }
+      });
+
       // Touchstart
       this.paneEl.addEventListener('touchstart', (t) => {
         // Event emitter
@@ -314,13 +334,6 @@ export class CupertinoPane {
         const maxDiff = 4;
         if (Math.abs(diff) >= maxDiff) {
           closest = this.swipeNextPoint(diff, maxDiff, closest);
-        }
-
-        // Click to bottom - open middle
-        if (this.currentBreak === this.breaks['bottom'] && isNaN(diff)) {
-          closest = this.settings.breaks['middle'].enabled
-          ? this.breaks['middle'] : this.settings.breaks['top'].enabled
-          ? this.breaks['top'] : this.breaks['bottom'];
         }
 
         // Bottom closable

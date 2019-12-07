@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 0.1.2
+ * Cupertino Pane 0.1.3
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: November 30, 2019
+ * Released on: December 7, 2019
  */
 
 /*! *****************************************************************************
@@ -285,6 +285,24 @@ var CupertinoPane = /** @class */ (function () {
             // headerEl.style.borderBottom = '1px solid #ebebeb';
         }
         /****** Events *******/
+        // Click
+        this.paneEl.addEventListener('click', function (t) {
+            if (t.target['className'].includes('close-button')) {
+                _this.closePane(_this.backdropEl);
+                return;
+            }
+            // Click to bottom - open middle
+            if (_this.currentBreak === _this.breaks['bottom']) {
+                if (_this.settings.breaks['middle'].enabled) {
+                    _this.moveToBreak('middle');
+                    return;
+                }
+                if (_this.settings.breaks['top'].enabled) {
+                    _this.moveToBreak('top');
+                    return;
+                }
+            }
+        });
         // Touchstart
         this.paneEl.addEventListener('touchstart', function (t) {
             // Event emitter
@@ -338,12 +356,6 @@ var CupertinoPane = /** @class */ (function () {
             var maxDiff = 4;
             if (Math.abs(diff) >= maxDiff) {
                 closest = _this.swipeNextPoint(diff, maxDiff, closest);
-            }
-            // Click to bottom - open middle
-            if (_this.currentBreak === _this.breaks['bottom'] && isNaN(diff)) {
-                closest = _this.settings.breaks['middle'].enabled
-                    ? _this.breaks['middle'] : _this.settings.breaks['top'].enabled
-                    ? _this.breaks['top'] : _this.breaks['bottom'];
             }
             // Bottom closable
             if (_this.settings.bottomClose && closest === _this.breaks['bottom']) {
