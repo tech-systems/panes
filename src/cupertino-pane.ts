@@ -14,6 +14,7 @@ export class CupertinoPane {
     topperOverflow: true,
     topperOverflowOffset: 0,
     showDraggable: true,
+    clickBottomOpen: true,
     breaks: {
       top: { enabled: true, offset: 0},
       middle: { enabled: true, offset: 0},
@@ -161,6 +162,7 @@ export class CupertinoPane {
   }
 
   present() {
+
       if (document.querySelector(
         `.cupertino-pane-wrapper.${this.el.className.split(' ').join('.')}`)
       ) {
@@ -257,26 +259,6 @@ export class CupertinoPane {
 
       /****** Events *******/
 
-      // Click
-      this.paneEl.addEventListener('click', (t) => {
-        if (t.target['className'].includes('close-button')) {
-          this.closePane(this.backdropEl);
-          return;
-        }
-
-        // Click to bottom - open middle
-        if (this.currentBreak === this.breaks['bottom']) {
-          if (this.settings.breaks['middle'].enabled) {
-            this.moveToBreak('middle');
-            return;
-          } 
-          if (this.settings.breaks['top'].enabled) {
-            this.moveToBreak('top');
-            return;
-          }
-        }
-      });
-
       // Touchstart
       this.paneEl.addEventListener('touchstart', (t) => {
         // Event emitter
@@ -336,10 +318,13 @@ export class CupertinoPane {
           closest = this.swipeNextPoint(diff, maxDiff, closest);
         }
 
-        // Bottom closable
-        if (this.settings.bottomClose && closest === this.breaks['bottom']) {
-          this.closePane(this.backdropEl);
-          return;
+        // Click to bottom - open middle
+        if (this.settings.clickBottomOpen) {
+          if (this.currentBreak === this.breaks['bottom'] && isNaN(diff)) {
+            closest = this.settings.breaks['middle'].enabled
+            ? this.breaks['middle'] : this.settings.breaks['top'].enabled
+            ? this.breaks['top'] : this.breaks['bottom'];
+          }
         }
 
         this.steps = [];
@@ -356,6 +341,12 @@ export class CupertinoPane {
           this.contentEl.style.overflowY = 'auto';
         } else {
           this.contentEl.style.overflowY = 'hidden';
+        }
+
+        // Bottom closable
+        if (this.settings.bottomClose && closest === this.breaks['bottom']) {
+          this.closePane(this.backdropEl);
+          return;
         }
 
         if (!this.settings.freeMode) {
@@ -413,6 +404,9 @@ export class CupertinoPane {
       // Return dynamic content
       this.el.appendChild(this.headerEl);
       this.el.appendChild(this.contentEl);
+      
+      // Reset vars
+      this.currentBreak = this.breaks[this.settings.initialBreak];
 
       this.paneEl.addEventListener('transitionend', (t) => {
         this.parentEl.removeChild(this.wrapperEl);
