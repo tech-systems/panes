@@ -1,5 +1,6 @@
 export class CupertinoPane {
 
+  public currentBreak: number;
   private settings: any = {
     initialShow: false,
     initialBreak: 'middle',
@@ -31,7 +32,6 @@ export class CupertinoPane {
   private screen_height: number = window.screen.height;
   private steps: any[] = [];
   private startP: any;
-  private currentBreak: number;
   private topper: number;
   private bottomer: number;
 
