@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 0.1.4
+ * Cupertino Pane 0.1.6
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -415,6 +415,13 @@
                 initTransitionEv = undefined;
             });
         };
+        Object.defineProperty(CupertinoPane.prototype, "isHidden", {
+            get: function () {
+                return this.paneEl.style.transform === "translateY(" + this.screen_height + "px)";
+            },
+            enumerable: true,
+            configurable: true
+        });
         CupertinoPane.prototype.closePane = function (backdropEl) {
             var _this = this;
             // Emit event

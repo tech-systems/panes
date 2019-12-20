@@ -1,6 +1,5 @@
 export class CupertinoPane {
 
-  public currentBreak: number;
   private settings: any = {
     initialShow: false,
     initialBreak: 'middle',
@@ -34,6 +33,7 @@ export class CupertinoPane {
   private startP: any;
   private topper: number;
   private bottomer: number;
+  private currentBreak: number;
 
   private breaks: {} = {
     top: 50,
@@ -389,6 +389,10 @@ export class CupertinoPane {
       this.paneEl.style.transition = `initial`;
       initTransitionEv = undefined;
     });
+  }
+
+  get isHidden() {
+    return this.paneEl.style.transform === `translateY(${this.screen_height}px)`;;
   }
 
   private closePane(backdropEl) {
