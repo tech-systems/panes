@@ -11,9 +11,18 @@
 Multiplatform Cupertino styled slide-over pane 
 
 
-<!-- Titles with icons -->
-<!-- Logo -->
-<!-- Titles -->
-<!-- Description -->
 <!-- Animations -->
+<!-- Description -->
+<!-- Language -->
+<!-- Platforms -->
+<!-- Menu -->
+<!-- Features -->
+<!-- Getting Started -->
 <!-- Install from CDN -->
+<!-- Install from NPM -->
+<!-- Examples Angular, React, Jquery, Ionic -->
+<!-- Settings -->
+<!-- Dist / Build -->
+<!-- Future Goals -->
+<!-- Contributing -->
+<!-- License -->
