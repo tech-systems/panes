@@ -8,21 +8,29 @@
 [![Code Style](https://badgen.net/badge/icon/typescript?icon=typescript&label)](https://www.typescriptlang.org/)
 [![Code Style](https://badgen.net/badge/code%20style/airbnb/ff5a5f?icon=airbnb)](https://github.com/airbnb/javascript)
 
-Multiplatform Cupertino styled slide-over pane 
+Multiplatform Cupertino styled slide-over pane (like google maps, stocks, with JavaScript)
 
+# Menu
 
-<!-- Animations -->
-<!-- Description -->
-<!-- Language -->
-<!-- Platforms -->
-<!-- Menu -->
-<!-- Features -->
-<!-- Getting Started -->
-<!-- Install from CDN -->
-<!-- Install from NPM -->
-<!-- Examples Angular, React, Jquery, Ionic -->
-<!-- Settings -->
-<!-- Dist / Build -->
-<!-- Future Goals -->
-<!-- Contributing -->
-<!-- License -->
+<img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/1.gif?raw=true" width="250">
+<img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/3.gif?raw=true" width="250">
+<!-- <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/2.gif?raw=true" width="250"> -->
+
+# Supporting platforms
+
+# Features
+
+# Getting Started
+## Install using CDN
+## Install using npm
+
+# Examples
+## Angular
+## React
+## jQuery
+
+# Settings
+# Dist / Build
+# Future Goals
+# Contributing
+# License
