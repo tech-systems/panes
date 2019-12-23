@@ -15,8 +15,10 @@ Multiplatform Cupertino styled slide-over pane (like google maps, stocks, with J
 ![Video 1](https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/1.gif?raw=true)
 ![Video 2](https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/2.gif?raw=true)
 
+<div style="display:flex;">
 <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/1.gif?raw=true" style="display:inline-block;" width="250">
 <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/3.gif?raw=true" style="display:inline-block;" width="250">
+</div>
 <!-- <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/2.gif?raw=true" width="250"> -->
 
 # Supporting platforms
