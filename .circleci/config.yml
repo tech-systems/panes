@@ -1,7 +1,7 @@
 version: 2
 
 defaults: &defaults
-  working_directory: ~/
+  working_directory: ~/cupertino-pane
   docker:
     - image: circleci/node:10.16.3
 
@@ -32,17 +32,17 @@ jobs:
           command: npm build
 
       - persist_to_workspace:
-          root: ~/
+          root: ~/cupertino-pane
           paths: .
 
   deploy:
     <<: *defaults
     steps:
       - attach_workspace:
-          at: ~/
+          at: ~/cupertino-pane
       - run:
           name: Authenticate with registry
-          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/repo/.npmrc
+          command: echo "//registry.npmjs.org/:_authToken=$npm_TOKEN" > ~/cupertino-pane/.npmrc
       - run:
           name: Publish package
           command: npm publish
