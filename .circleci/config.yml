@@ -1,4 +1,4 @@
-version: 2.1 # use CircleCI 2.1
+version: 2
 
 defaults: &defaults
   working_directory: ~/
@@ -27,8 +27,8 @@ jobs:
             - node_modules
           key: v1-dependencies-{{ checksum "package.json" }}
 
-      - run: # run tests
-          name: build
+      - run: # run build
+          name: Make build
           command: npm build
 
       - persist_to_workspace:
@@ -48,7 +48,7 @@ jobs:
           command: npm publish
             
 workflows:
-  version: 2.1
+  version: 2
   test-deploy:
     jobs:
       - build:
@@ -57,7 +57,7 @@ workflows:
               only: /^v.*/
       - deploy:
           requires:
-            - build
+            - Make build
           filters:
             tags:
               only: /^v.*/
