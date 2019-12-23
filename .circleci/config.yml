@@ -13,7 +13,7 @@ jobs:
 
       - run:
           name: update-npm
-          command: 'sudo npm install -g npm@latest'
+          command: 'sudo npm install -g npm@latest && sudo npm install -g gulp'
 
       - restore_cache:
           keys:
