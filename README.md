@@ -8,11 +8,12 @@
 [![Code Style](https://badgen.net/badge/icon/typescript?icon=typescript&label)](https://www.typescriptlang.org/)
 [![Code Style](https://badgen.net/badge/code%20style/airbnb/ff5a5f?icon=airbnb)](https://github.com/airbnb/javascript)
 
-Multiplatform Cupertino styled slide-over pane (like google maps, stocks, with JavaScript)
+### Cupertino Pane is ... lightweight, multiplatform slide-over pane (like google maps, stocks, with JavaScript)
 
 # Menu
 
-<div style="display:flex;">
+# How its looks like ?
+<div style="display:flex;flex-wrap:wrap;">
     <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/2.gif?raw=true" width="250">
     <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/1.gif?raw=true" width="250">
     <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/3.gif?raw=true" width="250">
