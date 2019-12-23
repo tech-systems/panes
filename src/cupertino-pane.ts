@@ -40,6 +40,7 @@ export class CupertinoPane {
     middle: Math.round(this.screen_height - (this.screen_height * 0.35)),
     bottom: this.screen_height - 80
   };
+  private brs: number[] = [];
 
   private parentEl: HTMLElement;
   private wrapperEl: HTMLDivElement;
@@ -236,18 +237,18 @@ export class CupertinoPane {
         this.settings.breaks.bottom.enabled = true;
       }
 
-      const brs = [];
       ['top', 'middle', 'bottom'].forEach((val) => {
         if (this.settings.breaks[val].enabled) {
-          brs.push(this.breaks[val]);
+          this.brs.push(this.breaks[val]);
         }
       });
+      
       // Determinate topper point
-      this.topper = brs.reduce((prev, curr) => {
+      this.topper = this.brs.reduce((prev, curr) => {
         return (Math.abs(curr) < Math.abs(prev) ? curr : prev);
       });
       // Determinate bottomer point
-      this.bottomer = brs.reduce((prev, curr) => {
+      this.bottomer = this.brs.reduce((prev, curr) => {
         return (Math.abs(curr) > Math.abs(prev) ? curr : prev);
       });
 
@@ -258,106 +259,112 @@ export class CupertinoPane {
       }
 
       /****** Events *******/
+      this.paneEl.addEventListener('touchstart', (t) => this.touchStart(t));
+      this.paneEl.addEventListener('touchmove', (t) => this.touchMove(t));
+      this.paneEl.addEventListener('touchend', (t) => this.touchEnd(t));
+  }
 
-      // Touchstart
-      this.paneEl.addEventListener('touchstart', (t) => {
-        // Event emitter
-        this.settings.onDragStart();
-        this.startP = (<any>t).touches[0].screenY;
-        this.steps.push(this.startP);
-      });
+  touchStart(t) {
+    // Event emitter
+    this.settings.onDragStart();
+    this.startP = (<any>t).touches[0].screenY;
+    this.steps.push(this.startP);
+  }
 
-      // Touchmove
-      this.paneEl.addEventListener('touchmove', (t) => {
-        this.settings.onDrag();
+  touchMove(t) {
+    this.settings.onDrag();
 
-        const translateYRegex = /\.*translateY\((.*)px\)/i;
-        const p = parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
-        // Delta
-        const n = (<any>t).touches[0].screenY;
-        const diff = n - this.steps[this.steps.length - 1];
-        const newVal = p + diff;
+    const translateYRegex = /\.*translateY\((.*)px\)/i;
+    const p = parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
+    // Delta
+    const n = (<any>t).touches[0].screenY;
+    const diff = n - this.steps[this.steps.length - 1];
+    const newVal = p + diff;
 
-        // Not allow move panel with overflow scroll
-        let noScroll = false;
-        if (this.contentEl.style.overflowY === 'auto') {
-          t.composedPath().forEach((item) => {
-            if (item['className'] && item['className'].includes('cupertino-content')) {
-              noScroll = true;
-            }
-          });
-          if (noScroll && this.contentEl.scrollTop > 20) { return; }
-          if ((p + diff) <= this.topper && noScroll) { return; }
-        }
-
-        // Not allow drag upper than topper point
-        // Not allow drag lower than bottom if free mode
-        if (((p + diff) <= this.topper - 20)
-            || (this.settings.freeMode && !this.settings.bottomClose && ((p + diff) >= this.bottomer + 20))) {
-          return;
-        }
-
-        this.paneEl.style.transform = `translateY(${newVal}px)`;
-        this.steps.push(n);
-      });
-
-      // Touchend
-      this.paneEl.addEventListener('touchend', (t) => {
-        const translateYRegex = /\.*translateY\((.*)px\)/i;
-        const p = parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
-
-        // Determinate nearest point
-        let closest = brs.reduce((prev, curr) => {
-          return (Math.abs(curr - p) < Math.abs(prev - p) ? curr : prev);
-        });
-
-        // Swipe - next (if differ > 10)
-        const diff =  this.steps[this.steps.length - 1] - this.steps[this.steps.length - 2];
-        const maxDiff = 4;
-        if (Math.abs(diff) >= maxDiff) {
-          closest = this.swipeNextPoint(diff, maxDiff, closest);
-        }
-
-        // Click to bottom - open middle
-        if (this.settings.clickBottomOpen) {
-          if (this.currentBreak === this.breaks['bottom'] && isNaN(diff)) {
-            closest = this.settings.breaks['middle'].enabled
-            ? this.breaks['middle'] : this.settings.breaks['top'].enabled
-            ? this.breaks['top'] : this.breaks['bottom'];
-          }
-        }
-
-        this.steps = [];
-        this.currentBreak = closest;
-
-        if (this.currentBreak === this.breaks['bottom']) {
-          this.contentEl.style.opacity = '0';
-        } else {
-          this.contentEl.style.opacity = '1';
-        }
-
-        if (this.currentBreak === this.topper
-            && this.settings.topperOverflow) {
-          this.contentEl.style.overflowY = 'auto';
-        } else {
-          this.contentEl.style.overflowY = 'hidden';
-        }
-
-        // Bottom closable
-        if (this.settings.bottomClose && closest === this.breaks['bottom']) {
-          this.closePane(this.backdropEl);
-          return;
-        }
-
-        if (!this.settings.freeMode) {
-          this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-          this.paneEl.style.transform = `translateY(${closest}px)`;
-          let initTransitionEv = this.paneEl.addEventListener('transitionend', () => {
-            this.paneEl.style.transition = `initial`;
-            initTransitionEv = undefined;
-          });
+    // Not allow move panel with overflow scroll
+    let noScroll = false;
+    if (this.contentEl.style.overflowY === 'auto') {
+      t.composedPath().forEach((item) => {
+        if (item['className'] && item['className'].includes('cupertino-content')) {
+          noScroll = true;
         }
       });
+      if (noScroll && this.contentEl.scrollTop > 20) { return; }
+      if ((p + diff) <= this.topper && noScroll) { return; }
+    }
+
+    // Not allow drag upper than topper point
+    // Not allow drag lower than bottom if free mode
+    if (((p + diff) <= this.topper - 20)
+        || (this.settings.freeMode && !this.settings.bottomClose && ((p + diff) >= this.bottomer + 20))) {
+      return;
+    }
+
+    this.paneEl.style.transform = `translateY(${newVal}px)`;
+    this.steps.push(n);    
+
+    if (newVal > this.breaks['bottom']) {
+      this.contentEl.style.opacity = '0';
+    } else {
+      this.contentEl.style.opacity = '1';
+    }
+  }
+
+  touchEnd(t) {
+    const translateYRegex = /\.*translateY\((.*)px\)/i;
+    const p = parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
+
+    // Determinate nearest point
+    let closest = this.brs.reduce((prev, curr) => {
+      return (Math.abs(curr - p) < Math.abs(prev - p) ? curr : prev);
+    });
+
+    // Swipe - next (if differ > 10)
+    const diff =  this.steps[this.steps.length - 1] - this.steps[this.steps.length - 2];
+    const maxDiff = 4;
+    if (Math.abs(diff) >= maxDiff) {
+      closest = this.swipeNextPoint(diff, maxDiff, closest);
+    }
+
+    // Click to bottom - open middle
+    if (this.settings.clickBottomOpen) {
+      if (this.currentBreak === this.breaks['bottom'] && isNaN(diff)) {
+        closest = this.settings.breaks['middle'].enabled
+        ? this.breaks['middle'] : this.settings.breaks['top'].enabled
+        ? this.breaks['top'] : this.breaks['bottom'];
+      }
+    }
+
+    this.steps = [];
+    this.currentBreak = closest;
+
+    if (this.currentBreak === this.breaks['bottom']) {
+      this.contentEl.style.opacity = '0';
+    } else {
+      this.contentEl.style.opacity = '1';
+    }
+
+    if (this.currentBreak === this.topper
+        && this.settings.topperOverflow) {
+      this.contentEl.style.overflowY = 'auto';
+    } else {
+      this.contentEl.style.overflowY = 'hidden';
+    }
+
+    // Bottom closable
+    if (this.settings.bottomClose && closest === this.breaks['bottom']) {
+      this.closePane(this.backdropEl);
+      return;
+    }
+
+    if (!this.settings.freeMode) {
+      this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+      this.paneEl.style.transform = `translateY(${closest}px)`;
+      let initTransitionEv = this.paneEl.addEventListener('transitionend', () => {
+        this.paneEl.style.transition = `initial`;
+        initTransitionEv = undefined;
+      });
+    }
   }
 
   moveToBreak(val) {
