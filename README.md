@@ -36,9 +36,9 @@ Cupertino Pane is ... lightweight, multiplatform slide-over pane (like google ma
 
 # Demonstration
 <div style="display:flex;flex-wrap:wrap;">
-    <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/2.gif?raw=true" width="250">
     <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/1.gif?raw=true" width="250">
     <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/3.gif?raw=true" width="250">
+    <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/2.gif?raw=true" width="250">
 </div>
 
 
@@ -56,7 +56,37 @@ Cupertino Pane is ... lightweight, multiplatform slide-over pane (like google ma
 ## jQuery
 
 # Settings
-# Dist / Build
+
 # Future Goals
+
+
+
+
 # Contributing
+We welcome contributions of all kinds from anyone.
+### 1. Where do I go from here?
+If you've noticed a bug or have a question, [make an issue](https://github.com/roman-rr/cupertino-pane/issues/new),
+we'll try to answer it as fast as possible.
+### 2. Fork & Create a branch
+If this is something you think you can fix, then
+[fork Cupertino Pane](https://help.github.com/articles/fork-a-repo)
+and create a branch.
+```sh
+# Create new branch
+git checkout -b my_issue
+
+# Then we install the dependencies
+npm install
+```
+### 3. Changes & Build
+```sh
+# Make bundles 
+gulp build
+```
+This will output the files into the dist directory.
+### 4. Push changes
+Push your changes to a topic branch in your fork of the repository.
+Submit a pull request to the repository.
+It can take several days before we can review the code you've submitted. 
 # License
+Licensed under the MIT License. [View license](/LICENSE).
