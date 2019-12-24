@@ -56,10 +56,39 @@ Cupertino Pane is ... lightweight, multiplatform slide-over pane (like google ma
 ## jQuery
 
 # Settings
-
-
-
-
+### Common configuration
+- `initialShow` | boolean: false |
+- `initialBreak` | string: 'middle' |
+- `darkMode` | boolean: false |
+- `backdrop` | boolean: false |
+- `backdropClose` | boolean: false |
+- `animationType` | string: 'ease' |
+- `animationDuration` | number: 300 |
+- `bottomClose` | boolean: false |
+- `freeMode` | boolean: false |
+- `buttonClose` | boolean: true |
+- `topperOverflow` | boolean: true |
+- `topperOverflowOffset` | number: 0 |
+- `showDraggable` | boolean: true |
+- `clickBottomOpen` | boolean: true |
+### Break points
+- `breaks` | {} |
+    - `top` | {} |
+        - `enabled` | boolean: true |
+        -  `offset` | number: 0 |
+    - `middle` | {} |
+        - `enabled` | boolean: true |
+        -  `offset` | number: 0 |
+    - `bottom` | {} |
+        - `enabled` | boolean: true |
+        -  `offset` | number: 0 |
+### Callbacks
+- `onDidDismiss` | void: () => {} | 
+- `onWillDismiss` | void: () => {} | 
+- `onDidPresent` | void: () => {} | 
+- `onWillPresent` | void: () => {} | 
+- `onDragStart` | void: () => {} | 
+- `onDrag` | void: () => {} | 
 
 
 
