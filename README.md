@@ -10,11 +10,11 @@
 
 Cupertino Pane is ... lightweight, multiplatform slide-over pane (like google maps, stocks, with JavaScript)
 
+* [Demonstration](#demonstration)
+* [Features](#features)
 * [Supporting platforms](#supporting-platforms)
+* [Getting Started](#getting-started)
 * [Settings](#settings)
-    * [Common configuration](#common-configuration)
-    * [Breakpoints](#breakpoints)
-    * [Callbacks](#callbacks)
 * [Future Goals](#future-goals)
 * [Contributing](#contributing)
 * [License](#license)
@@ -26,6 +26,7 @@ Cupertino Pane is ... lightweight, multiplatform slide-over pane (like google ma
     <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/2.gif?raw=true" width="250">
 </div>
 
+## Features
 
 ## Supporting platforms
 We officially support the last two versions of every major browser. Specifically, we test on the following browsers:
@@ -34,17 +35,23 @@ We officially support the last two versions of every major browser. Specifically
 - **Safari** on iOS
 - **iOS WkWebView** on iOS
 - **Android WebView** on Android
-
-## Features
-
 ## Getting Started
-### Install using CDN
-### Install using npm
+### Install via NPM
+```sh
+npm install cupertino-pane
+```
 
-## Examples
-### Angular
-### React
-### jQuery
+### Use from CDN
+If you don't want to include Cupertino Pane files in your project, you may use it from CDN. The following files are available:
+```html
+<html lang="en">
+    <body>
+        ...
+        <script src="https://unpkg.com/cupertino-pane/dist/cupertino-pane.min.js"></script>
+    </body>
+</html>
+```
+
 
 
 
@@ -98,11 +105,13 @@ The function that executes when the event fires.
 - `onWillPresent` | **void: () => {}** | Call before panel will present
 - `onDragStart` | **void: () => {}** | Call when detect user drag event on pane
 - `onDrag` | **void: () => {}** | Call executes on each new pane position
+
 ## Future Goals
 - Hardware accelerated drag&drop actions
 - Realistic easy-in-out transitions
 - Work out the state with overflow-x
 - Using in all popular mobile frameworks
+
 ## Contributing
 We welcome contributions of all kinds from anyone.
 ### 1. Where do I go from here?
@@ -129,5 +138,6 @@ This will output the files into the dist directory.
 Push your changes to a topic branch in your fork of the repository.
 Submit a pull request to the repository.
 It can take several days before we can review the code you've submitted. 
+
 ## License
 Licensed under the MIT License. [View license](/LICENSE).

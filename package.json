@@ -6,7 +6,7 @@
   "homepage": "https://github.com/roman-rr/cupertino-pane/",
   "repository": "roman-rr/cupertino-pane",
   "license": "MIT",
-  "main": "dist/cupertino-pane.js",
+  "main": "dist/cupertino-pane.min.js",
   "module": "dist/cupertino-pane.esm.bundle.js",
   "scripts": {
     "build": "gulp build",
