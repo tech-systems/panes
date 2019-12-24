@@ -112,7 +112,7 @@ Cupertino Pane package comes with ES module version which can be used where supp
 ```javascript
 import { CupertinoPane } from 'cupertino-pane';
 
-var myPane = new Swiper('.cupertino-pane', { /* ... */ });
+var myPane = new CupertinoPane('.cupertino-pane', { /* ... */ });
 ```
 
 ## Settings
