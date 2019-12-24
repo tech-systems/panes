@@ -8,10 +8,11 @@
 [![Code Style](https://badgen.net/badge/icon/typescript?icon=typescript&label)](https://www.typescriptlang.org/)
 [![Code Style](https://badgen.net/badge/code%20style/airbnb/ff5a5f?icon=airbnb)](https://github.com/airbnb/javascript)
 
-Cupertino Pane is ... lightweight, multiplatform slide-over pane (like google maps, stocks, with JavaScript)
+Cupertino Pane is great modern slide-over pane with touch technologies. Right like in Apple Maps, Apple Stocks, Apple Music and other modern applications.
+
+Lightweight, Multiplatform, Open Source. For progressive applications. 
 
 * [Demonstration](#demonstration)
-* [Features](#features)
 * [Supporting platforms](#supporting-platforms)
 * [Getting Started](#getting-started)
 * [Settings](#settings)
@@ -25,8 +26,6 @@ Cupertino Pane is ... lightweight, multiplatform slide-over pane (like google ma
     <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/3.gif?raw=true" width="250">
     <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/2.gif?raw=true" width="250">
 </div>
-
-## Features
 
 ## Supporting platforms
 We officially support the last two versions of every major browser. Specifically, we test on the following browsers:
