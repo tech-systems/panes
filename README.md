@@ -35,40 +35,87 @@ We officially support the last two versions of every major browser. Specifically
 - **Safari** on iOS
 - **iOS WkWebView** on iOS
 - **Android WebView** on Android
+
 ## Getting Started
 ### Install via NPM
 ```sh
 npm install cupertino-pane
 ```
-
 ### Use from CDN
 If you don't want to include Cupertino Pane files in your project, you may use it from CDN. The following files are available:
 ```html
+<script src="https://unpkg.com/cupertino-pane/dist/cupertino-pane.js"></script>
+<script src="https://unpkg.com/cupertino-pane/dist/cupertino-pane.min.js"></script>
+```
+### Include Files To App/Website
+```html
+<!DOCTYPE html>
 <html lang="en">
-    <body>
-        ...
-        <script src="https://unpkg.com/cupertino-pane/dist/cupertino-pane.min.js"></script>
-    </body>
+<body>
+    ...
+    <script src="path/to/cupertino-pane.min.js"></script>
+</body>
 </html>
 ```
+### Add HTML Layout
+```html
+<div class="cupertino-pane">
+    <div class="cupertino-header">
+        Header
+    </div>
+    <div class="cupertino-content">
+        Content
+    </div>    
+</div>
+```
+### Additional CSS Styles
+```css
+.cupertino-pane-wrapper .pane {
+    background: #ffffff;
+}
 
+.cupertino-header,
+.cupertino-content {
+    margin: 20px;
+}
+```
+### Initialize Cupertino Pane
+```html
+<body>
+  ...
+  <script>
+  window.onload = function () {
+    var myPane = new CupertinoPane(
+      '.cupertino-pane', // Pane container selector
+      { 
+        initialShow: false,
+        buttonClose: false,
+        breaks: {
+            top: { enabled: false, offset: -70 },
+            middle: { enabled: true, offset: 0 },
+            bottom: { enabled: true, offset: 0 },
+        },
+        onDrag: () => console.log('Drag event')
+      }
+    );
+  };
+  </script>
+</body>
+```
+### jQuery example
+```javascript
+$(document).ready(function () {
+  //initialize pane when document ready
+  var myPane = new CupertinoPane('.cupertino-pane', { /* ... */ });
+});
+```
+### As an ES module
+Cupertino Pane package comes with ES module version which can be used where supported or with bundlers like Webpack or Rollup:
+```javascript
+import { CupertinoPane } from 'cupertino-pane';
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+var myPane = new Swiper('.cupertino-pane', { /* ... */ });
+```
 
 ## Settings
 ### Common configuration
