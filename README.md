@@ -18,7 +18,7 @@ Cupertino Pane is ... lightweight, multiplatform slide-over pane (like google ma
 * [Contributing](#contributing)
 * [License](#license)
 
-# Demonstration
+## Demonstration
 <div style="display:flex;flex-wrap:wrap;">
     <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/1.gif?raw=true" width="250">
     <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/3.gif?raw=true" width="250">
@@ -26,18 +26,18 @@ Cupertino Pane is ... lightweight, multiplatform slide-over pane (like google ma
 </div>
 
 
-# Supporting platforms
+## Supporting platforms
 
-# Features
+## Features
 
-# Getting Started
-## Install using CDN
-## Install using npm
+## Getting Started
+### Install using CDN
+### Install using npm
 
-# Examples
-## Angular
-## React
-## jQuery
+## Examples
+### Angular
+### React
+### jQuery
 
 
 
@@ -84,7 +84,7 @@ Cupertino Pane is ... lightweight, multiplatform slide-over pane (like google ma
         - `enabled` | **boolean: true** | Enable or disable breakpoint
         -  `offset` | **number: 0** | Additional bottom margin if needs
 ### Callbacks
-### The function that executes when the event fires.
+The function that executes when the event fires.
 - `onDidDismiss` | **void: () => {}** | Call after pane will dissapeared
 - `onWillDismiss` | **void: () => {}** | Call before pane will dissapeared
 - `onDidPresent` | **void: () => {}** | Call after pane will present
