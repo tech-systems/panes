@@ -1,6 +1,5 @@
 # Cupertino Pane
 
-
 [![CircleCI](https://circleci.com/gh/roman-rr/cupertino-pane.svg?style=svg)](https://circleci.com/gh/roman-rr/cupertino-pane)
 ![npm](https://img.shields.io/npm/v/cupertino-pane)
 ![npm](https://img.shields.io/npm/dm/cupertino-pane?color=%23007DC5)
