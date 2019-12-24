@@ -57,11 +57,26 @@ Cupertino Pane is ... lightweight, multiplatform slide-over pane (like google ma
 
 # Settings
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Future Goals
-
-
-
-
+- Hardware accelerated drag&drop actions
+- Realistic easy-in-out transitions
+- Work out the state with overflow-x
+- Using in all popular mobile frameworks
 # Contributing
 We welcome contributions of all kinds from anyone.
 ### 1. Where do I go from here?
