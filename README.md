@@ -10,7 +10,7 @@
 
 Cupertino Pane is ... lightweight, multiplatform slide-over pane (like google maps, stocks, with JavaScript)
 
-* [Supporting browsers & platforms](#supporting-browsers-&-platforms)
+* [Supporting platforms](#supporting-platforms)
 * [Settings](#settings)
     * [Common configuration](#common-configuration)
     * [Breakpoints](#breakpoints)
@@ -27,13 +27,13 @@ Cupertino Pane is ... lightweight, multiplatform slide-over pane (like google ma
 </div>
 
 
-## Supporting browsers & platforms
+## Supporting platforms
 We officially support the last two versions of every major browser. Specifically, we test on the following browsers:
 - **Chrome** on Android, Windows, macOS, and Linux
 - **Firefox** on Windows, macOS, and Linux
-- **Safari** on iOS and macOS
-- **Edge** on Windows
-- **IE 11** on Windows
+- **Safari** on iOS
+- **iOS WkWebView** on iOS
+- **Android WebView** on Android
 
 ## Features
 
