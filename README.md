@@ -10,28 +10,12 @@
 
 Cupertino Pane is ... lightweight, multiplatform slide-over pane (like google maps, stocks, with JavaScript)
 
-* [Introduction](#introduction)
-  * [Purpose](#purpose)
-  * [Features](#features)
-  * [Who is it for?](#who-is-it-for)
-  * [What Monica isn't](#what-monica-isnt)
-  * [Where does this tool come from?](#where-does-this-tool-come-from)
-* [Get started](#get-started)
-  * [Requirements](#requirements)
-  * [Update your instance](#update-your-instance)
-* [Contribute](#contribute)
-  * [As a community](#as-a-community)
-* [Contribute as a developer](#contribute-as-a-developer)
-* [Principles, vision, goals and strategy](#principles-vision-goals-and-strategy)
-  * [Principles](#principles)
-  * [Vision](#vision)
-  * [Goals](#goals)
-  * [Strategy](#strategy)
-  * [Monetization](#monetization)
-  * [Why Open Source?](#why-open-source)
-  * [Patreon](#patreon)
-* [Contact](#contact)
-* [Thank you, open source](#thank-you-open-source)
+* [Settings](#settings)
+    * [Common configuration](#common-configuration)
+    * [Breakpoints](#breakpoints)
+    * [Callbacks](#callbacks)
+* [Future Goals](#future-goals)
+* [Contributing](#contributing)
 * [License](#license)
 
 # Demonstration
@@ -72,7 +56,7 @@ Cupertino Pane is ... lightweight, multiplatform slide-over pane (like google ma
 
 
 
-# Settings
+## Settings
 ### Common configuration
 - `initialShow` | **boolean: false** | Determinate if pane will rendered with animation or immediately
 - `initialBreak` | **(top|middle|bottom): 'middle'** | Initial pane position
@@ -107,12 +91,12 @@ Cupertino Pane is ... lightweight, multiplatform slide-over pane (like google ma
 - `onWillPresent` | **void: () => {}** | Call before panel will present
 - `onDragStart` | **void: () => {}** | Call when detect user drag event on pane
 - `onDrag` | **void: () => {}** | Call executes on each new pane position
-# Future Goals
+## Future Goals
 - Hardware accelerated drag&drop actions
 - Realistic easy-in-out transitions
 - Work out the state with overflow-x
 - Using in all popular mobile frameworks
-# Contributing
+## Contributing
 We welcome contributions of all kinds from anyone.
 ### 1. Where do I go from here?
 If you've noticed a bug or have a question, [make an issue](https://github.com/roman-rr/cupertino-pane/issues/new),
@@ -138,5 +122,5 @@ This will output the files into the dist directory.
 Push your changes to a topic branch in your fork of the repository.
 Submit a pull request to the repository.
 It can take several days before we can review the code you've submitted. 
-# License
+## License
 Licensed under the MIT License. [View license](/LICENSE).
