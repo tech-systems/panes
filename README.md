@@ -55,52 +55,58 @@ Cupertino Pane is ... lightweight, multiplatform slide-over pane (like google ma
 ## React
 ## jQuery
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 # Settings
 ### Common configuration
-- `initialShow` | boolean: false |
-- `initialBreak` | string: 'middle' |
-- `darkMode` | boolean: false |
-- `backdrop` | boolean: false |
-- `backdropClose` | boolean: false |
-- `animationType` | string: 'ease' |
-- `animationDuration` | number: 300 |
-- `bottomClose` | boolean: false |
-- `freeMode` | boolean: false |
-- `buttonClose` | boolean: true |
-- `topperOverflow` | boolean: true |
-- `topperOverflowOffset` | number: 0 |
-- `showDraggable` | boolean: true |
-- `clickBottomOpen` | boolean: true |
-### Break points
-- `breaks` | {} |
-    - `top` | {} |
-        - `enabled` | boolean: true |
-        -  `offset` | number: 0 |
-    - `middle` | {} |
-        - `enabled` | boolean: true |
-        -  `offset` | number: 0 |
-    - `bottom` | {} |
-        - `enabled` | boolean: true |
-        -  `offset` | number: 0 |
+- `initialShow` | boolean: false | Determinate if pane will rendered with animation or immediately
+- `initialBreak` |  (top|middle|bottom): 'middle'  | Initial pane position
+- `darkMode` | boolean: false | Initial pane styles
+- `backdrop` | boolean: false | Dimmed overlay will rendered with pane if `true`
+- `backdropClose` | boolean: false | Close pane with click to backdrop element
+- `animationType` | (ease | ease-in | ease-out | ease-in-out | cubic-bezier): 'ease' | Transition property animation type
+- `animationDuration` | number: 300 | Transition property duration
+- `bottomClose` | boolean: false | Close pane with drag to bottom breakpoint
+- `freeMode` | boolean: false | On `true` will remove automatical magnetic effects to near breakpoint.
+- `buttonClose` | boolean: true | Determinate whetever close button will render or not
+- `topperOverflow` | boolean: true | Ability to scroll content inside pane if topper point reached
+- `topperOverflowOffset` | number: 0 | Offset from screen bottom to the end of overflow content
+- `showDraggable` | boolean: true | Render rectangular shape on the top of pane
+- `clickBottomOpen` | boolean: true | Determinate if simple click to pane with reached bottom position will open pane to the next upper point
+### Breakpoints
+- `breaks` | {} | Using to override default pane breakpoints. Note that **necessary** to define all three breakpoints when override, with new `enabled` and `offset` if needs.
+    - `top` | {} | Topper point that pane can reach
+        - `enabled` | boolean: true | Enable or disable breakpoint
+        -  `offset` | number: 0 | Additional bottom margin if needs
+    - `middle` | {} | Middle point that pane can reach
+        - `enabled` | boolean: true | Enable or disable breakpoint
+        -  `offset` | number: 0 | Additional bottom margin if needs
+    - `bottom` | {} | Bottom point that pane can reach
+        - `enabled` | boolean: true | Enable or disable breakpoint
+        -  `offset` | number: 0 | Additional bottom margin if needs
 ### Callbacks
-- `onDidDismiss` | void: () => {} | 
-- `onWillDismiss` | void: () => {} | 
-- `onDidPresent` | void: () => {} | 
-- `onWillPresent` | void: () => {} | 
-- `onDragStart` | void: () => {} | 
-- `onDrag` | void: () => {} | 
-
-
-
-
-
-
-
-
-
-
-
-
+### The function that executes when the event fires.
+- `onDidDismiss` | void: () => {} | Call after pane will dissapeared
+- `onWillDismiss` | void: () => {} | Call before pane will dissapeared
+- `onDidPresent` | void: () => {} | Call after pane will present
+- `onWillPresent` | void: () => {} | Call before panel will present
+- `onDragStart` | void: () => {} | Call when detect user drag event on pane
+- `onDrag` | void: () => {} | Call executes on each new pane position
 # Future Goals
 - Hardware accelerated drag&drop actions
 - Realistic easy-in-out transitions
