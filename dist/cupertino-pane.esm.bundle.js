@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.0.42
+ * Cupertino Pane 1.0.44
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -117,6 +117,7 @@ var CupertinoPane = /** @class */ (function () {
         };
         this.settings = __assign(__assign({}, this.settings), conf);
         this.el = document.querySelector(this.el);
+        this.el.style.display = 'none';
         if (this.settings.parentElement) {
             this.settings.parentElement = document.querySelector(this.settings.parentElement);
         }
@@ -143,7 +144,6 @@ var CupertinoPane = /** @class */ (function () {
         }
     }
     CupertinoPane.prototype.drawElements = function () {
-        this.el.style.display = 'none';
         this.parentEl = this.settings.parentElement;
         // Wrapper
         this.wrapperEl = document.createElement('div');
