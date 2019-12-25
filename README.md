@@ -15,6 +15,7 @@ Lightweight, Multiplatform, Open Source. For progressive applications.
 * [Supporting platforms](#supporting-platforms)
 * [Getting Started](#getting-started)
 * [Settings](#settings)
+* [Public Methods](#public-methods)
 * [Future Goals](#future-goals)
 * [Contributing](#contributing)
 * [License](#license)
