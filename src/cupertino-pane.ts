@@ -264,14 +264,49 @@ export class CupertinoPane {
       this.paneEl.addEventListener('touchend', (t) => this.touchEnd(t));
   }
 
-  touchStart(t) {
+  moveToBreak(val) {
+    if (this.breaks[val] === this.breaks['bottom']) {
+      this.contentEl.style.opacity = '0';
+    } else {
+      this.contentEl.style.opacity = '1';
+    }
+
+    if (this.breaks[val] === this.topper
+        && this.settings.topperOverflow) {
+      this.contentEl.style.overflowY = 'auto';
+    } else {
+      this.contentEl.style.overflowY = 'hidden';
+    }
+
+    this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+    this.paneEl.style.transform = `translateY(${this.breaks[val]}px)`;
+    let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
+      this.paneEl.style.transition = `initial`;
+      initTransitionEv = undefined;
+    });
+  }
+
+  hide() {
+    this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+    this.paneEl.style.transform = `translateY(${this.screen_height}px)`;
+    let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
+      this.paneEl.style.transition = `initial`;
+      initTransitionEv = undefined;
+    });
+  }
+
+  get isHidden() {
+    return this.paneEl.style.transform === `translateY(${this.screen_height}px)`;;
+  }
+
+  private touchStart(t) {
     // Event emitter
     this.settings.onDragStart();
     this.startP = (<any>t).touches[0].screenY;
     this.steps.push(this.startP);
   }
 
-  touchMove(t) {
+  private touchMove(t) {
     this.settings.onDrag();
 
     const translateYRegex = /\.*translateY\((.*)px\)/i;
@@ -310,7 +345,7 @@ export class CupertinoPane {
     }
   }
 
-  touchEnd(t) {
+  private touchEnd(t) {
     const translateYRegex = /\.*translateY\((.*)px\)/i;
     const p = parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
 
@@ -365,41 +400,6 @@ export class CupertinoPane {
         initTransitionEv = undefined;
       });
     }
-  }
-
-  moveToBreak(val) {
-    if (this.breaks[val] === this.breaks['bottom']) {
-      this.contentEl.style.opacity = '0';
-    } else {
-      this.contentEl.style.opacity = '1';
-    }
-
-    if (this.breaks[val] === this.topper
-        && this.settings.topperOverflow) {
-      this.contentEl.style.overflowY = 'auto';
-    } else {
-      this.contentEl.style.overflowY = 'hidden';
-    }
-
-    this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-    this.paneEl.style.transform = `translateY(${this.breaks[val]}px)`;
-    let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
-      this.paneEl.style.transition = `initial`;
-      initTransitionEv = undefined;
-    });
-  }
-
-  hide() {
-    this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-    this.paneEl.style.transform = `translateY(${this.screen_height}px)`;
-    let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
-      this.paneEl.style.transition = `initial`;
-      initTransitionEv = undefined;
-    });
-  }
-
-  get isHidden() {
-    return this.paneEl.style.transform === `translateY(${this.screen_height}px)`;;
   }
 
   private closePane(backdropEl) {

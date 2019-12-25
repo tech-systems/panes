@@ -154,6 +154,30 @@ The function that executes when the event fires.
 - `onDragStart` | **void: () => {}** | Call when detect user drag event on pane
 - `onDrag` | **void: () => {}** | Call executes on each new pane position
 
+## Public Methods
+### present()
+Will render pane DOM and show pane with setted params.
+```javascript
+myPane.present();
+```
+### moveToBreak('top' | 'middle' | 'bottom')
+Will change pane position with animation to selected breakpoint.
+```javascript
+myPane.moveToBreak('top');
+```
+### hide()
+Dissappear pane from screen, still keep pane in DOM.
+```javascript
+myPane.hide();
+```
+### isHidden
+Determinate if pane position was moved out of screen, but pane still exist in DOM.
+```javascript
+if (myPane.isHidden) {
+    myPane.moveToBreak('top');
+}
+```
+
 ## Future Goals
 - Hardware accelerated drag&drop actions
 - Realistic easy-in-out transitions
