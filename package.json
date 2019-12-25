@@ -1,25 +1,27 @@
 {
-  "name": "cupertino-pane", 
+  "name": "cupertino-pane",
   "description": "Multiplatform slide-over pane",
-  "version": "1.0.4",
+  "version": "1.0.41",
   "author": "Roman Antonov (roman-rr)",
   "homepage": "https://github.com/roman-rr/cupertino-pane/",
   "repository": "roman-rr/cupertino-pane",
   "license": "MIT",
   "main": "dist/cupertino-pane.min.js",
   "module": "dist/cupertino-pane.esm.bundle.js",
+  "types": "dist/cupertino-pane.d.ts",
   "scripts": {
     "build": "gulp build",
     "tslint": "tslint src/**/*.ts"
   },
   "devDependencies": {
+    "del": "^5.1.0",
     "glob": "^7.1.6",
     "gulp": "^4.0.2",
     "rollup": "^1.27.5",
     "rollup-plugin-buble": "^0.19.8",
     "rollup-plugin-node-resolve": "^5.2.0",
     "rollup-plugin-replace": "^2.2.0",
-    "rollup-plugin-typescript": "^1.0.1",
+    "rollup-plugin-typescript2": "^0.25.3",
     "terser": "^4.4.0",
     "tslib": "^1.10.0",
     "tslint": "^5.20.1",
@@ -49,5 +51,6 @@
     "mobile",
     "cordova",
     "plugin"
-  ]
+  ],
+  "dependencies": {}
 }

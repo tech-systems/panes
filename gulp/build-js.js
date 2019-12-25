@@ -7,7 +7,7 @@ const buble = require('rollup-plugin-buble');
 const replace = require('rollup-plugin-replace');
 const resolve = require('rollup-plugin-node-resolve');
 const Terser = require('terser');
-const typescript = require('rollup-plugin-typescript');
+const typescript = require('rollup-plugin-typescript2');
 
 const banner = require('./banner.js');
 

@@ -1,0 +1,32 @@
+export declare class CupertinoPane {
+    private el;
+    private settings;
+    private screen_height;
+    private steps;
+    private startP;
+    private topper;
+    private bottomer;
+    private currentBreak;
+    private breaks;
+    private brs;
+    private parentEl;
+    private wrapperEl;
+    private paneEl;
+    private draggableEl;
+    private moveEl;
+    private headerEl;
+    private contentEl;
+    private backdropEl;
+    private closeEl;
+    constructor(el: any, conf?: any);
+    private drawElements;
+    present(): void;
+    moveToBreak(val: any): void;
+    hide(): void;
+    get isHidden(): boolean;
+    private touchStart;
+    private touchMove;
+    private touchEnd;
+    private closePane;
+    private swipeNextPoint;
+}

@@ -242,7 +242,7 @@ export class CupertinoPane {
           this.brs.push(this.breaks[val]);
         }
       });
-      
+
       // Determinate topper point
       this.topper = this.brs.reduce((prev, curr) => {
         return (Math.abs(curr) < Math.abs(prev) ? curr : prev);
@@ -296,7 +296,7 @@ export class CupertinoPane {
   }
 
   get isHidden() {
-    return this.paneEl.style.transform === `translateY(${this.screen_height}px)`;;
+    return this.paneEl.style.transform === `translateY(${this.screen_height}px)`;
   }
 
   private touchStart(t) {
@@ -336,7 +336,7 @@ export class CupertinoPane {
     }
 
     this.paneEl.style.transform = `translateY(${newVal}px)`;
-    this.steps.push(n);    
+    this.steps.push(n);
 
     if (newVal > this.breaks['bottom']) {
       this.contentEl.style.opacity = '0';
@@ -415,7 +415,7 @@ export class CupertinoPane {
       // Return dynamic content
       this.el.appendChild(this.headerEl);
       this.el.appendChild(this.contentEl);
-      
+
       // Reset vars
       this.currentBreak = this.breaks[this.settings.initialBreak];
 

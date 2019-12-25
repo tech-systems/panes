@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.0.0
+ * Cupertino Pane 1.0.4
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: December 23, 2019
+ * Released on: December 25, 2019
  */
 
 (function (global, factory) {
@@ -296,6 +296,44 @@
             this.paneEl.addEventListener('touchmove', function (t) { return _this.touchMove(t); });
             this.paneEl.addEventListener('touchend', function (t) { return _this.touchEnd(t); });
         };
+        CupertinoPane.prototype.moveToBreak = function (val) {
+            var _this = this;
+            if (this.breaks[val] === this.breaks['bottom']) {
+                this.contentEl.style.opacity = '0';
+            }
+            else {
+                this.contentEl.style.opacity = '1';
+            }
+            if (this.breaks[val] === this.topper
+                && this.settings.topperOverflow) {
+                this.contentEl.style.overflowY = 'auto';
+            }
+            else {
+                this.contentEl.style.overflowY = 'hidden';
+            }
+            this.paneEl.style.transition = "transform " + this.settings.animationDuration + "ms " + this.settings.animationType + " 0s";
+            this.paneEl.style.transform = "translateY(" + this.breaks[val] + "px)";
+            var initTransitionEv = this.paneEl.addEventListener('transitionend', function (t) {
+                _this.paneEl.style.transition = "initial";
+                initTransitionEv = undefined;
+            });
+        };
+        CupertinoPane.prototype.hide = function () {
+            var _this = this;
+            this.paneEl.style.transition = "transform " + this.settings.animationDuration + "ms " + this.settings.animationType + " 0s";
+            this.paneEl.style.transform = "translateY(" + this.screen_height + "px)";
+            var initTransitionEv = this.paneEl.addEventListener('transitionend', function (t) {
+                _this.paneEl.style.transition = "initial";
+                initTransitionEv = undefined;
+            });
+        };
+        Object.defineProperty(CupertinoPane.prototype, "isHidden", {
+            get: function () {
+                return this.paneEl.style.transform === "translateY(" + this.screen_height + "px)";
+            },
+            enumerable: true,
+            configurable: true
+        });
         CupertinoPane.prototype.touchStart = function (t) {
             // Event emitter
             this.settings.onDragStart();
@@ -391,44 +429,6 @@
                 });
             }
         };
-        CupertinoPane.prototype.moveToBreak = function (val) {
-            var _this = this;
-            if (this.breaks[val] === this.breaks['bottom']) {
-                this.contentEl.style.opacity = '0';
-            }
-            else {
-                this.contentEl.style.opacity = '1';
-            }
-            if (this.breaks[val] === this.topper
-                && this.settings.topperOverflow) {
-                this.contentEl.style.overflowY = 'auto';
-            }
-            else {
-                this.contentEl.style.overflowY = 'hidden';
-            }
-            this.paneEl.style.transition = "transform " + this.settings.animationDuration + "ms " + this.settings.animationType + " 0s";
-            this.paneEl.style.transform = "translateY(" + this.breaks[val] + "px)";
-            var initTransitionEv = this.paneEl.addEventListener('transitionend', function (t) {
-                _this.paneEl.style.transition = "initial";
-                initTransitionEv = undefined;
-            });
-        };
-        CupertinoPane.prototype.hide = function () {
-            var _this = this;
-            this.paneEl.style.transition = "transform " + this.settings.animationDuration + "ms " + this.settings.animationType + " 0s";
-            this.paneEl.style.transform = "translateY(" + this.screen_height + "px)";
-            var initTransitionEv = this.paneEl.addEventListener('transitionend', function (t) {
-                _this.paneEl.style.transition = "initial";
-                initTransitionEv = undefined;
-            });
-        };
-        Object.defineProperty(CupertinoPane.prototype, "isHidden", {
-            get: function () {
-                return this.paneEl.style.transform === "translateY(" + this.screen_height + "px)";
-            },
-            enumerable: true,
-            configurable: true
-        });
         CupertinoPane.prototype.closePane = function (backdropEl) {
             var _this = this;
             // Emit event
