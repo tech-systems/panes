@@ -96,6 +96,7 @@ If you don't want to include Cupertino Pane files in your project, you may use i
         onDrag: () => console.log('Drag event')
       }
     );
+    myPane.present();
   };
   </script>
 </body>
@@ -105,6 +106,7 @@ If you don't want to include Cupertino Pane files in your project, you may use i
 $(document).ready(function () {
   //initialize pane when document ready
   var myPane = new CupertinoPane('.cupertino-pane', { /* ... */ });
+  myPane.present();
 });
 ```
 ### As an ES module
@@ -113,6 +115,7 @@ Cupertino Pane package comes with ES module version which can be used where supp
 import { CupertinoPane } from 'cupertino-pane';
 
 var myPane = new CupertinoPane('.cupertino-pane', { /* ... */ });
+    myPane.present();
 ```
 
 ## Settings
