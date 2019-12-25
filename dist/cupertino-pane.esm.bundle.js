@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.0.4
+ * Cupertino Pane 1.0.42
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -44,6 +44,7 @@ var CupertinoPane = /** @class */ (function () {
         this.settings = {
             initialShow: false,
             initialBreak: 'middle',
+            parentElement: null,
             backdrop: false,
             backdropClose: false,
             animationType: 'ease',

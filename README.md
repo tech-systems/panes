@@ -87,8 +87,8 @@ If you don't want to include Cupertino Pane files in your project, you may use i
     var myPane = new CupertinoPane(
       '.cupertino-pane', // Pane container selector
       { 
+        parentElement: 'body', // Parent container
         initialShow: false,
-        buttonClose: false,
         breaks: {
             top: { enabled: false, offset: -70 },
             middle: { enabled: true, offset: 0 },
@@ -121,6 +121,7 @@ var myPane = new CupertinoPane('.cupertino-pane', { /* ... */ });
 
 ## Settings
 ### Common configuration
+- `parentElement` | **string** | Element where pane with appended (by default using parent element where html layout placed)
 - `initialShow` | **boolean: false** | Determinate if pane will rendered with animation or immediately
 - `initialBreak` | **(top|middle|bottom): 'middle'** | Initial pane position
 - `darkMode` | **boolean: false** | Initial pane styles

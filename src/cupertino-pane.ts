@@ -3,6 +3,7 @@ export class CupertinoPane {
   private settings: any = {
     initialShow: false,
     initialBreak: 'middle',
+    parentElement: null,
     backdrop: false,
     backdropClose: false,
     animationType: 'ease',
