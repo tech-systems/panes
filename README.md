@@ -22,11 +22,11 @@ Lightweight, Multiplatform, Open Source. For progressive applications.
 * [License](#license)
 
 ## Demonstration
-[Live Demo Available Here](https://ionicsvelte.firebaseapp.com/pane/)
+[Live Demo](https://ionicsvelte.firebaseapp.com/pane/)
 <div style="display:flex;flex-wrap:wrap;">
     <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/1.gif?raw=true" width="250">
     <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/3.gif?raw=true" width="250">
-    <!-- <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/2.gif?raw=true" width="250"> -->
+    <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/2.gif?raw=true" width="250">
 </div>
 
 ## Supporting platforms
