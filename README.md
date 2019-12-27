@@ -165,10 +165,10 @@ Dissappear pane from screen, still keep pane in DOM.
 ```javascript
 myPane.hide();
 ```
-### isHidden
+### isHidden()
 Determinate if pane position was moved out of screen, but pane still exist in DOM.
 ```javascript
-if (myPane.isHidden) {
+if (myPane.isHidden()) {
     myPane.moveToBreak('top');
 }
 ```

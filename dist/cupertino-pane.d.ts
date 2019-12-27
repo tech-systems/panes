@@ -22,7 +22,7 @@ export declare class CupertinoPane {
     present(): void;
     moveToBreak(val: any): void;
     hide(): void;
-    get isHidden(): boolean;
+    isHidden(): boolean;
     private checkOpacityAttr;
     private touchStart;
     private touchMove;

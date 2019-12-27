@@ -283,7 +283,7 @@ export class CupertinoPane {
     });
   }
 
-  get isHidden() {
+  public isHidden(): boolean {
     return this.paneEl.style.transform === `translateY(${this.screen_height}px)`;
   }
 

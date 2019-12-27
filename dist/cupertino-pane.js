@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.0.45
+ * Cupertino Pane 1.0.51
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -315,13 +315,9 @@
                 initTransitionEv = undefined;
             });
         };
-        Object.defineProperty(CupertinoPane.prototype, "isHidden", {
-            get: function () {
-                return this.paneEl.style.transform === "translateY(" + this.screen_height + "px)";
-            },
-            enumerable: true,
-            configurable: true
-        });
+        CupertinoPane.prototype.isHidden = function () {
+            return this.paneEl.style.transform === "translateY(" + this.screen_height + "px)";
+        };
         CupertinoPane.prototype.checkOpacityAttr = function (val) {
             var _this = this;
             var attrElements = document.querySelectorAll("." + this.el.className + " [hide-on-bottom]");
