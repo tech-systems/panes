@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.0.44
+ * Cupertino Pane 1.0.45
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: December 25, 2019
+ * Released on: December 27, 2019
  */
 
 (function (global, factory) {
@@ -123,7 +123,6 @@
             };
             this.settings = __assign(__assign({}, this.settings), conf);
             this.el = document.querySelector(this.el);
-            this.el.style.display = 'none';
             if (this.settings.parentElement) {
                 this.settings.parentElement = document.querySelector(this.settings.parentElement);
             }
@@ -182,10 +181,9 @@
             this.moveEl.style.background = '#c0c0c0';
             this.moveEl.style.width = '36px';
             this.moveEl.style.borderRadius = '4px';
-            // Header
-            this.headerEl = this.el.childNodes[0];
             // Content
-            this.contentEl = this.el.childNodes[1];
+            this.contentEl = this.el;
+            this.contentEl.style.display = '';
             this.contentEl.style.transition = "opacity " + this.settings.animationDuration + "ms " + this.settings.animationType + " 0s";
             this.contentEl.style.overflowX = 'hidden';
             this.contentEl.style.height = this.screen_height
@@ -226,7 +224,6 @@
             this.parentEl.appendChild(this.wrapperEl);
             this.wrapperEl.appendChild(this.paneEl);
             this.paneEl.appendChild(this.draggableEl);
-            this.paneEl.appendChild(this.headerEl);
             this.paneEl.appendChild(this.contentEl);
             this.draggableEl.appendChild(this.moveEl);
             if (!this.settings.initialShow) {
@@ -265,12 +262,7 @@
                 }
                 this.closeEl.innerHTML = "<svg xmlns=\"http://www.w3.org/2000/svg\" viewBox=\"0 0 512 512\">\n          <path fill=\"" + iconColor + "\" d=\"M278.6 256l68.2-68.2c6.2-6.2 6.2-16.4 0-22.6-6.2-6.2-16.4-6.2-22.6 0L256 233.4l-68.2-68.2c-6.2-6.2-16.4-6.2-22.6 0-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3l68.2 68.2-68.2 68.2c-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3 6.2 6.2 16.4 6.2 22.6 0l68.2-68.2 68.2 68.2c6.2 6.2 16.4 6.2 22.6 0 6.2-6.2 6.2-16.4 0-22.6L278.6 256z\"/>\n        </svg>";
             }
-            if (this.currentBreak === this.breaks['bottom']) {
-                this.contentEl.style.opacity = '0';
-            }
-            else {
-                this.contentEl.style.opacity = '1';
-            }
+            this.checkOpacityAttr(this.currentBreak);
             if (this.settings.bottomClose) {
                 this.settings.breaks.bottom.enabled = true;
             }
@@ -299,12 +291,7 @@
         };
         CupertinoPane.prototype.moveToBreak = function (val) {
             var _this = this;
-            if (this.breaks[val] === this.breaks['bottom']) {
-                this.contentEl.style.opacity = '0';
-            }
-            else {
-                this.contentEl.style.opacity = '1';
-            }
+            this.checkOpacityAttr(this.breaks[val]);
             if (this.breaks[val] === this.topper
                 && this.settings.topperOverflow) {
                 this.contentEl.style.overflowY = 'auto';
@@ -335,6 +322,17 @@
             enumerable: true,
             configurable: true
         });
+        CupertinoPane.prototype.checkOpacityAttr = function (val) {
+            var _this = this;
+            var attrElements = document.querySelectorAll("." + this.el.className + " [hide-on-bottom]");
+            if (!attrElements.length)
+                { return; }
+            attrElements.forEach(function (item) {
+                item.style.transition = "opacity " + _this.settings.animationDuration + "ms " + _this.settings.animationType + " 0s";
+                item.style.opacity = (val >= _this.breaks['bottom'])
+                    ? '0' : '1';
+            });
+        };
         CupertinoPane.prototype.touchStart = function (t) {
             // Event emitter
             this.settings.onDragStart();
@@ -372,12 +370,7 @@
             }
             this.paneEl.style.transform = "translateY(" + newVal + "px)";
             this.steps.push(n);
-            if (newVal > this.breaks['bottom']) {
-                this.contentEl.style.opacity = '0';
-            }
-            else {
-                this.contentEl.style.opacity = '1';
-            }
+            this.checkOpacityAttr(newVal);
         };
         CupertinoPane.prototype.touchEnd = function (t) {
             var _this = this;
@@ -389,9 +382,10 @@
             });
             // Swipe - next (if differ > 10)
             var diff = this.steps[this.steps.length - 1] - this.steps[this.steps.length - 2];
-            var maxDiff = 4;
-            if (Math.abs(diff) >= maxDiff) {
-                closest = this.swipeNextPoint(diff, maxDiff, closest);
+            // Set sensivity lower for web
+            var swipeNextSensivity = window.hasOwnProperty('cordova') ? 4 : 3;
+            if (Math.abs(diff) >= swipeNextSensivity) {
+                closest = this.swipeNextPoint(diff, swipeNextSensivity, closest);
             }
             // Click to bottom - open middle
             if (this.settings.clickBottomOpen) {
@@ -403,12 +397,7 @@
             }
             this.steps = [];
             this.currentBreak = closest;
-            if (this.currentBreak === this.breaks['bottom']) {
-                this.contentEl.style.opacity = '0';
-            }
-            else {
-                this.contentEl.style.opacity = '1';
-            }
+            this.checkOpacityAttr(this.currentBreak);
             if (this.currentBreak === this.topper
                 && this.settings.topperOverflow) {
                 this.contentEl.style.overflowY = 'auto';
@@ -438,12 +427,10 @@
             this.paneEl.style.transform = "translateY(" + this.screen_height + "px)";
             backdropEl.style.transition = "transform " + this.settings.animationDuration + "ms " + this.settings.animationType + " 0s";
             backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
-            // Return dynamic content
-            this.el.appendChild(this.headerEl);
-            this.el.appendChild(this.contentEl);
             // Reset vars
             this.currentBreak = this.breaks[this.settings.initialBreak];
             this.paneEl.addEventListener('transitionend', function (t) {
+                _this.parentEl.appendChild(_this.contentEl);
                 _this.parentEl.removeChild(_this.wrapperEl);
                 // Emit event
                 _this.settings.onDidDismiss();

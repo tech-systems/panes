@@ -14,7 +14,6 @@ export declare class CupertinoPane {
     private paneEl;
     private draggableEl;
     private moveEl;
-    private headerEl;
     private contentEl;
     private backdropEl;
     private closeEl;
@@ -24,6 +23,7 @@ export declare class CupertinoPane {
     moveToBreak(val: any): void;
     hide(): void;
     get isHidden(): boolean;
+    private checkOpacityAttr;
     private touchStart;
     private touchMove;
     private touchEnd;

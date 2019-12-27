@@ -16,15 +16,17 @@ Lightweight, Multiplatform, Open Source. For progressive applications.
 * [Getting Started](#getting-started)
 * [Settings](#settings)
 * [Public Methods](#public-methods)
+* [Attributes](#attributes)
 * [Future Goals](#future-goals)
 * [Contributing](#contributing)
 * [License](#license)
 
 ## Demonstration
+[Live Demo Available Here](https://ionicsvelte.firebaseapp.com/pane/)
 <div style="display:flex;flex-wrap:wrap;">
     <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/1.gif?raw=true" width="250">
     <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/3.gif?raw=true" width="250">
-    <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/2.gif?raw=true" width="250">
+    <!-- <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/2.gif?raw=true" width="250"> -->
 </div>
 
 ## Supporting platforms
@@ -59,22 +61,13 @@ If you don't want to include Cupertino Pane files in your project, you may use i
 ### Add HTML Layout
 ```html
 <div class="cupertino-pane">
-    <div class="cupertino-header">
-        Header
-    </div>
-    <div class="cupertino-content">
-        Content
-    </div>    
+    <h1>Header</h1>
+    <div class="content">Content</div>    
 </div>
 ```
 ### Additional CSS Styles
 ```css
-.cupertino-pane-wrapper .pane {
-    background: #ffffff;
-}
-
-.cupertino-header,
-.cupertino-content {
+.cupertino-pane {
     margin: 20px;
 }
 ```
@@ -180,7 +173,18 @@ if (myPane.isHidden) {
 }
 ```
 
+## Attributes
+### hide-on-bottom
+Set for element to automaticaly hide on reach bottom breakpoint.
+```html
+<div class="cupertino-pane">
+    <h1>Header</h1>
+    <div class="content" hide-on-bottom>Content</div>    
+</div>
+```
+
 ## Future Goals
+- Create component for Ionic Framework using stencil
 - Hardware accelerated drag&drop actions
 - Realistic easy-in-out transitions
 - Work out the state with overflow-x
