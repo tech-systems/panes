@@ -407,8 +407,10 @@ export class CupertinoPane {
       this.currentBreak = this.breaks[this.settings.initialBreak];
 
       this.paneEl.addEventListener('transitionend', (t) => {
+        this.parentEl.appendChild(this.contentEl);
+        this.contentEl.style.display = 'none';
         this.parentEl.removeChild(this.wrapperEl);
-
+        
         // Emit event
         this.settings.onDidDismiss();
       });
