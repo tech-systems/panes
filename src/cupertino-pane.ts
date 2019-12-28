@@ -55,6 +55,7 @@ export class CupertinoPane {
   constructor(private el, conf: any = {}) {
     this.settings = {...this.settings, ...conf};
     this.el = <HTMLDivElement>document.querySelector(this.el);
+    this.el.style.display = 'none';
     
     if (this.settings.parentElement) {
       this.settings.parentElement = <HTMLElement>document.querySelector(
