@@ -35,6 +35,7 @@ export class CupertinoPane {
   private topper: number;
   private bottomer: number;
   private currentBreak: number;
+  private contentScrollTop: number;
 
   private breaks: {} = {
     top: 50,
@@ -51,6 +52,7 @@ export class CupertinoPane {
   private contentEl: HTMLHeadingElement;
   private backdropEl: HTMLDivElement;
   private closeEl: HTMLDivElement;
+  private overflowEl: HTMLElement;
 
   constructor(private el, conf: any = {}) {
     this.settings = {...this.settings, ...conf};
@@ -131,9 +133,6 @@ export class CupertinoPane {
       this.contentEl.style.display = '';
       this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
       this.contentEl.style.overflowX = 'hidden';
-      this.contentEl.style.height = `${this.screen_height
-        - this.breaks['top'] - 51
-        - this.settings.topperOverflowOffset}px`;
 
       // Backdrop
       this.backdropEl = document.createElement('div');
@@ -224,8 +223,6 @@ export class CupertinoPane {
         </svg>`;
       }
 
-      this.checkOpacityAttr(this.currentBreak);
-
       if (this.settings.bottomClose) {
         this.settings.breaks.bottom.enabled = true;
       }
@@ -245,11 +242,19 @@ export class CupertinoPane {
         return (Math.abs(curr) > Math.abs(prev) ? curr : prev);
       });
 
-      if (this.currentBreak === this.topper
-          && this.settings.topperOverflow) {
-            this.contentEl.style.overflowY = 'auto';
-        // headerEl.style.borderBottom = '1px solid #ebebeb';
+      // Get overflow element
+      let attrElements = document.querySelectorAll(`.${this.el.className.split(' ')[0]} [overflow-y]`);
+      if (!attrElements.length || attrElements.length > 1) {
+        this.overflowEl = this.contentEl;
+      } else {
+        this.overflowEl = <HTMLElement>attrElements[0];
       }
+      this.overflowEl.style.height = `${this.screen_height
+        - this.breaks['top'] - 51
+        - this.settings.topperOverflowOffset}px`;
+
+      this.checkOpacityAttr(this.currentBreak);
+      this.checkOverflowAttr(this.currentBreak);
 
       /****** Events *******/
       this.paneEl.addEventListener('touchstart', (t) => this.touchStart(t));
@@ -259,13 +264,7 @@ export class CupertinoPane {
 
   moveToBreak(val) {
     this.checkOpacityAttr(this.breaks[val]);
-
-    if (this.breaks[val] === this.topper
-        && this.settings.topperOverflow) {
-      this.contentEl.style.overflowY = 'auto';
-    } else {
-      this.contentEl.style.overflowY = 'hidden';
-    }
+    this.checkOverflowAttr(this.breaks[val]);
 
     this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
     this.paneEl.style.transform = `translateY(${this.breaks[val]}px)`;
@@ -289,15 +288,23 @@ export class CupertinoPane {
   }
 
   private checkOpacityAttr(val) {
-    let attrElements = document.querySelectorAll(`.${this.el.className} [hide-on-bottom]`);
+    let attrElements = document.querySelectorAll(`.${this.el.className.split(' ')[0]} [hide-on-bottom]`);
     if (!attrElements.length) return;
     attrElements.forEach((item) => {
       (<HTMLElement>item).style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-      (<HTMLElement>item).style.opacity = (val >= this.breaks['bottom']) 
-        ? '0' : '1';
+      (<HTMLElement>item).style.opacity = (val >= this.breaks['bottom']) ? '0' : '1';
     });
   }
 
+  private checkOverflowAttr(val) {
+    if (!this.settings.topperOverflow) return;
+    this.overflowEl.style.overflowY = (val <= this.topper) ? 'auto' : 'hidden';
+  }
+
+  /**
+   * Touch Start Event
+   * @param t 
+   */
   private touchStart(t) {
     // Event emitter
     this.settings.onDragStart();
@@ -305,6 +312,10 @@ export class CupertinoPane {
     this.steps.push(this.startP);
   }
 
+  /**
+   * Touch Move Event
+   * @param t 
+   */
   private touchMove(t) {
     this.settings.onDrag();
 
@@ -315,31 +326,36 @@ export class CupertinoPane {
     const diff = n - this.steps[this.steps.length - 1];
     const newVal = p + diff;
 
-    // Not allow move panel with overflow scroll
-    let noScroll = false;
-    if (this.contentEl.style.overflowY === 'auto') {
-      t.composedPath().forEach((item) => {
-        if (item['className'] && item['className'].includes('cupertino-content')) {
-          noScroll = true;
-        }
+    // Not allow move panel with positive overflow scroll
+    if (this.overflowEl.style.overflowY === 'auto') {
+      this.overflowEl.addEventListener('scroll', (s: any) => {
+        this.contentScrollTop = s.target.scrollTop;
       });
-      if (noScroll && this.contentEl.scrollTop > 20) { return; }
-      if ((p + diff) <= this.topper && noScroll) { return; }
+      if ((newVal > this.topper && this.contentScrollTop > 0) 
+          || (newVal <= this.topper)) { 
+        return;
+      }
     }
 
     // Not allow drag upper than topper point
     // Not allow drag lower than bottom if free mode
-    if (((p + diff) <= this.topper - 20)
-        || (this.settings.freeMode && !this.settings.bottomClose && ((p + diff) >= this.bottomer + 20))) {
+    if ((newVal <= this.topper)
+        || (this.settings.freeMode && !this.settings.bottomClose && (newVal >= this.bottomer))) {
       return;
     }
 
+    this.checkOpacityAttr(newVal);
+    this.checkOverflowAttr(newVal);
+    
+    this.paneEl.style.transition = 'initial';
     this.paneEl.style.transform = `translateY(${newVal}px)`;
     this.steps.push(n);
-
-    this.checkOpacityAttr(newVal);
   }
 
+  /**
+   * Touch End Event
+   * @param t 
+   */
   private touchEnd(t) {
     const translateYRegex = /\.*translateY\((.*)px\)/i;
     const p = parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
@@ -370,13 +386,7 @@ export class CupertinoPane {
     this.currentBreak = closest;
 
     this.checkOpacityAttr(this.currentBreak);
-
-    if (this.currentBreak === this.topper
-        && this.settings.topperOverflow) {
-      this.contentEl.style.overflowY = 'auto';
-    } else {
-      this.contentEl.style.overflowY = 'hidden';
-    }
+    this.checkOverflowAttr(this.currentBreak);
 
     // Bottom closable
     if (this.settings.bottomClose && closest === this.breaks['bottom']) {

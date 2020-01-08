@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.0.61
+ * Cupertino Pane 1.0.7
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: January 7, 2020
+ * Released on: January 9, 2020
  */
 
 class CupertinoPane {
@@ -153,9 +153,6 @@ class CupertinoPane {
         this.contentEl.style.display = '';
         this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
         this.contentEl.style.overflowX = 'hidden';
-        this.contentEl.style.height = `${this.screen_height
-            - this.breaks['top'] - 51
-            - this.settings.topperOverflowOffset}px`;
         // Backdrop
         this.backdropEl = document.createElement('div');
         this.backdropEl.className = 'backdrop';
@@ -230,7 +227,6 @@ class CupertinoPane {
           <path fill="${iconColor}" d="M278.6 256l68.2-68.2c6.2-6.2 6.2-16.4 0-22.6-6.2-6.2-16.4-6.2-22.6 0L256 233.4l-68.2-68.2c-6.2-6.2-16.4-6.2-22.6 0-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3l68.2 68.2-68.2 68.2c-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3 6.2 6.2 16.4 6.2 22.6 0l68.2-68.2 68.2 68.2c6.2 6.2 16.4 6.2 22.6 0 6.2-6.2 6.2-16.4 0-22.6L278.6 256z"/>
         </svg>`;
         }
-        this.checkOpacityAttr(this.currentBreak);
         if (this.settings.bottomClose) {
             this.settings.breaks.bottom.enabled = true;
         }
@@ -247,11 +243,19 @@ class CupertinoPane {
         this.bottomer = this.brs.reduce((prev, curr) => {
             return (Math.abs(curr) > Math.abs(prev) ? curr : prev);
         });
-        if (this.currentBreak === this.topper
-            && this.settings.topperOverflow) {
-            this.contentEl.style.overflowY = 'auto';
-            // headerEl.style.borderBottom = '1px solid #ebebeb';
+        // Get overflow element
+        let attrElements = document.querySelectorAll(`.${this.el.className.split(' ')[0]} [overflow-y]`);
+        if (!attrElements.length || attrElements.length > 1) {
+            this.overflowEl = this.contentEl;
         }
+        else {
+            this.overflowEl = attrElements[0];
+        }
+        this.overflowEl.style.height = `${this.screen_height
+            - this.breaks['top'] - 51
+            - this.settings.topperOverflowOffset}px`;
+        this.checkOpacityAttr(this.currentBreak);
+        this.checkOverflowAttr(this.currentBreak);
         /****** Events *******/
         this.paneEl.addEventListener('touchstart', (t) => this.touchStart(t));
         this.paneEl.addEventListener('touchmove', (t) => this.touchMove(t));
@@ -259,13 +263,7 @@ class CupertinoPane {
     }
     moveToBreak(val) {
         this.checkOpacityAttr(this.breaks[val]);
-        if (this.breaks[val] === this.topper
-            && this.settings.topperOverflow) {
-            this.contentEl.style.overflowY = 'auto';
-        }
-        else {
-            this.contentEl.style.overflowY = 'hidden';
-        }
+        this.checkOverflowAttr(this.breaks[val]);
         this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
         this.paneEl.style.transform = `translateY(${this.breaks[val]}px)`;
         let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
@@ -285,21 +283,33 @@ class CupertinoPane {
         return this.paneEl.style.transform === `translateY(${this.screen_height}px)`;
     }
     checkOpacityAttr(val) {
-        let attrElements = document.querySelectorAll(`.${this.el.className} [hide-on-bottom]`);
+        let attrElements = document.querySelectorAll(`.${this.el.className.split(' ')[0]} [hide-on-bottom]`);
         if (!attrElements.length)
             return;
         attrElements.forEach((item) => {
             item.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-            item.style.opacity = (val >= this.breaks['bottom'])
-                ? '0' : '1';
+            item.style.opacity = (val >= this.breaks['bottom']) ? '0' : '1';
         });
     }
+    checkOverflowAttr(val) {
+        if (!this.settings.topperOverflow)
+            return;
+        this.overflowEl.style.overflowY = (val <= this.topper) ? 'auto' : 'hidden';
+    }
+    /**
+     * Touch Start Event
+     * @param t
+     */
     touchStart(t) {
         // Event emitter
         this.settings.onDragStart();
         this.startP = t.touches[0].screenY;
         this.steps.push(this.startP);
     }
+    /**
+     * Touch Move Event
+     * @param t
+     */
     touchMove(t) {
         this.settings.onDrag();
         const translateYRegex = /\.*translateY\((.*)px\)/i;
@@ -308,31 +318,32 @@ class CupertinoPane {
         const n = t.touches[0].screenY;
         const diff = n - this.steps[this.steps.length - 1];
         const newVal = p + diff;
-        // Not allow move panel with overflow scroll
-        let noScroll = false;
-        if (this.contentEl.style.overflowY === 'auto') {
-            t.composedPath().forEach((item) => {
-                if (item['className'] && item['className'].includes('cupertino-content')) {
-                    noScroll = true;
-                }
+        // Not allow move panel with positive overflow scroll
+        if (this.overflowEl.style.overflowY === 'auto') {
+            this.overflowEl.addEventListener('scroll', (s) => {
+                this.contentScrollTop = s.target.scrollTop;
             });
-            if (noScroll && this.contentEl.scrollTop > 20) {
-                return;
-            }
-            if ((p + diff) <= this.topper && noScroll) {
+            if ((newVal > this.topper && this.contentScrollTop > 0)
+                || (newVal <= this.topper)) {
                 return;
             }
         }
         // Not allow drag upper than topper point
         // Not allow drag lower than bottom if free mode
-        if (((p + diff) <= this.topper - 20)
-            || (this.settings.freeMode && !this.settings.bottomClose && ((p + diff) >= this.bottomer + 20))) {
+        if ((newVal <= this.topper)
+            || (this.settings.freeMode && !this.settings.bottomClose && (newVal >= this.bottomer))) {
             return;
         }
+        this.checkOpacityAttr(newVal);
+        this.checkOverflowAttr(newVal);
+        this.paneEl.style.transition = 'initial';
         this.paneEl.style.transform = `translateY(${newVal}px)`;
         this.steps.push(n);
-        this.checkOpacityAttr(newVal);
     }
+    /**
+     * Touch End Event
+     * @param t
+     */
     touchEnd(t) {
         const translateYRegex = /\.*translateY\((.*)px\)/i;
         const p = parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
@@ -358,13 +369,7 @@ class CupertinoPane {
         this.steps = [];
         this.currentBreak = closest;
         this.checkOpacityAttr(this.currentBreak);
-        if (this.currentBreak === this.topper
-            && this.settings.topperOverflow) {
-            this.contentEl.style.overflowY = 'auto';
-        }
-        else {
-            this.contentEl.style.overflowY = 'hidden';
-        }
+        this.checkOverflowAttr(this.currentBreak);
         // Bottom closable
         if (this.settings.bottomClose && closest === this.breaks['bottom']) {
             this.closePane(this.backdropEl);
