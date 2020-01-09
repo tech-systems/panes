@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.0.7
+ * Cupertino Pane 1.0.71
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -126,6 +126,7 @@ class CupertinoPane {
         this.wrapperEl.className = `cupertino-pane-wrapper ${this.el.className}`;
         this.wrapperEl.style.position = 'absolute';
         this.wrapperEl.style.top = '0';
+        this.wrapperEl.style.left = '0';
         // Panel
         this.paneEl = document.createElement('div');
         this.paneEl.className = 'pane';
