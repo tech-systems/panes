@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.0.71
+ * Cupertino Pane 1.0.8
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,12 +7,143 @@
  *
  * Released under the MIT License
  *
- * Released on: January 9, 2020
+ * Released on: February 6, 2020
  */
 
 'use strict';
 
 Object.defineProperty(exports, '__esModule', { value: true });
+
+class Support {
+    static get touch() {
+        return (window['Modernizr'] && window['Modernizr'].touch === true) || (function checkTouch() {
+            return !!((window.navigator.maxTouchPoints > 0) || ('ontouchstart' in window) || (window['DocumentTouch'] && document instanceof window['DocumentTouch']));
+        }());
+    }
+    static get observer() {
+        return ('MutationObserver' in window || 'WebkitMutationObserver' in window);
+    }
+    static get passiveListener() {
+        let supportsPassive = false;
+        try {
+            const opts = Object.defineProperty({}, 'passive', {
+                // eslint-disable-next-line
+                get() {
+                    supportsPassive = true;
+                },
+            });
+            window.addEventListener('testPassiveListener', null, opts);
+        }
+        catch (e) {
+            // No support
+        }
+        return supportsPassive;
+    }
+    static get gestures() {
+        return 'ongesturestart' in window;
+    }
+    static pointerEvents() {
+    }
+}
+
+class Device {
+    constructor() {
+        this.ios = false;
+        this.android = false;
+        this.androidChrome = false;
+        this.desktop = false;
+        this.iphone = false;
+        this.ipod = false;
+        this.ipad = false;
+        this.edge = false;
+        this.ie = false;
+        this.firefox = false;
+        this.macos = false;
+        this.windows = false;
+        this.cordova = !!(window['cordova'] || window['phonegap']);
+        this.phonegap = !!(window['cordova'] || window['phonegap']);
+        this.electron = false;
+        const platform = window.navigator.platform;
+        const ua = window.navigator.userAgent;
+        const screenWidth = window.screen.width;
+        const screenHeight = window.screen.height;
+        let android = ua.match(/(Android);?[\s\/]+([\d.]+)?/); // eslint-disable-line
+        let ipad = ua.match(/(iPad).*OS\s([\d_]+)/);
+        let ipod = ua.match(/(iPod)(.*OS\s([\d_]+))?/);
+        let iphone = !this.ipad && ua.match(/(iPhone\sOS|iOS)\s([\d_]+)/);
+        let ie = ua.indexOf('MSIE ') >= 0 || ua.indexOf('Trident/') >= 0;
+        let edge = ua.indexOf('Edge/') >= 0;
+        let firefox = ua.indexOf('Gecko/') >= 0 && ua.indexOf('Firefox/') >= 0;
+        let windows = platform === 'Win32';
+        let electron = ua.toLowerCase().indexOf('electron') >= 0;
+        let macos = platform === 'MacIntel';
+        // iPadOs 13 fix
+        if (!ipad
+            && macos
+            && Support.touch
+            && ((screenWidth === 1024 && screenHeight === 1366) // Pro 12.9
+                || (screenWidth === 834 && screenHeight === 1194) // Pro 11
+                || (screenWidth === 834 && screenHeight === 1112) // Pro 10.5
+                || (screenWidth === 768 && screenHeight === 1024) // other
+            )) {
+            ipad = ua.match(/(Version)\/([\d.]+)/);
+            macos = false;
+        }
+        this.ie = ie;
+        this.edge = edge;
+        this.firefox = firefox;
+        // Android
+        if (android && !windows) {
+            this.os = 'android';
+            this.osVersion = android[2];
+            this.android = true;
+            this.androidChrome = ua.toLowerCase().indexOf('chrome') >= 0;
+        }
+        if (ipad || iphone || ipod) {
+            this.os = 'ios';
+            this.ios = true;
+        }
+        // iOS
+        if (iphone && !ipod) {
+            this.osVersion = iphone[2].replace(/_/g, '.');
+            this.iphone = true;
+        }
+        if (ipad) {
+            this.osVersion = ipad[2].replace(/_/g, '.');
+            this.ipad = true;
+        }
+        if (ipod) {
+            this.osVersion = ipod[3] ? ipod[3].replace(/_/g, '.') : null;
+            this.ipod = true;
+        }
+        // iOS 8+ changed UA
+        if (this.ios && this.osVersion && ua.indexOf('Version/') >= 0) {
+            if (this.osVersion.split('.')[0] === '10') {
+                this.osVersion = ua.toLowerCase().split('version/')[1].split(' ')[0];
+            }
+        }
+        // Webview
+        this.webView = !!((iphone || ipad || ipod) && (ua.match(/.*AppleWebKit(?!.*Safari)/i) || window.navigator['standalone']))
+            || (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches);
+        this.webview = this.webView;
+        this.standalone = this.webView;
+        // Desktop
+        this.desktop = !(this.ios || this.android) || electron;
+        if (this.desktop) {
+            this.electron = electron;
+            this.macos = macos;
+            this.windows = windows;
+            if (this.macos) {
+                this.os = 'macos';
+            }
+            if (this.windows) {
+                this.os = 'windows';
+            }
+        }
+        // Pixel Ratio
+        this.pixelRatio = window.devicePixelRatio || 1;
+    }
+}
 
 class CupertinoPane {
     constructor(el, conf = {}) {
@@ -33,6 +164,8 @@ class CupertinoPane {
             topperOverflowOffset: 0,
             showDraggable: true,
             clickBottomOpen: true,
+            simulateTouch: true,
+            passiveListeners: true,
             breaks: {
                 top: { enabled: true, offset: 0 },
                 middle: { enabled: true, offset: 0 },
@@ -47,12 +180,14 @@ class CupertinoPane {
         };
         this.screen_height = window.screen.height;
         this.steps = [];
+        this.pointerDown = false;
         this.breaks = {
             top: 50,
             middle: Math.round(this.screen_height - (this.screen_height * 0.35)),
             bottom: this.screen_height - 80
         };
         this.brs = [];
+        this.device = new Device();
         this.swipeNextPoint = (diff, maxDiff, closest) => {
             if (this.currentBreak === this.breaks['top']) {
                 if (diff > maxDiff) {
@@ -91,6 +226,28 @@ class CupertinoPane {
             }
             return closest;
         };
+        /************************************
+         * Events
+         */
+        this.touchEvents = (() => {
+            const touch = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
+            let desktop = ['mousedown', 'mousemove', 'mouseup'];
+            if (Support.pointerEvents) {
+                desktop = ['pointerdown', 'pointermove', 'pointerup'];
+            }
+            const touchEventsTouch = {
+                start: touch[0],
+                move: touch[1],
+                end: touch[2],
+                cancel: touch[3],
+            };
+            const touchEventsDesktop = {
+                start: desktop[0],
+                move: desktop[1],
+                end: desktop[2],
+            };
+            return Support.touch || !this.settings.simulateTouch ? touchEventsTouch : touchEventsDesktop;
+        })();
         this.settings = Object.assign(Object.assign({}, this.settings), conf);
         this.el = document.querySelector(this.el);
         this.el.style.display = 'none';
@@ -261,10 +418,8 @@ class CupertinoPane {
             - this.settings.topperOverflowOffset}px`;
         this.checkOpacityAttr(this.currentBreak);
         this.checkOverflowAttr(this.currentBreak);
-        /****** Events *******/
-        this.paneEl.addEventListener('touchstart', (t) => this.touchStart(t));
-        this.paneEl.addEventListener('touchmove', (t) => this.touchMove(t));
-        this.paneEl.addEventListener('touchend', (t) => this.touchEnd(t));
+        /****** Attach Events *******/
+        this.attachEvents();
     }
     moveToBreak(val) {
         this.checkOpacityAttr(this.breaks[val]);
@@ -306,9 +461,13 @@ class CupertinoPane {
      * @param t
      */
     touchStart(t) {
+        const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
+        const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
+        if (t.type === 'pointerdown')
+            this.pointerDown = true;
         // Event emitter
         this.settings.onDragStart();
-        this.startP = t.touches[0].screenY;
+        this.startP = screenY;
         this.steps.push(this.startP);
     }
     /**
@@ -316,11 +475,17 @@ class CupertinoPane {
      * @param t
      */
     touchMove(t) {
+        // Handle desktop/mobile events
+        const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
+        const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
+        if (t.type === 'pointermove' && !this.pointerDown)
+            return;
+        // Event emitter
         this.settings.onDrag();
         const translateYRegex = /\.*translateY\((.*)px\)/i;
         const p = parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
         // Delta
-        const n = t.touches[0].screenY;
+        const n = screenY;
         const diff = n - this.steps[this.steps.length - 1];
         const newVal = p + diff;
         // Not allow move panel with positive overflow scroll
@@ -350,6 +515,10 @@ class CupertinoPane {
      * @param t
      */
     touchEnd(t) {
+        const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
+        const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
+        if (t.type === 'pointerup')
+            this.pointerDown = false;
         const translateYRegex = /\.*translateY\((.*)px\)/i;
         const p = parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
         // Determinate nearest point
@@ -402,9 +571,59 @@ class CupertinoPane {
             this.parentEl.appendChild(this.contentEl);
             this.contentEl.style.display = 'none';
             this.parentEl.removeChild(this.wrapperEl);
+            /****** Detach Events *******/
+            this.detachEvents();
             // Emit event
             this.settings.onDidDismiss();
         });
+    }
+    attachEvents() {
+        // Touch Events
+        if (!Support.touch && Support.pointerEvents) {
+            this.paneEl.addEventListener(this.touchEvents.start, (t) => this.touchStart(t), false);
+            this.paneEl.addEventListener(this.touchEvents.move, (t) => this.touchMove(t), false);
+            this.paneEl.addEventListener(this.touchEvents.end, (t) => this.touchEnd(t), false);
+        }
+        else {
+            if (Support.touch) {
+                const passiveListener = this.touchEvents.start === 'touchstart' && Support.passiveListener && this.settings.passiveListeners ? { passive: true, capture: false } : false;
+                this.paneEl.addEventListener(this.touchEvents.start, (t) => this.touchStart(t), passiveListener);
+                this.paneEl.addEventListener(this.touchEvents.move, (t) => this.touchMove(t), Support.passiveListener ? { passive: false, capture: false } : false);
+                this.paneEl.addEventListener(this.touchEvents.end, (t) => this.touchEnd(t), passiveListener);
+                if (this.touchEvents['cancel']) {
+                    this.paneEl.addEventListener(this.touchEvents['cancel'], (t) => this.touchEnd(t), passiveListener);
+                }
+            }
+            if ((this.settings.simulateTouch && !this.device.ios && !this.device.android) || (this.settings.simulateTouch && !Support.touch && this.device.ios)) {
+                this.paneEl.addEventListener('mousedown', (t) => this.touchStart(t), false);
+                this.paneEl.addEventListener('mousemove', (t) => this.touchMove(t), false);
+                this.paneEl.addEventListener('mouseup', (t) => this.touchEnd(t), false);
+            }
+        }
+    }
+    detachEvents() {
+        // Touch Events
+        if (!Support.touch && Support.pointerEvents) {
+            this.paneEl.removeEventListener(this.touchEvents.start, (t) => this.touchStart(t), false);
+            this.paneEl.removeEventListener(this.touchEvents.move, (t) => this.touchMove(t), false);
+            this.paneEl.removeEventListener(this.touchEvents.end, (t) => this.touchEnd(t), false);
+        }
+        else {
+            if (Support.touch) {
+                const passiveListener = this.touchEvents.start === 'onTouchStart' && Support.passiveListener && this.settings.passiveListeners ? { passive: true, capture: false } : false;
+                this.paneEl.removeEventListener(this.touchEvents.start, (t) => this.touchStart(t), passiveListener);
+                this.paneEl.removeEventListener(this.touchEvents.move, (t) => this.touchMove(t), false);
+                this.paneEl.removeEventListener(this.touchEvents.end, (t) => this.touchEnd(t), passiveListener);
+                if (this.touchEvents['cancel']) {
+                    this.paneEl.removeEventListener(this.touchEvents['cancel'], (t) => this.touchEnd(t), passiveListener);
+                }
+            }
+            if ((this.settings.simulateTouch && !this.device.ios && !this.device.android) || (this.settings.simulateTouch && !Support.touch && this.device.ios)) {
+                this.paneEl.removeEventListener('mousedown', (t) => this.touchStart(t), false);
+                this.paneEl.removeEventListener('mousemove', (t) => this.touchMove(t), false);
+                this.paneEl.removeEventListener('mouseup', (t) => this.touchEnd(t), false);
+            }
+        }
     }
 }
 

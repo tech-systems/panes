@@ -1,3 +1,6 @@
+import { Support } from './support';
+import { Device } from './device';
+
 export class CupertinoPane {
 
   private settings: any = {
@@ -16,6 +19,8 @@ export class CupertinoPane {
     topperOverflowOffset: 0,
     showDraggable: true,
     clickBottomOpen: true,
+    simulateTouch: true,
+    passiveListeners: true,
     breaks: {
       top: { enabled: true, offset: 0},
       middle: { enabled: true, offset: 0},
@@ -32,6 +37,7 @@ export class CupertinoPane {
   private screen_height: number = window.screen.height;
   private steps: any[] = [];
   private startP: any;
+  private pointerDown: boolean = false;
   private topper: number;
   private bottomer: number;
   private currentBreak: number;
@@ -53,6 +59,8 @@ export class CupertinoPane {
   private backdropEl: HTMLDivElement;
   private closeEl: HTMLDivElement;
   private overflowEl: HTMLElement;
+
+  private device = new Device();
 
   constructor(private el, conf: any = {}) {
     this.settings = {...this.settings, ...conf};
@@ -257,10 +265,8 @@ export class CupertinoPane {
       this.checkOpacityAttr(this.currentBreak);
       this.checkOverflowAttr(this.currentBreak);
 
-      /****** Events *******/
-      this.paneEl.addEventListener('touchstart', (t) => this.touchStart(t));
-      this.paneEl.addEventListener('touchmove', (t) => this.touchMove(t));
-      this.paneEl.addEventListener('touchend', (t) => this.touchEnd(t));
+      /****** Attach Events *******/
+      this.attachEvents();
   }
 
   moveToBreak(val) {
@@ -307,9 +313,13 @@ export class CupertinoPane {
    * @param t 
    */
   private touchStart(t) {
+    const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
+    const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
+    if (t.type === 'pointerdown') this.pointerDown = true;
+
     // Event emitter
     this.settings.onDragStart();
-    this.startP = (<any>t).touches[0].screenY;
+    this.startP = screenY;
     this.steps.push(this.startP);
   }
 
@@ -318,12 +328,18 @@ export class CupertinoPane {
    * @param t 
    */
   private touchMove(t) {
+    // Handle desktop/mobile events
+    const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
+    const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
+    if(t.type === 'pointermove' && !this.pointerDown) return;
+
+    // Event emitter
     this.settings.onDrag();
 
     const translateYRegex = /\.*translateY\((.*)px\)/i;
     const p = parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
     // Delta
-    const n = (<any>t).touches[0].screenY;
+    const n = screenY;
     const diff = n - this.steps[this.steps.length - 1];
     const newVal = p + diff;
 
@@ -358,6 +374,10 @@ export class CupertinoPane {
    * @param t 
    */
   private touchEnd(t) {
+    const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
+    const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
+    if (t.type === 'pointerup') this.pointerDown = false;
+
     const translateYRegex = /\.*translateY\((.*)px\)/i;
     const p = parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
 
@@ -423,6 +443,9 @@ export class CupertinoPane {
         this.contentEl.style.display = 'none';
         this.parentEl.removeChild(this.wrapperEl);
         
+        /****** Detach Events *******/
+        this.detachEvents();
+        
         // Emit event
         this.settings.onDidDismiss();
       });
@@ -456,6 +479,82 @@ export class CupertinoPane {
       }
 
       return closest;
+  }
+
+ 
+  /************************************
+   * Events
+   */
+  private touchEvents = (() => {
+    const touch = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
+    let desktop = ['mousedown', 'mousemove', 'mouseup'];
+    if (Support.pointerEvents) {
+      desktop = ['pointerdown', 'pointermove', 'pointerup'];
+    }
+    const touchEventsTouch = {
+      start: touch[0],
+      move: touch[1],
+      end: touch[2],
+      cancel: touch[3],
+    };
+    const touchEventsDesktop = {
+      start: desktop[0],
+      move: desktop[1],
+      end: desktop[2],
+    };
+    return Support.touch || !this.settings.simulateTouch ? touchEventsTouch : touchEventsDesktop;
+  })();
+
+  attachEvents() {
+    // Touch Events
+    if (!Support.touch && Support.pointerEvents) {
+      this.paneEl.addEventListener(this.touchEvents.start, (t) => this.touchStart(t), false);
+      this.paneEl.addEventListener(this.touchEvents.move, (t) => this.touchMove(t), false);
+      this.paneEl.addEventListener(this.touchEvents.end, (t) => this.touchEnd(t), false);
+    } else {
+
+      if (Support.touch) {
+        const passiveListener = this.touchEvents.start === 'touchstart' && Support.passiveListener && this.settings.passiveListeners ? { passive: true, capture: false } : false;
+        this.paneEl.addEventListener(this.touchEvents.start, (t) => this.touchStart(t), passiveListener);
+        this.paneEl.addEventListener(this.touchEvents.move, (t) => this.touchMove(t), Support.passiveListener ? { passive: false, capture: false } : false);
+        this.paneEl.addEventListener(this.touchEvents.end, (t) => this.touchEnd(t), passiveListener);
+        if (this.touchEvents['cancel']) {
+          this.paneEl.addEventListener(this.touchEvents['cancel'], (t) => this.touchEnd(t), passiveListener);
+        }
+      }
+
+      if ((this.settings.simulateTouch && !this.device.ios && !this.device.android) || (this.settings.simulateTouch && !Support.touch && this.device.ios)) {
+        this.paneEl.addEventListener('mousedown', (t) => this.touchStart(t), false);
+        this.paneEl.addEventListener('mousemove', (t) => this.touchMove(t), false);
+        this.paneEl.addEventListener('mouseup', (t) => this.touchEnd(t), false);
+      }
+    }
+
+
+  }
+
+  detachEvents() {
+    // Touch Events
+    if (!Support.touch && Support.pointerEvents) {
+      this.paneEl.removeEventListener(this.touchEvents.start, (t) => this.touchStart(t), false);
+      this.paneEl.removeEventListener(this.touchEvents.move, (t) => this.touchMove(t), false);
+      this.paneEl.removeEventListener(this.touchEvents.end, (t) => this.touchEnd(t), false);
+    } else {
+      if (Support.touch) {
+        const passiveListener = this.touchEvents.start === 'onTouchStart' && Support.passiveListener && this.settings.passiveListeners ? { passive: true, capture: false } : false;
+        this.paneEl.removeEventListener(this.touchEvents.start, (t) => this.touchStart(t), passiveListener);
+        this.paneEl.removeEventListener(this.touchEvents.move, (t) => this.touchMove(t), false);
+        this.paneEl.removeEventListener(this.touchEvents.end, (t) => this.touchEnd(t), passiveListener);
+        if (this.touchEvents['cancel']) {
+          this.paneEl.removeEventListener(this.touchEvents['cancel'], (t) => this.touchEnd(t), passiveListener);
+        }
+      }
+      if ((this.settings.simulateTouch && !this.device.ios && !this.device.android) || (this.settings.simulateTouch && !Support.touch && this.device.ios)) {
+        this.paneEl.removeEventListener('mousedown', (t) => this.touchStart(t), false);
+        this.paneEl.removeEventListener('mousemove', (t) => this.touchMove(t), false);
+        this.paneEl.removeEventListener('mouseup', (t) => this.touchEnd(t), false);
+      }
+    }
   }
 
 }

@@ -129,6 +129,8 @@ var myPane = new CupertinoPane('.cupertino-pane', { /* ... */ });
 - `topperOverflowOffset` | **number: 0** | Offset from screen bottom to the end of overflow content
 - `showDraggable` | **boolean: true** | Render rectangular shape on the top of pane
 - `clickBottomOpen` | **boolean: true** | If bottom position reached, simple click to pane will open pane to the next upper point
+- `simulateTouch` | **boolean: true** | Simulate touch events for Desktop
+- `passiveListeners` | **boolean: true** | (Indicates that the function specified by listener will never call preventDefault())
 ### Breakpoints
 - `breaks` | **{}** | Using to override default pane breakpoints. Note that **necessary** to define all three breakpoints when override, with new `enabled` and `offset` if needs.
     - `top` | **{}** | Topper point that pane can reach
@@ -193,10 +195,9 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- Create component for Ionic Framework using stencil
 - Hardware accelerated drag&drop actions
 - Realistic easy-in-out transitions
-- Using in all popular mobile frameworks
+- Using in 3 popular mobile frameworks
 
 ## Contributing
 We welcome contributions of all kinds from anyone.

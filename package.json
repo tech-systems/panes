@@ -1,7 +1,7 @@
 {
   "name": "cupertino-pane",
   "description": "Multiplatform slide-over pane",
-  "version": "1.0.71",
+  "version": "1.0.8",
   "author": "Roman Antonov (roman-rr)",
   "homepage": "https://github.com/roman-rr/cupertino-pane/",
   "repository": "roman-rr/cupertino-pane",
@@ -18,7 +18,7 @@
     "glob": "^7.1.6",
     "gulp": "^4.0.2",
     "rollup": "^1.27.5",
-    "rollup-plugin-typescript2": "^0.25.3",
+    "rollup-plugin-typescript2": "0.25.3",
     "terser": "^4.4.0",
     "tslib": "^1.10.0",
     "tslint": "^5.20.1",
