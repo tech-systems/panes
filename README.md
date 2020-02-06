@@ -22,7 +22,7 @@ Lightweight, Multiplatform, Open Source. For progressive applications.
 * [License](#license)
 
 ## Demonstration
-[Live Demo](https://ionicsvelte.firebaseapp.com/pane/)
+[Live Demo](https://ionicsvelte.firebaseapp.com/ionic/Pane/)
 <div style="display:flex;flex-wrap:wrap;">
     <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/1.gif?raw=true" width="250">
     <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/3.gif?raw=true" width="250">
@@ -150,7 +150,7 @@ The function that executes when the event fires.
 - `onDrag` | **void: () => {}** | Call executes on each new pane position
 
 ## Public Methods
-### present({animate: **boolean: false**})
+### present({animate: **boolean = false**})
 Will render pane DOM and show pane with setted params.
 ```javascript
 myPane.present();
@@ -165,7 +165,7 @@ Dissappear pane from screen, still keep pane in DOM.
 ```javascript
 myPane.hide();
 ```
-### destroy({animate: **boolean: false**})
+### destroy({animate: **boolean = false**})
 Remove pane from DOM and clear styles
 ```javascript
 myPane.destroy();
