@@ -13,7 +13,7 @@ function umd(cb) {
   rollup.rollup({
     input: './src/cupertino-pane.ts',
     plugins: [
-      typescript()
+      typescript({clean:true})
     ],
   }).then((bundle) => bundle.write({
     format: 'cjs',
