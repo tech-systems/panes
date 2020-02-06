@@ -172,6 +172,7 @@ myPane.destroy();
 ```
 ### isHidden()
 Determinate if pane position was moved out of screen, but pane still exist in DOM.
+true - in DOM but not visible, false - in DOM and visible, null - not rendered
 ```javascript
 if (myPane.isHidden()) {
     myPane.moveToBreak('top');

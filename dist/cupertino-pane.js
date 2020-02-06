@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.0.81
+ * Cupertino Pane 1.0.82
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -393,6 +393,7 @@ class CupertinoPane {
         if (this.settings.bottomClose) {
             this.settings.breaks.bottom.enabled = true;
         }
+        this.brs = [];
         ['top', 'middle', 'bottom'].forEach((val) => {
             if (this.settings.breaks[val].enabled) {
                 this.brs.push(this.breaks[val]);
@@ -441,6 +442,9 @@ class CupertinoPane {
         });
     }
     isHidden() {
+        if (!document.querySelector(`.cupertino-pane-wrapper.${this.el.className.split(' ').join('.')}`)) {
+            return null;
+        }
         return this.paneEl.style.transform === `translateY(${this.screen_height}px)`;
     }
     checkOpacityAttr(val) {
@@ -571,6 +575,7 @@ class CupertinoPane {
             this.currentBreak = this.breaks[this.settings.initialBreak];
             // Reset styles
             this.contentEl.style.display = 'none';
+            this.paneEl.style.transform = 'initial';
             // Emit event
             this.settings.onDidDismiss();
         };

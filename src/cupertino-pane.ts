@@ -234,6 +234,7 @@ export class CupertinoPane {
         this.settings.breaks.bottom.enabled = true;
       }
 
+      this.brs = [];
       ['top', 'middle', 'bottom'].forEach((val) => {
         if (this.settings.breaks[val].enabled) {
           this.brs.push(this.breaks[val]);
@@ -288,7 +289,13 @@ export class CupertinoPane {
     });
   }
 
-  public isHidden(): boolean {
+  public isHidden(): (boolean|null) {
+    if (!document.querySelector(
+      `.cupertino-pane-wrapper.${this.el.className.split(' ').join('.')}`)
+    ) {
+      return null;
+    }
+    
     return this.paneEl.style.transform === `translateY(${this.screen_height}px)`;
   }
 
@@ -439,6 +446,7 @@ export class CupertinoPane {
 
         // Reset styles
         this.contentEl.style.display = 'none';
+        this.paneEl.style.transform = 'initial';
 
         // Emit event
         this.settings.onDidDismiss();

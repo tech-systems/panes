@@ -28,7 +28,7 @@ export declare class CupertinoPane {
     }): void;
     moveToBreak(val: any): void;
     hide(): void;
-    isHidden(): boolean;
+    isHidden(): (boolean | null);
     private checkOpacityAttr;
     private checkOverflowAttr;
     /**
