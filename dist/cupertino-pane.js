@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.0.8
+ * Cupertino Pane 1.0.81
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: February 6, 2020
+ * Released on: February 7, 2020
  */
 
 'use strict';
@@ -149,7 +149,6 @@ class CupertinoPane {
     constructor(el, conf = {}) {
         this.el = el;
         this.settings = {
-            initialShow: false,
             initialBreak: 'middle',
             parentElement: null,
             backdrop: false,
@@ -181,11 +180,7 @@ class CupertinoPane {
         this.screen_height = window.screen.height;
         this.steps = [];
         this.pointerDown = false;
-        this.breaks = {
-            top: 50,
-            middle: Math.round(this.screen_height - (this.screen_height * 0.35)),
-            bottom: this.screen_height - 80
-        };
+        this.breaks = {};
         this.brs = [];
         this.device = new Device();
         this.swipeNextPoint = (diff, maxDiff, closest) => {
@@ -257,24 +252,6 @@ class CupertinoPane {
         else {
             this.settings.parentElement = this.el.parentElement;
         }
-        ['top', 'middle', 'bottom'].forEach((val) => {
-            // If initial break disabled - set first enabled
-            if (!this.settings.breaks[this.settings.initialBreak].enabled) {
-                if (this.settings.breaks[val].enabled) {
-                    this.settings.initialBreak = val;
-                }
-            }
-            // Add offsets
-            if (this.settings.breaks[val]
-                && this.settings.breaks[val].enabled
-                && this.settings.breaks[val].offset) {
-                this.breaks[val] -= this.settings.breaks[val].offset;
-            }
-        });
-        this.currentBreak = this.breaks[this.settings.initialBreak];
-        if (this.settings.initialShow) {
-            this.present();
-        }
     }
     drawElements() {
         this.parentEl = this.settings.parentElement;
@@ -296,8 +273,7 @@ class CupertinoPane {
         this.paneEl.style.borderTopRightRadius = '20px';
         this.paneEl.style.boxShadow = '0 4px 16px rgba(0,0,0,.12)';
         this.paneEl.style.overflow = 'hidden';
-        this.paneEl.style.transform = `translateY(${this.settings.initialShow ?
-            this.breaks[this.settings.initialBreak] : this.screen_height}px)`;
+        this.paneEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak]}px)`;
         // Draggable
         this.draggableEl = document.createElement('div');
         this.draggableEl.className = 'draggable';
@@ -338,20 +314,41 @@ class CupertinoPane {
         this.closeEl.style.right = '20px';
         this.closeEl.style.borderRadius = '100%';
     }
-    present() {
+    present(conf = { animate: false }) {
         if (document.querySelector(`.cupertino-pane-wrapper.${this.el.className.split(' ').join('.')}`)) {
             this.moveToBreak(this.settings.initialBreak);
             return;
         }
         // Emit event
         this.settings.onWillPresent();
+        this.breaks = {
+            top: 50,
+            middle: Math.round(this.screen_height - (this.screen_height * 0.35)),
+            bottom: this.screen_height - 80
+        };
+        ['top', 'middle', 'bottom'].forEach((val) => {
+            // If initial break disabled - set first enabled
+            if (!this.settings.breaks[this.settings.initialBreak].enabled) {
+                if (this.settings.breaks[val].enabled) {
+                    this.settings.initialBreak = val;
+                }
+            }
+            // Add offsets
+            if (this.settings.breaks[val]
+                && this.settings.breaks[val].enabled
+                && this.settings.breaks[val].offset) {
+                this.breaks[val] -= this.settings.breaks[val].offset;
+            }
+        });
+        this.currentBreak = this.breaks[this.settings.initialBreak];
         this.drawElements();
         this.parentEl.appendChild(this.wrapperEl);
         this.wrapperEl.appendChild(this.paneEl);
         this.paneEl.appendChild(this.draggableEl);
         this.paneEl.appendChild(this.contentEl);
         this.draggableEl.appendChild(this.moveEl);
-        if (!this.settings.initialShow) {
+        if (conf.animate) {
+            this.paneEl.style.transform = `translateY(${this.screen_height}px)`;
             this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
             setTimeout(() => {
                 this.paneEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak]}px)`;
@@ -359,14 +356,18 @@ class CupertinoPane {
             let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
                 this.paneEl.style.transition = `initial`;
                 initTransitionEv = undefined;
+                // Emit event
+                this.settings.onDidPresent();
             });
         }
-        // Emit event
-        this.settings.onDidPresent();
+        else {
+            // Emit event
+            this.settings.onDidPresent();
+        }
         if (this.settings.backdrop) {
             this.wrapperEl.appendChild(this.backdropEl);
             if (this.settings.backdropClose) {
-                this.backdropEl.addEventListener('click', (t) => this.closePane(this.backdropEl));
+                this.backdropEl.addEventListener('click', (t) => this.destroy({ animate: true }));
             }
         }
         if (!this.settings.showDraggable) {
@@ -379,7 +380,7 @@ class CupertinoPane {
         }
         if (this.settings.buttonClose) {
             this.paneEl.appendChild(this.closeEl);
-            this.closeEl.addEventListener('click', (t) => this.closePane(this.backdropEl));
+            this.closeEl.addEventListener('click', (t) => this.destroy({ animate: true }));
             let iconColor = '#7a7a7e';
             if (this.settings.darkMode) {
                 this.closeEl.style.background = '#424246';
@@ -546,7 +547,7 @@ class CupertinoPane {
         this.checkOverflowAttr(this.currentBreak);
         // Bottom closable
         if (this.settings.bottomClose && closest === this.breaks['bottom']) {
-            this.closePane(this.backdropEl);
+            this.destroy({ animate: true });
             return;
         }
         if (!this.settings.freeMode) {
@@ -558,24 +559,30 @@ class CupertinoPane {
             });
         }
     }
-    closePane(backdropEl) {
+    destroy(conf = { animate: false }) {
         // Emit event
         this.settings.onWillDismiss();
-        this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-        this.paneEl.style.transform = `translateY(${this.screen_height}px)`;
-        backdropEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-        backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
-        // Reset vars
-        this.currentBreak = this.breaks[this.settings.initialBreak];
-        this.paneEl.addEventListener('transitionend', (t) => {
+        const resets = () => {
             this.parentEl.appendChild(this.contentEl);
-            this.contentEl.style.display = 'none';
             this.parentEl.removeChild(this.wrapperEl);
             /****** Detach Events *******/
             this.detachEvents();
+            // Reset vars
+            this.currentBreak = this.breaks[this.settings.initialBreak];
+            // Reset styles
+            this.contentEl.style.display = 'none';
             // Emit event
             this.settings.onDidDismiss();
-        });
+        };
+        if (conf.animate) {
+            this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+            this.paneEl.style.transform = `translateY(${this.screen_height}px)`;
+            this.backdropEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+            this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
+            this.paneEl.addEventListener('transitionend', () => resets());
+            return;
+        }
+        resets();
     }
     attachEvents() {
         // Touch Events

@@ -3,8 +3,7 @@ import { Device } from './device';
 
 export class CupertinoPane {
 
-  private settings: any = {
-    initialShow: false,
+  public settings: any = {
     initialBreak: 'middle',
     parentElement: null,
     backdrop: false,
@@ -43,11 +42,7 @@ export class CupertinoPane {
   private currentBreak: number;
   private contentScrollTop: number;
 
-  private breaks: {} = {
-    top: 50,
-    middle: Math.round(this.screen_height - (this.screen_height * 0.35)),
-    bottom: this.screen_height - 80
-  };
+  private breaks: {} = {}
   private brs: number[] = [];
 
   private parentEl: HTMLElement;
@@ -74,27 +69,6 @@ export class CupertinoPane {
     } else {
       this.settings.parentElement = this.el.parentElement;
     }
-
-    ['top', 'middle', 'bottom'].forEach((val) => {
-      // If initial break disabled - set first enabled
-      if (!this.settings.breaks[this.settings.initialBreak].enabled) {
-        if (this.settings.breaks[val].enabled) {
-          this.settings.initialBreak = val;
-        }
-      }
-
-      // Add offsets
-      if (this.settings.breaks[val]
-          && this.settings.breaks[val].enabled
-          && this.settings.breaks[val].offset) {
-        this.breaks[val] -= this.settings.breaks[val].offset;
-      }
-    });
-    this.currentBreak = this.breaks[this.settings.initialBreak];
-
-    if (this.settings.initialShow) {
-      this.present();
-    }
   }
 
   private drawElements() {
@@ -119,9 +93,7 @@ export class CupertinoPane {
       this.paneEl.style.borderTopRightRadius = '20px';
       this.paneEl.style.boxShadow = '0 4px 16px rgba(0,0,0,.12)';
       this.paneEl.style.overflow = 'hidden';
-      this.paneEl.style.transform = `translateY(${
-        this.settings.initialShow ?
-        this.breaks[this.settings.initialBreak] : this.screen_height}px)`;
+      this.paneEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak]}px)`;
 
       // Draggable
       this.draggableEl = document.createElement('div');
@@ -168,7 +140,7 @@ export class CupertinoPane {
       this.closeEl.style.borderRadius = '100%';
   }
 
-  present() {
+  present(conf: {animate: boolean} = {animate: false}) {
 
       if (document.querySelector(
         `.cupertino-pane-wrapper.${this.el.className.split(' ').join('.')}`)
@@ -180,14 +152,38 @@ export class CupertinoPane {
       // Emit event
       this.settings.onWillPresent();
 
+      this.breaks = {
+        top: 50,
+        middle: Math.round(this.screen_height - (this.screen_height * 0.35)),
+        bottom: this.screen_height - 80
+      };
+      
+      ['top', 'middle', 'bottom'].forEach((val) => {
+        // If initial break disabled - set first enabled
+        if (!this.settings.breaks[this.settings.initialBreak].enabled) {
+          if (this.settings.breaks[val].enabled) {
+            this.settings.initialBreak = val;
+          }
+        }
+  
+        // Add offsets
+        if (this.settings.breaks[val]
+            && this.settings.breaks[val].enabled
+            && this.settings.breaks[val].offset) {
+          this.breaks[val] -= this.settings.breaks[val].offset;
+        }
+      });
+      this.currentBreak = this.breaks[this.settings.initialBreak];
+
       this.drawElements();
       this.parentEl.appendChild(this.wrapperEl);
       this.wrapperEl.appendChild(this.paneEl);
       this.paneEl.appendChild(this.draggableEl);
       this.paneEl.appendChild(this.contentEl);
       this.draggableEl.appendChild(this.moveEl);
-
-      if (!this.settings.initialShow) {
+  
+      if (conf.animate) {
+        this.paneEl.style.transform = `translateY(${this.screen_height}px)`; 
         this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
         setTimeout(() => {
           this.paneEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak]}px)`;
@@ -196,16 +192,18 @@ export class CupertinoPane {
         let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
           this.paneEl.style.transition = `initial`;
           initTransitionEv = undefined;
+          // Emit event
+          this.settings.onDidPresent();
         });
+      } else {
+        // Emit event
+        this.settings.onDidPresent();
       }
-
-      // Emit event
-      this.settings.onDidPresent();
 
       if (this.settings.backdrop) {
         this.wrapperEl.appendChild(this.backdropEl);
         if (this.settings.backdropClose) {
-          this.backdropEl.addEventListener('click', (t) => this.closePane(this.backdropEl));
+          this.backdropEl.addEventListener('click', (t) => this.destroy({animate:true}));
         }
       }
 
@@ -221,7 +219,7 @@ export class CupertinoPane {
 
       if (this.settings.buttonClose) {
         this.paneEl.appendChild(this.closeEl);
-        this.closeEl.addEventListener('click', (t) => this.closePane(this.backdropEl));
+        this.closeEl.addEventListener('click', (t) => this.destroy({animate:true}));
         let iconColor = '#7a7a7e';
         if (this.settings.darkMode) {
           this.closeEl.style.background = '#424246';
@@ -411,7 +409,7 @@ export class CupertinoPane {
 
     // Bottom closable
     if (this.settings.bottomClose && closest === this.breaks['bottom']) {
-      this.closePane(this.backdropEl);
+      this.destroy({animate:true});
       return;
     }
 
@@ -425,30 +423,39 @@ export class CupertinoPane {
     }
   }
 
-  private closePane(backdropEl) {
+  public destroy(conf: {animate: boolean} = {animate: false}) {
       // Emit event
       this.settings.onWillDismiss();
 
-      this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-      this.paneEl.style.transform = `translateY(${this.screen_height}px)`;
-
-      backdropEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-      backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
-      
-      // Reset vars
-      this.currentBreak = this.breaks[this.settings.initialBreak];
-
-      this.paneEl.addEventListener('transitionend', (t) => {
+      const resets = () => {
         this.parentEl.appendChild(this.contentEl);
-        this.contentEl.style.display = 'none';
         this.parentEl.removeChild(this.wrapperEl);
         
         /****** Detach Events *******/
         this.detachEvents();
         
+        // Reset vars
+        this.currentBreak = this.breaks[this.settings.initialBreak];
+
+        // Reset styles
+        this.contentEl.style.display = 'none';
+
         // Emit event
         this.settings.onDidDismiss();
-      });
+      };
+
+      if (conf.animate) {
+        this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+        this.paneEl.style.transform = `translateY(${this.screen_height}px)`;
+
+        this.backdropEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+        this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
+
+        this.paneEl.addEventListener('transitionend', () => resets());
+        return;
+      } 
+
+      resets();
   }
 
   private swipeNextPoint = (diff, maxDiff, closest) => {

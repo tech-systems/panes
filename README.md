@@ -81,7 +81,6 @@ If you don't want to include Cupertino Pane files in your project, you may use i
       '.cupertino-pane', // Pane container selector
       { 
         parentElement: 'body', // Parent container
-        initialShow: false,
         breaks: {
             top: { enabled: false, offset: -70 },
             middle: { enabled: true, offset: 0 },
@@ -90,7 +89,7 @@ If you don't want to include Cupertino Pane files in your project, you may use i
         onDrag: () => console.log('Drag event')
       }
     );
-    myPane.present();
+    myPane.present({animate: true});
   };
   </script>
 </body>
@@ -115,7 +114,6 @@ var myPane = new CupertinoPane('.cupertino-pane', { /* ... */ });
 ## Settings
 ### Common configuration
 - `parentElement` | **string** | Element selector where pane will appended (by default using parent element where html layout placed)
-- `initialShow` | **boolean: false** | Determinate if pane will rendered with animation or immediately
 - `initialBreak` | **(top|middle|bottom): 'middle'** | Initial pane position
 - `darkMode` | **boolean: false** | Initial pane styles
 - `backdrop` | **boolean: false** | Dimmed overlay will rendered with pane if `true`
@@ -152,7 +150,7 @@ The function that executes when the event fires.
 - `onDrag` | **void: () => {}** | Call executes on each new pane position
 
 ## Public Methods
-### present()
+### present({animate: **boolean: false**})
 Will render pane DOM and show pane with setted params.
 ```javascript
 myPane.present();
@@ -166,6 +164,11 @@ myPane.moveToBreak('top');
 Dissappear pane from screen, still keep pane in DOM.
 ```javascript
 myPane.hide();
+```
+### destroy({animate: **boolean: false**})
+Remove pane from DOM and clear styles
+```javascript
+myPane.destroy();
 ```
 ### isHidden()
 Determinate if pane position was moved out of screen, but pane still exist in DOM.

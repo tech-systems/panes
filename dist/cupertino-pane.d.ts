@@ -1,6 +1,6 @@
 export declare class CupertinoPane {
     private el;
-    private settings;
+    settings: any;
     private screen_height;
     private steps;
     private startP;
@@ -23,7 +23,9 @@ export declare class CupertinoPane {
     private device;
     constructor(el: any, conf?: any);
     private drawElements;
-    present(): void;
+    present(conf?: {
+        animate: boolean;
+    }): void;
     moveToBreak(val: any): void;
     hide(): void;
     isHidden(): boolean;
@@ -44,7 +46,9 @@ export declare class CupertinoPane {
      * @param t
      */
     private touchEnd;
-    private closePane;
+    destroy(conf?: {
+        animate: boolean;
+    }): void;
     private swipeNextPoint;
     /************************************
      * Events
