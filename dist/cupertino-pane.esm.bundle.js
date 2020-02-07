@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.0.82
+ * Cupertino Pane 1.0.9
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -462,8 +462,8 @@ class CupertinoPane {
      * @param t
      */
     touchStart(t) {
-        const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
-        const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
+        const targetTouch = t.type === 'touchstart' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
+        const screenY = t.type === 'touchstart' ? targetTouch.screenY : t.screenY;
         if (t.type === 'pointerdown')
             this.pointerDown = true;
         // Event emitter
