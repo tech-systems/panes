@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: February 7, 2020
+ * Released on: February 21, 2020
  */
 
 'use strict';
@@ -152,7 +152,7 @@ class CupertinoPane {
             initialBreak: 'middle',
             parentElement: null,
             backdrop: false,
-            backdropClose: false,
+            backdropTransparent: false,
             animationType: 'ease',
             animationDuration: 300,
             darkMode: false,
@@ -175,7 +175,8 @@ class CupertinoPane {
             onDidPresent: () => { },
             onWillPresent: () => { },
             onDragStart: () => { },
-            onDrag: () => { }
+            onDrag: () => { },
+            onBackdropTap: () => { }
         };
         this.screen_height = window.screen.height;
         this.steps = [];
@@ -303,6 +304,7 @@ class CupertinoPane {
         this.backdropEl.style.top = '0';
         this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.4)';
         this.backdropEl.style.zIndex = '10';
+        this.backdropEl.style.opacity = this.settings.backdropTransparent ? '0' : '1';
         // Close button
         this.closeEl = document.createElement('div');
         this.closeEl.className = 'close-button';
@@ -366,8 +368,8 @@ class CupertinoPane {
         }
         if (this.settings.backdrop) {
             this.wrapperEl.appendChild(this.backdropEl);
-            if (this.settings.backdropClose) {
-                this.backdropEl.addEventListener('click', (t) => this.destroy({ animate: true }));
+            if (this.settings.backdrop) {
+                this.backdropEl.addEventListener('click', (t) => this.settings.onBackdropTap());
             }
         }
         if (!this.settings.showDraggable) {

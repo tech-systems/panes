@@ -117,7 +117,7 @@ var myPane = new CupertinoPane('.cupertino-pane', { /* ... */ });
 - `initialBreak` | **(top|middle|bottom): 'middle'** | Initial pane position
 - `darkMode` | **boolean: false** | Initial pane styles
 - `backdrop` | **boolean: false** | Dimmed overlay will rendered with pane if `true`
-- `backdropClose` | **boolean: false** | Close pane with click to backdrop element
+- `backdropTransparent` | **boolean: false** | Dimmed overlay will rendered with zero opacity
 - `animationType` | **(ease | ease-in | ease-out | ease-in-out | cubic-bezier): 'ease'** | Transition property animation type
 - `animationDuration` | **number: 300** | Transition property duration
 - `bottomClose` | **boolean: false** | Close pane with drag to bottom breakpoint
@@ -148,6 +148,7 @@ The function that executes when the event fires.
 - `onWillPresent` | **void: () => {}** | Call before panel will present
 - `onDragStart` | **void: () => {}** | Call when detect user drag event on pane
 - `onDrag` | **void: () => {}** | Call executes on each new pane position
+- `onBackdropTap` | **void: () => {}** | Call when user tap backdrop overlay
 
 ## Public Methods
 ### present({animate: **boolean = false**})

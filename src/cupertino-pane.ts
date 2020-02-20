@@ -7,7 +7,7 @@ export class CupertinoPane {
     initialBreak: 'middle',
     parentElement: null,
     backdrop: false,
-    backdropClose: false,
+    backdropTransparent: false, 
     animationType: 'ease',
     animationDuration: 300,
     darkMode: false,
@@ -30,7 +30,8 @@ export class CupertinoPane {
     onDidPresent: () => {},
     onWillPresent: () => {},
     onDragStart: () => {},
-    onDrag: () => {}
+    onDrag: () => {},
+    onBackdropTap: () => {}
   };
 
   private screen_height: number = window.screen.height;
@@ -127,6 +128,7 @@ export class CupertinoPane {
       this.backdropEl.style.top = '0';
       this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.4)';
       this.backdropEl.style.zIndex = '10';
+      this.backdropEl.style.opacity = this.settings.backdropTransparent ? '0' : '1';
 
       // Close button
       this.closeEl = document.createElement('div');
@@ -202,8 +204,9 @@ export class CupertinoPane {
 
       if (this.settings.backdrop) {
         this.wrapperEl.appendChild(this.backdropEl);
-        if (this.settings.backdropClose) {
-          this.backdropEl.addEventListener('click', (t) => this.destroy({animate:true}));
+        
+        if (this.settings.backdrop) {
+          this.backdropEl.addEventListener('click', (t) => this.settings.onBackdropTap());
         }
       }
 
