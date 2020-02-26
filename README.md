@@ -179,6 +179,13 @@ if (myPane.isHidden()) {
     myPane.moveToBreak('top');
 }
 ```
+### currentBreak()
+Method return current break position in text format ('top' | 'middle' | 'bottom)
+```javascript
+if (myPane.currentBreak() === 'top') {
+    myPane.moveToBreak('bottom');
+}
+```
 
 ## Attributes
 ### hide-on-bottom

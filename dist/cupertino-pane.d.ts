@@ -7,7 +7,7 @@ export declare class CupertinoPane {
     private pointerDown;
     private topper;
     private bottomer;
-    private currentBreak;
+    private currentBreakpoint;
     private contentScrollTop;
     private breaks;
     private brs;
@@ -29,6 +29,7 @@ export declare class CupertinoPane {
     moveToBreak(val: any): void;
     hide(): void;
     isHidden(): (boolean | null);
+    currentBreak(): (string | null);
     private checkOpacityAttr;
     private checkOverflowAttr;
     /**

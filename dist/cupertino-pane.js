@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.0.9
+ * Cupertino Pane 1.1.1
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: February 21, 2020
+ * Released on: February 26, 2020
  */
 
 'use strict';
@@ -185,7 +185,7 @@ class CupertinoPane {
         this.brs = [];
         this.device = new Device();
         this.swipeNextPoint = (diff, maxDiff, closest) => {
-            if (this.currentBreak === this.breaks['top']) {
+            if (this.currentBreakpoint === this.breaks['top']) {
                 if (diff > maxDiff) {
                     if (this.settings.breaks['middle'].enabled) {
                         return this.breaks['middle'];
@@ -196,7 +196,7 @@ class CupertinoPane {
                 }
                 return this.breaks['top'];
             }
-            if (this.currentBreak === this.breaks['middle']) {
+            if (this.currentBreakpoint === this.breaks['middle']) {
                 if (diff < -maxDiff) {
                     if (this.settings.breaks['top'].enabled) {
                         return this.breaks['top'];
@@ -209,7 +209,7 @@ class CupertinoPane {
                 }
                 return this.breaks['middle'];
             }
-            if (this.currentBreak === this.breaks['bottom']) {
+            if (this.currentBreakpoint === this.breaks['bottom']) {
                 if (diff < -maxDiff) {
                     if (this.settings.breaks['middle'].enabled) {
                         return this.breaks['middle'];
@@ -342,7 +342,7 @@ class CupertinoPane {
                 this.breaks[val] -= this.settings.breaks[val].offset;
             }
         });
-        this.currentBreak = this.breaks[this.settings.initialBreak];
+        this.currentBreakpoint = this.breaks[this.settings.initialBreak];
         this.drawElements();
         this.parentEl.appendChild(this.wrapperEl);
         this.wrapperEl.appendChild(this.paneEl);
@@ -420,8 +420,8 @@ class CupertinoPane {
         this.overflowEl.style.height = `${this.screen_height
             - this.breaks['top'] - 51
             - this.settings.topperOverflowOffset}px`;
-        this.checkOpacityAttr(this.currentBreak);
-        this.checkOverflowAttr(this.currentBreak);
+        this.checkOpacityAttr(this.currentBreakpoint);
+        this.checkOverflowAttr(this.currentBreakpoint);
         /****** Attach Events *******/
         this.attachEvents();
     }
@@ -449,6 +449,16 @@ class CupertinoPane {
         }
         return this.paneEl.style.transform === `translateY(${this.screen_height}px)`;
     }
+    currentBreak() {
+        if (this.breaks['top'] === this.currentBreakpoint)
+            return 'top';
+        if (this.breaks['middle'] === this.currentBreakpoint)
+            return 'middle';
+        if (this.breaks['bottom'] === this.currentBreakpoint)
+            return 'bottom';
+        return null;
+    }
+    ;
     checkOpacityAttr(val) {
         let attrElements = document.querySelectorAll(`.${this.el.className.split(' ')[0]} [hide-on-bottom]`);
         if (!attrElements.length)
@@ -541,16 +551,16 @@ class CupertinoPane {
         }
         // Click to bottom - open middle
         if (this.settings.clickBottomOpen) {
-            if (this.currentBreak === this.breaks['bottom'] && isNaN(diff)) {
+            if (this.currentBreakpoint === this.breaks['bottom'] && isNaN(diff)) {
                 closest = this.settings.breaks['middle'].enabled
                     ? this.breaks['middle'] : this.settings.breaks['top'].enabled
                     ? this.breaks['top'] : this.breaks['bottom'];
             }
         }
         this.steps = [];
-        this.currentBreak = closest;
-        this.checkOpacityAttr(this.currentBreak);
-        this.checkOverflowAttr(this.currentBreak);
+        this.currentBreakpoint = closest;
+        this.checkOpacityAttr(this.currentBreakpoint);
+        this.checkOverflowAttr(this.currentBreakpoint);
         // Bottom closable
         if (this.settings.bottomClose && closest === this.breaks['bottom']) {
             this.destroy({ animate: true });
@@ -574,7 +584,7 @@ class CupertinoPane {
             /****** Detach Events *******/
             this.detachEvents();
             // Reset vars
-            this.currentBreak = this.breaks[this.settings.initialBreak];
+            this.currentBreakpoint = this.breaks[this.settings.initialBreak];
             // Reset styles
             this.contentEl.style.display = 'none';
             this.paneEl.style.transform = 'initial';

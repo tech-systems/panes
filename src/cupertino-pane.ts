@@ -40,7 +40,7 @@ export class CupertinoPane {
   private pointerDown: boolean = false;
   private topper: number;
   private bottomer: number;
-  private currentBreak: number;
+  private currentBreakpoint: number;
   private contentScrollTop: number;
 
   private breaks: {} = {}
@@ -175,7 +175,7 @@ export class CupertinoPane {
           this.breaks[val] -= this.settings.breaks[val].offset;
         }
       });
-      this.currentBreak = this.breaks[this.settings.initialBreak];
+      this.currentBreakpoint = this.breaks[this.settings.initialBreak];
 
       this.drawElements();
       this.parentEl.appendChild(this.wrapperEl);
@@ -264,14 +264,14 @@ export class CupertinoPane {
         - this.breaks['top'] - 51
         - this.settings.topperOverflowOffset}px`;
 
-      this.checkOpacityAttr(this.currentBreak);
-      this.checkOverflowAttr(this.currentBreak);
+      this.checkOpacityAttr(this.currentBreakpoint);
+      this.checkOverflowAttr(this.currentBreakpoint);
 
       /****** Attach Events *******/
       this.attachEvents();
   }
 
-  moveToBreak(val) {
+  public moveToBreak(val) {
     this.checkOpacityAttr(this.breaks[val]);
     this.checkOverflowAttr(this.breaks[val]);
 
@@ -283,7 +283,7 @@ export class CupertinoPane {
     });
   }
 
-  hide() {
+  public hide() {
     this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
     this.paneEl.style.transform = `translateY(${this.screen_height}px)`;
     let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
@@ -301,6 +301,13 @@ export class CupertinoPane {
     
     return this.paneEl.style.transform === `translateY(${this.screen_height}px)`;
   }
+
+  public currentBreak(): (string|null) {
+    if (this.breaks['top'] === this.currentBreakpoint) return 'top';
+    if (this.breaks['middle'] === this.currentBreakpoint) return 'middle';
+    if (this.breaks['bottom'] === this.currentBreakpoint) return 'bottom';
+    return null;
+  };
 
   private checkOpacityAttr(val) {
     let attrElements = document.querySelectorAll(`.${this.el.className.split(' ')[0]} [hide-on-bottom]`);
@@ -404,7 +411,7 @@ export class CupertinoPane {
 
     // Click to bottom - open middle
     if (this.settings.clickBottomOpen) {
-      if (this.currentBreak === this.breaks['bottom'] && isNaN(diff)) {
+      if (this.currentBreakpoint === this.breaks['bottom'] && isNaN(diff)) {
         closest = this.settings.breaks['middle'].enabled
         ? this.breaks['middle'] : this.settings.breaks['top'].enabled
         ? this.breaks['top'] : this.breaks['bottom'];
@@ -412,10 +419,10 @@ export class CupertinoPane {
     }
 
     this.steps = [];
-    this.currentBreak = closest;
+    this.currentBreakpoint = closest;
 
-    this.checkOpacityAttr(this.currentBreak);
-    this.checkOverflowAttr(this.currentBreak);
+    this.checkOpacityAttr(this.currentBreakpoint);
+    this.checkOverflowAttr(this.currentBreakpoint);
 
     // Bottom closable
     if (this.settings.bottomClose && closest === this.breaks['bottom']) {
@@ -445,7 +452,7 @@ export class CupertinoPane {
         this.detachEvents();
         
         // Reset vars
-        this.currentBreak = this.breaks[this.settings.initialBreak];
+        this.currentBreakpoint = this.breaks[this.settings.initialBreak];
 
         // Reset styles
         this.contentEl.style.display = 'none';
@@ -470,7 +477,7 @@ export class CupertinoPane {
   }
 
   private swipeNextPoint = (diff, maxDiff, closest) => {
-      if (this.currentBreak === this.breaks['top']) {
+      if (this.currentBreakpoint === this.breaks['top']) {
         if (diff > maxDiff) {
           if (this.settings.breaks['middle'].enabled) { return this.breaks['middle']; }
           if (this.settings.breaks['bottom'].enabled) { return this.breaks['bottom']; }
@@ -478,7 +485,7 @@ export class CupertinoPane {
         return this.breaks['top'];
       }
 
-      if (this.currentBreak === this.breaks['middle']) {
+      if (this.currentBreakpoint === this.breaks['middle']) {
         if (diff < -maxDiff) {
           if (this.settings.breaks['top'].enabled) { return this.breaks['top']; }
         }
@@ -488,7 +495,7 @@ export class CupertinoPane {
         return this.breaks['middle'];
       }
 
-      if (this.currentBreak === this.breaks['bottom']) {
+      if (this.currentBreakpoint === this.breaks['bottom']) {
         if (diff < -maxDiff) {
           if (this.settings.breaks['middle'].enabled) { return this.breaks['middle']; }
           if (this.settings.breaks['top'].enabled) { return this.breaks['top']; }
