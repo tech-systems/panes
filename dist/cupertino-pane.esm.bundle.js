@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.1
+ * Cupertino Pane 1.1.2
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: February 26, 2020
+ * Released on: March 1, 2020
  */
 
 class Support {
@@ -161,11 +161,7 @@ class CupertinoPane {
             clickBottomOpen: true,
             simulateTouch: true,
             passiveListeners: true,
-            breaks: {
-                top: { enabled: true, offset: 0 },
-                middle: { enabled: true, offset: 0 },
-                bottom: { enabled: true, offset: 0 },
-            },
+            breaks: {},
             onDidDismiss: () => { },
             onWillDismiss: () => { },
             onDidPresent: () => { },
@@ -173,6 +169,11 @@ class CupertinoPane {
             onDragStart: () => { },
             onDrag: () => { },
             onBackdropTap: () => { }
+        };
+        this.defaultBreaksConf = {
+            top: { enabled: true, offset: window.screen.height - (135 * 0.35) },
+            middle: { enabled: true, offset: 300 },
+            bottom: { enabled: true, offset: 100 },
         };
         this.screen_height = window.screen.height;
         this.steps = [];
@@ -320,11 +321,15 @@ class CupertinoPane {
         // Emit event
         this.settings.onWillPresent();
         this.breaks = {
-            top: 50,
-            middle: Math.round(this.screen_height - (this.screen_height * 0.35)),
-            bottom: this.screen_height - 80
+            top: this.screen_height,
+            middle: this.screen_height,
+            bottom: this.screen_height
         };
         ['top', 'middle', 'bottom'].forEach((val) => {
+            // Set default if no exist
+            if (!this.settings.breaks[val]) {
+                this.settings.breaks[val] = this.defaultBreaksConf[val];
+            }
             // If initial break disabled - set first enabled
             if (!this.settings.breaks[this.settings.initialBreak].enabled) {
                 if (this.settings.breaks[val].enabled) {
@@ -338,6 +343,13 @@ class CupertinoPane {
                 this.breaks[val] -= this.settings.breaks[val].offset;
             }
         });
+        // Warnings 
+        if (this.settings.breaks['middle'].offset >= this.settings.breaks['top'].offset) {
+            console.warn('Cupertino Pane: Please set middle offset lower than top offset');
+        }
+        if (this.settings.breaks['middle'].offset <= this.settings.breaks['bottom'].offset) {
+            console.warn('Cupertino Pane: Please set bottom offset lower than middle offset');
+        }
         this.currentBreakpoint = this.breaks[this.settings.initialBreak];
         this.drawElements();
         this.parentEl.appendChild(this.wrapperEl);

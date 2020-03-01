@@ -11,6 +11,7 @@ Cupertino Pane is great modern slide-over pane with touch technologies. Right li
 
 Lightweight, Multiplatform, Open Source. For progressive applications. 
 
+* [Breaking changes](#breaking-changes)
 * [Demonstration](#demonstration)
 * [Supporting platforms](#supporting-platforms)
 * [Getting Started](#getting-started)
@@ -20,6 +21,28 @@ Lightweight, Multiplatform, Open Source. For progressive applications.
 * [Future Goals](#future-goals)
 * [Contributing](#contributing)
 * [License](#license)
+
+## Breaking Changes
+### v.1.1.2
+- Offsets and pane position normalized across all devices and screen heights. Please re-configure offsets if needs. 
+- Offsets value now calculating from screen bottom position
+- Do not necessary now to specify all breaks in settings configuration. Can be changed one or few:
+
+```javascript
+let settings = {
+    breaks: {
+        top: { 
+          enabled: true, 
+          offset: window.screen.height - (135 * 0.35)
+        },
+        middle: {
+          enabled: true,
+          offset: 410 // 410 pixels from screen bottom until pane top vertex
+        }
+      }
+    }
+};
+```
 
 ## Demonstration
 [Live Demo](https://ionicsvelte.firebaseapp.com/ionic/Pane/)
@@ -82,9 +105,8 @@ If you don't want to include Cupertino Pane files in your project, you may use i
       { 
         parentElement: 'body', // Parent container
         breaks: {
-            top: { enabled: false, offset: -70 },
-            middle: { enabled: true, offset: 0 },
-            bottom: { enabled: true, offset: 0 },
+            middle: { enabled: true, offset: 300 },
+            bottom: { enabled: true, offset: 80 },
         },
         onDrag: () => console.log('Drag event')
       }
@@ -130,16 +152,16 @@ var myPane = new CupertinoPane('.cupertino-pane', { /* ... */ });
 - `simulateTouch` | **boolean: true** | Simulate touch events for Desktop
 - `passiveListeners` | **boolean: true** | (Indicates that the function specified by listener will never call preventDefault())
 ### Breakpoints
-- `breaks` | **{}** | Using to override default pane breakpoints. Note that **necessary** to define all three breakpoints when override, with new `enabled` and `offset` if needs.
+- `breaks` | **{}** | Using to override default pane breakpoints.
     - `top` | **{}** | Topper point that pane can reach
         - `enabled` | **boolean: true** | Enable or disable breakpoint
-        -  `offset` | **number: 0** | Additional bottom margin if needs
+        -  `offset` | **number: window.screen.height - (135 * 0.35)** | Additional bottom margin if needs
     - `middle` | **{}** | Middle point that pane can reach
         - `enabled` | **boolean: true** | Enable or disable breakpoint
-        -  `offset` | **number: 0** | Additional bottom margin if needs
+        -  `offset` | **number: 300** | Additional bottom margin if needs
     - `bottom` | **{}** | Bottom point that pane can reach
         - `enabled` | **boolean: true** | Enable or disable breakpoint
-        -  `offset` | **number: 0** | Additional bottom margin if needs
+        -  `offset` | **number: 100** | Additional bottom margin if needs
 ### Callbacks
 The function that executes when the event fires.
 - `onDidDismiss` | **void: () => {}** | Call after pane will dissapeared

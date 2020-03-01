@@ -1,6 +1,7 @@
 export declare class CupertinoPane {
     private el;
     settings: any;
+    private defaultBreaksConf;
     private screen_height;
     private steps;
     private startP;
