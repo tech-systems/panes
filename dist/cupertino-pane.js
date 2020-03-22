@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.2
+ * Cupertino Pane 1.1.21
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: March 1, 2020
+ * Released on: March 22, 2020
  */
 
 'use strict';
@@ -334,12 +334,6 @@ class CupertinoPane {
             if (!this.settings.breaks[val]) {
                 this.settings.breaks[val] = this.defaultBreaksConf[val];
             }
-            // If initial break disabled - set first enabled
-            if (!this.settings.breaks[this.settings.initialBreak].enabled) {
-                if (this.settings.breaks[val].enabled) {
-                    this.settings.initialBreak = val;
-                }
-            }
             // Add offsets
             if (this.settings.breaks[val]
                 && this.settings.breaks[val].enabled
@@ -348,6 +342,9 @@ class CupertinoPane {
             }
         });
         // Warnings 
+        if (!this.settings.breaks[this.settings.initialBreak].enabled) {
+            console.warn('Cupertino Pane: Please set initialBreak for enabled breakpoint');
+        }
         if (this.settings.breaks['middle'].offset >= this.settings.breaks['top'].offset) {
             console.warn('Cupertino Pane: Please set middle offset lower than top offset');
         }

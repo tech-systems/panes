@@ -166,13 +166,6 @@ export class CupertinoPane {
         if (!this.settings.breaks[val]) {
           this.settings.breaks[val] = this.defaultBreaksConf[val];
         }
-
-        // If initial break disabled - set first enabled
-        if (!this.settings.breaks[this.settings.initialBreak].enabled) {
-          if (this.settings.breaks[val].enabled) {
-            this.settings.initialBreak = val;
-          }
-        }
   
         // Add offsets
         if (this.settings.breaks[val]
@@ -183,6 +176,9 @@ export class CupertinoPane {
       });
 
       // Warnings 
+      if (!this.settings.breaks[this.settings.initialBreak].enabled) {
+        console.warn('Cupertino Pane: Please set initialBreak for enabled breakpoint');
+      }
       if (this.settings.breaks['middle'].offset >= this.settings.breaks['top'].offset) {
         console.warn('Cupertino Pane: Please set middle offset lower than top offset');
       }
