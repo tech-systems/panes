@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: April 1, 2020
+ * Released on: April 2, 2020
  */
 
 'use strict';
@@ -444,6 +444,10 @@ class CupertinoPane {
         this.attachEvents();
     }
     moveToBreak(val) {
+        if (!this.settings.breaks[val].enabled) {
+            console.warn('Cupertino Pane: %s breakpoint disabled', val);
+            return;
+        }
         this.checkOpacityAttr(this.breaks[val]);
         this.checkOverflowAttr(this.breaks[val]);
         this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;

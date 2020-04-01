@@ -293,6 +293,11 @@ export class CupertinoPane {
   }
 
   public moveToBreak(val) {
+    if (!this.settings.breaks[val].enabled) {
+      console.warn('Cupertino Pane: %s breakpoint disabled', val);
+      return;
+    }
+
     this.checkOpacityAttr(this.breaks[val]);
     this.checkOverflowAttr(this.breaks[val]);
 
