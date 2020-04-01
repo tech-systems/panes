@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.21
+ * Cupertino Pane 1.1.3
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: March 22, 2020
+ * Released on: April 1, 2020
  */
 
 'use strict';
@@ -146,8 +146,8 @@ class Device {
 }
 
 class CupertinoPane {
-    constructor(el, conf = {}) {
-        this.el = el;
+    constructor(selector, conf = {}) {
+        this.selector = selector;
         this.settings = {
             initialBreak: 'middle',
             parentElement: null,
@@ -245,9 +245,15 @@ class CupertinoPane {
             };
             return Support.touch || !this.settings.simulateTouch ? touchEventsTouch : touchEventsDesktop;
         })();
-        this.settings = Object.assign(Object.assign({}, this.settings), conf);
-        this.el = document.querySelector(this.el);
+        // Unable attach DOM element
+        if (!document.querySelector(this.selector)) {
+            console.error('Cupertino Pane: wrong selector specified', this.selector);
+            delete this.el;
+            return;
+        }
+        this.el = document.querySelector(this.selector);
         this.el.style.display = 'none';
+        this.settings = Object.assign(Object.assign({}, this.settings), conf);
         if (this.settings.parentElement) {
             this.settings.parentElement = document.querySelector(this.settings.parentElement);
         }
@@ -318,7 +324,10 @@ class CupertinoPane {
         this.closeEl.style.borderRadius = '100%';
     }
     present(conf = { animate: false }) {
-        if (document.querySelector(`.cupertino-pane-wrapper.${this.el.className.split(' ').join('.')}`)) {
+        if (!this.el)
+            return;
+        // Pane already was rendered
+        if (document.querySelector(`.cupertino-pane-wrapper ${this.selector}`)) {
             this.moveToBreak(this.settings.initialBreak);
             return;
         }
@@ -419,7 +428,7 @@ class CupertinoPane {
             return (Math.abs(curr) > Math.abs(prev) ? curr : prev);
         });
         // Get overflow element
-        let attrElements = document.querySelectorAll(`.${this.el.className.split(' ')[0]} [overflow-y]`);
+        let attrElements = document.querySelectorAll(`${this.selector} [overflow-y]`);
         if (!attrElements.length || attrElements.length > 1) {
             this.overflowEl = this.contentEl;
         }
@@ -453,7 +462,7 @@ class CupertinoPane {
         });
     }
     isHidden() {
-        if (!document.querySelector(`.cupertino-pane-wrapper.${this.el.className.split(' ').join('.')}`)) {
+        if (!document.querySelector(`.cupertino-pane-wrapper ${this.selector}`)) {
             return null;
         }
         return this.paneEl.style.transform === `translateY(${this.screen_height}px)`;
@@ -469,7 +478,7 @@ class CupertinoPane {
     }
     ;
     checkOpacityAttr(val) {
-        let attrElements = document.querySelectorAll(`.${this.el.className.split(' ')[0]} [hide-on-bottom]`);
+        let attrElements = document.querySelectorAll(`${this.selector} [hide-on-bottom]`);
         if (!attrElements.length)
             return;
         attrElements.forEach((item) => {

@@ -1,5 +1,5 @@
 export declare class CupertinoPane {
-    private el;
+    private selector;
     settings: any;
     private defaultBreaksConf;
     private screen_height;
@@ -12,6 +12,7 @@ export declare class CupertinoPane {
     private contentScrollTop;
     private breaks;
     private brs;
+    private el;
     private parentEl;
     private wrapperEl;
     private paneEl;
@@ -22,7 +23,7 @@ export declare class CupertinoPane {
     private closeEl;
     private overflowEl;
     private device;
-    constructor(el: any, conf?: any);
+    constructor(selector: string, conf?: any);
     private drawElements;
     present(conf?: {
         animate: boolean;

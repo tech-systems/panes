@@ -46,23 +46,31 @@ export class CupertinoPane {
 
   private breaks: {} = {}
   private brs: number[] = [];
-
+  
+  private el: HTMLElement;
   private parentEl: HTMLElement;
   private wrapperEl: HTMLDivElement;
   private paneEl: HTMLDivElement;
   private draggableEl: HTMLDivElement;
   private moveEl: HTMLDivElement;
-  private contentEl: HTMLHeadingElement;
+  private contentEl: HTMLElement;
   private backdropEl: HTMLDivElement;
   private closeEl: HTMLDivElement;
   private overflowEl: HTMLElement;
 
   private device = new Device();
 
-  constructor(private el, conf: any = {}) {
-    this.settings = {...this.settings, ...conf};
-    this.el = <HTMLDivElement>document.querySelector(this.el);
+  constructor(private selector: string, conf: any = {}) {
+    // Unable attach DOM element
+    if (!<HTMLElement>document.querySelector(this.selector)) {
+      console.error('Cupertino Pane: wrong selector specified', this.selector);
+      delete this.el;
+      return;
+    }
+
+    this.el = <HTMLElement>document.querySelector(this.selector);
     this.el.style.display = 'none';
+    this.settings = {...this.settings, ...conf};
     
     if (this.settings.parentElement) {
       this.settings.parentElement = <HTMLElement>document.querySelector(
@@ -144,9 +152,11 @@ export class CupertinoPane {
   }
 
   present(conf: {animate: boolean} = {animate: false}) {
+      if (!this.el) return;
 
+      // Pane already was rendered
       if (document.querySelector(
-        `.cupertino-pane-wrapper.${this.el.className.split(' ').join('.')}`)
+        `.cupertino-pane-wrapper ${this.selector}`)
       ) {
         this.moveToBreak(this.settings.initialBreak);
         return;
@@ -265,7 +275,7 @@ export class CupertinoPane {
       });
 
       // Get overflow element
-      let attrElements = document.querySelectorAll(`.${this.el.className.split(' ')[0]} [overflow-y]`);
+      let attrElements = document.querySelectorAll(`${this.selector} [overflow-y]`);
       if (!attrElements.length || attrElements.length > 1) {
         this.overflowEl = this.contentEl;
       } else {
@@ -305,7 +315,7 @@ export class CupertinoPane {
 
   public isHidden(): (boolean|null) {
     if (!document.querySelector(
-      `.cupertino-pane-wrapper.${this.el.className.split(' ').join('.')}`)
+      `.cupertino-pane-wrapper ${this.selector}`)
     ) {
       return null;
     }
@@ -321,7 +331,7 @@ export class CupertinoPane {
   };
 
   private checkOpacityAttr(val) {
-    let attrElements = document.querySelectorAll(`.${this.el.className.split(' ')[0]} [hide-on-bottom]`);
+    let attrElements = document.querySelectorAll(`${this.selector} [hide-on-bottom]`);
     if (!attrElements.length) return;
     attrElements.forEach((item) => {
       (<HTMLElement>item).style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
