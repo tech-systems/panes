@@ -293,6 +293,7 @@ export class CupertinoPane {
   }
 
   public moveToBreak(val) {
+    // TODO: error handler if pane doesn't presented
     if (!this.settings.breaks[val].enabled) {
       console.warn('Cupertino Pane: %s breakpoint disabled', val);
       return;
@@ -310,6 +311,7 @@ export class CupertinoPane {
   }
 
   public hide() {
+    // TODO: error handler if pane doesn't presented
     this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
     this.paneEl.style.transform = `translateY(${this.screen_height}px)`;
     let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
