@@ -231,7 +231,8 @@ By default using for full pane area, but in some cases good useful with header.
 ## Future Goals
 - Hardware accelerated drag&drop actions
 - Realistic easy-in-out transitions
-- Using in 3 popular mobile frameworks
+- 3D effect
+- Drawer effect
 
 ## Contributing
 We welcome contributions of all kinds from anyone.
