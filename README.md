@@ -1,3 +1,5 @@
+<!-- https://github.com/ai/nanoid - cover -->
+
 # Cupertino Pane
 
 [![CircleCI](https://circleci.com/gh/roman-rr/cupertino-pane.svg?style=svg)](https://circleci.com/gh/roman-rr/cupertino-pane)
