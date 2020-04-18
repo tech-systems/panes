@@ -28,12 +28,13 @@ export declare class CupertinoPane {
     present(conf?: {
         animate: boolean;
     }): void;
-    moveToBreak(val: any): void;
-    hide(): void;
+    moveToBreak(val: any): any;
+    hide(): any;
     isHidden(): (boolean | null);
     currentBreak(): (string | null);
     private checkOpacityAttr;
     private checkOverflowAttr;
+    private isPanePresented;
     /**
      * Touch Start Event
      * @param t
@@ -51,7 +52,7 @@ export declare class CupertinoPane {
     private touchEnd;
     destroy(conf?: {
         animate: boolean;
-    }): void;
+    }): any;
     private swipeNextPoint;
     /************************************
      * Events

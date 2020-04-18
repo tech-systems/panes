@@ -233,12 +233,11 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- Hide backdrop on pane hide
-- Error handlers for methods
 - Hardware accelerated drag&drop actions
 - Realistic easy-in-out transitions
 - 3D effect (ion-modal example)
 - Drawer effect
+- 3D button effect
 - Refresh readme with live example on pages
 
 ## Contributing
