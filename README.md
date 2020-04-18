@@ -231,6 +231,7 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
+- Error handlers for methods
 - Hardware accelerated drag&drop actions
 - Realistic easy-in-out transitions
 - 3D effect (ion-modal example)
