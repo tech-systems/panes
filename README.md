@@ -9,9 +9,11 @@
 [![Code Style](https://badgen.net/badge/icon/typescript?icon=typescript&label)](https://www.typescriptlang.org/)
 [![Code Style](https://badgen.net/badge/code%20style/airbnb/ff5a5f?icon=airbnb)](https://github.com/airbnb/javascript)
 
-Cupertino Pane is great modern slide-over pane with touch technologies. Right like in Apple Maps, Apple Stocks, Apple Music and other modern apps.
+Cupertino Pane is great modern slide-over pane with touch technologies. 
+Right like in Apple Maps, Apple Stocks, Apple Music and other modern apps.
 
-Lightweight, Multiplatform, Open Source. For progressive applications. 
+> Lightweight, Multiplatform, Open Source. For progressive applications. 
+
 
 * [Breaking changes](#breaking-changes)
 * [Demonstration](#demonstration)
