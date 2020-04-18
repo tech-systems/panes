@@ -233,11 +233,12 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
+- Tests envieronment
 - Hardware accelerated drag&drop actions
-- Realistic easy-in-out transitions
 - 3D effect (ion-modal example)
 - Drawer effect
-- 3D button effect
+- 3D button toggle effect
+- Realistic easy-in-out transitions
 - Refresh readme with live example on pages
 
 ## Contributing
