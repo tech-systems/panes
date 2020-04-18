@@ -156,7 +156,7 @@ export class CupertinoPane {
       if (!this.el) return;
 
       // Pane already was rendered
-      if (this.isPanePresented) {
+      if (this.isPanePresented()) {
         this.moveToBreak(this.settings.initialBreak);
         return;
       }
@@ -289,7 +289,7 @@ export class CupertinoPane {
   }
 
   public moveToBreak(val) {
-    if (!this.isPanePresented) {
+    if (!this.isPanePresented()) {
       console.warn(`Cupertino Pane: Present pane before call moveToBreak()`);
       return null;
     }
@@ -316,7 +316,7 @@ export class CupertinoPane {
   }
 
   public hide() {
-    if (!this.isPanePresented) {
+    if (!this.isPanePresented()) {
       console.warn(`Cupertino Pane: Present pane before call hide()`);
       return null;
     }
@@ -342,7 +342,7 @@ export class CupertinoPane {
   }
 
   public isHidden(): (boolean|null) {
-    if (!this.isPanePresented) {
+    if (!this.isPanePresented()) {
       console.warn(`Cupertino Pane: Present pane before call isHidden()`);
       return null;
     }
@@ -351,7 +351,7 @@ export class CupertinoPane {
   }
 
   public currentBreak(): (string|null) {
-    if (!this.isPanePresented) {
+    if (!this.isPanePresented()) {
       console.warn(`Cupertino Pane: Present pane before call currentBreak()`);
       return null;
     }
@@ -376,7 +376,7 @@ export class CupertinoPane {
     this.overflowEl.style.overflowY = (val <= this.topper) ? 'auto' : 'hidden';
   }
 
-  private isPanePresented() {
+  private isPanePresented():boolean {
     return document.querySelector(`.cupertino-pane-wrapper ${this.selector}`) 
     ? true : false;
   }
@@ -499,7 +499,7 @@ export class CupertinoPane {
   }
 
   public destroy(conf: {animate: boolean} = {animate: false}) {
-    if (!this.isPanePresented) {
+    if (!this.isPanePresented()) {
       console.warn(`Cupertino Pane: Present pane before call destroy()`);
       return null;
     }
@@ -533,7 +533,7 @@ export class CupertinoPane {
           this.backdropEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
           this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
         }
-        
+
         this.paneEl.addEventListener('transitionend', () => resets());
         return;
       } 

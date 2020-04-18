@@ -328,7 +328,7 @@ class CupertinoPane {
         if (!this.el)
             return;
         // Pane already was rendered
-        if (this.isPanePresented) {
+        if (this.isPanePresented()) {
             this.moveToBreak(this.settings.initialBreak);
             return;
         }
@@ -443,7 +443,7 @@ class CupertinoPane {
         this.attachEvents();
     }
     moveToBreak(val) {
-        if (!this.isPanePresented) {
+        if (!this.isPanePresented()) {
             console.warn(`Cupertino Pane: Present pane before call moveToBreak()`);
             return null;
         }
@@ -465,7 +465,7 @@ class CupertinoPane {
         });
     }
     hide() {
-        if (!this.isPanePresented) {
+        if (!this.isPanePresented()) {
             console.warn(`Cupertino Pane: Present pane before call hide()`);
             return null;
         }
@@ -485,14 +485,14 @@ class CupertinoPane {
         });
     }
     isHidden() {
-        if (!this.isPanePresented) {
+        if (!this.isPanePresented()) {
             console.warn(`Cupertino Pane: Present pane before call isHidden()`);
             return null;
         }
         return this.paneEl.style.transform === `translateY(${this.screen_height}px)`;
     }
     currentBreak() {
-        if (!this.isPanePresented) {
+        if (!this.isPanePresented()) {
             console.warn(`Cupertino Pane: Present pane before call currentBreak()`);
             return null;
         }
@@ -626,7 +626,7 @@ class CupertinoPane {
         }
     }
     destroy(conf = { animate: false }) {
-        if (!this.isPanePresented) {
+        if (!this.isPanePresented()) {
             console.warn(`Cupertino Pane: Present pane before call destroy()`);
             return null;
         }
