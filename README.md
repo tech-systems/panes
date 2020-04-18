@@ -233,8 +233,9 @@ By default using for full pane area, but in some cases good useful with header.
 ## Future Goals
 - Hardware accelerated drag&drop actions
 - Realistic easy-in-out transitions
-- 3D effect
+- 3D effect (ion-modal example)
 - Drawer effect
+- Refresh readme with live example on pages
 
 ## Contributing
 We welcome contributions of all kinds from anyone.
