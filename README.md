@@ -12,7 +12,7 @@
 <img src="https://user-images.githubusercontent.com/10646478/79794348-4846bc00-837c-11ea-8b74-7c71fac120aa.png" 
      align="right" alt="Cupertino Pane logo Roman Antonov" width="260px" height="421px">
      
-Cupertino Pane is great modern slide-over pane with touch technologies. 
+Cupertino Pane is great modern slide-over pane with touch technologies. <br>
 Right like in Apple Maps, Apple Stocks, Apple Music and other modern apps.
 
 > Lightweight, Multiplatform, Open Source. For progressive applications. 
