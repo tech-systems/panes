@@ -9,6 +9,9 @@
 [![Code Style](https://badgen.net/badge/icon/typescript?icon=typescript&label)](https://www.typescriptlang.org/)
 [![Code Style](https://badgen.net/badge/code%20style/airbnb/ff5a5f?icon=airbnb)](https://github.com/airbnb/javascript)
 
+<img src="https://user-images.githubusercontent.com/10646478/79794348-4846bc00-837c-11ea-8b74-7c71fac120aa.png" 
+     align="right" alt="Cupertino Pane logo Roman Antonov" width="260px" height="421px">
+     
 Cupertino Pane is great modern slide-over pane with touch technologies. 
 Right like in Apple Maps, Apple Stocks, Apple Music and other modern apps.
 
@@ -49,12 +52,10 @@ let settings = {
 ```
 
 ## Demonstration
-[Live Demo](https://ionicsvelte.firebaseapp.com/ionic/Pane/)
-<div style="display:flex;flex-wrap:wrap;">
-    <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/1.gif?raw=true" width="250">
-    <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/3.gif?raw=true" width="250">
-    <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/2.gif?raw=true" width="250">
-</div>
+- [Animated Gif Demo #1](https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/1.gif?raw=true)
+- [Animated Gif Demo #2](https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/2.gif?raw=true)
+- [Animated Gif Demo #3](https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/3.gif?raw=true)
+- [Live Demo Old Version](https://ionicsvelte.firebaseapp.com/ionic/Pane/)
 
 ## Supporting platforms
 We officially support the last two versions of every major browser. Specifically, we test on the following browsers:
