@@ -307,6 +307,8 @@ export class CupertinoPane {
       this.backdropEl.style.display = 'block';
     }
 
+    this.currentBreakpoint = this.breaks[val];
+    
     this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
     this.paneEl.style.transform = `translateY(${this.breaks[val]}px)`;
     let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {

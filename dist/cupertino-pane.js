@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.32
+ * Cupertino Pane 1.1.33
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: April 18, 2020
+ * Released on: April 24, 2020
  */
 
 'use strict';
@@ -457,6 +457,7 @@ class CupertinoPane {
             this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.4)';
             this.backdropEl.style.display = 'block';
         }
+        this.currentBreakpoint = this.breaks[val];
         this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
         this.paneEl.style.transform = `translateY(${this.breaks[val]}px)`;
         let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
