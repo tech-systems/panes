@@ -43,6 +43,7 @@ export class CupertinoPane {
   private bottomer: number;
   private currentBreakpoint: number;
   private contentScrollTop: number;
+  private disableDragEvents: boolean = false;
 
   private breaks: {} = {}
   private brs: number[] = [];
@@ -288,82 +289,6 @@ export class CupertinoPane {
       this.attachEvents();
   }
 
-  public moveToBreak(val) {
-    if (!this.isPanePresented()) {
-      console.warn(`Cupertino Pane: Present pane before call moveToBreak()`);
-      return null;
-    }
-
-    if (!this.settings.breaks[val].enabled) {
-      console.warn('Cupertino Pane: %s breakpoint disabled', val);
-      return;
-    }
-
-    this.checkOpacityAttr(this.breaks[val]);
-    this.checkOverflowAttr(this.breaks[val]);
-
-    if (this.settings.backdrop) {
-      this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.4)';
-      this.backdropEl.style.display = 'block';
-    }
-
-    this.currentBreakpoint = this.breaks[val];
-    
-    this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-    this.paneEl.style.transform = `translateY(${this.breaks[val]}px)`;
-    let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
-      this.paneEl.style.transition = `initial`;
-      initTransitionEv = undefined;
-    });
-  }
-
-  public hide() {
-    if (!this.isPanePresented()) {
-      console.warn(`Cupertino Pane: Present pane before call hide()`);
-      return null;
-    }
-
-    this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-    this.paneEl.style.transform = `translateY(${this.screen_height}px)`;
-
-    if (this.settings.backdrop) {
-      this.backdropEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-      this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
-    }
-
-    let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
-      this.paneEl.style.transition = `initial`;
-
-      if (this.settings.backdrop) {
-        this.backdropEl.style.transition = `initial`;
-        this.backdropEl.style.display = `none`;
-      }
-
-      initTransitionEv = undefined;
-    });
-  }
-
-  public isHidden(): (boolean|null) {
-    if (!this.isPanePresented()) {
-      console.warn(`Cupertino Pane: Present pane before call isHidden()`);
-      return null;
-    }
-    
-    return this.paneEl.style.transform === `translateY(${this.screen_height}px)`;
-  }
-
-  public currentBreak(): (string|null) {
-    if (!this.isPanePresented()) {
-      console.warn(`Cupertino Pane: Present pane before call currentBreak()`);
-      return null;
-    }
-
-    if (this.breaks['top'] === this.currentBreakpoint) return 'top';
-    if (this.breaks['middle'] === this.currentBreakpoint) return 'middle';
-    if (this.breaks['bottom'] === this.currentBreakpoint) return 'bottom';
-    return null;
-  };
-
   private checkOpacityAttr(val) {
     let attrElements = document.querySelectorAll(`${this.selector} [hide-on-bottom]`);
     if (!attrElements.length) return;
@@ -388,28 +313,33 @@ export class CupertinoPane {
    * @param t 
    */
   private touchStart(t) {
+    // Event emitter
+    this.settings.onDragStart(t as CustomEvent);
+
+    if (this.disableDragEvents) return;
+
     const targetTouch = t.type === 'touchstart' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
     const screenY = t.type === 'touchstart' ? targetTouch.screenY : t.screenY;
     if (t.type === 'pointerdown') this.pointerDown = true;
 
-    // Event emitter
-    this.settings.onDragStart();
     this.startP = screenY;
     this.steps.push(this.startP);
   }
 
-  /**
+  /** 
    * Touch Move Event
    * @param t 
    */
   private touchMove(t) {
+    // Event emitter
+    this.settings.onDrag(t as CustomEvent);
+
+    if (this.disableDragEvents) return;
+
     // Handle desktop/mobile events
     const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
     const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
     if(t.type === 'pointermove' && !this.pointerDown) return;
-
-    // Event emitter
-    this.settings.onDrag();
 
     const translateYRegex = /\.*translateY\((.*)px\)/i;
     const p = parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
@@ -449,6 +379,8 @@ export class CupertinoPane {
    * @param t 
    */
   private touchEnd(t) {
+    if (this.disableDragEvents) return;
+
     const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
     const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
     if (t.type === 'pointerup') this.pointerDown = false;
@@ -498,49 +430,6 @@ export class CupertinoPane {
         initTransitionEv = undefined;
       });
     }
-  }
-
-  public destroy(conf: {animate: boolean} = {animate: false}) {
-    if (!this.isPanePresented()) {
-      console.warn(`Cupertino Pane: Present pane before call destroy()`);
-      return null;
-    }
-
-      // Emit event
-      this.settings.onWillDismiss();
-
-      const resets = () => {
-        this.parentEl.appendChild(this.contentEl);
-        this.parentEl.removeChild(this.wrapperEl);
-        
-        /****** Detach Events *******/
-        this.detachEvents();
-        
-        // Reset vars
-        this.currentBreakpoint = this.breaks[this.settings.initialBreak];
-
-        // Reset styles
-        this.contentEl.style.display = 'none';
-        this.paneEl.style.transform = 'initial';
-
-        // Emit event
-        this.settings.onDidDismiss();
-      };
-
-      if (conf.animate) {
-        this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-        this.paneEl.style.transform = `translateY(${this.screen_height}px)`;
-
-        if (this.settings.backdrop) {
-          this.backdropEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-          this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
-        }
-
-        this.paneEl.addEventListener('transitionend', () => resets());
-        return;
-      } 
-
-      resets();
   }
 
   private swipeNextPoint = (diff, maxDiff, closest) => {
@@ -647,6 +536,143 @@ export class CupertinoPane {
         this.paneEl.removeEventListener('mouseup', (t) => this.touchEnd(t), false);
       }
     }
+  }
+
+  /************************************
+   * Public user methods
+   */
+
+  /**
+   * Disable pane drag events
+   */
+  public disableDrag(): void {
+    this.disableDragEvents = true;
+  }
+
+  /**
+   * Enable pane drag events
+   */  
+  public enableDrag(): void {
+    this.disableDragEvents = false;
+  }
+
+  public moveToBreak(val) {
+    if (!this.isPanePresented()) {
+      console.warn(`Cupertino Pane: Present pane before call moveToBreak()`);
+      return null;
+    }
+
+    if (!this.settings.breaks[val].enabled) {
+      console.warn('Cupertino Pane: %s breakpoint disabled', val);
+      return;
+    }
+
+    this.checkOpacityAttr(this.breaks[val]);
+    this.checkOverflowAttr(this.breaks[val]);
+
+    if (this.settings.backdrop) {
+      this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.4)';
+      this.backdropEl.style.display = 'block';
+    }
+
+    this.currentBreakpoint = this.breaks[val];
+    
+    this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+    this.paneEl.style.transform = `translateY(${this.breaks[val]}px)`;
+    let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
+      this.paneEl.style.transition = `initial`;
+      initTransitionEv = undefined;
+    });
+  }
+
+  public hide() {
+    if (!this.isPanePresented()) {
+      console.warn(`Cupertino Pane: Present pane before call hide()`);
+      return null;
+    }
+
+    this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+    this.paneEl.style.transform = `translateY(${this.screen_height}px)`;
+
+    if (this.settings.backdrop) {
+      this.backdropEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+      this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
+    }
+
+    let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
+      this.paneEl.style.transition = `initial`;
+
+      if (this.settings.backdrop) {
+        this.backdropEl.style.transition = `initial`;
+        this.backdropEl.style.display = `none`;
+      }
+
+      initTransitionEv = undefined;
+    });
+  }
+
+  public isHidden(): (boolean|null) {
+    if (!this.isPanePresented()) {
+      console.warn(`Cupertino Pane: Present pane before call isHidden()`);
+      return null;
+    }
+    
+    return this.paneEl.style.transform === `translateY(${this.screen_height}px)`;
+  }
+
+  public currentBreak(): (string|null) {
+    if (!this.isPanePresented()) {
+      console.warn(`Cupertino Pane: Present pane before call currentBreak()`);
+      return null;
+    }
+
+    if (this.breaks['top'] === this.currentBreakpoint) return 'top';
+    if (this.breaks['middle'] === this.currentBreakpoint) return 'middle';
+    if (this.breaks['bottom'] === this.currentBreakpoint) return 'bottom';
+    return null;
+  };
+
+  public destroy(conf: {animate: boolean} = {animate: false}) {
+    if (!this.isPanePresented()) {
+      console.warn(`Cupertino Pane: Present pane before call destroy()`);
+      return null;
+    }
+
+      // Emit event
+      this.settings.onWillDismiss();
+
+      const resets = () => {
+        this.parentEl.appendChild(this.contentEl);
+        this.parentEl.removeChild(this.wrapperEl);
+        
+        /****** Detach Events *******/
+        this.detachEvents();
+        
+        // Reset vars
+        this.currentBreakpoint = this.breaks[this.settings.initialBreak];
+
+        // Reset styles
+        this.contentEl.style.display = 'none';
+        this.paneEl.style.transform = 'initial';
+
+        // Emit event
+        this.settings.onDidDismiss();
+      };
+
+      if (conf.animate) {
+        this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+        this.paneEl.style.transform = `translateY(${this.screen_height}px)`;
+
+        if (this.settings.backdrop) {
+          this.backdropEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+          this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
+        }
+
+        this.paneEl.addEventListener('transitionend', () => resets());
+        return;
+      } 
+
+      resets();
   }
 
 }

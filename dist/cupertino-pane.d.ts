@@ -10,6 +10,7 @@ export declare class CupertinoPane {
     private bottomer;
     private currentBreakpoint;
     private contentScrollTop;
+    private disableDragEvents;
     private breaks;
     private brs;
     private el;
@@ -28,10 +29,6 @@ export declare class CupertinoPane {
     present(conf?: {
         animate: boolean;
     }): void;
-    moveToBreak(val: any): any;
-    hide(): any;
-    isHidden(): (boolean | null);
-    currentBreak(): (string | null);
     private checkOpacityAttr;
     private checkOverflowAttr;
     private isPanePresented;
@@ -50,9 +47,6 @@ export declare class CupertinoPane {
      * @param t
      */
     private touchEnd;
-    destroy(conf?: {
-        animate: boolean;
-    }): any;
     private swipeNextPoint;
     /************************************
      * Events
@@ -60,4 +54,22 @@ export declare class CupertinoPane {
     private touchEvents;
     attachEvents(): void;
     detachEvents(): void;
+    /************************************
+     * Public user methods
+     */
+    /**
+     * Disable pane drag events
+     */
+    disableDrag(): void;
+    /**
+     * Enable pane drag events
+     */
+    enableDrag(): void;
+    moveToBreak(val: any): any;
+    hide(): any;
+    isHidden(): (boolean | null);
+    currentBreak(): (string | null);
+    destroy(conf?: {
+        animate: boolean;
+    }): any;
 }

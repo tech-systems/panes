@@ -213,6 +213,16 @@ if (myPane.currentBreak() === 'top') {
     myPane.moveToBreak('bottom');
 }
 ```
+### disableDrag()
+Method disable any drag actions for pane
+```javascript
+myPane.disableDrag();
+```
+### enableDrag()
+Method enable any drag actions for pane
+```javascript
+myPane.enableDrag();
+```
 
 ## Attributes
 ### hide-on-bottom
@@ -234,7 +244,7 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- Tests envieronment
+- Playground (livereload, build ionic app, live demo)
 - Hardware accelerated drag&drop actions
 - 3D effect (ion-modal example)
 - Drawer effect

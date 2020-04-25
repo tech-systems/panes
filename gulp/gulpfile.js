@@ -1,5 +1,7 @@
 /* eslint no-console: ["error", { allow: ["log"] }] */
 const gulp = require('gulp');
+const connect = require('gulp-connect');
+const gopen = require('gulp-open');
 const fs = require('fs');
 const path = require('path');
 const del = require('del');
@@ -37,3 +39,24 @@ gulp.task('prod-source-sourcemap-fix-paths', (cb) => {
 });
 
 gulp.task('build', gulp.series(['clean', 'js', 'prod-source-sourcemap-fix-paths']));
+
+gulp.task('watch', () => {
+  gulp.watch('./src/**/**/*.ts', gulp.series('js'));
+});
+
+gulp.task('connect', () => {
+  connect.server({
+    root: ['./'],
+    livereload: true,
+    host: '0.0.0.0',
+    port: '3000',
+  });
+});
+
+gulp.task('open', () => {
+  gulp.src('./playground/index.html').pipe(gopen({ uri: 'http://localhost:3000/playground/' }));
+});
+
+gulp.task('server', gulp.parallel(['watch', 'connect', 'open']));
+
+gulp.task('default', gulp.series('server'));

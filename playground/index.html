@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html dir="ltr">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Cupertino Pane - Basic</title>
+
+  <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script>var exports = {"__esModule": true};</script> <!-- Required if exports not defined earlier -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+  <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+  <script src="../dist/cupertino-pane.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css"/> 
+</head>
+
+<body>
+  <ion-app>
+
+    <ion-content id="content">
+      <ion-drawer>
+        <h1>Header</h1>
+        <p hide-on-bottom>Content</p> 
+      </ion-drawer>
+
+      <ion-button expand="block" color="danger" onclick="presentDrawer()">Present Drawer</ion-button>
+      <ion-button expand="block" color="danger" onclick="destroyDrawer()">Destroy Drawer</ion-button>
+
+      <ion-button expand="block" onclick="hideDrawer()">Hide Drawer</ion-button>
+      <ion-button expand="block" onclick="isHiddenDrawer()">Drawer is hidden</ion-button>
+
+      <ion-button expand="block" color="secondary" onclick="setTopDrawer()">Set Top</ion-button>
+      <ion-button expand="block" color="secondary" onclick="setMiddleDrawer()">Set Moddle</ion-button>
+      <ion-button expand="block" color="secondary" onclick="setBottomDrawer()">Set bottom</ion-button>
+
+      <ion-button expand="block" color="tertiary" onclick="setFreeMode()">Enable free mode</ion-button>
+      <ion-button expand="block" color="tertiary" onclick="setBottomClose()">Close on bottom break</ion-button>
+      <ion-button expand="block" color="tertiary" onclick="setBottomMiddle()">Bottom + Middle breaks</ion-button>
+    </ion-content>
+
+  </ion-app>
+  <script>
+    var drawer = new CupertinoPane('ion-drawer', { 
+        onDrag: () => console.log('Drag event')
+    });
+    drawer.present({animate: true});
+
+    async function presentDrawer() {
+      drawer.present({animate: true});
+    };
+
+    async function destroyDrawer() {
+      drawer.destroy({animate: false});
+    };
+    
+    async function hideDrawer() {
+      drawer.hide();
+    };
+
+    async function isHiddenDrawer() {
+        console.log(await drawer.isHidden());
+    };
+
+    async function setTopDrawer() {
+      drawer.moveToBreak('top');
+    };
+
+    async function setMiddleDrawer() {
+      drawer.moveToBreak('middle');
+    };
+
+    async function setBottomDrawer() {
+      drawer.moveToBreak('bottom');
+    };
+
+    // async function setFreeMode() {
+    //   drawer.options = Object.assign({}, drawer.options, {
+    //     freeMode: true
+    //   });
+    // }
+
+    // async function setBottomClose() {
+    //   drawer.options = Object.assign({}, drawer.options, {
+    //     bottomClose: true
+    //   });
+    // }
+
+    // async function setBottomMiddle() {
+    //   drawer.options = Object.assign({}, drawer.options, {
+    //     breaks: {
+    //       top: { enabled: false, offset: 0},
+    //       middle: { enabled: true, offset: 0},
+    //       bottom: { enabled: true, offset: 0},
+    //     },
+    //   });
+    // }
+  </script>
+</body>
+
+</html>

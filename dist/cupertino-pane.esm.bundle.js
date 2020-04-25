@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.33
+ * Cupertino Pane 1.1.34
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: April 24, 2020
+ * Released on: April 26, 2020
  */
 
 class Support {
@@ -178,6 +178,7 @@ class CupertinoPane {
         this.screen_height = window.screen.height;
         this.steps = [];
         this.pointerDown = false;
+        this.disableDragEvents = false;
         this.breaks = {};
         this.brs = [];
         this.device = new Device();
@@ -438,6 +439,195 @@ class CupertinoPane {
         /****** Attach Events *******/
         this.attachEvents();
     }
+    checkOpacityAttr(val) {
+        let attrElements = document.querySelectorAll(`${this.selector} [hide-on-bottom]`);
+        if (!attrElements.length)
+            return;
+        attrElements.forEach((item) => {
+            item.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+            item.style.opacity = (val >= this.breaks['bottom']) ? '0' : '1';
+        });
+    }
+    checkOverflowAttr(val) {
+        if (!this.settings.topperOverflow)
+            return;
+        this.overflowEl.style.overflowY = (val <= this.topper) ? 'auto' : 'hidden';
+    }
+    isPanePresented() {
+        return document.querySelector(`.cupertino-pane-wrapper ${this.selector}`)
+            ? true : false;
+    }
+    /**
+     * Touch Start Event
+     * @param t
+     */
+    touchStart(t) {
+        // Event emitter
+        this.settings.onDragStart(t);
+        if (this.disableDragEvents)
+            return;
+        const targetTouch = t.type === 'touchstart' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
+        const screenY = t.type === 'touchstart' ? targetTouch.screenY : t.screenY;
+        if (t.type === 'pointerdown')
+            this.pointerDown = true;
+        this.startP = screenY;
+        this.steps.push(this.startP);
+    }
+    /**
+     * Touch Move Event
+     * @param t
+     */
+    touchMove(t) {
+        // Event emitter
+        this.settings.onDrag(t);
+        if (this.disableDragEvents)
+            return;
+        // Handle desktop/mobile events
+        const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
+        const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
+        if (t.type === 'pointermove' && !this.pointerDown)
+            return;
+        const translateYRegex = /\.*translateY\((.*)px\)/i;
+        const p = parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
+        // Delta
+        const n = screenY;
+        const diff = n - this.steps[this.steps.length - 1];
+        const newVal = p + diff;
+        // Not allow move panel with positive overflow scroll
+        if (this.overflowEl.style.overflowY === 'auto') {
+            this.overflowEl.addEventListener('scroll', (s) => {
+                this.contentScrollTop = s.target.scrollTop;
+            });
+            if ((newVal > this.topper && this.contentScrollTop > 0)
+                || (newVal <= this.topper)) {
+                return;
+            }
+        }
+        // Not allow drag upper than topper point
+        // Not allow drag lower than bottom if free mode
+        if ((newVal <= this.topper)
+            || (this.settings.freeMode && !this.settings.bottomClose && (newVal >= this.bottomer))) {
+            return;
+        }
+        this.checkOpacityAttr(newVal);
+        this.checkOverflowAttr(newVal);
+        this.paneEl.style.transition = 'initial';
+        this.paneEl.style.transform = `translateY(${newVal}px)`;
+        this.steps.push(n);
+    }
+    /**
+     * Touch End Event
+     * @param t
+     */
+    touchEnd(t) {
+        if (this.disableDragEvents)
+            return;
+        const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
+        const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
+        if (t.type === 'pointerup')
+            this.pointerDown = false;
+        const translateYRegex = /\.*translateY\((.*)px\)/i;
+        const p = parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
+        // Determinate nearest point
+        let closest = this.brs.reduce((prev, curr) => {
+            return (Math.abs(curr - p) < Math.abs(prev - p) ? curr : prev);
+        });
+        // Swipe - next (if differ > 10)
+        const diff = this.steps[this.steps.length - 1] - this.steps[this.steps.length - 2];
+        // Set sensivity lower for web
+        const swipeNextSensivity = window.hasOwnProperty('cordova') ? 4 : 3;
+        if (Math.abs(diff) >= swipeNextSensivity) {
+            closest = this.swipeNextPoint(diff, swipeNextSensivity, closest);
+        }
+        // Click to bottom - open middle
+        if (this.settings.clickBottomOpen) {
+            if (this.currentBreakpoint === this.breaks['bottom'] && isNaN(diff)) {
+                closest = this.settings.breaks['middle'].enabled
+                    ? this.breaks['middle'] : this.settings.breaks['top'].enabled
+                    ? this.breaks['top'] : this.breaks['bottom'];
+            }
+        }
+        this.steps = [];
+        this.currentBreakpoint = closest;
+        this.checkOpacityAttr(this.currentBreakpoint);
+        this.checkOverflowAttr(this.currentBreakpoint);
+        // Bottom closable
+        if (this.settings.bottomClose && closest === this.breaks['bottom']) {
+            this.destroy({ animate: true });
+            return;
+        }
+        if (!this.settings.freeMode) {
+            this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+            this.paneEl.style.transform = `translateY(${closest}px)`;
+            let initTransitionEv = this.paneEl.addEventListener('transitionend', () => {
+                this.paneEl.style.transition = `initial`;
+                initTransitionEv = undefined;
+            });
+        }
+    }
+    attachEvents() {
+        // Touch Events
+        if (!Support.touch && Support.pointerEvents) {
+            this.paneEl.addEventListener(this.touchEvents.start, (t) => this.touchStart(t), false);
+            this.paneEl.addEventListener(this.touchEvents.move, (t) => this.touchMove(t), false);
+            this.paneEl.addEventListener(this.touchEvents.end, (t) => this.touchEnd(t), false);
+        }
+        else {
+            if (Support.touch) {
+                const passiveListener = this.touchEvents.start === 'touchstart' && Support.passiveListener && this.settings.passiveListeners ? { passive: true, capture: false } : false;
+                this.paneEl.addEventListener(this.touchEvents.start, (t) => this.touchStart(t), passiveListener);
+                this.paneEl.addEventListener(this.touchEvents.move, (t) => this.touchMove(t), Support.passiveListener ? { passive: false, capture: false } : false);
+                this.paneEl.addEventListener(this.touchEvents.end, (t) => this.touchEnd(t), passiveListener);
+                if (this.touchEvents['cancel']) {
+                    this.paneEl.addEventListener(this.touchEvents['cancel'], (t) => this.touchEnd(t), passiveListener);
+                }
+            }
+            if ((this.settings.simulateTouch && !this.device.ios && !this.device.android) || (this.settings.simulateTouch && !Support.touch && this.device.ios)) {
+                this.paneEl.addEventListener('mousedown', (t) => this.touchStart(t), false);
+                this.paneEl.addEventListener('mousemove', (t) => this.touchMove(t), false);
+                this.paneEl.addEventListener('mouseup', (t) => this.touchEnd(t), false);
+            }
+        }
+    }
+    detachEvents() {
+        // Touch Events
+        if (!Support.touch && Support.pointerEvents) {
+            this.paneEl.removeEventListener(this.touchEvents.start, (t) => this.touchStart(t), false);
+            this.paneEl.removeEventListener(this.touchEvents.move, (t) => this.touchMove(t), false);
+            this.paneEl.removeEventListener(this.touchEvents.end, (t) => this.touchEnd(t), false);
+        }
+        else {
+            if (Support.touch) {
+                const passiveListener = this.touchEvents.start === 'onTouchStart' && Support.passiveListener && this.settings.passiveListeners ? { passive: true, capture: false } : false;
+                this.paneEl.removeEventListener(this.touchEvents.start, (t) => this.touchStart(t), passiveListener);
+                this.paneEl.removeEventListener(this.touchEvents.move, (t) => this.touchMove(t), false);
+                this.paneEl.removeEventListener(this.touchEvents.end, (t) => this.touchEnd(t), passiveListener);
+                if (this.touchEvents['cancel']) {
+                    this.paneEl.removeEventListener(this.touchEvents['cancel'], (t) => this.touchEnd(t), passiveListener);
+                }
+            }
+            if ((this.settings.simulateTouch && !this.device.ios && !this.device.android) || (this.settings.simulateTouch && !Support.touch && this.device.ios)) {
+                this.paneEl.removeEventListener('mousedown', (t) => this.touchStart(t), false);
+                this.paneEl.removeEventListener('mousemove', (t) => this.touchMove(t), false);
+                this.paneEl.removeEventListener('mouseup', (t) => this.touchEnd(t), false);
+            }
+        }
+    }
+    /************************************
+     * Public user methods
+     */
+    /**
+     * Disable pane drag events
+     */
+    disableDrag() {
+        this.disableDragEvents = true;
+    }
+    /**
+     * Enable pane drag events
+     */
+    enableDrag() {
+        this.disableDragEvents = false;
+    }
     moveToBreak(val) {
         if (!this.isPanePresented()) {
             console.warn(`Cupertino Pane: Present pane before call moveToBreak()`);
@@ -502,126 +692,6 @@ class CupertinoPane {
         return null;
     }
     ;
-    checkOpacityAttr(val) {
-        let attrElements = document.querySelectorAll(`${this.selector} [hide-on-bottom]`);
-        if (!attrElements.length)
-            return;
-        attrElements.forEach((item) => {
-            item.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-            item.style.opacity = (val >= this.breaks['bottom']) ? '0' : '1';
-        });
-    }
-    checkOverflowAttr(val) {
-        if (!this.settings.topperOverflow)
-            return;
-        this.overflowEl.style.overflowY = (val <= this.topper) ? 'auto' : 'hidden';
-    }
-    isPanePresented() {
-        return document.querySelector(`.cupertino-pane-wrapper ${this.selector}`)
-            ? true : false;
-    }
-    /**
-     * Touch Start Event
-     * @param t
-     */
-    touchStart(t) {
-        const targetTouch = t.type === 'touchstart' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
-        const screenY = t.type === 'touchstart' ? targetTouch.screenY : t.screenY;
-        if (t.type === 'pointerdown')
-            this.pointerDown = true;
-        // Event emitter
-        this.settings.onDragStart();
-        this.startP = screenY;
-        this.steps.push(this.startP);
-    }
-    /**
-     * Touch Move Event
-     * @param t
-     */
-    touchMove(t) {
-        // Handle desktop/mobile events
-        const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
-        const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
-        if (t.type === 'pointermove' && !this.pointerDown)
-            return;
-        // Event emitter
-        this.settings.onDrag();
-        const translateYRegex = /\.*translateY\((.*)px\)/i;
-        const p = parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
-        // Delta
-        const n = screenY;
-        const diff = n - this.steps[this.steps.length - 1];
-        const newVal = p + diff;
-        // Not allow move panel with positive overflow scroll
-        if (this.overflowEl.style.overflowY === 'auto') {
-            this.overflowEl.addEventListener('scroll', (s) => {
-                this.contentScrollTop = s.target.scrollTop;
-            });
-            if ((newVal > this.topper && this.contentScrollTop > 0)
-                || (newVal <= this.topper)) {
-                return;
-            }
-        }
-        // Not allow drag upper than topper point
-        // Not allow drag lower than bottom if free mode
-        if ((newVal <= this.topper)
-            || (this.settings.freeMode && !this.settings.bottomClose && (newVal >= this.bottomer))) {
-            return;
-        }
-        this.checkOpacityAttr(newVal);
-        this.checkOverflowAttr(newVal);
-        this.paneEl.style.transition = 'initial';
-        this.paneEl.style.transform = `translateY(${newVal}px)`;
-        this.steps.push(n);
-    }
-    /**
-     * Touch End Event
-     * @param t
-     */
-    touchEnd(t) {
-        const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
-        const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
-        if (t.type === 'pointerup')
-            this.pointerDown = false;
-        const translateYRegex = /\.*translateY\((.*)px\)/i;
-        const p = parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
-        // Determinate nearest point
-        let closest = this.brs.reduce((prev, curr) => {
-            return (Math.abs(curr - p) < Math.abs(prev - p) ? curr : prev);
-        });
-        // Swipe - next (if differ > 10)
-        const diff = this.steps[this.steps.length - 1] - this.steps[this.steps.length - 2];
-        // Set sensivity lower for web
-        const swipeNextSensivity = window.hasOwnProperty('cordova') ? 4 : 3;
-        if (Math.abs(diff) >= swipeNextSensivity) {
-            closest = this.swipeNextPoint(diff, swipeNextSensivity, closest);
-        }
-        // Click to bottom - open middle
-        if (this.settings.clickBottomOpen) {
-            if (this.currentBreakpoint === this.breaks['bottom'] && isNaN(diff)) {
-                closest = this.settings.breaks['middle'].enabled
-                    ? this.breaks['middle'] : this.settings.breaks['top'].enabled
-                    ? this.breaks['top'] : this.breaks['bottom'];
-            }
-        }
-        this.steps = [];
-        this.currentBreakpoint = closest;
-        this.checkOpacityAttr(this.currentBreakpoint);
-        this.checkOverflowAttr(this.currentBreakpoint);
-        // Bottom closable
-        if (this.settings.bottomClose && closest === this.breaks['bottom']) {
-            this.destroy({ animate: true });
-            return;
-        }
-        if (!this.settings.freeMode) {
-            this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-            this.paneEl.style.transform = `translateY(${closest}px)`;
-            let initTransitionEv = this.paneEl.addEventListener('transitionend', () => {
-                this.paneEl.style.transition = `initial`;
-                initTransitionEv = undefined;
-            });
-        }
-    }
     destroy(conf = { animate: false }) {
         if (!this.isPanePresented()) {
             console.warn(`Cupertino Pane: Present pane before call destroy()`);
@@ -653,54 +723,6 @@ class CupertinoPane {
             return;
         }
         resets();
-    }
-    attachEvents() {
-        // Touch Events
-        if (!Support.touch && Support.pointerEvents) {
-            this.paneEl.addEventListener(this.touchEvents.start, (t) => this.touchStart(t), false);
-            this.paneEl.addEventListener(this.touchEvents.move, (t) => this.touchMove(t), false);
-            this.paneEl.addEventListener(this.touchEvents.end, (t) => this.touchEnd(t), false);
-        }
-        else {
-            if (Support.touch) {
-                const passiveListener = this.touchEvents.start === 'touchstart' && Support.passiveListener && this.settings.passiveListeners ? { passive: true, capture: false } : false;
-                this.paneEl.addEventListener(this.touchEvents.start, (t) => this.touchStart(t), passiveListener);
-                this.paneEl.addEventListener(this.touchEvents.move, (t) => this.touchMove(t), Support.passiveListener ? { passive: false, capture: false } : false);
-                this.paneEl.addEventListener(this.touchEvents.end, (t) => this.touchEnd(t), passiveListener);
-                if (this.touchEvents['cancel']) {
-                    this.paneEl.addEventListener(this.touchEvents['cancel'], (t) => this.touchEnd(t), passiveListener);
-                }
-            }
-            if ((this.settings.simulateTouch && !this.device.ios && !this.device.android) || (this.settings.simulateTouch && !Support.touch && this.device.ios)) {
-                this.paneEl.addEventListener('mousedown', (t) => this.touchStart(t), false);
-                this.paneEl.addEventListener('mousemove', (t) => this.touchMove(t), false);
-                this.paneEl.addEventListener('mouseup', (t) => this.touchEnd(t), false);
-            }
-        }
-    }
-    detachEvents() {
-        // Touch Events
-        if (!Support.touch && Support.pointerEvents) {
-            this.paneEl.removeEventListener(this.touchEvents.start, (t) => this.touchStart(t), false);
-            this.paneEl.removeEventListener(this.touchEvents.move, (t) => this.touchMove(t), false);
-            this.paneEl.removeEventListener(this.touchEvents.end, (t) => this.touchEnd(t), false);
-        }
-        else {
-            if (Support.touch) {
-                const passiveListener = this.touchEvents.start === 'onTouchStart' && Support.passiveListener && this.settings.passiveListeners ? { passive: true, capture: false } : false;
-                this.paneEl.removeEventListener(this.touchEvents.start, (t) => this.touchStart(t), passiveListener);
-                this.paneEl.removeEventListener(this.touchEvents.move, (t) => this.touchMove(t), false);
-                this.paneEl.removeEventListener(this.touchEvents.end, (t) => this.touchEnd(t), passiveListener);
-                if (this.touchEvents['cancel']) {
-                    this.paneEl.removeEventListener(this.touchEvents['cancel'], (t) => this.touchEnd(t), passiveListener);
-                }
-            }
-            if ((this.settings.simulateTouch && !this.device.ios && !this.device.android) || (this.settings.simulateTouch && !Support.touch && this.device.ios)) {
-                this.paneEl.removeEventListener('mousedown', (t) => this.touchStart(t), false);
-                this.paneEl.removeEventListener('mousemove', (t) => this.touchMove(t), false);
-                this.paneEl.removeEventListener('mouseup', (t) => this.touchEnd(t), false);
-            }
-        }
     }
 }
 
