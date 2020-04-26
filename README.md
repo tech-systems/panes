@@ -245,6 +245,7 @@ By default using for full pane area, but in some cases good useful with header.
 
 ## Future Goals
 - Playground (livereload, build ionic app, live demo)
+- Precision delta counts
 - Hardware accelerated drag&drop actions
 - 3D effect (ion-modal example)
 - Drawer effect
