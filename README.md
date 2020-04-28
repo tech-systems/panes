@@ -244,9 +244,9 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
+- Hardware accelerated drag&drop actions (transitions layers sizes check, z-index)
 - Playground (livereload, build ionic app, live demo)
 - Precision delta counts
-- Hardware accelerated drag&drop actions
 - 3D effect (ion-modal example)
 - Drawer effect
 - 3D button toggle effect
