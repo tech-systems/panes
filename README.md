@@ -244,6 +244,7 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
+- Draggable area for single element
 - Hardware accelerated drag&drop actions (transitions layers sizes check, translate3d, z-index)
 - Readme cons, emoji, tables (nanoid, storybook)
 - Playground (livereload, build ionic app, live demo)
