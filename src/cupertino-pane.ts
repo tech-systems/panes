@@ -18,6 +18,7 @@ export class CupertinoPane {
     topperOverflowOffset: 0,
     showDraggable: true,
     clickBottomOpen: true,
+    dragByCursor: false,
     simulateTouch: true,
     passiveListeners: true,
     breaks: {},
@@ -97,6 +98,7 @@ export class CupertinoPane {
       this.paneEl.className = 'pane';
       this.paneEl.style.position = 'fixed';
       this.paneEl.style.zIndex = '11';
+      this.paneEl.style.paddingTop = '15px';
       this.paneEl.style.width = '100%';
       this.paneEl.style.height = '100%';
       this.paneEl.style.background = '#ffffff';
@@ -110,6 +112,13 @@ export class CupertinoPane {
       this.draggableEl = document.createElement('div');
       this.draggableEl.className = 'draggable';
       this.draggableEl.style.padding = '5px';
+      this.draggableEl.style.position = 'absolute';
+      this.draggableEl.style.top = '0';
+      this.draggableEl.style.left = '0';
+      this.draggableEl.style.right = '0';
+      this.draggableEl.style.marginLeft = 'auto';
+      this.draggableEl.style.marginRight = 'auto';
+      this.draggableEl.style.height = '30px';
 
       // Move
       this.moveEl = document.createElement('div');
@@ -487,27 +496,32 @@ export class CupertinoPane {
   })();
 
   attachEvents() {
+    let el: HTMLElement = this.paneEl;
+    if (this.settings.dragByCursor) {
+      el = this.draggableEl;
+    }
+
     // Touch Events
     if (!Support.touch && Support.pointerEvents) {
-      this.paneEl.addEventListener(this.touchEvents.start, (t) => this.touchStart(t), false);
-      this.paneEl.addEventListener(this.touchEvents.move, (t) => this.touchMove(t), false);
-      this.paneEl.addEventListener(this.touchEvents.end, (t) => this.touchEnd(t), false);
+      el.addEventListener(this.touchEvents.start, (t) => this.touchStart(t), false);
+      el.addEventListener(this.touchEvents.move, (t) => this.touchMove(t), false);
+      el.addEventListener(this.touchEvents.end, (t) => this.touchEnd(t), false);
     } else {
 
       if (Support.touch) {
         const passiveListener = this.touchEvents.start === 'touchstart' && Support.passiveListener && this.settings.passiveListeners ? { passive: true, capture: false } : false;
-        this.paneEl.addEventListener(this.touchEvents.start, (t) => this.touchStart(t), passiveListener);
-        this.paneEl.addEventListener(this.touchEvents.move, (t) => this.touchMove(t), Support.passiveListener ? { passive: false, capture: false } : false);
-        this.paneEl.addEventListener(this.touchEvents.end, (t) => this.touchEnd(t), passiveListener);
+        el.addEventListener(this.touchEvents.start, (t) => this.touchStart(t), passiveListener);
+        el.addEventListener(this.touchEvents.move, (t) => this.touchMove(t), Support.passiveListener ? { passive: false, capture: false } : false);
+        el.addEventListener(this.touchEvents.end, (t) => this.touchEnd(t), passiveListener);
         if (this.touchEvents['cancel']) {
-          this.paneEl.addEventListener(this.touchEvents['cancel'], (t) => this.touchEnd(t), passiveListener);
+          el.addEventListener(this.touchEvents['cancel'], (t) => this.touchEnd(t), passiveListener);
         }
       }
 
       if ((this.settings.simulateTouch && !this.device.ios && !this.device.android) || (this.settings.simulateTouch && !Support.touch && this.device.ios)) {
-        this.paneEl.addEventListener('mousedown', (t) => this.touchStart(t), false);
-        this.paneEl.addEventListener('mousemove', (t) => this.touchMove(t), false);
-        this.paneEl.addEventListener('mouseup', (t) => this.touchEnd(t), false);
+        el.addEventListener('mousedown', (t) => this.touchStart(t), false);
+        el.addEventListener('mousemove', (t) => this.touchMove(t), false);
+        el.addEventListener('mouseup', (t) => this.touchEnd(t), false);
       }
     }
 
@@ -515,25 +529,30 @@ export class CupertinoPane {
   }
 
   detachEvents() {
+    let el: HTMLElement = this.paneEl;
+    if (this.settings.dragByCursor) {
+      el = this.draggableEl;
+    }
+    
     // Touch Events
     if (!Support.touch && Support.pointerEvents) {
-      this.paneEl.removeEventListener(this.touchEvents.start, (t) => this.touchStart(t), false);
-      this.paneEl.removeEventListener(this.touchEvents.move, (t) => this.touchMove(t), false);
-      this.paneEl.removeEventListener(this.touchEvents.end, (t) => this.touchEnd(t), false);
+      el.removeEventListener(this.touchEvents.start, (t) => this.touchStart(t), false);
+      el.removeEventListener(this.touchEvents.move, (t) => this.touchMove(t), false);
+      el.removeEventListener(this.touchEvents.end, (t) => this.touchEnd(t), false);
     } else {
       if (Support.touch) {
         const passiveListener = this.touchEvents.start === 'onTouchStart' && Support.passiveListener && this.settings.passiveListeners ? { passive: true, capture: false } : false;
-        this.paneEl.removeEventListener(this.touchEvents.start, (t) => this.touchStart(t), passiveListener);
-        this.paneEl.removeEventListener(this.touchEvents.move, (t) => this.touchMove(t), false);
-        this.paneEl.removeEventListener(this.touchEvents.end, (t) => this.touchEnd(t), passiveListener);
+        el.removeEventListener(this.touchEvents.start, (t) => this.touchStart(t), passiveListener);
+        el.removeEventListener(this.touchEvents.move, (t) => this.touchMove(t), false);
+        el.removeEventListener(this.touchEvents.end, (t) => this.touchEnd(t), passiveListener);
         if (this.touchEvents['cancel']) {
-          this.paneEl.removeEventListener(this.touchEvents['cancel'], (t) => this.touchEnd(t), passiveListener);
+          el.removeEventListener(this.touchEvents['cancel'], (t) => this.touchEnd(t), passiveListener);
         }
       }
       if ((this.settings.simulateTouch && !this.device.ios && !this.device.android) || (this.settings.simulateTouch && !Support.touch && this.device.ios)) {
-        this.paneEl.removeEventListener('mousedown', (t) => this.touchStart(t), false);
-        this.paneEl.removeEventListener('mousemove', (t) => this.touchMove(t), false);
-        this.paneEl.removeEventListener('mouseup', (t) => this.touchEnd(t), false);
+        el.removeEventListener('mousedown', (t) => this.touchStart(t), false);
+        el.removeEventListener('mousemove', (t) => this.touchMove(t), false);
+        el.removeEventListener('mouseup', (t) => this.touchEnd(t), false);
       }
     }
   }

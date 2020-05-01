@@ -154,6 +154,7 @@ var myPane = new CupertinoPane('.cupertino-pane', { /* ... */ });
 - `topperOverflowOffset` | **number: 0** | Offset from screen bottom to the end of overflow content
 - `showDraggable` | **boolean: true** | Render rectangular shape on the top of pane
 - `clickBottomOpen` | **boolean: true** | If bottom position reached, simple click to pane will open pane to the next upper point
+- `dragByCursor` | **boolean: false** | Drag pane only with draggabale top cursor
 - `simulateTouch` | **boolean: true** | Simulate touch events for Desktop
 - `passiveListeners` | **boolean: true** | (Indicates that the function specified by listener will never call preventDefault())
 ### Breakpoints
