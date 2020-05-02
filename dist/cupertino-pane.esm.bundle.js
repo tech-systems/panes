@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.37
+ * Cupertino Pane 1.1.4
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -280,7 +280,8 @@ class CupertinoPane {
         this.paneEl.style.borderTopRightRadius = '20px';
         this.paneEl.style.boxShadow = '0 4px 16px rgba(0,0,0,.12)';
         this.paneEl.style.overflow = 'hidden';
-        this.paneEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak]}px)`;
+        this.paneEl.style.willChange = 'transform';
+        this.paneEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
         // Draggable
         this.draggableEl = document.createElement('div');
         this.draggableEl.className = 'draggable';
@@ -375,10 +376,10 @@ class CupertinoPane {
         this.paneEl.appendChild(this.contentEl);
         this.draggableEl.appendChild(this.moveEl);
         if (conf.animate) {
-            this.paneEl.style.transform = `translateY(${this.screen_height}px)`;
+            this.paneEl.style.transform = `translateY(${this.screen_height}px) translateZ(0px)`;
             this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
             setTimeout(() => {
-                this.paneEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak]}px)`;
+                this.paneEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
             }, 50);
             let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
                 this.paneEl.style.transition = `initial`;
@@ -521,7 +522,7 @@ class CupertinoPane {
         this.checkOpacityAttr(newVal);
         this.checkOverflowAttr(newVal);
         this.paneEl.style.transition = 'initial';
-        this.paneEl.style.transform = `translateY(${newVal}px)`;
+        this.paneEl.style.transform = `translateY(${newVal}px) translateZ(0px)`;
         this.steps.push(n);
     }
     /**
@@ -567,7 +568,7 @@ class CupertinoPane {
         }
         if (!this.settings.freeMode) {
             this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-            this.paneEl.style.transform = `translateY(${closest}px)`;
+            this.paneEl.style.transform = `translateY(${closest}px) translateZ(0px)`;
             let initTransitionEv = this.paneEl.addEventListener('transitionend', () => {
                 this.paneEl.style.transition = `initial`;
                 initTransitionEv = undefined;
@@ -662,7 +663,7 @@ class CupertinoPane {
         }
         this.currentBreakpoint = this.breaks[val];
         this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-        this.paneEl.style.transform = `translateY(${this.breaks[val]}px)`;
+        this.paneEl.style.transform = `translateY(${this.breaks[val]}px) translateZ(0px)`;
         let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
             this.paneEl.style.transition = `initial`;
             initTransitionEv = undefined;
@@ -674,7 +675,7 @@ class CupertinoPane {
             return null;
         }
         this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-        this.paneEl.style.transform = `translateY(${this.screen_height}px)`;
+        this.paneEl.style.transform = `translateY(${this.screen_height}px) translateZ(0px)`;
         if (this.settings.backdrop) {
             this.backdropEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
             this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
@@ -693,7 +694,7 @@ class CupertinoPane {
             console.warn(`Cupertino Pane: Present pane before call isHidden()`);
             return null;
         }
-        return this.paneEl.style.transform === `translateY(${this.screen_height}px)`;
+        return this.paneEl.style.transform === `translateY(${this.screen_height}px) translateZ(0px)`;
     }
     currentBreak() {
         if (!this.isPanePresented()) {
@@ -731,7 +732,7 @@ class CupertinoPane {
         };
         if (conf.animate) {
             this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-            this.paneEl.style.transform = `translateY(${this.screen_height}px)`;
+            this.paneEl.style.transform = `translateY(${this.screen_height}px) translateZ(0px)`;
             if (this.settings.backdrop) {
                 this.backdropEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
                 this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';

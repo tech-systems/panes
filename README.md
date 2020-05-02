@@ -9,14 +9,16 @@
 [![Code Style](https://badgen.net/badge/icon/typescript?icon=typescript&label)](https://www.typescriptlang.org/)
 [![Code Style](https://badgen.net/badge/code%20style/airbnb/ff5a5f?icon=airbnb)](https://github.com/airbnb/javascript)
 
-<img src="https://user-images.githubusercontent.com/10646478/79794348-4846bc00-837c-11ea-8b74-7c71fac120aa.png" 
-     align="right" alt="Cupertino Pane logo Roman Antonov" width="260px" height="421px">
+<!-- <img src="https://user-images.githubusercontent.com/10646478/79794348-4846bc00-837c-11ea-8b74-7c71fac120aa.png" 
+     align="right" alt="Cupertino Pane logo Roman Antonov" width="260px" height="421px"> -->
      
 Cupertino Pane is great modern slide-over pane with touch technologies. <br>
-Right like in Apple Maps, Apple Stocks, Apple Music and other modern apps.
 
-> Lightweight, Multiplatform, Open Source. For progressive applications. 
+* **Small.** 5kb (minified and gzipped). No dependencies.
+* **Accelerated.** Hardware accelerated transitions and amazing native behavior.
+* **Progressive.** Useful for mobile/web/hybrid applications.
 
+> Right like in Apple Maps, Apple Stocks, Apple Music and other modern apps.
 
 * [Breaking changes](#breaking-changes)
 * [Demonstration](#demonstration)
@@ -52,10 +54,12 @@ let settings = {
 ```
 
 ## Demonstration
-- [Animated Gif Demo #1](https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/1.gif?raw=true)
-- [Animated Gif Demo #2](https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/2.gif?raw=true)
-- [Animated Gif Demo #3](https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/3.gif?raw=true)
-- [Live Demo Old Version](https://ionicsvelte.firebaseapp.com/ionic/Pane/)
+[Live Demo Old Version](https://ionicsvelte.firebaseapp.com/ionic/Pane/)
+
+<img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/1.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="220px">
+<img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/2.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="220px">
+<img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/3.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="220px">
+
 
 ## Supporting platforms
 We officially support the last two versions of every major browser. Specifically, we test on the following browsers:
@@ -245,16 +249,13 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- Draggable area for single element
-- Hardware accelerated drag&drop actions (transitions layers sizes check, translate3d, z-index)
-- Readme cons, emoji, tables (nanoid, storybook)
-- Playground (livereload, build ionic app, live demo)
+- Playground (livereload, build cordova app from html)
 - Precision delta counts
 - 3D effect (ion-modal example)
 - Drawer effect
 - 3D button toggle effect
 - Realistic easy-in-out transitions
-- Refresh readme with live example on pages
+- Readme (livedemos/tables/nanoid cons)
 
 ## Contributing
 We welcome contributions of all kinds from anyone.

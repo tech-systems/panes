@@ -106,7 +106,8 @@ export class CupertinoPane {
       this.paneEl.style.borderTopRightRadius = '20px';
       this.paneEl.style.boxShadow = '0 4px 16px rgba(0,0,0,.12)';
       this.paneEl.style.overflow = 'hidden';
-      this.paneEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak]}px)`;
+      this.paneEl.style.willChange = 'transform';
+      this.paneEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
 
       // Draggable
       this.draggableEl = document.createElement('div');
@@ -215,10 +216,10 @@ export class CupertinoPane {
       this.draggableEl.appendChild(this.moveEl);
   
       if (conf.animate) {
-        this.paneEl.style.transform = `translateY(${this.screen_height}px)`; 
+        this.paneEl.style.transform = `translateY(${this.screen_height}px) translateZ(0px)`; 
         this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
         setTimeout(() => {
-          this.paneEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak]}px)`;
+          this.paneEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
         }, 50);
 
         let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
@@ -379,7 +380,7 @@ export class CupertinoPane {
     this.checkOverflowAttr(newVal);
     
     this.paneEl.style.transition = 'initial';
-    this.paneEl.style.transform = `translateY(${newVal}px)`;
+    this.paneEl.style.transform = `translateY(${newVal}px) translateZ(0px)`;
     this.steps.push(n);
   }
 
@@ -433,7 +434,7 @@ export class CupertinoPane {
 
     if (!this.settings.freeMode) {
       this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-      this.paneEl.style.transform = `translateY(${closest}px)`;
+      this.paneEl.style.transform = `translateY(${closest}px) translateZ(0px)`;
       let initTransitionEv = this.paneEl.addEventListener('transitionend', () => {
         this.paneEl.style.transition = `initial`;
         initTransitionEv = undefined;
@@ -597,7 +598,7 @@ export class CupertinoPane {
     this.currentBreakpoint = this.breaks[val];
     
     this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-    this.paneEl.style.transform = `translateY(${this.breaks[val]}px)`;
+    this.paneEl.style.transform = `translateY(${this.breaks[val]}px) translateZ(0px)`;
     let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
       this.paneEl.style.transition = `initial`;
       initTransitionEv = undefined;
@@ -611,7 +612,7 @@ export class CupertinoPane {
     }
 
     this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-    this.paneEl.style.transform = `translateY(${this.screen_height}px)`;
+    this.paneEl.style.transform = `translateY(${this.screen_height}px) translateZ(0px)`;
 
     if (this.settings.backdrop) {
       this.backdropEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
@@ -636,7 +637,7 @@ export class CupertinoPane {
       return null;
     }
     
-    return this.paneEl.style.transform === `translateY(${this.screen_height}px)`;
+    return this.paneEl.style.transform === `translateY(${this.screen_height}px) translateZ(0px)`;
   }
 
   public currentBreak(): (string|null) {
@@ -680,7 +681,7 @@ export class CupertinoPane {
 
       if (conf.animate) {
         this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-        this.paneEl.style.transform = `translateY(${this.screen_height}px)`;
+        this.paneEl.style.transform = `translateY(${this.screen_height}px) translateZ(0px)`;
 
         if (this.settings.backdrop) {
           this.backdropEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
