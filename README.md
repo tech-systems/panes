@@ -55,11 +55,11 @@ let settings = {
 
 ## Demonstration
 [Live Demo Old Version](https://ionicsvelte.firebaseapp.com/ionic/Pane/)
-
-<img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/1.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="220px">
-<img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/2.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="220px">
-<img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/3.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="220px">
-
+<div style="display:flex;flex-wrap:wrap;">
+  <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/1.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="220px">
+  <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/2.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="220px">
+  <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/3.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="220px">
+</div>
 
 ## Supporting platforms
 We officially support the last two versions of every major browser. Specifically, we test on the following browsers:
