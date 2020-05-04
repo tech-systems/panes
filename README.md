@@ -62,12 +62,14 @@ let settings = {
 </div>
 
 ## Supporting platforms
-We officially support the last two versions of every major browser. Specifically, we test on the following browsers:
-- **Chrome** on Android, Windows, macOS, and Linux
-- **Firefox** on Windows, macOS, and Linux
-- **Safari** on iOS
-- **iOS WkWebView** on iOS
-- **Android WebView** on Android
+We officially support the last two versions of every major browser. Specifically, we test on the following browsers
+| Browser | Operating system |
+| - | - |
+| **Chrome** | Android, Windows, macOS, and Linux |
+| **Firefox** | Windows, macOS, and Linux |
+| **Safari** | iOS |
+| **WkWebView** | iOS |
+| **Android WebView** | Android |
 
 ## Getting Started
 ### Install via NPM
@@ -144,43 +146,53 @@ var myPane = new CupertinoPane('.cupertino-pane', { /* ... */ });
 
 ## Settings
 ### Common configuration
-- `parentElement` | **string** | Element selector where pane will appended (by default using parent element where html layout placed)
-- `initialBreak` | **(top|middle|bottom): 'middle'** | Initial pane position
-- `darkMode` | **boolean: false** | Initial pane styles
-- `backdrop` | **boolean: false** | Dimmed overlay will rendered with pane if `true`
-- `backdropTransparent` | **boolean: false** | Dimmed overlay will rendered with zero opacity
-- `animationType` | **(ease | ease-in | ease-out | ease-in-out | cubic-bezier): 'ease'** | Transition property animation type
-- `animationDuration` | **number: 300** | Transition property duration
-- `bottomClose` | **boolean: false** | Close pane with drag to bottom breakpoint
-- `freeMode` | **boolean: false** | On `true` will remove automatical magnetic effects to near breakpoint.
-- `buttonClose` | **boolean: true** | Determinate whetever close button will render or not
-- `topperOverflow` | **boolean: true** | Ability to scroll content inside pane if topper point reached
-- `topperOverflowOffset` | **number: 0** | Offset from screen bottom to the end of overflow content
-- `showDraggable` | **boolean: true** | Render rectangular shape on the top of pane
-- `clickBottomOpen` | **boolean: true** | If bottom position reached, simple click to pane will open pane to the next upper point
-- `dragByCursor` | **boolean: false** | Drag pane only with draggabale top cursor
-- `simulateTouch` | **boolean: true** | Simulate touch events for Desktop
-- `passiveListeners` | **boolean: true** | (Indicates that the function specified by listener will never call preventDefault())
+| Property | Type | Default | Description |
+| - | - | - | - |
+| `parentElement` | **string** | Parent element | Element selector where pane will rendered |
+| `initialBreak` | **'top' \| 'middle' \| 'bottom'** | **'middle'** | Initial pane position |
+| `darkMode` | **boolean** | **false** | Initial pane styles |
+| `backdrop` | **boolean** | **false** | Dimmed overlay will rendered with pane if `true` |
+| `backdropTransparent` | **boolean** | **false** | Dimmed overlay will rendered with zero opacity |
+| `animationType` | **'ease' \| 'ease-in' \| 'ease-out' \| 'ease-in-out' \| 'cubic-bezier'** | **'ease'** | Transition property animation type |
+| `animationDuration` | **number** | **300** | Transition property duration |
+| `bottomClose` | **boolean** | **false** | Close pane with drag to bottom breakpoint |
+| `freeMode` | **boolean** | **false** | On `true` will remove automatical magnetic effects to near breakpoint |
+| `buttonClose` | **boolean** | **true** | Determinate whetever close button will render or not |
+| `topperOverflow` | **boolean** | **true** | Ability to scroll content inside pane if topper point reached |
+| `topperOverflowOffset` | **number** | **0** | Offset from screen bottom to the end of overflow content |
+| `showDraggable` | **boolean** | **true** | Render rectangular shape on the top of pane
+| `clickBottomOpen` | **boolean** | **true** | If bottom position reached, simple click to pane will open pane to the next upper point |
+| `dragByCursor` | **boolean** | **false** | Drag pane only with draggabale top cursor |
+| `simulateTouch` | **boolean** | **true** | Simulate touch events for Desktop |
+| `passiveListeners` | **boolean** | **true** | (Indicates that the function specified by listener will never call preventDefault()) |
 ### Breakpoints
-- `breaks` | **{}** | Using to override default pane breakpoints.
-    - `top` | **{}** | Topper point that pane can reach
-        - `enabled` | **boolean: true** | Enable or disable breakpoint
-        -  `offset` | **number: window.screen.height - (135 * 0.35)** | Additional bottom margin if needs
-    - `middle` | **{}** | Middle point that pane can reach
-        - `enabled` | **boolean: true** | Enable or disable breakpoint
-        -  `offset` | **number: 300** | Additional bottom margin if needs
-    - `bottom` | **{}** | Bottom point that pane can reach
-        - `enabled` | **boolean: true** | Enable or disable breakpoint
-        -  `offset` | **number: 100** | Additional bottom margin if needs
+Package now supports 3 base breakpoints
+```javascript
+const pane = new CupertinoPane('.cupertino-pane', { 
+  breaks: {
+    top: { // Topper point that pane can reach
+      enabled: true, // Enable or disable breakpoint
+      offset: 0 // Additional bottom margin if needs
+    },
+    middle: { ... },
+    bottom: { ... }
+  }
+});
+```
+Default top offset: `window.screen.height - (135 * 0.35)`
+
+Bottom and middle offsets normalized accross devices by default 
 ### Callbacks
 The function that executes when the event fires.
-- `onDidDismiss` | **void: () => {}** | Call after pane will dissapeared
-- `onWillDismiss` | **void: () => {}** | Call before pane will dissapeared
-- `onDidPresent` | **void: () => {}** | Call after pane will present
-- `onWillPresent` | **void: () => {}** | Call before panel will present
-- `onDragStart` | **void: () => {}** | Call when detect user drag event on pane
-- `onDrag` | **void: () => {}** | Call executes on each new pane position
-- `onBackdropTap` | **void: () => {}** | Call when user tap backdrop overlay
+| Name | Type | Description |
+| ---- | ---- | ----------- |
+| `onDidDismiss` | **void: () => {}** | Call after pane will dissapeared |
+| `onWillDismiss` | **void: () => {}** | Call before pane will dissapeared |
+| `onDidPresent` | **void: () => {}** | Call after pane will present |
+| `onWillPresent` | **void: () => {}** | Call before panel will present |
+| `onDragStart` | **void: () => {}** | Call when detect user drag event on pane |
+| `onDrag` | **void: () => {}** | Call executes on each new pane position |
+| `onBackdropTap` | **void: () => {}** | Call when user tap backdrop overlay |
 
 ## Public Methods
 ### present({animate: **boolean = false**})
@@ -249,13 +261,18 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
+- Readme table
+- Help
+
 - Playground (livereload, build cordova app from html)
-- Precision delta counts
+- Live demo pages
+- Drag pane bottom-top with big delta
+- Click item/Drag pane Precision
+- Precision delta counts experiments
 - 3D effect (ion-modal example)
-- Drawer effect
+- Topper than top (10px-20px)
+- Drawer control effect
 - 3D button toggle effect
-- Realistic easy-in-out transitions
-- Readme (livedemos/tables/nanoid cons)
 
 ## Contributing
 We welcome contributions of all kinds from anyone.

@@ -65,8 +65,13 @@ export class CupertinoPane {
   constructor(private selector: string, conf: any = {}) {
     // Unable attach DOM element
     if (!<HTMLElement>document.querySelector(this.selector)) {
-      console.error('Cupertino Pane: wrong selector specified', this.selector);
-      delete this.el;
+      console.warn('Cupertino Pane: wrong selector specified', this.selector);
+      return;
+    }
+    
+    // Pane already was rendered
+    if (this.isPanePresented()) {
+      console.warn('Cupertino Pane: specified selector already in use', this.selector);
       return;
     }
 

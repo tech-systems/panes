@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.4
+ * Cupertino Pane 1.1.41
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: May 2, 2020
+ * Released on: May 4, 2020
  */
 
 'use strict';
@@ -249,8 +249,12 @@ class CupertinoPane {
         })();
         // Unable attach DOM element
         if (!document.querySelector(this.selector)) {
-            console.error('Cupertino Pane: wrong selector specified', this.selector);
-            delete this.el;
+            console.warn('Cupertino Pane: wrong selector specified', this.selector);
+            return;
+        }
+        // Pane already was rendered
+        if (this.isPanePresented()) {
+            console.warn('Cupertino Pane: specified selector already in use', this.selector);
             return;
         }
         this.el = document.querySelector(this.selector);
