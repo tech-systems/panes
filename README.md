@@ -148,23 +148,23 @@ var myPane = new CupertinoPane('.cupertino-pane', { /* ... */ });
 ### Common configuration
 | Property | Type | Default | Description |
 | - | - | - | - |
-| `parentElement` | **string** | Parent element | Element selector where pane will rendered |
-| `initialBreak` | **'top' \| 'middle' \| 'bottom'** | **'middle'** | Initial pane position |
-| `darkMode` | **boolean** | **false** | Initial pane styles |
-| `backdrop` | **boolean** | **false** | Dimmed overlay will rendered with pane if `true` |
-| `backdropTransparent` | **boolean** | **false** | Dimmed overlay will rendered with zero opacity |
-| `animationType` | **'ease' \| 'ease-in' \| 'ease-out' \| 'ease-in-out' \| 'cubic-bezier'** | **'ease'** | Transition property animation type |
-| `animationDuration` | **number** | **300** | Transition property duration |
-| `bottomClose` | **boolean** | **false** | Close pane with drag to bottom breakpoint |
-| `freeMode` | **boolean** | **false** | On `true` will remove automatical magnetic effects to near breakpoint |
-| `buttonClose` | **boolean** | **true** | Determinate whetever close button will render or not |
-| `topperOverflow` | **boolean** | **true** | Ability to scroll content inside pane if topper point reached |
-| `topperOverflowOffset` | **number** | **0** | Offset from screen bottom to the end of overflow content |
-| `showDraggable` | **boolean** | **true** | Render rectangular shape on the top of pane
-| `clickBottomOpen` | **boolean** | **true** | If bottom position reached, simple click to pane will open pane to the next upper point |
-| `dragByCursor` | **boolean** | **false** | Drag pane only with draggabale top cursor |
-| `simulateTouch` | **boolean** | **true** | Simulate touch events for Desktop |
-| `passiveListeners` | **boolean** | **true** | (Indicates that the function specified by listener will never call preventDefault()) |
+| **parentElement** | `string` | Parent element selector | Element selector where pane will rendered |
+| **initialBreak** | `'top' | 'middle' | 'bottom'` | 'middle' | Initial pane position |
+| **darkMode** | `boolean` | false | Initial pane styles |
+| **backdrop** | `boolean` | false | Dimmed overlay will rendered with pane if `true` |
+| **backdropTransparent** | `boolean` | false | Dimmed overlay will rendered with zero opacity |
+| **animationType** | `'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'cubic-bezier'` | 'ease' | Transition property animation type |
+| **animationDuration** | `number` | 300 | Transition property duration |
+| **bottomClose** | `boolean` | false | Close pane with drag to bottom breakpoint |
+| **freeMode** | `boolean` | false | On `true` will remove automatical magnetic effects to near breakpoint |
+| **buttonClose** | `boolean` | true | Determinate whetever close button will render or not |
+| **topperOverflow** | `boolean` | true | Ability to scroll content inside pane if topper point reached |
+| **topperOverflowOffset** | `number` | 0 | Offset from screen bottom to the end of overflow content |
+| **showDraggable** | `boolean` | true | Render rectangular shape on the top of pane
+| **clickBottomOpen** | `boolean` | true | If bottom position reached, simple click to pane will open pane to the next upper point |
+| **dragByCursor** | `boolean` | false | Drag pane only with draggabale top cursor |
+| **simulateTouch** | `boolean` | true | Simulate touch events for Desktop |
+| **passiveListeners** | `boolean` | true | (Indicates that the function specified by listener will never call preventDefault()) |
 ### Breakpoints
 Package now supports 3 base breakpoints
 ```javascript
@@ -186,13 +186,13 @@ Bottom and middle offsets normalized accross devices by default
 The function that executes when the event fires.
 | Name | Type | Description |
 | ---- | ---- | ----------- |
-| `onDidDismiss` | **void: () => {}** | Call after pane will dissapeared |
-| `onWillDismiss` | **void: () => {}** | Call before pane will dissapeared |
-| `onDidPresent` | **void: () => {}** | Call after pane will present |
-| `onWillPresent` | **void: () => {}** | Call before panel will present |
-| `onDragStart` | **void: () => {}** | Call when detect user drag event on pane |
-| `onDrag` | **void: () => {}** | Call executes on each new pane position |
-| `onBackdropTap` | **void: () => {}** | Call when user tap backdrop overlay |
+| **onDidDismiss** | `void: () => {}` | Call after pane will dissapeared |
+| **onWillDismiss** | `void: () => {}` | Call before pane will dissapeared |
+| **onDidPresent** | `void: () => {}` | Call after pane will present |
+| **onWillPresent** | `void: () => {}` | Call before panel will present |
+| **onDragStart** | `void: () => {}` | Call when detect user drag event on pane |
+| **onDrag** | `void: () => {}` | Call executes on each new pane position |
+| **onBackdropTap** | `void: () => {}` | Call when user tap backdrop overlay |
 
 ## Public Methods
 ### present({animate: **boolean = false**})
