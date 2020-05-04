@@ -149,11 +149,11 @@ var myPane = new CupertinoPane('.cupertino-pane', { /* ... */ });
 | Property | Type | Default | Description |
 | - | - | - | - |
 | **parentElement** | `string` | Parent element selector | Element selector where pane will rendered |
-| **initialBreak** | `'top' | 'middle' | 'bottom'` | 'middle' | Initial pane position |
+| **initialBreak** | `'top' \| 'middle' \| 'bottom'` | 'middle' | Initial pane position |
 | **darkMode** | `boolean` | false | Initial pane styles |
 | **backdrop** | `boolean` | false | Dimmed overlay will rendered with pane if `true` |
 | **backdropTransparent** | `boolean` | false | Dimmed overlay will rendered with zero opacity |
-| **animationType** | `'ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'cubic-bezier'` | 'ease' | Transition property animation type |
+| **animationType** | `'ease' \| 'ease-in' \| 'ease-out' \| 'ease-in-out' \| 'cubic-bezier'` | 'ease' | Transition property animation type |
 | **animationDuration** | `number` | 300 | Transition property duration |
 | **bottomClose** | `boolean` | false | Close pane with drag to bottom breakpoint |
 | **freeMode** | `boolean` | false | On `true` will remove automatical magnetic effects to near breakpoint |
