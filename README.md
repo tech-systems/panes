@@ -261,9 +261,6 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- Readme table
-- Help
-
 - Playground (livereload, build cordova app from html)
 - Live demo pages
 - Drag pane bottom-top with big delta
