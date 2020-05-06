@@ -31,7 +31,7 @@ Cupertino Pane is great modern slide-over pane with touch technologies. <br>
 * [Contributing](#contributing)
 * [License](#license)
 
-## Breaking Changes
+<!-- ## Breaking Changes
 ### v.1.1.2
 - Offsets and pane position normalized across all devices and screen heights. Please re-configure offsets if needs. 
 - Offsets value now calculating from screen bottom position
@@ -52,6 +52,7 @@ let settings = {
     }
 };
 ```
+-->
 
 ## Demonstration
 [Live Demo Old Version](https://ionicsvelte.firebaseapp.com/ionic/Pane/)
