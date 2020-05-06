@@ -28,6 +28,7 @@ export class CupertinoPane {
     onWillPresent: () => {},
     onDragStart: () => {},
     onDrag: () => {},
+    onDragEnd: () => {},
     onBackdropTap: () => {}
   };
 
@@ -394,6 +395,9 @@ export class CupertinoPane {
    * @param t 
    */
   private touchEnd(t) {
+    // Event emitter
+    this.settings.onDragEnd(t as CustomEvent);
+
     if (this.disableDragEvents) return;
 
     const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
