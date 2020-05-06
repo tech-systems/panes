@@ -32,11 +32,11 @@ export class CupertinoPane {
   };
 
   private defaultBreaksConf = {
-    top: { enabled: true, offset: window.screen.height - (135 * 0.35)},
+    top: { enabled: true, offset: window.innerHeight - (135 * 0.35)},
     middle: { enabled: true, offset: 300},
     bottom: { enabled: true, offset: 100},
   };
-  private screen_height: number = window.screen.height;
+  private screen_height: number = window.innerHeight;
   private steps: any[] = [];
   private startP: any;
   private pointerDown: boolean = false;

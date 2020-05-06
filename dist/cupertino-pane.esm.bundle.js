@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: May 4, 2020
+ * Released on: May 6, 2020
  */
 
 class Support {
@@ -172,11 +172,11 @@ class CupertinoPane {
             onBackdropTap: () => { }
         };
         this.defaultBreaksConf = {
-            top: { enabled: true, offset: window.screen.height - (135 * 0.35) },
+            top: { enabled: true, offset: window.innerHeight - (135 * 0.35) },
             middle: { enabled: true, offset: 300 },
             bottom: { enabled: true, offset: 100 },
         };
-        this.screen_height = window.screen.height;
+        this.screen_height = window.innerHeight;
         this.steps = [];
         this.pointerDown = false;
         this.disableDragEvents = false;
