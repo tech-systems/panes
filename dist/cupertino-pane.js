@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: May 4, 2020
+ * Released on: May 6, 2020
  */
 
 'use strict';
@@ -173,6 +173,7 @@ class CupertinoPane {
             onWillPresent: () => { },
             onDragStart: () => { },
             onDrag: () => { },
+            onDragEnd: () => { },
             onBackdropTap: () => { }
         };
         this.defaultBreaksConf = {
@@ -538,6 +539,8 @@ class CupertinoPane {
      * @param t
      */
     touchEnd(t) {
+        // Event emitter
+        this.settings.onDragEnd(t);
         if (this.disableDragEvents)
             return;
         const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
