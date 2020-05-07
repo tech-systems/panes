@@ -264,7 +264,7 @@ By default using for full pane area, but in some cases good useful with header.
 
 ## Future Goals
 - Playground (livereload, build cordova app from html)
-- Live demo pages
+- Docs engine + live example hosted in pages
 - Drag pane bottom-top with big delta
 - Click item/Drag pane Precision
 - Precision delta counts experiments
@@ -272,6 +272,7 @@ By default using for full pane area, but in some cases good useful with header.
 - Topper than top (10px-20px)
 - Drawer control effect
 - 3D button toggle effect
+- React Native version with one core
 
 ## Contributing
 We welcome contributions of all kinds from anyone.
