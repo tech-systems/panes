@@ -16,6 +16,9 @@ gulp.task('clean', (cb) => {
 // js bundle
 gulp.task('js', (cb) => {
   buildJs(cb);
+  return gulp
+    .src('./src/**/*.ts')
+    .pipe(connect.reload());
 });
 
 // in prod builds, adjust sourcemap paths to actual src location

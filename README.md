@@ -153,7 +153,7 @@ var myPane = new CupertinoPane('.cupertino-pane', { /* ... */ });
 | **initialBreak** | `'top' \| 'middle' \| 'bottom'` | 'middle' | Initial pane position |
 | **darkMode** | `boolean` | false | Initial pane styles |
 | **backdrop** | `boolean` | false | Dimmed overlay will rendered with pane if `true` |
-| **backdropTransparent** | `boolean` | false | Dimmed overlay will rendered with zero opacity |
+| **backdropOpacity** | `number` | 0.4 | Dimmed overlay opacity value |
 | **animationType** | `'ease' \| 'ease-in' \| 'ease-out' \| 'ease-in-out' \| 'cubic-bezier'` | 'ease' | Transition property animation type |
 | **animationDuration** | `number` | 300 | Transition property duration |
 | **bottomClose** | `boolean` | false | Close pane with drag to bottom breakpoint |
@@ -263,9 +263,9 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- Playground (livereload, build cordova app from html)
-- Docs engine + live example hosted in pages
 - Drag pane bottom-top with big delta
+- Docs engine 
+- Live example hosted in pages
 - Click item/Drag pane Precision
 - Precision delta counts experiments
 - 3D effect (ion-modal example)
