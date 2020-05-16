@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.42
+ * Cupertino Pane 1.1.43
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: May 9, 2020
+ * Released on: May 17, 2020
  */
 
 class Support {
@@ -510,12 +510,10 @@ class CupertinoPane {
         const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
         if (t.type === 'pointermove' && !this.pointerDown)
             return;
-        const translateYRegex = /\.*translateY\((.*)px\)/i;
-        const p = parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
         // Delta
         const n = screenY;
         const diff = n - this.steps[this.steps.length - 1];
-        const newVal = p + diff;
+        const newVal = this.getPanelTransformY + diff;
         // Not allow move panel with positive overflow scroll
         if (this.overflowEl.style.overflowY === 'auto') {
             this.overflowEl.addEventListener('scroll', (s) => {
@@ -551,11 +549,9 @@ class CupertinoPane {
         const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
         if (t.type === 'pointerup')
             this.pointerDown = false;
-        const translateYRegex = /\.*translateY\((.*)px\)/i;
-        const p = parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
         // Determinate nearest point
         let closest = this.brs.reduce((prev, curr) => {
-            return (Math.abs(curr - p) < Math.abs(prev - p) ? curr : prev);
+            return (Math.abs(curr - this.getPanelTransformY) < Math.abs(prev - this.getPanelTransformY) ? curr : prev);
         });
         // Swipe - next (if differ > 10)
         const diff = this.steps[this.steps.length - 1] - this.steps[this.steps.length - 2];
@@ -645,6 +641,10 @@ class CupertinoPane {
                 el.removeEventListener('mouseup', (t) => this.touchEnd(t), false);
             }
         }
+    }
+    get getPanelTransformY() {
+        const translateYRegex = /\.*translateY\((.*)px\)/i;
+        return parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
     }
     /************************************
      * Public user methods

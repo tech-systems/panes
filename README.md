@@ -263,7 +263,9 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- Drag pane bottom-top with big delta
+- breakpoint reached callback
+- Drag pane bottom-top with big delta (moveend debug)
+- Merge transitions to one function
 - Docs engine 
 - Live example hosted in pages
 - Click item/Drag pane Precision
