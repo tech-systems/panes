@@ -195,6 +195,7 @@ The function that executes when the event fires.
 | **onDrag** | `void: () => {}` | Call executes on each new position of pane |
 | **onDragEng** | `void: () => {}` | Executes when drag event complete |
 | **onBackdropTap** | `void: () => {}` | Call when user tap backdrop overlay |
+| **onTransitionEnd** | `void: () => {}` | Executes when transition and animation complete |
 
 ## Public Methods
 ### present({animate: **boolean = false**})
@@ -263,17 +264,15 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- breakpoint reached callback
-- Drag pane bottom-top with big delta (moveend debug)
 - Merge transitions to one function
-- Docs engine 
-- Live example hosted in pages
 - Click item/Drag pane Precision
 - Precision delta counts experiments
 - 3D effect (ion-modal example)
 - Topper than top (10px-20px)
 - Drawer control effect
 - 3D button toggle effect
+- Docs engine 
+- Live example hosted in pages
 - React Native version with one core
 
 ## Contributing

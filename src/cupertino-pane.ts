@@ -29,7 +29,8 @@ export class CupertinoPane {
     onDragStart: () => {},
     onDrag: () => {},
     onDragEnd: () => {},
-    onBackdropTap: () => {}
+    onBackdropTap: () => {},
+    onTransitionEnd: () => {}
   };
 
   private defaultBreaksConf = {
@@ -287,13 +288,25 @@ export class CupertinoPane {
       /****** Attach Events *******/
       this.attachEvents();
 
-      /** Animation present
+      /** Animation present *******
        * TODO: merge this animation with move to break
-       */
+       ********/
+      const transitionEnd = () => {
+        this.paneEl.style.transition = `initial`;
+
+        // Emit event
+        this.settings.onDidPresent();
+        this.settings.onTransitionEnd();
+
+        // Remove listener
+        this.paneEl.removeEventListener('transitionend', transitionEnd);
+      };
+
       if (conf.animate) {
         this.paneEl.style.transform = `translateY(${this.screen_height}px) translateZ(0px)`; 
         this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
         this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
+
         setTimeout(() => {
           this.paneEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
           if (this.settings.backdrop) {
@@ -301,12 +314,7 @@ export class CupertinoPane {
           }
         }, 50);
 
-        let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
-          this.paneEl.style.transition = `initial`;
-          initTransitionEv = undefined;
-          // Emit event
-          this.settings.onDidPresent();
-        });
+        this.paneEl.addEventListener('transitionend', transitionEnd);
       } else {
         // Emit event
         this.settings.onDidPresent();
@@ -444,13 +452,21 @@ export class CupertinoPane {
       return;
     }
 
+    const transitionEnd = () => {
+      this.paneEl.style.transition = `initial`;
+
+      // Emit event
+      this.settings.onTransitionEnd();
+
+      // Remove listener
+      this.paneEl.removeEventListener('transitionend', transitionEnd);
+    };
+
     if (!this.settings.freeMode) {
       this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
       this.paneEl.style.transform = `translateY(${closest}px) translateZ(0px)`;
-      let initTransitionEv = this.paneEl.addEventListener('transitionend', () => {
-        this.paneEl.style.transition = `initial`;
-        initTransitionEv = undefined;
-      });
+
+      this.paneEl.addEventListener('transitionend', transitionEnd);
     }
   }
 
@@ -458,7 +474,12 @@ export class CupertinoPane {
       if (this.currentBreakpoint === this.breaks['top']) {
         if (diff > maxDiff) {
           if (this.settings.breaks['middle'].enabled) { return this.breaks['middle']; }
-          if (this.settings.breaks['bottom'].enabled) { return this.breaks['bottom']; }
+          if (this.settings.breaks['bottom'].enabled) { 
+            if (this.breaks['middle'] < closest) {
+              return closest;
+            }
+            return this.breaks['bottom']; 
+          }
         }
         return this.breaks['top'];
       }
@@ -475,7 +496,12 @@ export class CupertinoPane {
 
       if (this.currentBreakpoint === this.breaks['bottom']) {
         if (diff < -maxDiff) {
-          if (this.settings.breaks['middle'].enabled) { return this.breaks['middle']; }
+          if (this.settings.breaks['middle'].enabled) { 
+            if (this.breaks['middle'] > closest) {
+              return closest;
+            }
+            return this.breaks['middle']; 
+          }
           if (this.settings.breaks['top'].enabled) { return this.breaks['top']; }
         }
         return this.breaks['bottom'];
@@ -622,10 +648,18 @@ export class CupertinoPane {
     this.currentBreakpoint = this.breaks[val];
     this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
     this.paneEl.style.transform = `translateY(${this.breaks[val]}px) translateZ(0px)`;
-    let initTransitionEv = this.paneEl.addEventListener('transitionend', (t) => {
+
+    // Transition end
+    const transitionEnd = () => {
       this.paneEl.style.transition = `initial`;
-      initTransitionEv = undefined;
-    });
+
+      // Emit event
+      this.settings.onTransitionEnd();
+      
+      // Remove listener
+      this.paneEl.removeEventListener('transitionend', transitionEnd);
+    };
+    this.paneEl.addEventListener('transitionend', transitionEnd);
   }
 
   public hide() {
@@ -642,17 +676,20 @@ export class CupertinoPane {
       this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
     }
 
-    const hideTransitionEnd = () => {
+    // Transition end
+    const transitionEnd = () => {
       this.paneEl.style.transition = `initial`;
 
       if (this.settings.backdrop) {
         this.backdropEl.style.transition = `initial`;
         this.backdropEl.style.display = `none`;
       }
-      this.paneEl.removeEventListener('transitionend', hideTransitionEnd);
-    };
 
-    this.paneEl.addEventListener('transitionend', hideTransitionEnd);
+      // Emit event
+      this.settings.onTransitionEnd();
+      this.paneEl.removeEventListener('transitionend', transitionEnd);
+    };
+    this.paneEl.addEventListener('transitionend', transitionEnd);
   }
 
   public isHidden(): (boolean|null) {
@@ -701,6 +738,10 @@ export class CupertinoPane {
 
         // Emit event
         this.settings.onDidDismiss();
+        this.settings.onTransitionEnd();
+
+        // Remove listener
+        this.paneEl.removeEventListener('transitionend', resets);
       };
 
       if (conf.animate) {
@@ -712,7 +753,7 @@ export class CupertinoPane {
           this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
         }
 
-        this.paneEl.addEventListener('transitionend', () => resets());
+        this.paneEl.addEventListener('transitionend', resets);
         return;
       } 
 
