@@ -263,7 +263,7 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- Drag pane bottom-top with big delta
+- Drag pane bottom-top with big delta (jump to near not next by the last position)
 - Docs engine 
 - Live example hosted in pages
 - Click item/Drag pane Precision
