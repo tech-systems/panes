@@ -17,6 +17,9 @@
       <ion-drawer>
         <h1>Header</h1>
         <p hide-on-bottom>Content</p> 
+        <ion-button expand="block" color="secondary" onclick="setTopDrawer()">Set Top</ion-button>
+        <ion-button expand="block" color="secondary" onclick="setMiddleDrawer()">Set Moddle</ion-button>
+        <ion-button expand="block" color="secondary" onclick="setBottomDrawer()">Set bottom</ion-button>
       </ion-drawer>
 
       <ion-button expand="block" color="danger" onclick="presentDrawer()">Present Drawer</ion-button>
@@ -35,16 +38,19 @@
 
   <script>
     var drawer = new CupertinoPane('ion-drawer', { 
-        onDrag: () => console.log('Drag event')
+        onDrag: () => console.log('Drag event'),
+        // freeMode: true,
+        // onBackdropTap: () => hideDrawer(),
+        // backdrop: true
     });
-    drawer.present({animate: true});
+    setTimeout(() => drawer.present({animate: true}));
 
     async function presentDrawer() {
       drawer.present({animate: true});
     };
 
     async function destroyDrawer() {
-      drawer.destroy({animate: false});
+      drawer.destroy({animate: true});
     };
     
     async function hideDrawer() {

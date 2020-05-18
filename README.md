@@ -264,9 +264,13 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- Merge transitions to one function
-- Click item/Drag pane Precision
-- Precision delta counts experiments
+- hide - crash pane
+- merge + push
+- issues: check click over transparent background
+- issues try attach fab element
+
+- Click item/drag pane precision on device
+- Precision delta counts experiments + option
 - 3D effect (ion-modal example)
 - Topper than top (10px-20px)
 - Drawer control effect

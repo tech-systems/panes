@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: May 17, 2020
+ * Released on: May 19, 2020
  */
 
 'use strict';
@@ -448,28 +448,9 @@ class CupertinoPane {
         this.checkOverflowAttr(this.currentBreakpoint);
         /****** Attach Events *******/
         this.attachEvents();
-        /** Animation present *******
-         * TODO: merge this animation with move to break
-         ********/
-        const transitionEnd = () => {
-            this.paneEl.style.transition = `initial`;
-            // Emit event
-            this.settings.onDidPresent();
-            this.settings.onTransitionEnd();
-            // Remove listener
-            this.paneEl.removeEventListener('transitionend', transitionEnd);
-        };
+        /****** Animation & Transition ******/
         if (conf.animate) {
-            this.paneEl.style.transform = `translateY(${this.screen_height}px) translateZ(0px)`;
-            this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-            this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
-            setTimeout(() => {
-                this.paneEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
-                if (this.settings.backdrop) {
-                    this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
-                }
-            }, 50);
-            this.paneEl.addEventListener('transitionend', transitionEnd);
+            this.doTransition({ type: 'present', translateY: this.breaks[this.settings.initialBreak] });
         }
         else {
             // Emit event
@@ -546,8 +527,7 @@ class CupertinoPane {
         }
         this.checkOpacityAttr(newVal);
         this.checkOverflowAttr(newVal);
-        this.paneEl.style.transition = 'initial';
-        this.paneEl.style.transform = `translateY(${newVal}px) translateZ(0px)`;
+        this.doTransition({ type: 'move', translateY: newVal });
         this.steps.push(n);
     }
     /**
@@ -591,18 +571,7 @@ class CupertinoPane {
             this.destroy({ animate: true });
             return;
         }
-        const transitionEnd = () => {
-            this.paneEl.style.transition = `initial`;
-            // Emit event
-            this.settings.onTransitionEnd();
-            // Remove listener
-            this.paneEl.removeEventListener('transitionend', transitionEnd);
-        };
-        if (!this.settings.freeMode) {
-            this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-            this.paneEl.style.transform = `translateY(${closest}px) translateZ(0px)`;
-            this.paneEl.addEventListener('transitionend', transitionEnd);
-        }
+        this.doTransition({ type: 'end', translateY: closest });
     }
     attachEvents() {
         let el = this.paneEl;
@@ -690,53 +659,19 @@ class CupertinoPane {
         }
         this.checkOpacityAttr(this.breaks[val]);
         this.checkOverflowAttr(this.breaks[val]);
-        /** Animation present
-         * TODO: merge this animation with move to break
-         */
-        if (this.settings.backdrop) {
-            this.backdropEl.style.display = 'block';
-            this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
-            this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-            setTimeout(() => {
-                this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
-            }, 50);
-        }
+        this.doTransition({ type: 'breakpoint', translateY: this.breaks[val] });
         this.currentBreakpoint = this.breaks[val];
-        this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-        this.paneEl.style.transform = `translateY(${this.breaks[val]}px) translateZ(0px)`;
-        // Transition end
-        const transitionEnd = () => {
-            this.paneEl.style.transition = `initial`;
-            // Emit event
-            this.settings.onTransitionEnd();
-            // Remove listener
-            this.paneEl.removeEventListener('transitionend', transitionEnd);
-        };
-        this.paneEl.addEventListener('transitionend', transitionEnd);
     }
     hide() {
         if (!this.isPanePresented()) {
             console.warn(`Cupertino Pane: Present pane before call hide()`);
             return null;
         }
-        this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-        this.paneEl.style.transform = `translateY(${this.screen_height}px) translateZ(0px)`;
-        if (this.settings.backdrop) {
-            this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-            this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
+        if (this.isHidden()) {
+            console.warn(`Cupertino Pane: Pane already hidden`);
+            return null;
         }
-        // Transition end
-        const transitionEnd = () => {
-            this.paneEl.style.transition = `initial`;
-            if (this.settings.backdrop) {
-                this.backdropEl.style.transition = `initial`;
-                this.backdropEl.style.display = `none`;
-            }
-            // Emit event
-            this.settings.onTransitionEnd();
-            this.paneEl.removeEventListener('transitionend', transitionEnd);
-        };
-        this.paneEl.addEventListener('transitionend', transitionEnd);
+        this.doTransition({ type: 'hide', translateY: this.screen_height });
     }
     isHidden() {
         if (!this.isPanePresented()) {
@@ -759,6 +694,16 @@ class CupertinoPane {
         return null;
     }
     ;
+    destroyResets() {
+        this.parentEl.appendChild(this.contentEl);
+        this.parentEl.removeChild(this.wrapperEl);
+        /****** Detach Events *******/
+        this.detachEvents();
+        // Reset vars
+        this.currentBreakpoint = this.breaks[this.settings.initialBreak];
+        // Reset styles
+        this.contentEl.style.display = 'none';
+    }
     destroy(conf = { animate: false }) {
         if (!this.isPanePresented()) {
             console.warn(`Cupertino Pane: Present pane before call destroy()`);
@@ -766,33 +711,90 @@ class CupertinoPane {
         }
         // Emit event
         this.settings.onWillDismiss();
-        const resets = () => {
-            this.parentEl.appendChild(this.contentEl);
-            this.parentEl.removeChild(this.wrapperEl);
-            /****** Detach Events *******/
-            this.detachEvents();
-            // Reset vars
-            this.currentBreakpoint = this.breaks[this.settings.initialBreak];
-            // Reset styles
-            this.contentEl.style.display = 'none';
-            this.paneEl.style.transform = 'initial';
+        /****** Animation & Transition ******/
+        if (conf.animate) {
+            this.doTransition({ type: 'destroy', translateY: this.screen_height });
+        }
+        else {
+            this.destroyResets();
             // Emit event
             this.settings.onDidDismiss();
-            this.settings.onTransitionEnd();
-            // Remove listener
-            this.paneEl.removeEventListener('transitionend', resets);
-        };
-        if (conf.animate) {
-            this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-            this.paneEl.style.transform = `translateY(${this.screen_height}px) translateZ(0px)`;
-            if (this.settings.backdrop) {
-                this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-                this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
-            }
-            this.paneEl.addEventListener('transitionend', resets);
+        }
+    }
+    /***********************************
+     * Transitions handler
+     */
+    doTransition(params = {}) {
+        // touchmove simple event
+        if (params.type === 'move') {
+            this.paneEl.style.transition = 'initial';
+            this.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
             return;
         }
-        resets();
+        // Transition end
+        const transitionEnd = () => {
+            if (params.type === 'destroy') {
+                this.destroyResets();
+            }
+            this.paneEl.style.transition = `initial`;
+            // Backdrop 
+            if (this.settings.backdrop) {
+                if (params.type === 'destroy' || params.type === 'hide') {
+                    this.backdropEl.style.transition = `initial`;
+                    this.backdropEl.style.display = `none`;
+                }
+            }
+            // Emit event
+            if (params.type === 'present') {
+                this.settings.onDidPresent();
+            }
+            if (params.type === 'destroy') {
+                this.settings.onDidDismiss();
+            }
+            this.settings.onTransitionEnd();
+            // Remove listener
+            this.paneEl.removeEventListener('transitionend', transitionEnd);
+        };
+        // MoveToBreak, Touchend, Present, Hide, Destroy events
+        if (params.type === 'breakpoint'
+            || params.type === 'end'
+            || params.type === 'present'
+            || params.type === 'hide'
+            || params.type === 'destroy') {
+            // backdrop 
+            if (this.settings.backdrop) {
+                if (this.isHidden()
+                    || params.type === 'hide'
+                    || params.type === 'destroy'
+                    || params.type === 'present') {
+                    this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
+                    this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+                    if (params.type !== 'hide' && params.type !== 'destroy') {
+                        this.backdropEl.style.display = 'block';
+                        setTimeout(() => {
+                            this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
+                        }, 50);
+                    }
+                }
+            }
+            // freemode
+            if (params.type === 'end' && this.settings.freeMode)
+                return;
+            // style
+            this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+            // main transitions
+            if (params.type === 'present') {
+                this.paneEl.style.transform = `translateY(${this.screen_height}px) translateZ(0px)`;
+                setTimeout(() => {
+                    this.paneEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+                }, 50);
+            }
+            else {
+                this.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
+            }
+            this.paneEl.addEventListener('transitionend', transitionEnd);
+            return;
+        }
     }
 }
 

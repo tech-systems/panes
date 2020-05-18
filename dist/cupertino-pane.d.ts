@@ -70,7 +70,12 @@ export declare class CupertinoPane {
     hide(): any;
     isHidden(): (boolean | null);
     currentBreak(): (string | null);
+    private destroyResets;
     destroy(conf?: {
         animate: boolean;
     }): any;
+    /***********************************
+     * Transitions handler
+     */
+    private doTransition;
 }
