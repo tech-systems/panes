@@ -150,6 +150,7 @@ var myPane = new CupertinoPane('.cupertino-pane', { /* ... */ });
 | Property | Type | Default | Description |
 | - | - | - | - |
 | **parentElement** | `string` | Parent element selector | Element selector where pane will rendered |
+| **followerElement** | `string` | Follower element selector | Element with selector will following pane transitions |
 | **initialBreak** | `'top' \| 'middle' \| 'bottom'` | 'middle' | Initial pane position |
 | **darkMode** | `boolean` | false | Initial pane styles |
 | **backdrop** | `boolean` | false | Dimmed overlay will rendered with pane if `true` |
@@ -264,11 +265,6 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- hide - crash pane
-- merge + push
-- issues: check click over transparent background
-- issues try attach fab element
-
 - Click item/drag pane precision on device
 - Precision delta counts experiments + option
 - 3D effect (ion-modal example)

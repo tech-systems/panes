@@ -14,12 +14,16 @@
 </head>
 
 <body>
+  <ion-content>
+    <ion-fab vertical="center" horizontal="end">
+      <ion-fab-button>
+        <ion-icon name="arrow-up-circle"></ion-icon>
+      </ion-fab-button>
+    </ion-fab>
+
       <ion-drawer>
         <h1>Header</h1>
         <p hide-on-bottom>Content</p> 
-        <ion-button expand="block" color="secondary" onclick="setTopDrawer()">Set Top</ion-button>
-        <ion-button expand="block" color="secondary" onclick="setMiddleDrawer()">Set Moddle</ion-button>
-        <ion-button expand="block" color="secondary" onclick="setBottomDrawer()">Set bottom</ion-button>
       </ion-drawer>
 
       <ion-button expand="block" color="danger" onclick="presentDrawer()">Present Drawer</ion-button>
@@ -35,9 +39,10 @@
       <ion-button expand="block" color="tertiary" onclick="setFreeMode()">Enable free mode</ion-button>
       <ion-button expand="block" color="tertiary" onclick="setBottomClose()">Close on bottom break</ion-button>
       <ion-button expand="block" color="tertiary" onclick="setBottomMiddle()">Bottom + Middle breaks</ion-button>
-
+  </ion-content>
   <script>
     var drawer = new CupertinoPane('ion-drawer', { 
+        followerElement: 'ion-fab',
         onDrag: () => console.log('Drag event'),
         // freeMode: true,
         // onBackdropTap: () => hideDrawer(),

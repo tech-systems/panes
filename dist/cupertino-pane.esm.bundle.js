@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.5
+ * Cupertino Pane 1.1.51
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -147,6 +147,7 @@ class CupertinoPane {
         this.settings = {
             initialBreak: 'middle',
             parentElement: null,
+            followerElement: null,
             backdrop: false,
             backdropOpacity: 0.4,
             animationType: 'ease',
@@ -387,6 +388,15 @@ class CupertinoPane {
         this.paneEl.appendChild(this.draggableEl);
         this.paneEl.appendChild(this.contentEl);
         this.draggableEl.appendChild(this.moveEl);
+        if (this.settings.followerElement) {
+            if (!document.querySelector(this.settings.followerElement)) {
+                console.warn('Cupertino Pane: wrong follower element selector specified', this.settings.followerElement);
+                return;
+            }
+            this.followerEl = document.querySelector(this.settings.followerElement);
+            this.followerEl.style.willChange = 'transform';
+            this.followerEl.style.transform = `translateY(0px) translateZ(0px)`;
+        }
         if (!this.settings.showDraggable) {
             this.draggableEl.style.opacity = '0';
         }
@@ -725,6 +735,11 @@ class CupertinoPane {
         if (params.type === 'move') {
             this.paneEl.style.transition = 'initial';
             this.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
+            // Bind for follower same transitions
+            if (this.followerEl) {
+                this.followerEl.style.transition = 'initial';
+                this.followerEl.style.transform = `translateY(${params.translateY - this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+            }
             return;
         }
         // Transition end
@@ -733,6 +748,10 @@ class CupertinoPane {
                 this.destroyResets();
             }
             this.paneEl.style.transition = `initial`;
+            // Bind for follower same transitions
+            if (this.followerEl) {
+                this.followerEl.style.transition = `initial`;
+            }
             // Backdrop 
             if (this.settings.backdrop) {
                 if (params.type === 'destroy' || params.type === 'hide') {
@@ -778,15 +797,31 @@ class CupertinoPane {
                 return;
             // style
             this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+            // Bind for follower same transitions
+            if (this.followerEl) {
+                this.followerEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+            }
             // main transitions
             if (params.type === 'present') {
                 this.paneEl.style.transform = `translateY(${this.screen_height}px) translateZ(0px)`;
+                // Bind for follower same transitions
+                if (this.followerEl) {
+                    this.followerEl.style.transform = `translateY(${this.screen_height - this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+                }
                 setTimeout(() => {
                     this.paneEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+                    // Bind for follower same transitions
+                    if (this.followerEl) {
+                        this.followerEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak] - this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+                    }
                 }, 50);
             }
             else {
                 this.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
+                // Bind for follower same transitions
+                if (this.followerEl) {
+                    this.followerEl.style.transform = `translateY(${params.translateY - this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+                }
             }
             this.paneEl.addEventListener('transitionend', transitionEnd);
             return;

@@ -23,6 +23,7 @@ export declare class CupertinoPane {
     private backdropEl;
     private closeEl;
     private overflowEl;
+    private followerEl;
     private device;
     constructor(selector: string, conf?: any);
     private drawElements;
