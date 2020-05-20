@@ -275,6 +275,7 @@ By default using for full pane area, but in some cases good useful with header.
 - 3D button toggle effect
 - Docs engine 
 - Live example hosted in pages
+- No taps UI (increase User - Machine information throughput)
 - React Native version with one core
 
 ## Contributing
