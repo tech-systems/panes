@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: May 19, 2020
+ * Released on: May 20, 2020
  */
 
 'use strict';
@@ -163,6 +163,7 @@ class CupertinoPane {
             topperOverflow: true,
             topperOverflowOffset: 0,
             showDraggable: true,
+            draggableOver: false,
             clickBottomOpen: true,
             dragByCursor: false,
             simulateTouch: true,
@@ -404,6 +405,19 @@ class CupertinoPane {
         if (!this.settings.showDraggable) {
             this.draggableEl.style.opacity = '0';
         }
+        // Draggable over pane position
+        if (this.settings.draggableOver) {
+            this.paneEl.style.background = 'transparent';
+            this.paneEl.style.boxShadow = 'none';
+            this.paneEl.style.paddingTop = '30px';
+            this.contentEl.style.background = '#ffffff';
+            this.contentEl.style.display = 'block';
+            this.contentEl.style.borderTopLeftRadius = '20px';
+            this.contentEl.style.borderTopRightRadius = '20px';
+            this.contentEl.style.boxShadow = '0 4px 16px rgba(0,0,0,.12)';
+            this.closeEl.style.top = '45px';
+            this.draggableEl.style.padding = '15px';
+        }
         if (this.settings.darkMode) {
             this.paneEl.style.background = '#1c1c1d';
             this.paneEl.style.color = '#ffffff';
@@ -453,6 +467,7 @@ class CupertinoPane {
         }
         this.overflowEl.style.height = `${this.screen_height
             - this.breaks['top'] - 51
+            + (this.settings.draggableOver ? 30 : 0)
             - this.settings.topperOverflowOffset}px`;
         this.checkOpacityAttr(this.currentBreakpoint);
         this.checkOverflowAttr(this.currentBreakpoint);

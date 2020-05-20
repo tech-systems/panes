@@ -163,6 +163,7 @@ var myPane = new CupertinoPane('.cupertino-pane', { /* ... */ });
 | **topperOverflow** | `boolean` | true | Ability to scroll content inside pane if topper point reached |
 | **topperOverflowOffset** | `number` | 0 | Offset from screen bottom to the end of overflow content |
 | **showDraggable** | `boolean` | true | Render rectangular shape on the top of pane
+| **draggableOver** | `boolean` | true | Render rectangular shape over a pane
 | **clickBottomOpen** | `boolean` | true | If bottom position reached, simple click to pane will open pane to the next upper point |
 | **dragByCursor** | `boolean` | false | Drag pane only with draggabale top cursor |
 | **simulateTouch** | `boolean` | true | Simulate touch events for Desktop |
