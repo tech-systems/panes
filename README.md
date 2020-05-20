@@ -266,6 +266,7 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
+- Contribution guidefile
 - Click item/drag pane precision on device
 - Precision delta counts experiments + option
 - 3D effect (ion-modal example)
