@@ -265,7 +265,7 @@ export class CupertinoPane {
         this.draggableEl.querySelector<HTMLElement>('.move').style.background = 'rgba(228, 228, 228, 0.6)';
         this.draggableEl.querySelector<HTMLElement>('.move').classList.add('move-translucent');
         let draggableStyle = document.createElement('style');
-        draggableStyle.innerHTML = ".move-translucent{backdrop-filter:blur(6px)}";
+        draggableStyle.innerHTML = ".move-translucent{backdrop-filter:blur(6px);-webkit-backdrop-filter: blur(6px);}";
         document.body.appendChild(draggableStyle);
       }
 
