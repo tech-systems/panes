@@ -279,31 +279,8 @@ By default using for full pane area, but in some cases good useful with header.
 - React Native version with one core
 
 ## Contributing
-We welcome contributions of all kinds from anyone.
-### 1. Where do I go from here?
-If you've noticed a bug or have a question, [make an issue](https://github.com/roman-rr/cupertino-pane/issues/new),
-we'll try to answer it as fast as possible.
-### 2. Fork & Create a branch
-If this is something you think you can fix, then
-[fork Cupertino Pane](https://help.github.com/articles/fork-a-repo)
-and create a branch.
-```sh
-# Create new branch
-git checkout -b my_issue
-
-# Then we install the dependencies
-npm install
-```
-### 3. Changes & Build
-```sh
-# Make bundles 
-gulp build
-```
-This will output the files into the dist directory.
-### 4. Push changes
-Push your changes to a topic branch in your fork of the repository.
-Submit a pull request to the repository.
-It can take several days before we can review the code you've submitted. 
+We are welcome contributions of all kinds from anyone. 
+Please review the [contributing](https://github.com/roman-rr/cupertino-pane/blob/master/CONTRIBUTING.md) guideline.
 
 ## License
 Licensed under the MIT License. [View license](/LICENSE).
