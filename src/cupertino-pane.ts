@@ -19,6 +19,7 @@ export class CupertinoPane {
     topperOverflowOffset: 0,
     showDraggable: true,
     draggableOver: false,
+    draggableTranslucent: false,
     clickBottomOpen: true,
     dragByCursor: false,
     simulateTouch: true,
@@ -257,6 +258,15 @@ export class CupertinoPane {
         this.closeEl.style.top = '45px';
 
         this.draggableEl.style.padding = '15px';
+      }
+
+      // Draggable translucent style
+      if (this.settings.draggableTranslucent) {
+        this.draggableEl.querySelector<HTMLElement>('.move').style.background = 'rgba(228, 228, 228, 0.6)';
+        this.draggableEl.querySelector<HTMLElement>('.move').classList.add('move-translucent');
+        let draggableStyle = document.createElement('style');
+        draggableStyle.innerHTML = ".move-translucent{backdrop-filter:blur(6px)}";
+        document.body.appendChild(draggableStyle);
       }
 
       if (this.settings.darkMode) {
