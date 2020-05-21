@@ -19,7 +19,6 @@ export class CupertinoPane {
     topperOverflowOffset: 0,
     showDraggable: true,
     draggableOver: false,
-    draggableTranslucent: false,
     clickBottomOpen: true,
     dragByCursor: false,
     simulateTouch: true,
@@ -258,15 +257,13 @@ export class CupertinoPane {
         this.closeEl.style.top = '45px';
 
         this.draggableEl.style.padding = '15px';
-      }
 
-      // Draggable translucent style
-      if (this.settings.draggableTranslucent) {
-        this.draggableEl.querySelector<HTMLElement>('.move').style.background = 'rgba(228, 228, 228, 0.6)';
-        this.draggableEl.querySelector<HTMLElement>('.move').classList.add('move-translucent');
-        let draggableStyle = document.createElement('style');
-        draggableStyle.innerHTML = ".move-translucent{backdrop-filter:blur(6px);-webkit-backdrop-filter: blur(6px);}";
-        document.body.appendChild(draggableStyle);
+        this.moveEl.style.width = '45px';
+        this.moveEl.style.background = 'rgba(225, 225, 225, 0.6)';
+        if (Support.backdropFilter) {
+          this.moveEl.style['backdropFilter'] = 'saturate(180%) blur(20px)';
+          this.moveEl.style['webkitBackdropFilter'] = 'saturate(180%) blur(20px)';
+        }
       }
 
       if (this.settings.darkMode) {

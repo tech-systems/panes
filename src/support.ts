@@ -9,6 +9,11 @@ export class Support {
     return ('MutationObserver' in window || 'WebkitMutationObserver' in window);
   }
 
+  public static get backdropFilter() {
+    return CSS.supports("backdrop-filter", "blur(0px)") 
+      || CSS.supports("-webkit-backdrop-filter", "blur(0px)");
+  }
+
   public static get passiveListener() {
     let supportsPassive = false;
     try {

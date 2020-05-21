@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: May 21, 2020
+ * Released on: May 22, 2020
  */
 
 'use strict';
@@ -22,6 +22,10 @@ class Support {
     }
     static get observer() {
         return ('MutationObserver' in window || 'WebkitMutationObserver' in window);
+    }
+    static get backdropFilter() {
+        return CSS.supports("backdrop-filter", "blur(0px)")
+            || CSS.supports("-webkit-backdrop-filter", "blur(0px)");
     }
     static get passiveListener() {
         let supportsPassive = false;
@@ -164,7 +168,6 @@ class CupertinoPane {
             topperOverflowOffset: 0,
             showDraggable: true,
             draggableOver: false,
-            draggableTranslucent: false,
             clickBottomOpen: true,
             dragByCursor: false,
             simulateTouch: true,
@@ -418,14 +421,12 @@ class CupertinoPane {
             this.contentEl.style.boxShadow = '0 4px 16px rgba(0,0,0,.12)';
             this.closeEl.style.top = '45px';
             this.draggableEl.style.padding = '15px';
-        }
-        // Draggable translucent style
-        if (this.settings.draggableTranslucent) {
-            this.draggableEl.querySelector('.move').style.background = 'rgba(228, 228, 228, 0.6)';
-            this.draggableEl.querySelector('.move').classList.add('move-translucent');
-            let draggableStyle = document.createElement('style');
-            draggableStyle.innerHTML = ".move-translucent{backdrop-filter:blur(6px)}";
-            document.body.appendChild(draggableStyle);
+            this.moveEl.style.width = '45px';
+            this.moveEl.style.background = 'rgba(225, 225, 225, 0.6)';
+            if (Support.backdropFilter) {
+                this.moveEl.style['backdropFilter'] = 'saturate(180%) blur(20px)';
+                this.moveEl.style['webkitBackdropFilter'] = 'saturate(180%) blur(20px)';
+            }
         }
         if (this.settings.darkMode) {
             this.paneEl.style.background = '#1c1c1d';
