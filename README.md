@@ -267,6 +267,7 @@ By default using for full pane area, but in some cases good useful with header.
 
 ## Future Goals
 - Define max pane height by topper
+- Starbucks playground
 - Click item/drag pane precision on device
 - Precision delta counts experiments + option
 - 3D effect (ion-modal example)
