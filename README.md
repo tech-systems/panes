@@ -266,18 +266,18 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- Define max pane height by topper
-- Starbucks playground
-- Click item/drag pane precision on device
-- Precision delta counts experiments + option
-- 3D effect (ion-modal example)
-- Topper than top (10px-20px)
-- Drawer control effect
-- 3D button toggle effect
-- Docs engine 
-- Live example hosted in pages
-- No taps UI (increase User - Machine information throughput)
-- React Native version with one core
+- [UI] Starbucks playground
+- [Quality] Click item/drag pane precision on device
+- [Quality] Precision delta counts experiments + option
+- [UI] 3D effect (ion-modal example)
+- [Quality] Overflow enabled -> bottom scrolled -> dragend -> drag bottom point - teared
+- [Quality] Topper than top (if scroll - overflow enable else 10px-20px)
+- [UI] Drawer control effect (simple/circle)
+- [UI] 3D button toggle effect
+- [Docs] Docs engine 
+- [Docs] Live example hosted in pages
+- [UI] No taps UI (increase User - Machine information throughput)
+- [Platforms] React Native version with one core
 
 ## Contributing
 We are welcome contributions of all kinds from anyone. 

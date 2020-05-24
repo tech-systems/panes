@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Cupertino Pane - Playground</title>
+  <title>Cupertino Pane - Starbucks</title>
 
   <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <script>var exports = {"__esModule": true};</script> <!-- Required if exports not defined earlier -->
@@ -14,25 +14,28 @@
 </head>
 
 <body>
-  <ion-content class="ion-padding">
-    <ion-list>
-      <ion-item>
-        <ion-label>
-          <a href="./base.html">Base</a>
-        </ion-label>
-      </ion-item>
-      <ion-item>
-        <ion-label>
-          <a href="./overflow.html">Overflow</a>
-        </ion-label>
-      </ion-item>
-      <ion-item>
-        <ion-label>
-          <a href="./starbucks.html">Starbucks</a>
-        </ion-label>
-      </ion-item>
-    </ion-list>
+  <ion-content>
+      <ion-drawer>
+        <h1 class="ion-padding">Header</h1>
+      </ion-drawer>
   </ion-content>
+  <script>
+    var drawer = new CupertinoPane('ion-drawer', { 
+        // breaks: {
+        //   top: { enabled: false, offset: 700 }
+        // },
+        // draggableOver: true,
+        // dragByCursor: false,
+        // backdrop: true,
+        // topperOverflowOffset: 110
+        // followerElement: 'ion-fab',
+        // onDrag: () => console.log('Drag event'),
+        // freeMode: true,
+        // onBackdropTap: () => hideDrawer()
+    });
+    setTimeout(() => drawer.present({animate: true}));
+
+  </script>
 </body>
 
 </html>

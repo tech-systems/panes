@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html dir="ltr">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Cupertino Pane - Overflow</title>
+
+  <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script>var exports = {"__esModule": true};</script> <!-- Required if exports not defined earlier -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+  <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+  <script src="../dist/cupertino-pane.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css"/> 
+</head>
+
+<body>
+  <ion-content>
+      <ion-drawer>
+        <h1 class="ion-padding">Header</h1>
+        
+        <ion-list hide-on-bottom>
+          <ion-list-header>
+            Recent Conversations
+          </ion-list-header>
+  
+          <ion-item>
+            <ion-avatar slot="start">
+              <img src="https://github.com/ionic-team/ionic-docs/blob/master/src/demos/api/list/avatar-finn.png?raw=true">
+            </ion-avatar>
+            <ion-label>
+              <h2>Finn</h2>
+              <h3>I'm a big deal</h3>
+              <p>Listen, I've had a pretty messed up day...</p>
+            </ion-label>
+          </ion-item>
+  
+          <ion-item>
+            <ion-avatar slot="start">
+              <img src="https://github.com/ionic-team/ionic-docs/blob/master/src/demos/api/list/avatar-han.png?raw=true">
+            </ion-avatar>
+            <ion-label>
+              <h2>Han</h2>
+              <h3>Look, kid...</h3>
+              <p>I've got enough on my plate as it is, and I...</p>
+            </ion-label>
+          </ion-item>
+  
+          <ion-item>
+            <ion-avatar slot="start">
+              <img src="https://github.com/ionic-team/ionic-docs/blob/master/src/demos/api/list/avatar-rey.png?raw=true">
+            </ion-avatar>
+            <ion-label>
+              <h2>Rey</h2>
+              <h3>I can handle myself</h3>
+              <p>You will remove these restraints and leave...</p>
+            </ion-label>
+          </ion-item>
+  
+          <ion-item>
+            <ion-avatar slot="start">
+              <img src="https://github.com/ionic-team/ionic-docs/blob/master/src/demos/api/list/avatar-luke.png?raw=true">
+            </ion-avatar>
+            <ion-label>
+              <h2>Luke</h2>
+              <h3>Your thoughts betray you</h3>
+              <p>I feel the good in you, the conflict...</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+  
+        <ion-list>
+          <ion-list-header>
+            Online
+          </ion-list-header>
+  
+          <ion-item>
+            <ion-avatar slot="start">
+              <img src="https://github.com/ionic-team/ionic-docs/blob/master/src/demos/api/list/avatar-poe.png?raw=true">
+            </ion-avatar>
+            <ion-label>
+              <h2>Poe</h2>
+              <h3>New Ride</h3>
+              <p>I just upgraded my X-Wing. Next time...</p>
+            </ion-label>
+          </ion-item>
+  
+          <ion-item>
+            <ion-avatar slot="start">
+              <img src="https://github.com/ionic-team/ionic-docs/blob/master/src/demos/api/list/avatar-ben.png?raw=true">
+            </ion-avatar>
+            <ion-label>
+              <h2>Ben</h2>
+              <h3>Move Along</h3>
+              <p>These aren't the droids you're looking for...</p>
+            </ion-label>
+          </ion-item>
+  
+          <ion-item>
+            <ion-avatar slot="start">
+              <img src="https://github.com/ionic-team/ionic-docs/blob/master/src/demos/api/list/avatar-leia.png?raw=true">
+            </ion-avatar>
+            <ion-label>
+              <h2>Leia</h2>
+              <h3>You're My Only Hope</h3>
+              <p>I've placed information vital to the survival...</p>
+            </ion-label>
+          </ion-item>
+  
+          <ion-item>
+            <ion-avatar slot="start">
+              <img src="https://github.com/ionic-team/ionic-docs/blob/master/src/demos/api/list/avatar-yoda.png?raw=true">
+            </ion-avatar>
+            <ion-label>
+              <h2>Yoda</h2>
+              <h3>Size matters not</h3>
+              <p>Do or do not. There is no try...</p>
+            </ion-label>
+          </ion-item>
+        </ion-list>
+      </ion-drawer>
+
+      <ion-button expand="block" color="danger" onclick="presentDrawer()">Present Drawer</ion-button>
+      <ion-button expand="block" color="danger" onclick="destroyDrawer()">Destroy Drawer</ion-button>
+
+      <ion-button expand="block" onclick="hideDrawer()">Hide Drawer</ion-button>
+      <ion-button expand="block" onclick="isHiddenDrawer()">Drawer is hidden</ion-button>
+
+      <ion-button expand="block" color="secondary" onclick="setTopDrawer()">Set Top</ion-button>
+      <ion-button expand="block" color="secondary" onclick="setMiddleDrawer()">Set Moddle</ion-button>
+      <ion-button expand="block" color="secondary" onclick="setBottomDrawer()">Set bottom</ion-button>
+  </ion-content>
+  <script>
+    var drawer = new CupertinoPane('ion-drawer', { 
+        // breaks: {
+        //   top: { enabled: false, offset: 700 }
+        // },
+        // draggableOver: true,
+        // dragByCursor: false,
+        // backdrop: true,
+        // topperOverflowOffset: 110
+        // followerElement: 'ion-fab',
+        // onDrag: () => console.log('Drag event'),
+        // freeMode: true,
+        // onBackdropTap: () => hideDrawer()
+    });
+    setTimeout(() => drawer.present({animate: true}));
+
+    async function presentDrawer() {
+      drawer.present({animate: true});
+    };
+
+    async function destroyDrawer() {
+      drawer.destroy({animate: true});
+    };
+    
+    async function hideDrawer() {
+      drawer.hide();
+    };
+
+    async function isHiddenDrawer() {
+        console.log(await drawer.isHidden());
+    };
+
+    async function setTopDrawer() {
+      drawer.moveToBreak('top');
+    };
+
+    async function setMiddleDrawer() {
+      drawer.moveToBreak('middle');
+    };
+
+    async function setBottomDrawer() {
+      drawer.moveToBreak('bottom');
+    };
+  </script>
+</body>
+
+</html>

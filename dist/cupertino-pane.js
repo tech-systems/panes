@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.52
+ * Cupertino Pane 1.1.54
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: May 22, 2020
+ * Released on: May 24, 2020
  */
 
 'use strict';
@@ -296,7 +296,7 @@ class CupertinoPane {
         this.paneEl.style.zIndex = '11';
         this.paneEl.style.paddingTop = '15px';
         this.paneEl.style.width = '100%';
-        this.paneEl.style.height = '100%';
+        this.paneEl.style.height = `${this.screen_height - this.topper}px`;
         this.paneEl.style.background = '#ffffff';
         this.paneEl.style.borderTopLeftRadius = '20px';
         this.paneEl.style.borderTopRightRadius = '20px';
@@ -325,7 +325,7 @@ class CupertinoPane {
         this.moveEl.style.borderRadius = '4px';
         // Content
         this.contentEl = this.el;
-        this.contentEl.style.display = '';
+        this.contentEl.style.display = 'block';
         this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
         this.contentEl.style.overflowX = 'hidden';
         // Backdrop
@@ -390,6 +390,21 @@ class CupertinoPane {
         if (this.settings.breaks['middle'].offset <= this.settings.breaks['bottom'].offset) {
             console.warn('Cupertino Pane: Please set bottom offset lower than middle offset');
         }
+        // Prepare breakpoint numbers array
+        this.brs = [];
+        ['top', 'middle', 'bottom'].forEach((val) => {
+            if (this.settings.breaks[val].enabled) {
+                this.brs.push(this.breaks[val]);
+            }
+        });
+        // Determinate topper point
+        this.topper = this.brs.reduce((prev, curr) => {
+            return (Math.abs(curr) < Math.abs(prev) ? curr : prev);
+        });
+        // Determinate bottomer point
+        this.bottomer = this.brs.reduce((prev, curr) => {
+            return (Math.abs(curr) > Math.abs(prev) ? curr : prev);
+        });
         this.currentBreakpoint = this.breaks[this.settings.initialBreak];
         this.drawElements();
         this.parentEl.appendChild(this.wrapperEl);
@@ -453,20 +468,6 @@ class CupertinoPane {
             this.backdropEl.style.display = 'block';
             this.backdropEl.addEventListener('click', (t) => this.settings.onBackdropTap());
         }
-        this.brs = [];
-        ['top', 'middle', 'bottom'].forEach((val) => {
-            if (this.settings.breaks[val].enabled) {
-                this.brs.push(this.breaks[val]);
-            }
-        });
-        // Determinate topper point
-        this.topper = this.brs.reduce((prev, curr) => {
-            return (Math.abs(curr) < Math.abs(prev) ? curr : prev);
-        });
-        // Determinate bottomer point
-        this.bottomer = this.brs.reduce((prev, curr) => {
-            return (Math.abs(curr) > Math.abs(prev) ? curr : prev);
-        });
         // Get overflow element
         let attrElements = document.querySelectorAll(`${this.selector} [overflow-y]`);
         if (!attrElements.length || attrElements.length > 1) {
@@ -475,10 +476,10 @@ class CupertinoPane {
         else {
             this.overflowEl = attrElements[0];
         }
-        this.overflowEl.style.height = `${this.screen_height
-            - this.breaks['top'] - 51
+        this.overflowEl.style.height = `${this.screen_height - this.topper - 51
             + (this.settings.draggableOver ? 30 : 0)
             - this.settings.topperOverflowOffset}px`;
+        console.log();
         this.checkOpacityAttr(this.currentBreakpoint);
         this.checkOverflowAttr(this.currentBreakpoint);
         /****** Attach Events *******/
