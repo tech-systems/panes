@@ -53,9 +53,9 @@ export declare class CupertinoPane {
      * Events
      */
     private touchEvents;
-    attachEvents(): void;
-    detachEvents(): void;
-    private get getPanelTransformY();
+    private attachEvents;
+    private detachEvents;
+    private getPanelTransformY;
     /************************************
      * Public user methods
      */

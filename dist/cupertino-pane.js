@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: May 24, 2020
+ * Released on: May 26, 2020
  */
 
 'use strict';
@@ -544,7 +544,7 @@ class CupertinoPane {
         // Delta
         const n = screenY;
         const diff = n - this.steps[this.steps.length - 1];
-        const newVal = this.getPanelTransformY + diff;
+        const newVal = this.getPanelTransformY() + diff;
         // Not allow move panel with positive overflow scroll
         if (this.overflowEl.style.overflowY === 'auto') {
             this.overflowEl.addEventListener('scroll', (s) => {
@@ -581,7 +581,7 @@ class CupertinoPane {
             this.pointerDown = false;
         // Determinate nearest point
         let closest = this.brs.reduce((prev, curr) => {
-            return (Math.abs(curr - this.getPanelTransformY) < Math.abs(prev - this.getPanelTransformY) ? curr : prev);
+            return (Math.abs(curr - this.getPanelTransformY()) < Math.abs(prev - this.getPanelTransformY()) ? curr : prev);
         });
         // Swipe - next (if differ > 10)
         const diff = this.steps[this.steps.length - 1] - this.steps[this.steps.length - 2];
@@ -665,7 +665,7 @@ class CupertinoPane {
             }
         }
     }
-    get getPanelTransformY() {
+    getPanelTransformY() {
         const translateYRegex = /\.*translateY\((.*)px\)/i;
         return parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
     }
