@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.54
+ * Cupertino Pane 1.1.55
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -184,9 +184,9 @@ class CupertinoPane {
             onTransitionEnd: () => { }
         };
         this.defaultBreaksConf = {
-            top: { enabled: true, offset: window.innerHeight - (135 * 0.35) },
-            middle: { enabled: true, offset: 300 },
-            bottom: { enabled: true, offset: 100 },
+            top: { enabled: true, height: window.innerHeight - (135 * 0.35) },
+            middle: { enabled: true, height: 300 },
+            bottom: { enabled: true, height: 100 },
         };
         this.screen_height = window.innerHeight;
         this.steps = [];
@@ -373,22 +373,22 @@ class CupertinoPane {
             if (!this.settings.breaks[val]) {
                 this.settings.breaks[val] = this.defaultBreaksConf[val];
             }
-            // Add offsets
+            // Add offsets (offset or height, later need remove ofsfset)
             if (this.settings.breaks[val]
                 && this.settings.breaks[val].enabled
-                && this.settings.breaks[val].offset) {
-                this.breaks[val] -= this.settings.breaks[val].offset;
+                && (this.settings.breaks[val].offset || this.settings.breaks[val].height)) {
+                this.breaks[val] -= (this.settings.breaks[val].offset || this.settings.breaks[val].height);
             }
         });
         // Warnings 
         if (!this.settings.breaks[this.settings.initialBreak].enabled) {
             console.warn('Cupertino Pane: Please set initialBreak for enabled breakpoint');
         }
-        if (this.settings.breaks['middle'].offset >= this.settings.breaks['top'].offset) {
-            console.warn('Cupertino Pane: Please set middle offset lower than top offset');
+        if (this.settings.breaks['middle'].height >= this.settings.breaks['top'].height) {
+            console.warn('Cupertino Pane: Please set middle height lower than top height');
         }
-        if (this.settings.breaks['middle'].offset <= this.settings.breaks['bottom'].offset) {
-            console.warn('Cupertino Pane: Please set bottom offset lower than middle offset');
+        if (this.settings.breaks['middle'].height <= this.settings.breaks['bottom'].height) {
+            console.warn('Cupertino Pane: Please set bottom height lower than middle height');
         }
         // Prepare breakpoint numbers array
         this.brs = [];

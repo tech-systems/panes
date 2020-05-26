@@ -33,8 +33,8 @@ Cupertino Pane is great modern slide-over pane with touch technologies. <br>
 
 <!-- ## Breaking Changes
 ### v.1.1.2
-- Offsets and pane position normalized across all devices and screen heights. Please re-configure offsets if needs. 
-- Offsets value now calculating from screen bottom position
+- Heights and pane position normalized across all devices and screen heights. Please re-configure heights if needs. 
+- Heights value now calculating from screen bottom position
 - Do not necessary now to specify all breaks in settings configuration. Can be changed one or few:
 
 ```javascript
@@ -42,11 +42,11 @@ let settings = {
     breaks: {
         top: { 
           enabled: true, 
-          offset: window.screen.height - (135 * 0.35)
+          height: window.screen.height - (135 * 0.35)
         },
         middle: {
           enabled: true,
-          offset: 410 // 410 pixels from screen bottom until pane top vertex
+          height: 410 // 410 pixels from screen bottom until pane top vertex
         }
       }
     }
@@ -117,8 +117,8 @@ If you don't want to include Cupertino Pane files in your project, you may use i
       { 
         parentElement: 'body', // Parent container
         breaks: {
-            middle: { enabled: true, offset: 300 },
-            bottom: { enabled: true, offset: 80 },
+            middle: { enabled: true, height: 300 },
+            bottom: { enabled: true, height: 80 },
         },
         onDrag: () => console.log('Drag event')
       }
@@ -139,9 +139,10 @@ $(document).ready(function () {
 ### As an ES module
 Cupertino Pane package comes with ES module version which can be used where supported or with bundlers like Webpack or Rollup:
 ```javascript
-import { CupertinoPane } from 'cupertino-pane';
+import { CupertinoPane, CupertinoSettings } from 'cupertino-pane';
 
-var myPane = new CupertinoPane('.cupertino-pane', { /* ... */ });
+let settings: CupertinoSettings = { /* ... */ };
+let myPane = new CupertinoPane('.cupertino-pane', CupertinoSettings);
     myPane.present();
 ```
 
@@ -175,16 +176,16 @@ const pane = new CupertinoPane('.cupertino-pane', {
   breaks: {
     top: { // Topper point that pane can reach
       enabled: true, // Enable or disable breakpoint
-      offset: 0 // Additional bottom margin if needs
+      height: 0 // Pane breakpoint height
     },
     middle: { ... },
     bottom: { ... }
   }
 });
 ```
-Default top offset: `window.screen.height - (135 * 0.35)`
+Default top height: `window.screen.height - (135 * 0.35)`
 
-Bottom and middle offsets normalized accross devices by default 
+Bottom and middle heights normalized accross devices by default 
 ### Callbacks
 The function that executes when the event fires.
 | Name | Type | Description |
@@ -266,18 +267,23 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
+- [Quality] Overflow enabled -> bottom scrolled -> dragend -> drag bottom point - teared
 - [UI] Starbucks playground
+<!--
+https://cdn.dribbble.com/users/1187417/screenshots/6340744/coffee-app-booking.jpg
+https://dribbble.com/shots/6372790-Coffee-Ordering-Animation-Starbucks
+https://medium.com/@riz_maulana/dribbble-challenge-coffee-ordering-animation-cf3ae17785fe
+-->
 - [Quality] Click item/drag pane precision on device
 - [Quality] Precision delta counts experiments + option
-- [UI] 3D effect (ion-modal example)
-- [Quality] Overflow enabled -> bottom scrolled -> dragend -> drag bottom point - teared
 - [Quality] Topper than top (if scroll - overflow enable else 10px-20px)
+- [UI] 3D effect (ion-modal example)
 - [UI] Drawer control effect (simple/circle)
 - [UI] 3D button toggle effect
 - [Docs] Docs engine 
 - [Docs] Live example hosted in pages
-- [UI] No taps UI (increase User - Machine information throughput)
 - [Platforms] React Native version with one core
+- [UI] No taps UI (increase User - Machine information throughput)
 
 ## Contributing
 We are welcome contributions of all kinds from anyone. 
