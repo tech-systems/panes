@@ -267,7 +267,7 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- [Quality] Overflow enabled -> bottom scrolled -> dragend -> drag bottom point - teared
+- [Quality] Max width + Overflow enabled -> bottom scrolled -> dragend -> drag bottom point - teared
 - [UI] Starbucks playground
 <!--
 https://cdn.dribbble.com/users/1187417/screenshots/6340744/coffee-app-booking.jpg
@@ -277,6 +277,7 @@ https://medium.com/@riz_maulana/dribbble-challenge-coffee-ordering-animation-cf3
 - [Quality] Click item/drag pane precision on device
 - [Quality] Precision delta counts experiments + option
 - [Quality] Topper than top (if scroll - overflow enable else 10px-20px)
+- [Quality] Auto detection horizontall drag events inside pane
 - [UI] 3D effect (ion-modal example)
 - [UI] Drawer control effect (simple/circle)
 - [UI] 3D button toggle effect
