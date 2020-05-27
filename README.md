@@ -281,6 +281,7 @@ https://medium.com/@riz_maulana/dribbble-challenge-coffee-ordering-animation-cf3
 - [UI] 3D effect (ion-modal example)
 - [UI] Drawer control effect (simple/circle)
 - [UI] 3D button toggle effect
+- [Docs] BulletIn example
 - [Docs] Docs engine 
 - [Docs] Live example hosted in pages
 - [Platforms] React Native version with one core
