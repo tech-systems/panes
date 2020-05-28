@@ -49,7 +49,7 @@ export class CupertinoPane {
   private topper: number;
   private bottomer: number;
   private currentBreakpoint: number;
-  private contentScrollTop: number;
+  private contentScrollTop: number = 0;
   private disableDragEvents: boolean = false;
 
   private breaks: {} = {}
@@ -112,6 +112,7 @@ export class CupertinoPane {
       this.paneEl.style.zIndex = '11';
       this.paneEl.style.paddingTop = '15px';
       this.paneEl.style.width = '100%';
+      this.paneEl.style.maxWidth = '480px';
       this.paneEl.style.height = `${this.screen_height - this.topper}px`;
       this.paneEl.style.background = '#ffffff';
       this.paneEl.style.borderTopLeftRadius = '20px';
@@ -375,6 +376,8 @@ export class CupertinoPane {
     if (t.type === 'pointerdown') this.pointerDown = true;
 
     this.startP = screenY;
+    // if overflow content was scrolled - increase to scrolled value
+    this.startP += this.contentScrollTop;
     this.steps.push(this.startP);
   }
 
@@ -394,7 +397,7 @@ export class CupertinoPane {
     if(t.type === 'pointermove' && !this.pointerDown) return;
 
     // Delta
-    const n = screenY;
+    let n = screenY;
     const diff = n - this.steps[this.steps.length - 1];
     const newVal = this.getPanelTransformY() + diff;
 
@@ -403,10 +406,12 @@ export class CupertinoPane {
       this.overflowEl.addEventListener('scroll', (s: any) => {
         this.contentScrollTop = s.target.scrollTop;
       });
+      // Scrolled -> Disable drag
       if ((newVal > this.topper && this.contentScrollTop > 0) 
           || (newVal <= this.topper)) { 
         return;
-      }
+      } 
+      this.contentScrollTop = 0;
     }
 
     // Not allow drag upper than topper point
@@ -427,6 +432,8 @@ export class CupertinoPane {
    * @param t 
    */
   private touchEnd(t) {
+    console.log('touchEND', this.contentScrollTop);
+
     // Event emitter
     this.settings.onDragEnd(t as CustomEvent);
 

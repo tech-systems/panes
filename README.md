@@ -267,7 +267,7 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- [Quality] Max width + Overflow enabled -> bottom scrolled -> dragend -> drag bottom point - teared
+- [Docs] Pane livedemo + Bulletin livedemo + video
 - [UI] Starbucks playground
 <!--
 https://cdn.dribbble.com/users/1187417/screenshots/6340744/coffee-app-booking.jpg
@@ -281,7 +281,6 @@ https://medium.com/@riz_maulana/dribbble-challenge-coffee-ordering-animation-cf3
 - [UI] 3D effect (ion-modal example)
 - [UI] Drawer control effect (simple/circle)
 - [UI] 3D button toggle effect
-- [Docs] BulletIn example
 - [Docs] Docs engine 
 - [Docs] Live example hosted in pages
 - [Platforms] React Native version with one core
