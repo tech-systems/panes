@@ -23,6 +23,7 @@ export interface Settings {
     backdropOpacity: number;
     animationType: ('ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'cubic-bezier');
     animationDuration: number;
+    bottomOffset: number;
     darkMode: boolean;
     bottomClose: boolean;
     freeMode: boolean;

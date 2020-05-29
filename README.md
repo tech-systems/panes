@@ -161,6 +161,7 @@ let myPane = new CupertinoPane('.cupertino-pane', CupertinoSettings);
 | **bottomClose** | `boolean` | false | Close pane with drag to bottom breakpoint |
 | **freeMode** | `boolean` | false | On `true` will remove automatical magnetic effects to near breakpoint |
 | **buttonClose** | `boolean` | true | Determinate whetever close button will render or not |
+| **bottomOffset** | `number` | 0 | Margin bottom for pane from screen bottom point |
 | **topperOverflow** | `boolean` | true | Ability to scroll content inside pane if topper point reached |
 | **topperOverflowOffset** | `number` | 0 | Offset from screen bottom to the end of overflow content |
 | **showDraggable** | `boolean` | true | Render rectangular shape on the top of pane
@@ -267,21 +268,24 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- [Docs] Pane livedemo + Bulletin livedemo + video
+- [UI] Bulletin playground
 - [UI] Starbucks playground
 <!--
 https://cdn.dribbble.com/users/1187417/screenshots/6340744/coffee-app-booking.jpg
 https://dribbble.com/shots/6372790-Coffee-Ordering-Animation-Starbucks
 https://medium.com/@riz_maulana/dribbble-challenge-coffee-ordering-animation-cf3ae17785fe
 -->
+- [Docs] All playground live
+- [Docs] Bulletin, Starbucks video
 - [Quality] Click item/drag pane precision on device
+- [Quality] Max diff
 - [Quality] Precision delta counts experiments + option
 - [Quality] Topper than top (if scroll - overflow enable else 10px-20px)
 - [Quality] Auto detection horizontall drag events inside pane
 - [UI] 3D effect (ion-modal example)
 - [UI] Drawer control effect (simple/circle)
 - [UI] 3D button toggle effect
-- [Docs] Docs engine 
+- [Docs] Docs engine (React)
 - [Docs] Live example hosted in pages
 - [Platforms] React Native version with one core
 - [UI] No taps UI (increase User - Machine information throughput)

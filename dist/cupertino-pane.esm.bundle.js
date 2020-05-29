@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: May 28, 2020
+ * Released on: May 30, 2020
  */
 
 class Support {
@@ -156,6 +156,7 @@ class CupertinoPane {
             backdropOpacity: 0.4,
             animationType: 'ease',
             animationDuration: 300,
+            bottomOffset: 0,
             darkMode: false,
             bottomClose: false,
             freeMode: false,
@@ -294,7 +295,7 @@ class CupertinoPane {
         this.paneEl.style.paddingTop = '15px';
         this.paneEl.style.width = '100%';
         this.paneEl.style.maxWidth = '480px';
-        this.paneEl.style.height = `${this.screen_height - this.topper}px`;
+        this.paneEl.style.height = `${this.screen_height - this.topper - this.settings.bottomOffset}px`;
         this.paneEl.style.background = '#ffffff';
         this.paneEl.style.borderTopLeftRadius = '20px';
         this.paneEl.style.borderTopRightRadius = '20px';
@@ -367,6 +368,8 @@ class CupertinoPane {
             bottom: this.screen_height
         };
         ['top', 'middle', 'bottom'].forEach((val) => {
+            // bottom offset for bulletins
+            this.breaks[val] -= this.settings.bottomOffset;
             // Set default if no exist
             if (!this.settings.breaks[val]) {
                 this.settings.breaks[val] = this.defaultBreaksConf[val];
@@ -474,10 +477,11 @@ class CupertinoPane {
         else {
             this.overflowEl = attrElements[0];
         }
-        this.overflowEl.style.height = `${this.screen_height - this.topper - 51
-            + (this.settings.draggableOver ? 30 : 0)
-            - this.settings.topperOverflowOffset}px`;
-        console.log();
+        if (this.settings.topperOverflow) {
+            this.overflowEl.style.height = `${this.screen_height - this.topper - 51
+                + (this.settings.draggableOver ? 30 : 0)
+                - this.settings.topperOverflowOffset}px`;
+        }
         this.checkOpacityAttr(this.currentBreakpoint);
         this.checkOverflowAttr(this.currentBreakpoint);
         /****** Attach Events *******/
@@ -573,7 +577,6 @@ class CupertinoPane {
      * @param t
      */
     touchEnd(t) {
-        console.log('touchEND', this.contentScrollTop);
         // Event emitter
         this.settings.onDragEnd(t);
         if (this.disableDragEvents)
