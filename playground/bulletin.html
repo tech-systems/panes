@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html dir="ltr">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Cupertino Pane - Bulletin</title>
+
+  <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script>var exports = {"__esModule": true};</script> <!-- Required if exports not defined earlier -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+  <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+  <script src="../dist/cupertino-pane.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css"/> 
+</head>
+<style>
+
+    .pane {
+      border-radius: 30px !important;
+      width: calc(100% - 16px) !important;
+      margin: auto;
+      left: 0;
+      right: 0;
+      height: auto !important;
+    }
+
+    .pane ion-bulletin {
+      margin: 20px;
+      margin-top: 5px;
+      text-align: center;
+    }
+
+      .pane ion-bulletin h1 {
+        margin-top: 0px;
+        color: #9c9c9c;
+      }
+      
+      .pane ion-bulletin p {
+        margin-top: 5px;
+        margin-bottom: 20px;
+        font-size: 18px;
+        color: #666666;
+        line-height: 1.5;
+        margin-top: 0;
+      }
+
+      .pane ion-bulletin .emoji {
+        font-size: 70px;
+        background: rgb(56, 128, 255);
+        border-radius: 30px;
+        width: 110px;
+        height: 110px;
+        margin: auto;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-top: 5px;
+        margin-top: 20px;
+        margin-bottom: 15px;
+      }
+
+      .pane ion-bulletin ion-button {
+        height: 50px;
+        font-size: 16px;
+        font-weight: bold;
+      }
+    
+</style>
+<body>
+  <ion-content scroll-y="false">
+    <ion-header>
+      <ion-toolbar>
+        <ion-segment value="dogs">
+          <ion-segment-button value="cats">
+            <ion-label>Cats</ion-label>
+          </ion-segment-button>
+          <ion-segment-button value="dogs">
+            <ion-label>Dogs</ion-label>
+          </ion-segment-button>
+        </ion-segment>
+  
+        <ion-buttons slot="start">
+          <ion-button>
+            <ion-icon name="chevron-back-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+        <ion-buttons slot="end">
+          <ion-button>
+            <ion-icon name="person-circle-outline"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+  
+      </ion-toolbar>
+    </ion-header>
+
+      <!-- Image -->
+      <img onclick="present()" src="https://petdogowner.com/wp-content/uploads/2019/10/129357812_l.jpg" />
+      <img onclick="present()" src="https://assets.merriam-webster.com/mw/images/source-original/2016-12-02_15-49-00---27cb3bac0c4615abace2890e72cdfab6.jpg" />
+      <img onclick="present()" src="https://cdn.theatlantic.com/thumbor/pN25nhF1hatn7QpckNtABKwzmoI=/0x61:1000x624/720x405/media/old_wire/img/upload/2013/03/18/happydog/original.jpg" /> 
+
+      <!-- Bulletin -->
+      <ion-bulletin height="344">
+        <h1>Welcome to pet board!</h1>
+        <div class="emoji">😻</div>
+          <p>
+            Explore and choose a pet that you wanna play with.
+          </p>
+          <ion-button expand="block" (click)="dismiss();">
+            Continue
+          </ion-button>
+      </ion-bulletin> <!-- End bulletin -->
+
+  </ion-content>
+  <script>
+    // Calc height
+    let height = document.querySelector('ion-bulletin').getAttribute('height');
+        height = parseFloat(height);
+
+    let bulletin = new CupertinoPane('ion-bulletin', { 
+      initialBreak: 'top',
+      breaks: {
+        top: { enabled: true, height},
+        middle: { enabled: false},
+        bottom: { enabled: false},
+      },
+      backdrop: true,
+      topperOverflow: false,
+      backdropOpacity: 0.8,
+      bottomClose: true,
+      buttonClose: false,
+      showDraggable: false,
+      bottomOffset: 8,
+      onBackdropTap: () => bulletin.destroy({animate: true})
+    });
+    setTimeout(() => bulletin.present({animate: true}));
+
+    function present() {
+      setTimeout(() => bulletin.present({animate: true}));
+    }
+  </script>
+</body>
+
+</html>

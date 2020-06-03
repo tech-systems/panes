@@ -268,7 +268,6 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- [UI] Bulletin playground
 - [UI] Starbucks playground
 <!--
 https://cdn.dribbble.com/users/1187417/screenshots/6340744/coffee-app-booking.jpg
@@ -277,6 +276,8 @@ https://medium.com/@riz_maulana/dribbble-challenge-coffee-ordering-animation-cf3
 -->
 - [Docs] All playground live
 - [Docs] Bulletin, Starbucks video
+<!-- Write articles -->
+
 - [Quality] Click item/drag pane precision on device
 - [Quality] Max diff
 - [Quality] Precision delta counts experiments + option
