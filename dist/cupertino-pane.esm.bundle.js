@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.56
+ * Cupertino Pane 1.1.57
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: May 30, 2020
+ * Released on: June 10, 2020
  */
 
 class Support {
@@ -146,8 +146,8 @@ class Device {
 }
 
 class CupertinoPane {
-    constructor(selector, conf = {}) {
-        this.selector = selector;
+    constructor(elementOrSelector, conf = {}) {
+        this.elementOrSelector = elementOrSelector;
         this.settings = {
             initialBreak: 'middle',
             parentElement: null,
@@ -259,17 +259,23 @@ class CupertinoPane {
             };
             return Support.touch || !this.settings.simulateTouch ? touchEventsTouch : touchEventsDesktop;
         })();
+        this.isSelector = typeof elementOrSelector === 'string';
+        this.selector = this.isSelector ? elementOrSelector : null;
+        const element = this.isSelector ?
+            document.querySelector(elementOrSelector) :
+            elementOrSelector;
         // Unable attach DOM element
-        if (!document.querySelector(this.selector)) {
-            console.warn('Cupertino Pane: wrong selector specified', this.selector);
+        if (!element) {
+            console.warn('Cupertino Pane: wrong selector or element specified.', elementOrSelector);
             return;
         }
+        // Save element variable.
+        this.el = element;
         // Pane already was rendered
         if (this.isPanePresented()) {
-            console.warn('Cupertino Pane: specified selector already in use', this.selector);
+            console.warn('Cupertino Pane: specified selector already in use', this.elementOrSelector);
             return;
         }
-        this.el = document.querySelector(this.selector);
         this.el.style.display = 'none';
         this.settings = Object.assign(Object.assign({}, this.settings), conf);
         if (this.settings.parentElement) {
@@ -470,7 +476,9 @@ class CupertinoPane {
             this.backdropEl.addEventListener('click', (t) => this.settings.onBackdropTap());
         }
         // Get overflow element
-        let attrElements = document.querySelectorAll(`${this.selector} [overflow-y]`);
+        let attrElements = this.isSelector ?
+            document.querySelectorAll(`${this.selector} [overflow-y]`) :
+            this.el.querySelectorAll('[overflow-y]');
         if (!attrElements.length || attrElements.length > 1) {
             this.overflowEl = this.contentEl;
         }
@@ -496,7 +504,9 @@ class CupertinoPane {
         }
     }
     checkOpacityAttr(val) {
-        let attrElements = document.querySelectorAll(`${this.selector} [hide-on-bottom]`);
+        let attrElements = this.isSelector ?
+            document.querySelectorAll(`${this.selector} [hide-on-bottom]`) :
+            this.el.querySelectorAll('[hide-on-bottom]');
         if (!attrElements.length)
             return;
         attrElements.forEach((item) => {
@@ -510,8 +520,11 @@ class CupertinoPane {
         this.overflowEl.style.overflowY = (val <= this.topper) ? 'auto' : 'hidden';
     }
     isPanePresented() {
-        return document.querySelector(`.cupertino-pane-wrapper ${this.selector}`)
-            ? true : false;
+        if (this.isSelector) {
+            return !!document.querySelector(`.cupertino-pane-wrapper ${this.selector}`);
+        }
+        // Return closest parent element
+        return !!this.el.closest('.cupertino-pane-wrapper');
     }
     /**
      * Touch Start Event

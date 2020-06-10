@@ -1,7 +1,7 @@
 import { Settings } from './models';
 export declare type CupertinoSettings = Partial<Settings>;
 export declare class CupertinoPane {
-    private selector;
+    private elementOrSelector;
     settings: Settings;
     private defaultBreaksConf;
     private screen_height;
@@ -27,7 +27,9 @@ export declare class CupertinoPane {
     private overflowEl;
     private followerEl;
     private device;
-    constructor(selector: string, conf?: CupertinoSettings);
+    private readonly isSelector;
+    private readonly selector;
+    constructor(elementOrSelector: string | HTMLElement, conf?: CupertinoSettings);
     private drawElements;
     present(conf?: {
         animate: boolean;
