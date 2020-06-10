@@ -69,21 +69,28 @@ export class CupertinoPane {
   private followerEl: HTMLElement;
 
   private device = new Device();
+  private readonly isSelector: boolean;
+  private readonly selector: string;
 
-  constructor(private selector: string, conf: CupertinoSettings = {}) {
+  constructor(private elementOrSelector: string | HTMLElement, conf: CupertinoSettings = {}) {
+     this.isSelector = typeof elementOrSelector === 'string'
+     this.selector = this.isSelector ? <string> elementOrSelector : null;
+     const element =  this.isSelector ?
+       <HTMLElement>document.querySelector(elementOrSelector as string) :
+       elementOrSelector as HTMLElement
     // Unable attach DOM element
-    if (!<HTMLElement>document.querySelector(this.selector)) {
-      console.warn('Cupertino Pane: wrong selector specified', this.selector);
+    if (!element) {
+      console.warn('Cupertino Pane: wrong selector or element specified.', elementOrSelector);
       return;
     }
-    
+    // Save element variable.
+    this.el = element;
     // Pane already was rendered
     if (this.isPanePresented()) {
-      console.warn('Cupertino Pane: specified selector already in use', this.selector);
+      console.warn('Cupertino Pane: specified selector already in use', this.elementOrSelector);
       return;
     }
 
-    this.el = <HTMLElement>document.querySelector(this.selector);
     this.el.style.display = 'none';
     this.settings = {...this.settings, ...conf};
     
@@ -320,7 +327,9 @@ export class CupertinoPane {
       }
 
       // Get overflow element
-      let attrElements = document.querySelectorAll(`${this.selector} [overflow-y]`);
+      let attrElements = this.isSelector ?
+        document.querySelectorAll(`${this.selector} [overflow-y]`) :
+        this.el.querySelectorAll('[overflow-y]');
       if (!attrElements.length || attrElements.length > 1) {
         this.overflowEl = this.contentEl;
       } else {
@@ -349,7 +358,10 @@ export class CupertinoPane {
   }
 
   private checkOpacityAttr(val) {
-    let attrElements = document.querySelectorAll(`${this.selector} [hide-on-bottom]`);
+    let attrElements = this.isSelector ?
+      document.querySelectorAll(`${this.selector} [hide-on-bottom]`) :
+      this.el.querySelectorAll('[hide-on-bottom]')
+    ;
     if (!attrElements.length) return;
     attrElements.forEach((item) => {
       (<HTMLElement>item).style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
@@ -363,8 +375,11 @@ export class CupertinoPane {
   }
 
   private isPanePresented():boolean {
-    return document.querySelector(`.cupertino-pane-wrapper ${this.selector}`) 
-    ? true : false;
+    if (this.isSelector) {
+      return !!document.querySelector(`.cupertino-pane-wrapper ${this.selector}`);
+    }
+    // Return closest parent element
+    return !!this.el.closest('.cupertino-pane-wrapper')
   }
 
   /**
