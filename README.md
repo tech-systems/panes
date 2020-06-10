@@ -269,22 +269,6 @@ By default using for full pane area, but in some cases good useful with header.
 </div>
 ```
 
-
-- video to readme
-- readme live all (stackblitz preview)
-- Release
-
-## To mobile
-- Bullet-in ionic forum
-- Bullet-in dev.to
-- Bullet-in medium
-- Starbucks medium
-- Starbucks dev.to 
-- Starbucks ionic forum
-- Starbucks Habr ru
-- Digest habr
-- https://medium.com/@riz_maulana/dribbble-challenge-coffee-ordering-animation-cf3ae17785fe
-
 ## Future Goals
 - [Quality] Touch angle 45
 - [Quality] Click item/drag pane precision on device (threshold)

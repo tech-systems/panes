@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: June 9, 2020
+ * Released on: June 10, 2020
  */
 
 class Support {
