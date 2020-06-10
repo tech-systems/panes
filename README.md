@@ -55,11 +55,11 @@ let settings = {
 -->
 
 ## Demonstration
-- [Base live](https://output.jsbin.com/nomakijeta)
-- [Overflow live](https://output.jsbin.com/xugokodoka)
-- [Follower live](https://output.jsbin.com/qehusacori)
-- [Bulletin live](https://output.jsbin.com/peturiweva)
-- [Starbucks live](https://output.jsbin.com/dowiqegelo)
+- [Base live](https://output.jsbin.com/soyaqumoki)
+- [Overflow live](https://output.jsbin.com/podojujazu)
+- [Follower live](https://output.jsbin.com/kowirigevo)
+- [Bulletin live](https://output.jsbin.com/vinagukosi)
+- [Starbucks live](https://output.jsbin.com/goqotebiyu)
 
 <div style="display:flex;flex-wrap:wrap;">
   <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/maps.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="200px">
