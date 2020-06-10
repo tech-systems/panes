@@ -55,7 +55,12 @@ let settings = {
 -->
 
 ## Demonstration
-[Live Demo Old Version](https://ionicsvelte.firebaseapp.com/ionic/Pane/)
+- [Base live](https://output.jsbin.com/nomakijeta)
+- [Overflow live](https://output.jsbin.com/xugokodoka)
+- [Follower live](https://output.jsbin.com/qehusacori)
+- [Bulletin live](https://output.jsbin.com/peturiweva)
+- [Starbucks live](https://output.jsbin.com/dowiqegelo)
+
 <div style="display:flex;flex-wrap:wrap;">
   <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/maps.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="200px">
   <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/bulletin.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="200px">
