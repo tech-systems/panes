@@ -34,7 +34,7 @@ export class Support {
     return 'ongesturestart' in window;
   }
 
-  public static pointerEvents() {
-    !!window['PointerEvent'] && ('maxTouchPoints' in window.navigator) && window.navigator.maxTouchPoints > 0
+  public static get pointerEvents() {
+    return !!window['PointerEvent'] && ('maxTouchPoints' in window.navigator) && window.navigator.maxTouchPoints > 0
   }
 }

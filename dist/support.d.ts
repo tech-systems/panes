@@ -4,5 +4,5 @@ export declare class Support {
     static get backdropFilter(): boolean;
     static get passiveListener(): boolean;
     static get gestures(): boolean;
-    static pointerEvents(): void;
+    static get pointerEvents(): boolean;
 }

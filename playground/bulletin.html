@@ -23,18 +23,19 @@
       height: auto !important;
     }
 
-    .pane ion-bulletin {
+    ion-bulletin {
+      display: block;
       margin: 20px;
       margin-top: 5px;
       text-align: center;
     }
 
-      .pane ion-bulletin h1 {
+      ion-bulletin h1 {
         margin-top: 0px;
         color: #9c9c9c;
       }
       
-      .pane ion-bulletin p {
+      ion-bulletin p {
         margin-top: 5px;
         margin-bottom: 20px;
         font-size: 18px;
@@ -43,7 +44,7 @@
         margin-top: 0;
       }
 
-      .pane ion-bulletin .emoji {
+      ion-bulletin .emoji {
         font-size: 70px;
         background: rgb(56, 128, 255);
         border-radius: 30px;
@@ -58,7 +59,7 @@
         margin-bottom: 15px;
       }
 
-      .pane ion-bulletin ion-button {
+      ion-bulletin ion-button {
         height: 50px;
         font-size: 16px;
         font-weight: bold;
@@ -98,7 +99,7 @@
       <img onclick="present()" src="https://cdn.theatlantic.com/thumbor/pN25nhF1hatn7QpckNtABKwzmoI=/0x61:1000x624/720x405/media/old_wire/img/upload/2013/03/18/happydog/original.jpg" /> 
 
       <!-- Bulletin -->
-      <ion-bulletin height="344">
+      <ion-bulletin>
         <h1>Welcome to pet board!</h1>
         <div class="emoji">😻</div>
           <p>
@@ -111,27 +112,31 @@
 
   </ion-content>
   <script>
-    // Calc height
-    let height = document.querySelector('ion-bulletin').getAttribute('height');
-        height = parseFloat(height);
-
-    let bulletin = new CupertinoPane('ion-bulletin', { 
-      initialBreak: 'top',
-      breaks: {
-        top: { enabled: true, height},
-        middle: { enabled: false},
-        bottom: { enabled: false},
-      },
-      backdrop: true,
-      topperOverflow: false,
-      backdropOpacity: 0.8,
-      bottomClose: true,
-      buttonClose: false,
-      showDraggable: false,
-      bottomOffset: 8,
-      onBackdropTap: () => bulletin.destroy({animate: true})
-    });
-    setTimeout(() => bulletin.present({animate: true}));
+    let bulletin;
+    let elem = document.querySelector('ion-bulletin');
+    let height = window.getComputedStyle(elem);
+    setTimeout(() => {
+      height = height.getPropertyValue('height');
+      height = parseFloat(height);
+      
+      bulletin = new CupertinoPane('ion-bulletin', { 
+        initialBreak: 'top',
+        breaks: {
+          top: { enabled: true, height: height + 48},
+          middle: { enabled: false},
+          bottom: { enabled: false},
+        },
+        backdrop: true,
+        topperOverflow: false,
+        backdropOpacity: 0.8,
+        bottomClose: true,
+        buttonClose: false,
+        showDraggable: false,
+        bottomOffset: 8,
+        onBackdropTap: () => bulletin.destroy({animate: true})
+      });
+      bulletin.present({animate: true});
+    }, 200);
 
     function present() {
       setTimeout(() => bulletin.present({animate: true}));

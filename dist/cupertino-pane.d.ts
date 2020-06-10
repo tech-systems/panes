@@ -39,16 +39,19 @@ export declare class CupertinoPane {
      * Touch Start Event
      * @param t
      */
+    private touchStartCb;
     private touchStart;
     /**
      * Touch Move Event
      * @param t
      */
+    private touchMoveCb;
     private touchMove;
     /**
      * Touch End Event
      * @param t
      */
+    private touchEndCb;
     private touchEnd;
     private swipeNextPoint;
     /************************************

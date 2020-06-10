@@ -19,10 +19,11 @@ export interface Settings {
   buttonClose: boolean;
   topperOverflow: boolean;
   topperOverflowOffset: number;
+  lowerThanBottom: boolean;
   showDraggable: boolean;
   draggableOver: boolean;
   clickBottomOpen: boolean;
-  dragByCursor: boolean;
+  dragBy: string[];
   simulateTouch: boolean;
   passiveListeners: boolean;
   breaks: PaneBreaks;

@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.56
+ * Cupertino Pane 1.1.57
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: May 30, 2020
+ * Released on: June 9, 2020
  */
 
 class Support {
@@ -42,7 +42,8 @@ class Support {
     static get gestures() {
         return 'ongesturestart' in window;
     }
-    static pointerEvents() {
+    static get pointerEvents() {
+        return !!window['PointerEvent'] && ('maxTouchPoints' in window.navigator) && window.navigator.maxTouchPoints > 0;
     }
 }
 
@@ -156,6 +157,7 @@ class CupertinoPane {
             backdropOpacity: 0.4,
             animationType: 'ease',
             animationDuration: 300,
+            dragBy: ['.cupertino-pane-wrapper .pane'],
             bottomOffset: 0,
             darkMode: false,
             bottomClose: false,
@@ -163,10 +165,10 @@ class CupertinoPane {
             buttonClose: true,
             topperOverflow: true,
             topperOverflowOffset: 0,
+            lowerThanBottom: true,
             showDraggable: true,
             draggableOver: false,
             clickBottomOpen: true,
-            dragByCursor: false,
             simulateTouch: true,
             passiveListeners: true,
             breaks: {},
@@ -193,6 +195,21 @@ class CupertinoPane {
         this.breaks = {};
         this.brs = [];
         this.device = new Device();
+        /**
+         * Touch Start Event
+         * @param t
+         */
+        this.touchStartCb = (t) => this.touchStart(t);
+        /**
+         * Touch Move Event
+         * @param t
+         */
+        this.touchMoveCb = (t) => this.touchMove(t);
+        /**
+         * Touch End Event
+         * @param t
+         */
+        this.touchEndCb = (t) => this.touchEnd(t);
         this.swipeNextPoint = (diff, maxDiff, closest) => {
             if (this.currentBreakpoint === this.breaks['top']) {
                 if (diff > maxDiff) {
@@ -419,8 +436,9 @@ class CupertinoPane {
                 return;
             }
             this.followerEl = document.querySelector(this.settings.followerElement);
-            this.followerEl.style.willChange = 'transform';
+            this.followerEl.style.willChange = 'transform, border-radius';
             this.followerEl.style.transform = `translateY(0px) translateZ(0px)`;
+            this.followerEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
         }
         if (!this.settings.showDraggable) {
             this.draggableEl.style.opacity = '0';
@@ -485,7 +503,11 @@ class CupertinoPane {
         this.checkOpacityAttr(this.currentBreakpoint);
         this.checkOverflowAttr(this.currentBreakpoint);
         /****** Attach Events *******/
-        this.attachEvents();
+        this.settings.dragBy.forEach((selector) => {
+            const el = document.querySelector(selector);
+            if (el)
+                this.attachEvents(el);
+        });
         /****** Animation & Transition ******/
         if (conf.animate) {
             this.doTransition({ type: 'present', translateY: this.breaks[this.settings.initialBreak] });
@@ -513,10 +535,6 @@ class CupertinoPane {
         return document.querySelector(`.cupertino-pane-wrapper ${this.selector}`)
             ? true : false;
     }
-    /**
-     * Touch Start Event
-     * @param t
-     */
     touchStart(t) {
         // Event emitter
         this.settings.onDragStart(t);
@@ -531,10 +549,6 @@ class CupertinoPane {
         this.startP += this.contentScrollTop;
         this.steps.push(this.startP);
     }
-    /**
-     * Touch Move Event
-     * @param t
-     */
     touchMove(t) {
         // Event emitter
         this.settings.onDrag(t);
@@ -567,15 +581,17 @@ class CupertinoPane {
             || (this.settings.freeMode && !this.settings.bottomClose && (newVal >= this.bottomer))) {
             return;
         }
+        // Custom Lower then bottom 
+        // (for example in follower drag events)
+        if (!this.settings.lowerThanBottom && (newVal >= this.bottomer)) {
+            this.destroy({ animate: true });
+            return;
+        }
         this.checkOpacityAttr(newVal);
         this.checkOverflowAttr(newVal);
         this.doTransition({ type: 'move', translateY: newVal });
         this.steps.push(n);
     }
-    /**
-     * Touch End Event
-     * @param t
-     */
     touchEnd(t) {
         // Event emitter
         this.settings.onDragEnd(t);
@@ -615,59 +631,51 @@ class CupertinoPane {
         }
         this.doTransition({ type: 'end', translateY: closest });
     }
-    attachEvents() {
-        let el = this.paneEl;
-        if (this.settings.dragByCursor) {
-            el = this.draggableEl;
-        }
+    attachEvents(el) {
         // Touch Events
         if (!Support.touch && Support.pointerEvents) {
-            el.addEventListener(this.touchEvents.start, (t) => this.touchStart(t), false);
-            el.addEventListener(this.touchEvents.move, (t) => this.touchMove(t), false);
-            el.addEventListener(this.touchEvents.end, (t) => this.touchEnd(t), false);
+            el.addEventListener(this.touchEvents.start, this.touchStartCb, false);
+            el.addEventListener(this.touchEvents.move, this.touchMoveCb, false);
+            el.addEventListener(this.touchEvents.end, this.touchEndCb, false);
         }
         else {
             if (Support.touch) {
                 const passiveListener = this.touchEvents.start === 'touchstart' && Support.passiveListener && this.settings.passiveListeners ? { passive: true, capture: false } : false;
-                el.addEventListener(this.touchEvents.start, (t) => this.touchStart(t), passiveListener);
-                el.addEventListener(this.touchEvents.move, (t) => this.touchMove(t), Support.passiveListener ? { passive: false, capture: false } : false);
-                el.addEventListener(this.touchEvents.end, (t) => this.touchEnd(t), passiveListener);
+                el.addEventListener(this.touchEvents.start, this.touchStartCb, passiveListener);
+                el.addEventListener(this.touchEvents.move, this.touchMoveCb, Support.passiveListener ? { passive: false, capture: false } : false);
+                el.addEventListener(this.touchEvents.end, this.touchEndCb, passiveListener);
                 if (this.touchEvents['cancel']) {
-                    el.addEventListener(this.touchEvents['cancel'], (t) => this.touchEnd(t), passiveListener);
+                    el.addEventListener(this.touchEvents['cancel'], this.touchEndCb, passiveListener);
                 }
             }
             if ((this.settings.simulateTouch && !this.device.ios && !this.device.android) || (this.settings.simulateTouch && !Support.touch && this.device.ios)) {
-                el.addEventListener('mousedown', (t) => this.touchStart(t), false);
-                el.addEventListener('mousemove', (t) => this.touchMove(t), false);
-                el.addEventListener('mouseup', (t) => this.touchEnd(t), false);
+                el.addEventListener('mousedown', this.touchStartCb, false);
+                el.addEventListener('mousemove', this.touchMoveCb, false);
+                el.addEventListener('mouseup', this.touchEndCb, false);
             }
         }
     }
-    detachEvents() {
-        let el = this.paneEl;
-        if (this.settings.dragByCursor) {
-            el = this.draggableEl;
-        }
+    detachEvents(el) {
         // Touch Events
         if (!Support.touch && Support.pointerEvents) {
-            el.removeEventListener(this.touchEvents.start, (t) => this.touchStart(t), false);
-            el.removeEventListener(this.touchEvents.move, (t) => this.touchMove(t), false);
-            el.removeEventListener(this.touchEvents.end, (t) => this.touchEnd(t), false);
+            el.removeEventListener(this.touchEvents.start, this.touchStartCb, false);
+            el.removeEventListener(this.touchEvents.move, this.touchMoveCb, false);
+            el.removeEventListener(this.touchEvents.end, this.touchEndCb, false);
         }
         else {
             if (Support.touch) {
                 const passiveListener = this.touchEvents.start === 'onTouchStart' && Support.passiveListener && this.settings.passiveListeners ? { passive: true, capture: false } : false;
-                el.removeEventListener(this.touchEvents.start, (t) => this.touchStart(t), passiveListener);
-                el.removeEventListener(this.touchEvents.move, (t) => this.touchMove(t), false);
-                el.removeEventListener(this.touchEvents.end, (t) => this.touchEnd(t), passiveListener);
+                el.removeEventListener(this.touchEvents.start, this.touchStartCb, passiveListener);
+                el.removeEventListener(this.touchEvents.move, this.touchMoveCb, false);
+                el.removeEventListener(this.touchEvents.end, this.touchEndCb, passiveListener);
                 if (this.touchEvents['cancel']) {
-                    el.removeEventListener(this.touchEvents['cancel'], (t) => this.touchEnd(t), passiveListener);
+                    el.removeEventListener(this.touchEvents['cancel'], this.touchEndCb, passiveListener);
                 }
             }
             if ((this.settings.simulateTouch && !this.device.ios && !this.device.android) || (this.settings.simulateTouch && !Support.touch && this.device.ios)) {
-                el.removeEventListener('mousedown', (t) => this.touchStart(t), false);
-                el.removeEventListener('mousemove', (t) => this.touchMove(t), false);
-                el.removeEventListener('mouseup', (t) => this.touchEnd(t), false);
+                el.removeEventListener('mousedown', this.touchStartCb, false);
+                el.removeEventListener('mousemove', this.touchMoveCb, false);
+                el.removeEventListener('mouseup', this.touchEndCb, false);
             }
         }
     }
@@ -738,9 +746,13 @@ class CupertinoPane {
     ;
     destroyResets() {
         this.parentEl.appendChild(this.contentEl);
-        this.parentEl.removeChild(this.wrapperEl);
+        this.wrapperEl.remove();
         /****** Detach Events *******/
-        this.detachEvents();
+        this.settings.dragBy.forEach((selector) => {
+            const el = document.querySelector(selector);
+            if (el)
+                this.detachEvents(el);
+        });
         // Reset vars
         this.currentBreakpoint = this.breaks[this.settings.initialBreak];
         // Reset styles
@@ -769,11 +781,11 @@ class CupertinoPane {
     doTransition(params = {}) {
         // touchmove simple event
         if (params.type === 'move') {
-            this.paneEl.style.transition = 'initial';
+            this.paneEl.style.transition = 'all 0ms linear 0ms';
             this.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
             // Bind for follower same transitions
             if (this.followerEl) {
-                this.followerEl.style.transition = 'initial';
+                this.followerEl.style.transition = 'all 0ms linear 0ms';
                 this.followerEl.style.transform = `translateY(${params.translateY - this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
             }
             return;
@@ -840,15 +852,11 @@ class CupertinoPane {
             // main transitions
             if (params.type === 'present') {
                 this.paneEl.style.transform = `translateY(${this.screen_height}px) translateZ(0px)`;
-                // Bind for follower same transitions
-                if (this.followerEl) {
-                    this.followerEl.style.transform = `translateY(${this.screen_height - this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
-                }
                 setTimeout(() => {
                     this.paneEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
                     // Bind for follower same transitions
                     if (this.followerEl) {
-                        this.followerEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak] - this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+                        this.followerEl.style.transform = `translateY(0px) translateZ(0px)`;
                     }
                 }, 50);
             }

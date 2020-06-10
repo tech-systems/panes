@@ -57,9 +57,10 @@ let settings = {
 ## Demonstration
 [Live Demo Old Version](https://ionicsvelte.firebaseapp.com/ionic/Pane/)
 <div style="display:flex;flex-wrap:wrap;">
-  <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/1.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="220px">
-  <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/2.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="220px">
-  <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/3.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="220px">
+  <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/maps.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="200px">
+  <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/bulletin.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="200px">
+  <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/overflow.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="200px">
+  <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/starbucks.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="200px">
 </div>
 
 ## Supporting platforms
@@ -160,6 +161,7 @@ let myPane = new CupertinoPane('.cupertino-pane', CupertinoSettings);
 | **animationDuration** | `number` | 300 | Transition property duration |
 | **bottomClose** | `boolean` | false | Close pane with drag to bottom breakpoint |
 | **freeMode** | `boolean` | false | On `true` will remove automatical magnetic effects to near breakpoint |
+| **lowerThanBottom** | `boolean` | true | By default allow user to drag pane lower than bottom position. On `false` will automatically place pane to bottom position on lower than bottom attemption |
 | **buttonClose** | `boolean` | true | Determinate whetever close button will render or not |
 | **bottomOffset** | `number` | 0 | Margin bottom for pane from screen bottom point |
 | **topperOverflow** | `boolean` | true | Ability to scroll content inside pane if topper point reached |
@@ -167,7 +169,7 @@ let myPane = new CupertinoPane('.cupertino-pane', CupertinoSettings);
 | **showDraggable** | `boolean` | true | Render rectangular shape on the top of pane
 | **draggableOver** | `boolean` | true | Render rectangular shape over a pane
 | **clickBottomOpen** | `boolean` | true | If bottom position reached, simple click to pane will open pane to the next upper point |
-| **dragByCursor** | `boolean` | false | Drag pane only with draggabale top cursor |
+| **dragBy** | `string[]` | ['.cupertino-pane-wrapper .pane'] | Array of selectors for whom elements drag events will be attached. If you want drag only by draggable component set option to ['.pane .draggable'] |
 | **simulateTouch** | `boolean` | true | Simulate touch events for Desktop |
 | **passiveListeners** | `boolean` | true | (Indicates that the function specified by listener will never call preventDefault()) |
 ### Breakpoints
@@ -267,26 +269,33 @@ By default using for full pane area, but in some cases good useful with header.
 </div>
 ```
 
-## Future Goals
-- [UI] Starbucks playground
-<!--
-https://cdn.dribbble.com/users/1187417/screenshots/6340744/coffee-app-booking.jpg
-https://dribbble.com/shots/6372790-Coffee-Ordering-Animation-Starbucks
-https://medium.com/@riz_maulana/dribbble-challenge-coffee-ordering-animation-cf3ae17785fe
--->
-- [Docs] All playground live
-- [Docs] Bulletin, Starbucks video
-<!-- Write articles -->
 
-- [Quality] Click item/drag pane precision on device
-- [Quality] Max diff
-- [Quality] Precision delta counts experiments + option
+- video to readme
+- readme live all (stackblitz preview)
+- Release
+
+## To mobile
+- Bullet-in ionic forum
+- Bullet-in dev.to
+- Bullet-in medium
+- Starbucks medium
+- Starbucks dev.to 
+- Starbucks ionic forum
+- Starbucks Habr ru
+- Digest habr
+- https://medium.com/@riz_maulana/dribbble-challenge-coffee-ordering-animation-cf3ae17785fe
+
+## Future Goals
+- [Quality] Touch angle 45
+- [Quality] Click item/drag pane precision on device (threshold)
 - [Quality] Topper than top (if scroll - overflow enable else 10px-20px)
-- [Quality] Auto detection horizontall drag events inside pane
+- [Quality] Transition timing: easeOutElastic
+- [Accurance] Draw experiment application (Normal/TimeStamp/Native) 
+- [Accurance] Native Touch Plugin
 - [UI] 3D effect (ion-modal example)
 - [UI] Drawer control effect (simple/circle)
 - [UI] 3D button toggle effect
-- [Docs] Docs engine (React)
+- [Docs] Docs engine
 - [Docs] Live example hosted in pages
 - [Platforms] React Native version with one core
 - [UI] No taps UI (increase User - Machine information throughput)

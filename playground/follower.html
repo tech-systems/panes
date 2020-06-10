@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html dir="ltr">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Cupertino Pane - Basic</title>
+
+  <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script>var exports = {"__esModule": true};</script> <!-- Required if exports not defined earlier -->
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+  <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+  <script src="../dist/cupertino-pane.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css"/> 
+  <style>
+    ion-fab {
+      margin-bottom: 120px;
+    }
+  </style>
+</head>
+
+<body>
+  <ion-content>
+      <ion-fab horizontal="end" vertical="bottom">
+        <ion-fab-button size="small">
+          <ion-icon name="add"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
+      
+      <ion-drawer>
+        <h1>Header</h1>
+        <p hide-on-bottom>Content</p> 
+      </ion-drawer>
+
+      <ion-button expand="block" color="danger" onclick="presentDrawer()">Present Drawer</ion-button>
+      <ion-button expand="block" color="danger" onclick="destroyDrawer()">Destroy Drawer</ion-button>
+
+      <ion-button expand="block" onclick="hideDrawer()">Hide Drawer</ion-button>
+      <ion-button expand="block" onclick="isHiddenDrawer()">Drawer is hidden</ion-button>
+
+      <ion-button expand="block" color="secondary" onclick="setTopDrawer()">Set Top</ion-button>
+      <ion-button expand="block" color="secondary" onclick="setMiddleDrawer()">Set Moddle</ion-button>
+      <ion-button expand="block" color="secondary" onclick="setBottomDrawer()">Set bottom</ion-button>
+  </ion-content>
+  <script>
+    var drawer = new CupertinoPane('ion-drawer', { 
+      followerElement: 'ion-fab',
+      buttonClose: false,
+      initialBreak: 'bottom',
+      breaks: {
+        top: { enabled: false }
+      }
+    });
+    setTimeout(() => drawer.present({animate: true}));
+
+    async function presentDrawer() {
+      drawer.present({animate: true});
+    };
+
+    async function destroyDrawer() {
+      drawer.destroy({animate: true});
+    };
+    
+    async function hideDrawer() {
+      drawer.hide();
+    };
+
+    async function isHiddenDrawer() {
+        console.log(await drawer.isHidden());
+    };
+
+    async function setTopDrawer() {
+      drawer.moveToBreak('top');
+    };
+
+    async function setMiddleDrawer() {
+      drawer.moveToBreak('middle');
+    };
+
+    async function setBottomDrawer() {
+      drawer.moveToBreak('bottom');
+    };
+  </script>
+</body>
+
+</html>
