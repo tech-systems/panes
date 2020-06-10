@@ -19,7 +19,7 @@
         <h1>Header</h1>
         <p hide-on-bottom>Content</p> 
       </ion-drawer>
-
+      <ion-button expand="block" color="success" onclick="enableDisableSelectors(this)">With Selectors</ion-button>
       <ion-button expand="block" color="danger" onclick="presentDrawer()">Present Drawer</ion-button>
       <ion-button expand="block" color="danger" onclick="destroyDrawer()">Destroy Drawer</ion-button>
 
@@ -31,7 +31,27 @@
       <ion-button expand="block" color="secondary" onclick="setBottomDrawer()">Set bottom</ion-button>
   </ion-content>
   <script>
-    var drawer = new CupertinoPane('ion-drawer', { 
+    var selectorsEnabled = false;
+    var drawer;
+
+    async function enableDisableSelectors(button) {
+      selectorsEnabled = !selectorsEnabled;
+
+      if (!selectorsEnabled) {
+        button.color = 'success'
+        button.innerHTML = 'With Selectors';
+      } else {
+        button.color = 'danger';
+        button.innerHTML = 'Without Selectors';
+      }
+
+    }
+
+    function newDrawer() {
+      const elementOrSelector = selectorsEnabled ?
+        document.querySelector('ion-drawer') :
+        'ion-drawer';
+      return new CupertinoPane(elementOrSelector, {
         // breaks: {
         //   top: { enabled: false, offset: 700 }
         // },
@@ -43,10 +63,14 @@
         // onDrag: () => console.log('Drag event'),
         // freeMode: true,
         // onBackdropTap: () => hideDrawer()
-    });
-    setTimeout(() => drawer.present({animate: true}));
+      });
+    }
 
     async function presentDrawer() {
+      if (drawer) {
+        drawer.destroy({animate: true});
+      }
+      drawer = newDrawer();
       drawer.present({animate: true});
     };
 
