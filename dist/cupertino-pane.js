@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.6
+ * Cupertino Pane 1.1.61
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: June 10, 2020
+ * Released on: June 12, 2020
  */
 
 'use strict';
@@ -161,7 +161,7 @@ class CupertinoPane {
             backdropOpacity: 0.4,
             animationType: 'ease',
             animationDuration: 300,
-            dragBy: ['.cupertino-pane-wrapper .pane'],
+            dragBy: null,
             bottomOffset: 0,
             darkMode: false,
             bottomClose: false,
@@ -507,11 +507,16 @@ class CupertinoPane {
         this.checkOpacityAttr(this.currentBreakpoint);
         this.checkOverflowAttr(this.currentBreakpoint);
         /****** Attach Events *******/
-        this.settings.dragBy.forEach((selector) => {
-            const el = document.querySelector(selector);
-            if (el)
-                this.attachEvents(el);
-        });
+        if (!this.settings.dragBy) {
+            this.attachEvents(this.paneEl);
+        }
+        else {
+            this.settings.dragBy.forEach((selector) => {
+                const el = document.querySelector(selector);
+                if (el)
+                    this.attachEvents(el);
+            });
+        }
         /****** Animation & Transition ******/
         if (conf.animate) {
             this.doTransition({ type: 'present', translateY: this.breaks[this.settings.initialBreak] });
@@ -752,11 +757,16 @@ class CupertinoPane {
         this.parentEl.appendChild(this.contentEl);
         this.wrapperEl.remove();
         /****** Detach Events *******/
-        this.settings.dragBy.forEach((selector) => {
-            const el = document.querySelector(selector);
-            if (el)
-                this.detachEvents(el);
-        });
+        if (!this.settings.dragBy) {
+            this.detachEvents(this.paneEl);
+        }
+        else {
+            this.settings.dragBy.forEach((selector) => {
+                const el = document.querySelector(selector);
+                if (el)
+                    this.detachEvents(el);
+            });
+        }
         // Reset vars
         this.currentBreakpoint = this.breaks[this.settings.initialBreak];
         // Reset styles

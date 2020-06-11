@@ -174,7 +174,7 @@ let myPane = new CupertinoPane('.cupertino-pane', CupertinoSettings);
 | **showDraggable** | `boolean` | true | Render rectangular shape on the top of pane
 | **draggableOver** | `boolean` | true | Render rectangular shape over a pane
 | **clickBottomOpen** | `boolean` | true | If bottom position reached, simple click to pane will open pane to the next upper point |
-| **dragBy** | `string[]` | ['.cupertino-pane-wrapper .pane'] | Array of selectors for whom elements drag events will be attached. If you want drag only by draggable component set option to ['.pane .draggable'] |
+| **dragBy** | `string[]` | null | Array of selectors for whom elements drag events will be attached. By default drag events attached to pane element. If you are about to drag only with draggable component set option to ['.pane .draggable'] |
 | **simulateTouch** | `boolean` | true | Simulate touch events for Desktop |
 | **passiveListeners** | `boolean` | true | (Indicates that the function specified by listener will never call preventDefault()) |
 ### Breakpoints

@@ -13,7 +13,7 @@ export class CupertinoPane {
     backdropOpacity: 0.4, 
     animationType: 'ease',
     animationDuration: 300,
-    dragBy: ['.cupertino-pane-wrapper .pane'],
+    dragBy: null,
     bottomOffset: 0,
     darkMode: false,
     bottomClose: false,
@@ -339,10 +339,14 @@ export class CupertinoPane {
       this.checkOverflowAttr(this.currentBreakpoint);
 
       /****** Attach Events *******/
-      this.settings.dragBy.forEach((selector) => {
-        const el = document.querySelector(selector);
-        if (el) this.attachEvents(el);
-      });
+      if (!this.settings.dragBy) {
+        this.attachEvents(this.paneEl);
+      } else {
+        this.settings.dragBy.forEach((selector) => {
+          const el = document.querySelector(selector);
+          if (el) this.attachEvents(el);
+        });
+      }
 
       /****** Animation & Transition ******/
       if (conf.animate) {
@@ -694,10 +698,14 @@ export class CupertinoPane {
     this.wrapperEl.remove();
     
     /****** Detach Events *******/
-    this.settings.dragBy.forEach((selector) => {
-      const el = document.querySelector(selector);
-      if (el) this.detachEvents(el);
-    });
+    if (!this.settings.dragBy) {
+      this.detachEvents(this.paneEl);
+    } else {
+      this.settings.dragBy.forEach((selector) => {
+        const el = document.querySelector(selector);
+        if (el) this.detachEvents(el);
+      });
+    }
 
     // Reset vars
     this.currentBreakpoint = this.breaks[this.settings.initialBreak];
