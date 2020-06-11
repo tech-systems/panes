@@ -275,6 +275,7 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
+- [Code] Element or Selector
 - [Quality] Touch angle 45
 - [Quality] Click item/drag pane precision on device (threshold)
 - [Quality] Topper than top (if scroll - overflow enable else 10px-20px)
