@@ -115,28 +115,31 @@
     let bulletin;
     let elem = document.querySelector('ion-bulletin');
     let height = window.getComputedStyle(elem);
-    setTimeout(() => {
-      height = height.getPropertyValue('height');
-      height = parseFloat(height);
-      
-      bulletin = new CupertinoPane('ion-bulletin', { 
-        initialBreak: 'top',
-        breaks: {
-          top: { enabled: true, height: height + 48},
-          middle: { enabled: false},
-          bottom: { enabled: false},
-        },
-        backdrop: true,
-        topperOverflow: false,
-        backdropOpacity: 0.8,
-        bottomClose: true,
-        buttonClose: false,
-        showDraggable: false,
-        bottomOffset: 8,
-        onBackdropTap: () => bulletin.destroy({animate: true})
-      });
-      bulletin.present({animate: true});
-    }, 200);
+    
+    window.onload = function () {
+      setTimeout(() => {
+        height = height.getPropertyValue('height');
+        height = parseFloat(height);
+        
+        bulletin = new CupertinoPane('ion-bulletin', { 
+          initialBreak: 'top',
+          breaks: {
+            top: { enabled: true, height: height + 48},
+            middle: { enabled: false},
+            bottom: { enabled: false},
+          },
+          backdrop: true,
+          topperOverflow: false,
+          backdropOpacity: 0.8,
+          bottomClose: true,
+          buttonClose: false,
+          showDraggable: false,
+          bottomOffset: 8,
+          onBackdropTap: () => bulletin.destroy({animate: true})
+        });
+        bulletin.present({animate: true});
+      }, 200);
+    }
 
     function present() {
       setTimeout(() => bulletin.present({animate: true}));

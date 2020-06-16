@@ -275,6 +275,7 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
+- [Bug] Desktop - touch events
 - [Code] Element or Selector
 - [Quality] Touch angle 45
 - [Quality] Click item/drag pane precision on device (threshold)

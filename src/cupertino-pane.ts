@@ -114,7 +114,11 @@ export class CupertinoPane {
       this.paneEl.style.zIndex = '11';
       this.paneEl.style.paddingTop = '15px';
       this.paneEl.style.width = '100%';
-      this.paneEl.style.maxWidth = '480px';
+      this.paneEl.style.maxWidth = '500px';
+      this.paneEl.style.left = '0px';
+      this.paneEl.style.right = '0px';
+      this.paneEl.style.marginLeft = 'auto';
+      this.paneEl.style.marginRight = 'auto';
       this.paneEl.style.height = `${this.screen_height - this.topper - this.settings.bottomOffset}px`;
       this.paneEl.style.background = '#ffffff';
       this.paneEl.style.borderTopLeftRadius = '20px';
