@@ -393,7 +393,7 @@ export class CupertinoPane {
 
     const targetTouch = t.type === 'touchstart' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
     const screenY = t.type === 'touchstart' ? targetTouch.screenY : t.screenY;
-    if (t.type === 'pointerdown') this.pointerDown = true;
+    if (t.type === 'mousedown') this.pointerDown = true;
 
     this.startP = screenY;
     // if overflow content was scrolled - increase to scrolled value
@@ -415,7 +415,7 @@ export class CupertinoPane {
     // Handle desktop/mobile events
     const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
     const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
-    if(t.type === 'pointermove' && !this.pointerDown) return;
+    if(t.type === 'mousemove' && !this.pointerDown) return;
     
     // Delta
     let n = screenY;
@@ -469,7 +469,7 @@ export class CupertinoPane {
 
     const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
     const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
-    if (t.type === 'pointerup') this.pointerDown = false;
+    if (t.type === 'mouseup') this.pointerDown = false;
 
     // Determinate nearest point
     let closest = this.brs.reduce((prev, curr) => {

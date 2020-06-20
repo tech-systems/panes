@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.62
+ * Cupertino Pane 1.1.63
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: June 17, 2020
+ * Released on: June 20, 2020
  */
 
 class Support {
@@ -551,7 +551,7 @@ class CupertinoPane {
             return;
         const targetTouch = t.type === 'touchstart' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
         const screenY = t.type === 'touchstart' ? targetTouch.screenY : t.screenY;
-        if (t.type === 'pointerdown')
+        if (t.type === 'mousedown')
             this.pointerDown = true;
         this.startP = screenY;
         // if overflow content was scrolled - increase to scrolled value
@@ -566,7 +566,7 @@ class CupertinoPane {
         // Handle desktop/mobile events
         const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
         const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
-        if (t.type === 'pointermove' && !this.pointerDown)
+        if (t.type === 'mousemove' && !this.pointerDown)
             return;
         // Delta
         let n = screenY;
@@ -608,7 +608,7 @@ class CupertinoPane {
             return;
         const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
         const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
-        if (t.type === 'pointerup')
+        if (t.type === 'mouseup')
             this.pointerDown = false;
         // Determinate nearest point
         let closest = this.brs.reduce((prev, curr) => {
