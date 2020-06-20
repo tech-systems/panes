@@ -18,7 +18,8 @@
   <ion-content>
       <ion-drawer>
         <h1>Header</h1>
-        <p hide-on-bottom>Content</p> 
+        <p hide-on-bottom>Content</p>
+        <ion-button expand="block" color="secondary" onclick="destroyBackdropDrawer()">Destroy Backdrop</ion-button>
       </ion-drawer>
 
       <ion-button expand="block" color="danger" onclick="presentDrawer()">Present Drawer</ion-button>
@@ -30,6 +31,7 @@
       <ion-button expand="block" color="secondary" onclick="setTopDrawer()">Set Top</ion-button>
       <ion-button expand="block" color="secondary" onclick="setMiddleDrawer()">Set Middle</ion-button>
       <ion-button expand="block" color="secondary" onclick="setBottomDrawer()">Set Bottom</ion-button>
+      <ion-button expand="block" color="secondary" onclick="setBackdropDrawer()">Set Backdrop</ion-button>
   </ion-content>
   <script>
     var drawer = new CupertinoPane('ion-drawer', { 
@@ -74,6 +76,14 @@
     async function setBottomDrawer() {
       drawer.moveToBreak('bottom');
     };
+    
+    async function setBackdropDrawer() {
+      drawer.backdrop(true);
+    }
+
+    async function destroyBackdropDrawer() {
+      drawer.backdrop(false);
+    }
   </script>
 </body>
 

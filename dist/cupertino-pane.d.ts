@@ -80,6 +80,7 @@ export declare class CupertinoPane {
     destroy(conf?: {
         animate: boolean;
     }): any;
+    backdrop(backdrop: boolean): any;
     /***********************************
      * Transitions handler
      */

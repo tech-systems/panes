@@ -737,6 +737,40 @@ export class CupertinoPane {
     }
   }
 
+  public backdrop(backdrop: boolean) {
+    if (!this.isPanePresented()) {
+      console.warn(`Cupertino Pane: Present pane before call backdrop()`);
+      return null;
+    }
+
+    if (typeof backdrop !== 'boolean') {
+      console.warn(`Cupertino Pane: wrong backdrop specified`, backdrop);
+      return null;
+    }
+
+    if (this.settings.backdrop && this.settings.backdrop === backdrop) {
+      console.warn(`Cupertino Pane: Pane already has backdrop`);
+      return null;
+    }
+
+    this.settings.backdrop = backdrop;
+    if (this.settings.backdrop) {
+      this.wrapperEl.appendChild(this.backdropEl);
+      this.backdropEl.addEventListener('click', (t) => this.settings.onBackdropTap());
+      this.backdropEl.style.display = 'block';
+      this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
+      this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+      setTimeout(() => {
+        this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
+      }, 50);
+      return null;
+    }
+
+    this.backdropEl.style.transition = `initial`;
+    this.backdropEl.remove();
+    return null;
+  }
+  
   /***********************************
    * Transitions handler
    */
