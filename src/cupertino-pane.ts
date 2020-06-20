@@ -737,6 +737,34 @@ export class CupertinoPane {
     }
   }
 
+  public backdrop(backdrop: boolean) {
+    if (!this.isPanePresented()) {
+      console.warn(`Cupertino Pane: Present pane before call backdrop()`);
+      return null;
+    }
+
+    if (typeof backdrop !== 'boolean') {
+      console.warn(`Cupertino Pane: wrong backdrop specified`, backdrop);
+      return null;
+    }
+
+    if (this.settings.backdrop && this.settings.backdrop === backdrop) {
+      console.warn(`Cupertino Pane: Pane already has backdrop`);
+      return null;
+    }
+
+    this.settings.backdrop = backdrop;
+    if (this.settings.backdrop) {
+      this.wrapperEl.appendChild(this.backdropEl);
+      this.backdropEl.style.display = 'block';
+      this.backdropEl.addEventListener('click', (t) => this.settings.onBackdropTap());
+      return null;
+    }
+
+    this.backdropEl.remove();
+    return null;
+  }
+  
   /***********************************
    * Transitions handler
    */
