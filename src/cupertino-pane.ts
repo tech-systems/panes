@@ -139,6 +139,7 @@ export class CupertinoPane {
       this.draggableEl.style.marginLeft = 'auto';
       this.draggableEl.style.marginRight = 'auto';
       this.draggableEl.style.height = '30px';
+      this.draggableEl.style.zIndex = '12';
 
       // Move
       this.moveEl = document.createElement('div');
