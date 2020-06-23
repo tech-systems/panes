@@ -58,6 +58,7 @@ let settings = {
 - [Base live](https://output.jsbin.com/fuhisey)
 - [Overflow live](https://output.jsbin.com/baguroy)
 - [Follower live](https://output.jsbin.com/xogavec)
+- [Apple Clips live](https://output.jsbin.com/luqaxud)
 - [Bulletin live](https://output.jsbin.com/fonavuy)
 - [Starbucks live](https://output.jsbin.com/jayicip)
 
