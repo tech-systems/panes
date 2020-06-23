@@ -15,6 +15,11 @@ export interface PaneBreaks {
         offset?: number;
     };
 }
+export interface TransitionStartEvent {
+    translateY: {
+        new: number;
+    };
+}
 export interface Settings {
     initialBreak: ('top' | 'middle' | 'bottom');
     parentElement: any;
@@ -46,5 +51,6 @@ export interface Settings {
     onDrag: (event?: CustomEvent) => void;
     onDragEnd: (event?: CustomEvent) => void;
     onBackdropTap: (event?: CustomEvent) => void;
+    onTransitionStart: (event?: TransitionStartEvent) => void;
     onTransitionEnd: (event?: CustomEvent) => void;
 }

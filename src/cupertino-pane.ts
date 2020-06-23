@@ -36,6 +36,7 @@ export class CupertinoPane {
     onDrag: () => {},
     onDragEnd: () => {},
     onBackdropTap: () => {},
+    onTransitionStart: () => {},
     onTransitionEnd: () => {}
   };
 
@@ -822,10 +823,13 @@ export class CupertinoPane {
         this.followerEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
       }
 
-      // main transitions
+      // Main transitions
       if (params.type === 'present') {
         this.paneEl.style.transform = `translateY(${this.screen_height}px) translateZ(0px)`;
         setTimeout(() => {
+          // Emit event
+          this.settings.onTransitionStart({translateY: {new: this.breaks[this.settings.initialBreak]}});
+
           this.paneEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
           // Bind for follower same transitions
           if (this.followerEl) {
@@ -833,6 +837,9 @@ export class CupertinoPane {
           }          
         }, 50);
       } else {
+        // Emit event
+        this.settings.onTransitionStart({translateY: {new: params.translateY}});
+
         this.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
         // Bind for follower same transitions
         if (this.followerEl) {

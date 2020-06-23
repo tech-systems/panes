@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.63
+ * Cupertino Pane 1.1.64
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: June 20, 2020
+ * Released on: June 23, 2020
  */
 
 class Support {
@@ -180,6 +180,7 @@ class CupertinoPane {
             onDrag: () => { },
             onDragEnd: () => { },
             onBackdropTap: () => { },
+            onTransitionStart: () => { },
             onTransitionEnd: () => { }
         };
         this.defaultBreaksConf = {
@@ -335,6 +336,7 @@ class CupertinoPane {
         this.draggableEl.style.marginLeft = 'auto';
         this.draggableEl.style.marginRight = 'auto';
         this.draggableEl.style.height = '30px';
+        this.draggableEl.style.zIndex = '12';
         // Move
         this.moveEl = document.createElement('div');
         this.moveEl.className = 'move';
@@ -863,10 +865,12 @@ class CupertinoPane {
             if (this.followerEl) {
                 this.followerEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
             }
-            // main transitions
+            // Main transitions
             if (params.type === 'present') {
                 this.paneEl.style.transform = `translateY(${this.screen_height}px) translateZ(0px)`;
                 setTimeout(() => {
+                    // Emit event
+                    this.settings.onTransitionStart({ translateY: { new: this.breaks[this.settings.initialBreak] } });
                     this.paneEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
                     // Bind for follower same transitions
                     if (this.followerEl) {
@@ -875,6 +879,8 @@ class CupertinoPane {
                 }, 50);
             }
             else {
+                // Emit event
+                this.settings.onTransitionStart({ translateY: { new: params.translateY } });
                 this.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
                 // Bind for follower same transitions
                 if (this.followerEl) {

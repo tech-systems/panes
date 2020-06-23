@@ -206,6 +206,7 @@ The function that executes when the event fires.
 | **onDrag** | `void: () => {}` | Call executes on each new position of pane |
 | **onDragEng** | `void: () => {}` | Executes when drag event complete |
 | **onBackdropTap** | `void: () => {}` | Call when user tap backdrop overlay |
+| **onTransitionStart** | `void: () => {}` | Executes before auto transition and animation start |
 | **onTransitionEnd** | `void: () => {}` | Executes when transition and animation complete |
 
 ## Public Methods
@@ -275,7 +276,7 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- [Code] onTransition event + backdrop draggable opacity
+- [UI] Apple App Clips Panel + Video + Ionic Forum
 - [Bug] Drag by draggable not depend on scroll position
 - [Enhancement] Overflow for middle/top both
 - [Code] Element or Selector
