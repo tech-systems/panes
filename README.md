@@ -276,7 +276,6 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- [UI] Apple App Clips Panel + Video + Ionic Forum
 - [Bug] Drag by draggable not depend on scroll position
 - [Enhancement] Overflow for middle/top both
 - [Code] Element or Selector
