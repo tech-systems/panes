@@ -277,10 +277,8 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- [Bug] Drag by draggable not depend on scroll position
-- [Enhancement] Overflow for middle/top both
-- [Code] Element or Selector
-- [Code] Backdrop present/dismiss methods
+- [Pull] Element or Selector
+- [Pull] Backdrop present/dismiss methods
 - [Quality] Touch angle 45
 - [Quality] Click item/drag pane precision on device (threshold)
 - [Quality] Topper than top (if scroll - overflow enable else 10px-20px)

@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.64
+ * Cupertino Pane 1.1.65
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: June 23, 2020
+ * Released on: June 24, 2020
  */
 
 'use strict';
@@ -196,6 +196,7 @@ class CupertinoPane {
         this.steps = [];
         this.pointerDown = false;
         this.contentScrollTop = 0;
+        this.draggableScrollOffset = 0;
         this.disableDragEvents = false;
         this.breaks = {};
         this.brs = [];
@@ -550,6 +551,12 @@ class CupertinoPane {
         return document.querySelector(`.cupertino-pane-wrapper ${this.selector}`)
             ? true : false;
     }
+    /**
+     * Check if drag event fired by scrollable element
+     */
+    isDragScrollabe(path) {
+        return !!path.find(item => item === this.overflowEl);
+    }
     touchStart(t) {
         // Event emitter
         this.settings.onDragStart(t);
@@ -560,8 +567,11 @@ class CupertinoPane {
         if (t.type === 'mousedown')
             this.pointerDown = true;
         this.startP = screenY;
-        // if overflow content was scrolled - increase to scrolled value
-        this.startP += this.contentScrollTop;
+        // if overflow content was scrolled
+        // increase to scrolled value
+        if (this.isDragScrollabe(t.path)) {
+            this.startP += this.contentScrollTop;
+        }
         this.steps.push(this.startP);
     }
     touchMove(t) {
@@ -579,7 +589,8 @@ class CupertinoPane {
         const diff = n - this.steps[this.steps.length - 1];
         const newVal = this.getPanelTransformY() + diff;
         // Not allow move panel with positive overflow scroll
-        if (this.overflowEl.style.overflowY === 'auto') {
+        if (this.isDragScrollabe(t.path)
+            && this.overflowEl.style.overflowY === 'auto') {
             this.overflowEl.addEventListener('scroll', (s) => {
                 this.contentScrollTop = s.target.scrollTop;
             });
@@ -588,7 +599,6 @@ class CupertinoPane {
                 || (newVal <= this.topper)) {
                 return;
             }
-            this.contentScrollTop = 0;
         }
         // Not allow drag upper than topper point
         // Not allow drag lower than bottom if free mode

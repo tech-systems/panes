@@ -12,6 +12,7 @@ export declare class CupertinoPane {
     private bottomer;
     private currentBreakpoint;
     private contentScrollTop;
+    private draggableScrollOffset;
     private disableDragEvents;
     private breaks;
     private brs;
@@ -35,6 +36,10 @@ export declare class CupertinoPane {
     private checkOpacityAttr;
     private checkOverflowAttr;
     private isPanePresented;
+    /**
+     * Check if drag event fired by scrollable element
+     */
+    private isDragScrollabe;
     /**
      * Touch Start Event
      * @param t
