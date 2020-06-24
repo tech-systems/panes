@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.65
+ * Cupertino Pane 1.1.651
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -576,7 +576,7 @@ class CupertinoPane {
         this.startP = screenY;
         // if overflow content was scrolled
         // increase to scrolled value
-        if (this.isDragScrollabe(t.path)) {
+        if (this.isDragScrollabe(t.path || t.composedPath())) {
             this.startP += this.contentScrollTop;
         }
         this.steps.push(this.startP);
@@ -596,7 +596,7 @@ class CupertinoPane {
         const diff = n - this.steps[this.steps.length - 1];
         const newVal = this.getPanelTransformY() + diff;
         // Not allow move panel with positive overflow scroll
-        if (this.isDragScrollabe(t.path)
+        if (this.isDragScrollabe(t.path || t.composedPath())
             && this.overflowEl.style.overflowY === 'auto') {
             this.overflowEl.addEventListener('scroll', (s) => {
                 this.contentScrollTop = s.target.scrollTop;

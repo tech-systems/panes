@@ -421,7 +421,7 @@ export class CupertinoPane {
 
     // if overflow content was scrolled
     // increase to scrolled value
-    if (this.isDragScrollabe(t.path)) {
+    if (this.isDragScrollabe(t.path || t.composedPath())) {
       this.startP += this.contentScrollTop;  
     } 
     this.steps.push(this.startP);
@@ -449,7 +449,7 @@ export class CupertinoPane {
     const newVal = this.getPanelTransformY() + diff;
 
     // Not allow move panel with positive overflow scroll
-    if (this.isDragScrollabe(t.path) 
+    if (this.isDragScrollabe(t.path || t.composedPath()) 
           && this.overflowEl.style.overflowY === 'auto') {
       this.overflowEl.addEventListener('scroll', (s: any) => {
         this.contentScrollTop = s.target.scrollTop;
