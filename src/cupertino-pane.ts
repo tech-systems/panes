@@ -328,20 +328,7 @@ export class CupertinoPane {
         this.backdropEl.addEventListener('click', (t) => this.settings.onBackdropTap());
       }
 
-      // Get overflow element
-      let attrElements = document.querySelectorAll(`${this.selector} [overflow-y]`);
-      if (!attrElements.length || attrElements.length > 1) {
-        this.overflowEl = this.contentEl;
-      } else {
-        this.overflowEl = <HTMLElement>attrElements[0];
-      }
-      
-      if (this.settings.topperOverflow) {
-        this.overflowEl.style.height = `${this.screen_height - this.topper - 51
-          + (this.settings.draggableOver ? 30 : 0)
-          - this.settings.topperOverflowOffset}px`;
-      }
-
+      this.scrollElementInit();
       this.checkOpacityAttr(this.currentBreakpoint);
       this.checkOverflowAttr(this.currentBreakpoint);
 
@@ -362,6 +349,31 @@ export class CupertinoPane {
         // Emit event
         this.settings.onDidPresent();
       }
+  }
+
+  /**
+   * Private Utils methods
+   */
+
+  private scrollElementInit() {
+    let attrElements = document.querySelectorAll(`${this.selector} [overflow-y]`);
+    if (!attrElements.length || attrElements.length > 1) {
+      this.overflowEl = this.contentEl;
+    } else {
+      this.overflowEl = <HTMLElement>attrElements[0];
+    }
+    
+    if (this.settings.topperOverflow) {       
+      // Good to get rid of timeout
+      // but render dom take a time  
+      setTimeout(() => {
+        this.overflowEl.style.height = `${this.screen_height 
+          - this.topper 
+          - this.settings.bottomOffset
+          - this.settings.topperOverflowOffset
+          - this.overflowEl.offsetTop}px`;
+      }, 150);
+    }
   }
 
   private checkOpacityAttr(val) {

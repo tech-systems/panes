@@ -33,6 +33,10 @@ export declare class CupertinoPane {
     present(conf?: {
         animate: boolean;
     }): void;
+    /**
+     * Private Utils methods
+     */
+    private scrollElementInit;
     private checkOpacityAttr;
     private checkOverflowAttr;
     private isPanePresented;
