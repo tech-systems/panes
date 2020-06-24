@@ -57,11 +57,12 @@ let settings = {
 ## Demonstration
 - [Base live](https://output.jsbin.com/fuhisey)
 - [Overflow top live](https://output.jsbin.com/baguroy)
-- [Overflow top + middle live](https://output.jsbin.com/piwecad)
+- [Overflow top-middle live](https://output.jsbin.com/piwecad)
 - [Follower live](https://output.jsbin.com/xogavec)
 - [Apple Clips live](https://output.jsbin.com/luqaxud)
 - [Bulletin live](https://output.jsbin.com/fonavuy)
 - [Starbucks live](https://output.jsbin.com/jayicip)
+- [Backdrop drag-opacity live](https://output.jsbin.com/riwahab)
 
 <div style="display:flex;flex-wrap:wrap;">
   <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/maps.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="200px">
