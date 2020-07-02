@@ -101,7 +101,10 @@ export class CupertinoPane {
 
   private drawElements() {
       this.parentEl = this.settings.parentElement;
-
+      
+      // Body patch prevent android pull-to-refresh
+      document.body.style.overscrollBehaviorY = 'none';  
+    
       // Wrapper
       this.wrapperEl = document.createElement('div');
       this.wrapperEl.className = `cupertino-pane-wrapper ${this.el.className}`;
