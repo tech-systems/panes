@@ -1,7 +1,7 @@
 ---
 name: 🚀 Feature request
 about: If you have a feature request
-title: 'FEAT: '
+title: '[FEAT] '
 ---
 
 **What are you trying to add to Cupertino-Pane?**

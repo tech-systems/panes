@@ -1,7 +1,7 @@
 ---
 name: 🐜 Bug report
 about: If something is not working as excepted
-title: 'BUG: '
+title: '[BUG] '
 ---
 
 **Describe the bug**
