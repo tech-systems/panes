@@ -1,10 +1,7 @@
 ---
-name: Bug report
-about: Create a report to help us improve
-title: ''
-labels: ''
-assignees: ''
-
+name: 🐜 Bug report
+about: If something is not working as excepted
+title: 'BUG: '
 ---
 
 **Describe the bug**
