@@ -29,6 +29,7 @@ Cupertino Pane is great modern slide-over pane with touch technologies. <br>
 * [Attributes](#attributes)
 * [Future Goals](#future-goals)
 * [Contributing](#contributing)
+* [Changelog](https://github.com/roman-rr/cupertino-pane/blob/master/CHANGELOG.md)
 * [License](#license)
 
 <!-- ## Breaking Changes
