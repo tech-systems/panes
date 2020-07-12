@@ -283,8 +283,8 @@ By default using for full pane area, but in some cases good useful with header.
 - [Pull] Element or Selector
 - [Pull] Backdrop present/dismiss methods
 - [Quality] Touch angle 45
+- [Quality] Topper than top (allow mode/if scroll - overflow enable else 10px-20px)
 - [Quality] Click item/drag pane precision on device (threshold)
-- [Quality] Topper than top (if scroll - overflow enable else 10px-20px)
 - [Quality] Transition timing: easeOutElastic
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) 
 - [Accurance] Native Touch Plugin
