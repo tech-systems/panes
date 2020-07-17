@@ -286,6 +286,7 @@ By default using for full pane area, but in some cases good useful with header.
 - [Quality] Topper than top (allow mode/if scroll - overflow enable else 10px-20px)
 - [Quality] Click item/drag pane precision on device (threshold)
 - [Quality] Transition timing: easeOutElastic
+- [Showcase] Apple Music F7 
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) 
 - [Accurance] Native Touch Plugin
 - [UI] 3D effect (ion-modal example)
