@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.651
+ * Cupertino Pane 1.1.652
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: June 24, 2020
+ * Released on: July 19, 2020
  */
 
 'use strict';
@@ -68,6 +68,7 @@ class Device {
         this.cordova = !!(window['cordova'] || window['phonegap']);
         this.phonegap = !!(window['cordova'] || window['phonegap']);
         this.electron = false;
+        this.ionic = !!document.querySelector('ion-app');
         const platform = window.navigator.platform;
         const ua = window.navigator.userAgent;
         const screenWidth = window.screen.width;
@@ -501,6 +502,27 @@ class CupertinoPane {
         this.scrollElementInit();
         this.checkOpacityAttr(this.currentBreakpoint);
         this.checkOverflowAttr(this.currentBreakpoint);
+        /****** Fix android issues *******/
+        if (this.device.android) {
+            // Body patch prevent android pull-to-refresh
+            document.body.style['overscrollBehaviorY'] = 'none';
+            if (this.device.ionic
+                && this.device.cordova) {
+                // Fix android keyboard issue with transition (resize height on hide)
+                window.addEventListener('keyboardWillHide', () => {
+                    if (!this.paneEl)
+                        return;
+                    window.requestAnimationFrame(() => {
+                        this.wrapperEl.style.width = '100%';
+                        this.paneEl.style.position = 'absolute';
+                        window.requestAnimationFrame(() => {
+                            this.wrapperEl.style.width = 'unset';
+                            this.paneEl.style.position = 'fixed';
+                        });
+                    });
+                });
+            }
+        }
         /****** Attach Events *******/
         if (!this.settings.dragBy) {
             this.attachEvents(this.paneEl);

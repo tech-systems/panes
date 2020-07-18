@@ -20,5 +20,6 @@ export declare class Device {
     webview: any;
     standalone: any;
     pixelRatio: any;
+    ionic: boolean;
     constructor();
 }

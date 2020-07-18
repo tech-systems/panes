@@ -22,6 +22,7 @@ export class Device {
   public webview: any;
   public standalone: any;
   public pixelRatio: any;
+  public ionic: boolean = !!document.querySelector('ion-app');
 
   constructor() {
     const platform = window.navigator.platform;

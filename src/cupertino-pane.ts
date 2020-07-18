@@ -101,9 +101,6 @@ export class CupertinoPane {
 
   private drawElements() {
       this.parentEl = this.settings.parentElement;
-      
-      // Body patch prevent android pull-to-refresh
-      document.body.style.overscrollBehaviorY = 'none';  
     
       // Wrapper
       this.wrapperEl = document.createElement('div');
@@ -334,6 +331,29 @@ export class CupertinoPane {
       this.scrollElementInit();
       this.checkOpacityAttr(this.currentBreakpoint);
       this.checkOverflowAttr(this.currentBreakpoint);
+
+      /****** Fix android issues *******/
+      if (this.device.android) {
+        // Body patch prevent android pull-to-refresh
+        document.body.style['overscrollBehaviorY'] = 'none';  
+
+        if (this.device.ionic 
+          && this.device.cordova) {
+          // TODO: manual keyboard control (#49 issue)
+          // Fix android keyboard issue with transition (resize height on hide)
+          window.addEventListener('keyboardWillHide', () => {
+            if (!this.paneEl) return;
+            window.requestAnimationFrame(() => {
+              this.wrapperEl.style.width = '100%';
+              this.paneEl.style.position = 'absolute';
+              window.requestAnimationFrame(() => {
+                this.wrapperEl.style.width = 'unset';
+                this.paneEl.style.position = 'fixed';
+              });
+            });
+          });
+        }
+      }
 
       /****** Attach Events *******/
       if (!this.settings.dragBy) {

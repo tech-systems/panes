@@ -289,13 +289,14 @@ By default using for full pane area, but in some cases good useful with header.
 - [Showcase] Apple Music F7 
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) 
 - [Accurance] Native Touch Plugin
+- [Quality] Keyboard manual control
 - [UI] 3D effect (ion-modal example)
 - [UI] Drawer control effect (simple/circle)
 - [UI] 3D button toggle effect
 - [Docs] Docs engine
 - [Docs] Live example hosted in pages
-- [Platforms] React Native version with one core
-- [UI] No taps UI (increase User - Machine information throughput)
+- [Platforms] React Native version
+- [Platforms] C++ QT version
 
 ## Contributing
 We are welcome contributions of all kinds from anyone. 

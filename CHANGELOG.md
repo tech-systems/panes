@@ -9,4 +9,5 @@ All notable changes to this project will be documented in this file.
 - Better issues templates [#48](https://github.com/roman-rr/cupertino-pane/pull/48)
 
 ### Bug Fixes
-- Mobile chrome pull-to-refresh function disabled with `overscroll-behavior-y` [#46](https://github.com/roman-rr/cupertino-pane/issues/46) [commit](https://github.com/roman-rr/cupertino-pane/commit/16ce8259778bf3c2b2d9e809cf41aaf886fba362)
+- Mobile chrome pull-to-refresh function disabled with `overscroll-behavior-y` [#46](https://github.com/roman-rr/cupertino-pane/issues/46)
+- Resize frame after hide keyboard on Android device with Ionic apps [#49](https://github.com/roman-rr/cupertino-pane/issues/49)
