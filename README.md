@@ -259,6 +259,12 @@ Method enable any drag actions for pane
 ```javascript
 myPane.enableDrag();
 ```
+### backdrop({show: **boolean = true**})
+Show/Hide backdrop method 
+```javascript
+myPane.backdrop({show: true}); // show
+myPane.backdrop({show: false}); // hide
+```
 
 ## Attributes
 ### hide-on-bottom
@@ -280,13 +286,13 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- [Pull] Element or Selector
-- [Pull] Backdrop present/dismiss methods
+- [Pull] Element or Selector + release
 - [Quality] Touch angle 45
 - [Quality] Topper than top (allow mode/if scroll - overflow enable else 10px-20px)
 - [Quality] Click item/drag pane precision on device (threshold)
 - [Quality] Transition timing: easeOutElastic
 - [Showcase] Apple Music F7 
+- [Docs] Examples in one page F7
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) 
 - [Accurance] Native Touch Plugin
 - [Quality] Keyboard manual control

@@ -63,6 +63,15 @@ export declare class CupertinoPane {
     private touchEndCb;
     private touchEnd;
     private swipeNextPoint;
+    private isBackdropPresented;
+    private renderBackdrop;
+    /**
+     * Backdrop
+     * TODO: shared settings class, backdrop class
+     */
+    backdrop(conf?: {
+        show: boolean;
+    }): any;
     /************************************
      * Events
      */

@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: July 19, 2020
+ * Released on: July 20, 2020
  */
 
 class Support {
@@ -352,20 +352,6 @@ class CupertinoPane {
         this.contentEl.style.display = 'block';
         this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
         this.contentEl.style.overflowX = 'hidden';
-        // Backdrop
-        this.backdropEl = document.createElement('div');
-        this.backdropEl.className = 'backdrop';
-        this.backdropEl.style.overflow = 'hidden';
-        this.backdropEl.style.position = 'fixed';
-        this.backdropEl.style.width = '100%';
-        this.backdropEl.style.bottom = '0';
-        this.backdropEl.style.right = '0';
-        this.backdropEl.style.left = '0';
-        this.backdropEl.style.top = '0';
-        this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-        this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
-        this.backdropEl.style.display = 'none';
-        this.backdropEl.style.zIndex = '10';
         // Close button
         this.closeEl = document.createElement('div');
         this.closeEl.className = 'close-button';
@@ -491,9 +477,7 @@ class CupertinoPane {
             this.settings.breaks.bottom.enabled = true;
         }
         if (this.settings.backdrop) {
-            this.wrapperEl.appendChild(this.backdropEl);
-            this.backdropEl.style.display = 'block';
-            this.backdropEl.addEventListener('click', (t) => this.settings.onBackdropTap());
+            this.renderBackdrop();
         }
         this.scrollElementInit();
         this.checkOpacityAttr(this.currentBreakpoint);
@@ -504,6 +488,7 @@ class CupertinoPane {
             document.body.style['overscrollBehaviorY'] = 'none';
             if (this.device.ionic
                 && this.device.cordova) {
+                // TODO: manual keyboard control (#49 issue)
                 // Fix android keyboard issue with transition (resize height on hide)
                 window.addEventListener('keyboardWillHide', () => {
                     if (!this.paneEl)
@@ -684,6 +669,63 @@ class CupertinoPane {
             return;
         }
         this.doTransition({ type: 'end', translateY: closest });
+    }
+    isBackdropPresented() {
+        return document.querySelector(`.cupertino-pane-wrapper .backdrop`)
+            ? true : false;
+    }
+    renderBackdrop() {
+        this.backdropEl = document.createElement('div');
+        this.backdropEl.className = 'backdrop';
+        this.backdropEl.style.overflow = 'hidden';
+        this.backdropEl.style.position = 'fixed';
+        this.backdropEl.style.width = '100%';
+        this.backdropEl.style.bottom = '0';
+        this.backdropEl.style.right = '0';
+        this.backdropEl.style.left = '0';
+        this.backdropEl.style.top = '0';
+        this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+        this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
+        this.backdropEl.style.display = 'none';
+        this.backdropEl.style.zIndex = '10';
+        this.wrapperEl.appendChild(this.backdropEl);
+        this.backdropEl.style.display = 'block';
+        this.backdropEl.addEventListener('click', (t) => this.settings.onBackdropTap());
+    }
+    /**
+     * Backdrop
+     * TODO: shared settings class, backdrop class
+     */
+    backdrop(conf = { show: true }) {
+        if (!this.isPanePresented()) {
+            console.warn(`Cupertino Pane: Present pane before call backdrop()`);
+            return null;
+        }
+        if (!this.isBackdropPresented()) {
+            this.renderBackdrop();
+        }
+        const transitionEnd = () => {
+            this.backdropEl.style.transition = `initial`;
+            this.backdropEl.style.display = `none`;
+            this.backdropEl.removeEventListener('transitionend', transitionEnd);
+        };
+        this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+        this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
+        if (!conf.show) {
+            // Destroy
+            if (this.backdropEl.style.display === 'none')
+                return;
+            this.backdropEl.addEventListener('transitionend', transitionEnd);
+        }
+        else {
+            // Present
+            if (this.backdropEl.style.display !== 'none')
+                return;
+            this.backdropEl.style.display = 'block';
+            setTimeout(() => {
+                this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
+            }, 50);
+        }
     }
     attachEvents(el) {
         // Touch Events

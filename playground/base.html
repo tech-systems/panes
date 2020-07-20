@@ -30,6 +30,9 @@
       <ion-button expand="block" color="secondary" onclick="setTopDrawer()">Set Top</ion-button>
       <ion-button expand="block" color="secondary" onclick="setMiddleDrawer()">Set Middle</ion-button>
       <ion-button expand="block" color="secondary" onclick="setBottomDrawer()">Set Bottom</ion-button>
+
+      <ion-button expand="block" onclick="showBackdrop()">Show Backdrop</ion-button>
+      <ion-button expand="block" onclick="hideBackdrop()">Hide Backdrop</ion-button>
   </ion-content>
   <script>
     var drawer = new CupertinoPane('ion-drawer', { 
@@ -38,10 +41,11 @@
         // },
         // draggableOver: true,
         // dragByCursor: false,
-        // backdrop: true,
+        backdrop: true,
         // topperOverflowOffset: 110
         // followerElement: 'ion-fab',
         // onDrag: () => console.log('Drag event'),
+        onBackdropTap: () => hideBackdrop()
         // freeMode: true,
         // onBackdropTap: () => hideDrawer()
     });
@@ -74,6 +78,14 @@
     async function setBottomDrawer() {
       drawer.moveToBreak('bottom');
     };
+
+    async function showBackdrop() {
+      drawer.backdrop({show: true});
+    }
+
+    async function hideBackdrop() {
+      drawer.backdrop({show: false});
+    }
   </script>
 </body>
 

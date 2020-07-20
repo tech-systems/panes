@@ -158,21 +158,6 @@ export class CupertinoPane {
       this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
       this.contentEl.style.overflowX = 'hidden';
 
-      // Backdrop
-      this.backdropEl = document.createElement('div');
-      this.backdropEl.className = 'backdrop';
-      this.backdropEl.style.overflow = 'hidden';
-      this.backdropEl.style.position = 'fixed';
-      this.backdropEl.style.width = '100%';
-      this.backdropEl.style.bottom = '0';
-      this.backdropEl.style.right = '0';
-      this.backdropEl.style.left = '0';
-      this.backdropEl.style.top = '0';
-      this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-      this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
-      this.backdropEl.style.display = 'none';
-      this.backdropEl.style.zIndex = '10';
-
       // Close button
       this.closeEl = document.createElement('div');
       this.closeEl.className = 'close-button';
@@ -323,9 +308,7 @@ export class CupertinoPane {
       }
 
       if (this.settings.backdrop) {
-        this.wrapperEl.appendChild(this.backdropEl);
-        this.backdropEl.style.display = 'block';
-        this.backdropEl.addEventListener('click', (t) => this.settings.onBackdropTap());
+        this.renderBackdrop();
       }
 
       this.scrollElementInit();
@@ -595,6 +578,68 @@ export class CupertinoPane {
       }
 
       return closest;
+  }
+
+  private isBackdropPresented() {
+    return document.querySelector(`.cupertino-pane-wrapper .backdrop`) 
+    ? true : false;
+  }
+
+  private renderBackdrop() {
+    this.backdropEl = document.createElement('div');
+    this.backdropEl.className = 'backdrop';
+    this.backdropEl.style.overflow = 'hidden';
+    this.backdropEl.style.position = 'fixed';
+    this.backdropEl.style.width = '100%';
+    this.backdropEl.style.bottom = '0';
+    this.backdropEl.style.right = '0';
+    this.backdropEl.style.left = '0';
+    this.backdropEl.style.top = '0';
+    this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+    this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
+    this.backdropEl.style.display = 'none';
+    this.backdropEl.style.zIndex = '10';
+
+    this.wrapperEl.appendChild(this.backdropEl);
+    this.backdropEl.style.display = 'block';
+    this.backdropEl.addEventListener('click', (t) => this.settings.onBackdropTap());
+  }
+
+  /**
+   * Backdrop
+   * TODO: shared settings class, backdrop class
+   */
+  public backdrop(conf = { show: true }) {
+    if (!this.isPanePresented()) {
+      console.warn(`Cupertino Pane: Present pane before call backdrop()`);
+      return null;
+    }
+
+    if (!this.isBackdropPresented()) {
+      this.renderBackdrop();
+    }
+
+    const transitionEnd = () => {
+      this.backdropEl.style.transition = `initial`;
+      this.backdropEl.style.display = `none`;
+      this.backdropEl.removeEventListener('transitionend', transitionEnd); 
+    }
+    
+    this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+    this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
+
+    if (!conf.show) {
+      // Destroy
+      if (this.backdropEl.style.display === 'none') return;
+      this.backdropEl.addEventListener('transitionend', transitionEnd);   
+    } else {
+      // Present
+      if (this.backdropEl.style.display !== 'none') return;
+      this.backdropEl.style.display = 'block';
+      setTimeout(() => {
+        this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
+      }, 50);
+    }
   }
 
  
