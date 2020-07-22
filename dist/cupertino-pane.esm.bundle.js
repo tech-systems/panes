@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: July 20, 2020
+ * Released on: July 22, 2020
  */
 
 class Support {
@@ -195,6 +195,7 @@ class CupertinoPane {
         this.contentScrollTop = 0;
         this.draggableScrollOffset = 0;
         this.disableDragEvents = false;
+        this.rendered = false;
         this.breaks = {};
         this.brs = [];
         this.device = new Device();
@@ -279,17 +280,24 @@ class CupertinoPane {
             };
             return Support.touch || !this.settings.simulateTouch ? touchEventsTouch : touchEventsDesktop;
         })();
-        // Unable attach DOM element
-        if (!document.querySelector(this.selector)) {
-            console.warn('Cupertino Pane: wrong selector specified', this.selector);
+        // Element or selector
+        if (selector instanceof HTMLElement) {
+            this.selector = selector;
+        }
+        else {
+            this.selector = document.querySelector(selector);
+        }
+        // Unable attach selector or DOM element
+        if (!this.selector) {
+            console.warn('Cupertino Pane: wrong selector or DOM element specified', this.selector);
             return;
         }
-        // Pane already was rendered
+        // Pane class created
         if (this.isPanePresented()) {
-            console.warn('Cupertino Pane: specified selector already in use', this.selector);
+            console.warn('Cupertino Pane: specified selector or DOM element already in use', this.selector);
             return;
         }
-        this.el = document.querySelector(this.selector);
+        this.el = this.selector;
         this.el.style.display = 'none';
         this.settings = Object.assign(Object.assign({}, this.settings), conf);
         if (this.settings.parentElement) {
@@ -366,9 +374,14 @@ class CupertinoPane {
     present(conf = { animate: false }) {
         if (!this.el)
             return;
-        // Pane already was rendered
-        if (this.isPanePresented()) {
+        // Pane already exist and was rendered
+        if (this.isPanePresented() && this.rendered) {
             this.moveToBreak(this.settings.initialBreak);
+            return;
+        }
+        // Pane already exist but not rendered in this class
+        if (this.isPanePresented() && !this.rendered) {
+            console.warn('Cupertino Pane: specified selector or DOM element already in use', this.selector);
             return;
         }
         // Emit event
@@ -424,6 +437,7 @@ class CupertinoPane {
         this.paneEl.appendChild(this.draggableEl);
         this.paneEl.appendChild(this.contentEl);
         this.draggableEl.appendChild(this.moveEl);
+        this.rendered = true;
         if (this.settings.followerElement) {
             if (!document.querySelector(this.settings.followerElement)) {
                 console.warn('Cupertino Pane: wrong follower element selector specified', this.settings.followerElement);
@@ -528,7 +542,7 @@ class CupertinoPane {
      * Private Utils methods
      */
     scrollElementInit() {
-        let attrElements = document.querySelectorAll(`${this.selector} [overflow-y]`);
+        let attrElements = this.el.querySelectorAll('[overflow-y]');
         if (!attrElements.length || attrElements.length > 1) {
             this.overflowEl = this.contentEl;
         }
@@ -548,7 +562,7 @@ class CupertinoPane {
         }
     }
     checkOpacityAttr(val) {
-        let attrElements = document.querySelectorAll(`${this.selector} [hide-on-bottom]`);
+        let attrElements = this.el.querySelectorAll('[hide-on-bottom]');
         if (!attrElements.length)
             return;
         attrElements.forEach((item) => {
@@ -562,8 +576,11 @@ class CupertinoPane {
         this.overflowEl.style.overflowY = (val <= this.topper) ? 'auto' : 'hidden';
     }
     isPanePresented() {
-        return document.querySelector(`.cupertino-pane-wrapper ${this.selector}`)
-            ? true : false;
+        // Check through all presented panes
+        let wrappers = Array.from(document.querySelectorAll('.cupertino-pane-wrapper'));
+        if (!wrappers.length)
+            return false;
+        return wrappers.find((item) => item.contains(this.selector)) ? true : false;
     }
     /**
      * Check if drag event fired by scrollable element
@@ -694,7 +711,6 @@ class CupertinoPane {
     }
     /**
      * Backdrop
-     * TODO: shared settings class, backdrop class
      */
     backdrop(conf = { show: true }) {
         if (!this.isPanePresented()) {
@@ -719,8 +735,6 @@ class CupertinoPane {
         }
         else {
             // Present
-            if (this.backdropEl.style.display !== 'none')
-                return;
             this.backdropEl.style.display = 'block';
             setTimeout(() => {
                 this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;

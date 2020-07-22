@@ -121,7 +121,8 @@
         height = height.getPropertyValue('height');
         height = parseFloat(height);
         
-        bulletin = new CupertinoPane('ion-bulletin', { 
+        var element = document.querySelector('ion-bulletin');
+        bulletin = new CupertinoPane(element, { 
           initialBreak: 'top',
           breaks: {
             top: { enabled: true, height: height + 48},

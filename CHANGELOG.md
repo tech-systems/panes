@@ -2,7 +2,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
  
-## [Unreleased] - 2020-07-11
+## 1.1.7 - 2020-07-22
  
 ### Features
 - Changelog created to keep user informed [#47](https://github.com/roman-rr/cupertino-pane/issues/47)
@@ -11,6 +11,15 @@ All notable changes to this project will be documented in this file.
 ```javascript
 myPane.backdrop({show: true}); // show
 myPane.backdrop({show: false}); // hide
+```
+- Element or selector on class creation [#40](https://github.com/roman-rr/cupertino-pane/pull/40)
+```javascript
+// String selector
+new CupertinoPane('.cupertino-pane');
+
+// HTML element
+let element = document.querySelector('.cupertino-pane');
+new CupertinoPane(element); // HTMLElement
 ```
 
 ### Bug Fixes

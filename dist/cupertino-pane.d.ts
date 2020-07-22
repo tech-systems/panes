@@ -14,6 +14,7 @@ export declare class CupertinoPane {
     private contentScrollTop;
     private draggableScrollOffset;
     private disableDragEvents;
+    private rendered;
     private breaks;
     private brs;
     private el;
@@ -28,7 +29,7 @@ export declare class CupertinoPane {
     private overflowEl;
     private followerEl;
     private device;
-    constructor(selector: string, conf?: CupertinoSettings);
+    constructor(selector: (string | HTMLElement), conf?: CupertinoSettings);
     private drawElements;
     present(conf?: {
         animate: boolean;
@@ -67,7 +68,6 @@ export declare class CupertinoPane {
     private renderBackdrop;
     /**
      * Backdrop
-     * TODO: shared settings class, backdrop class
      */
     backdrop(conf?: {
         show: boolean;

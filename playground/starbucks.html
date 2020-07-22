@@ -561,7 +561,8 @@
       }
     }
 
-    let drawer = new CupertinoPane('ion-drawer', { 
+    var element = document.querySelector('ion-drawer');
+    let drawer = new CupertinoPane(element, { 
         followerElement: '.content',
         breaks: {
           middle: { enabled: true, height: firstHeight },

@@ -131,7 +131,8 @@
       <ion-button expand="block" color="secondary" onclick="setBottomDrawer()">Set Bottom</ion-button>
   </ion-content>
   <script>
-    var drawer = new CupertinoPane('ion-drawer', { 
+    var element = document.querySelector('ion-drawer');
+    var drawer = new CupertinoPane(element, { 
         // breaks: {
         //   top: { enabled: false, offset: 700 }
         // },

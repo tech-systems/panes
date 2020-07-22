@@ -156,6 +156,17 @@ let myPane = new CupertinoPane('.cupertino-pane', CupertinoSettings);
     myPane.present();
 ```
 
+### Class creation
+You can pass html element or string selector to class constructor
+```javascript
+// String selector
+new CupertinoPane('.cupertino-pane');
+
+// HTML element
+let element = document.querySelector('.cupertino-pane');
+new CupertinoPane(element); // HTMLElement
+```
+
 ## Settings
 ### Common configuration
 | Property | Type | Default | Description |
@@ -286,20 +297,17 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- [Pull] Element or Selector + release
+- [Code] Divide elements by classes
 - [Quality] Touch angle 45
 - [Quality] Topper than top (allow mode/if scroll - overflow enable else 10px-20px)
 - [Quality] Click item/drag pane precision on device (threshold)
-- [Quality] Transition timing: easeOutElastic
+- [Quality] Transition timing: easeOutElastic 
+- [UI] 3D effect (ion-modal example) + release
 - [Showcase] Apple Music F7 
-- [Docs] Examples in one page F7
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) 
 - [Accurance] Native Touch Plugin
 - [Quality] Keyboard manual control
-- [UI] 3D effect (ion-modal example)
-- [UI] Drawer control effect (simple/circle)
-- [UI] 3D button toggle effect
-- [Docs] Docs engine
+- [Docs] Docs engine (F7)
 - [Docs] Live example hosted in pages
 - [Platforms] React Native version
 - [Platforms] C++ QT version

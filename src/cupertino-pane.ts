@@ -55,6 +55,7 @@ export class CupertinoPane {
   private contentScrollTop: number = 0;
   private draggableScrollOffset: number = 0;
   private disableDragEvents: boolean = false;
+  private rendered: boolean = false;
 
   private breaks: {} = {}
   private brs: number[] = [];
@@ -73,20 +74,29 @@ export class CupertinoPane {
 
   private device = new Device();
 
-  constructor(private selector: string, conf: CupertinoSettings = {}) {
-    // Unable attach DOM element
-    if (!<HTMLElement>document.querySelector(this.selector)) {
-      console.warn('Cupertino Pane: wrong selector specified', this.selector);
+  constructor(private selector: (string | HTMLElement), 
+              conf: CupertinoSettings = {}) {
+
+    // Element or selector
+    if (selector instanceof HTMLElement) {
+      this.selector = selector;
+    } else {
+      this.selector = <HTMLElement>document.querySelector(selector);
+    }
+
+    // Unable attach selector or DOM element
+    if (!this.selector) {
+      console.warn('Cupertino Pane: wrong selector or DOM element specified', this.selector);
       return;
     }
     
-    // Pane already was rendered
+    // Pane class created
     if (this.isPanePresented()) {
-      console.warn('Cupertino Pane: specified selector already in use', this.selector);
+      console.warn('Cupertino Pane: specified selector or DOM element already in use', this.selector);
       return;
     }
 
-    this.el = <HTMLElement>document.querySelector(this.selector);
+    this.el = this.selector;
     this.el.style.display = 'none';
     this.settings = {...this.settings, ...conf};
     
@@ -173,9 +183,15 @@ export class CupertinoPane {
   present(conf: {animate: boolean} = {animate: false}) {
       if (!this.el) return;
 
-      // Pane already was rendered
-      if (this.isPanePresented()) {
+      // Pane already exist and was rendered
+      if (this.isPanePresented() && this.rendered) {
         this.moveToBreak(this.settings.initialBreak);
+        return;
+      }
+      
+      // Pane already exist but not rendered in this class
+      if (this.isPanePresented() && !this.rendered) {
+        console.warn('Cupertino Pane: specified selector or DOM element already in use', this.selector);
         return;
       }
 
@@ -241,6 +257,7 @@ export class CupertinoPane {
       this.paneEl.appendChild(this.draggableEl);
       this.paneEl.appendChild(this.contentEl);
       this.draggableEl.appendChild(this.moveEl);
+      this.rendered = true;
 
       if (this.settings.followerElement) {
         if (!<HTMLElement>document.querySelector(this.settings.followerElement)) {
@@ -362,7 +379,7 @@ export class CupertinoPane {
    */
 
   private scrollElementInit() {
-    let attrElements = document.querySelectorAll(`${this.selector} [overflow-y]`);
+    let attrElements = this.el.querySelectorAll('[overflow-y]');
     if (!attrElements.length || attrElements.length > 1) {
       this.overflowEl = this.contentEl;
     } else {
@@ -383,7 +400,7 @@ export class CupertinoPane {
   }
 
   private checkOpacityAttr(val) {
-    let attrElements = document.querySelectorAll(`${this.selector} [hide-on-bottom]`);
+    let attrElements = this.el.querySelectorAll('[hide-on-bottom]');
     if (!attrElements.length) return;
     attrElements.forEach((item) => {
       (<HTMLElement>item).style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
@@ -397,8 +414,10 @@ export class CupertinoPane {
   }
 
   private isPanePresented():boolean {
-    return document.querySelector(`.cupertino-pane-wrapper ${this.selector}`) 
-    ? true : false;
+    // Check through all presented panes
+    let wrappers = Array.from(document.querySelectorAll('.cupertino-pane-wrapper'));
+    if (!wrappers.length) return false;
+    return wrappers.find((item) => item.contains(<HTMLElement>this.selector)) ? true: false;
   }
 
   /** 
@@ -607,7 +626,6 @@ export class CupertinoPane {
 
   /**
    * Backdrop
-   * TODO: shared settings class, backdrop class
    */
   public backdrop(conf = { show: true }) {
     if (!this.isPanePresented()) {
@@ -634,7 +652,6 @@ export class CupertinoPane {
       this.backdropEl.addEventListener('transitionend', transitionEnd);   
     } else {
       // Present
-      if (this.backdropEl.style.display !== 'none') return;
       this.backdropEl.style.display = 'block';
       setTimeout(() => {
         this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;

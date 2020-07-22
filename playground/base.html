@@ -21,6 +21,10 @@
         <p hide-on-bottom>Content</p> 
       </ion-drawer>
 
+      <ion-extra-drawer>
+        <h1>Extra header</h1>
+        <p hide-on-bottom>Extra content</p> 
+      </ion-extra-drawer>
       <ion-button expand="block" color="danger" onclick="presentDrawer()">Present Drawer</ion-button>
       <ion-button expand="block" color="danger" onclick="destroyDrawer()">Destroy Drawer</ion-button>
 
@@ -32,16 +36,17 @@
       <ion-button expand="block" color="secondary" onclick="setBottomDrawer()">Set Bottom</ion-button>
 
       <ion-button expand="block" onclick="showBackdrop()">Show Backdrop</ion-button>
-      <ion-button expand="block" onclick="hideBackdrop()">Hide Backdrop</ion-button>
+      <ion-button expand="block" onclick="extraPane()">Extra Pane</ion-button>
   </ion-content>
   <script>
-    var drawer = new CupertinoPane('ion-drawer', { 
+    var element = document.querySelector('ion-drawer');
+    var drawer = new CupertinoPane(element, { 
         // breaks: {
         //   top: { enabled: false, offset: 700 }
         // },
         // draggableOver: true,
         // dragByCursor: false,
-        backdrop: true,
+        // backdrop: true,
         // topperOverflowOffset: 110
         // followerElement: 'ion-fab',
         // onDrag: () => console.log('Drag event'),
@@ -50,6 +55,21 @@
         // onBackdropTap: () => hideDrawer()
     });
     setTimeout(() => drawer.present({animate: true}));
+
+    // Extra pane
+    var extraDrawer = new CupertinoPane('ion-extra-drawer', {
+        initialBreak: 'bottom',
+        topperOverflow: false,
+        breaks: {
+          top: {enabled: false},
+          middle: {enabled: true, height: 200},
+          bottom: {enabled: true, height: 50},
+        }
+    });
+
+    async function extraPane() {
+      extraDrawer.present({animate: true});
+    }
 
     async function presentDrawer() {
       drawer.present({animate: true});
