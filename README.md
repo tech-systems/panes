@@ -219,7 +219,7 @@ The function that executes when the event fires.
 | **onWillPresent** | `void: () => {}` | Call before panel will present |
 | **onDragStart** | `void: () => {}` | Call when detect user drag event on pane |
 | **onDrag** | `void: () => {}` | Call executes on each new position of pane |
-| **onDragEng** | `void: () => {}` | Executes when drag event complete |
+| **onDragEnd** | `void: () => {}` | Executes when drag event complete |
 | **onBackdropTap** | `void: () => {}` | Call when user tap backdrop overlay |
 | **onTransitionStart** | `void: () => {}` | Executes before auto transition and animation start |
 | **onTransitionEnd** | `void: () => {}` | Executes when transition and animation complete |
