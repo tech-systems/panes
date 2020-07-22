@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.652
+ * Cupertino Pane 1.1.7
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
