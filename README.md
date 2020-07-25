@@ -297,12 +297,11 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- [Code] Divide elements by classes
+- [UI] 3D effect (ion-modal example) 
 - [Quality] Touch angle 45
 - [Quality] Topper than top (allow mode/if scroll - overflow enable else 10px-20px)
 - [Quality] Click item/drag pane precision on device (threshold)
-- [Quality] Transition timing: easeOutElastic 
-- [UI] 3D effect (ion-modal example) + release
+- [Quality] Transition timing: easeOutElastic + release
 - [Showcase] Apple Music F7 
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) 
 - [Accurance] Native Touch Plugin
