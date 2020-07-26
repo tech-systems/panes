@@ -61,7 +61,7 @@ let settings = {
 - [Overflow top-middle live](https://output.jsbin.com/piwecad)
 - [Follower live](https://output.jsbin.com/xogavec)
 - [Apple Clips live](https://output.jsbin.com/luqaxud)
-- [Bulletin live](https://output.jsbin.com/fonavuy)
+- [Bulletin live](https://output.jsbin.com/tafahupihe)
 - [Starbucks live](https://output.jsbin.com/jayicip)
 - [Backdrop drag-opacity live](https://output.jsbin.com/riwahab)
 
@@ -182,6 +182,7 @@ new CupertinoPane(element); // HTMLElement
 | **bottomClose** | `boolean` | false | Close pane with drag to bottom breakpoint |
 | **freeMode** | `boolean` | false | On `true` will remove automatical magnetic effects to near breakpoint |
 | **lowerThanBottom** | `boolean` | true | By default allow user to drag pane lower than bottom position. On `false` will automatically place pane to bottom position on lower than bottom attemption |
+| **upperThanTop** | `boolean` | false | Allow user to drag pane upper than maximum top position. Useful with bulletin style without overflow-y |
 | **buttonClose** | `boolean` | true | Determinate whetever close button will render or not |
 | **bottomOffset** | `number` | 0 | Margin bottom for pane from screen bottom point |
 | **topperOverflow** | `boolean` | true | Ability to scroll content inside pane if topper point reached |
@@ -297,9 +298,9 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- [UI] 3D effect (ion-modal example) 
+- [UI] 3D effect
+<!-- https://github.com/ionic-team/ionic-framework/blob/master/core/src/components/modal/animations/ios.enter.ts -->
 - [Quality] Touch angle 45
-- [Quality] Topper than top (allow mode/if scroll - overflow enable else 10px-20px)
 - [Quality] Click item/drag pane precision on device (threshold)
 - [Quality] Transition timing: easeOutElastic + release
 - [Showcase] Apple Music F7 
@@ -307,7 +308,6 @@ By default using for full pane area, but in some cases good useful with header.
 - [Accurance] Native Touch Plugin
 - [Quality] Keyboard manual control
 - [Docs] Docs engine (F7)
-- [Docs] Live example hosted in pages
 - [Platforms] React Native version
 - [Platforms] C++ QT version
 

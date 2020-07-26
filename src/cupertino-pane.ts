@@ -22,6 +22,7 @@ export class CupertinoPane {
     topperOverflow: true,
     topperOverflowOffset: 0,
     lowerThanBottom: true,
+    upperThanTop: false,
     showDraggable: true,
     draggableOver: false,
     clickBottomOpen: true,
@@ -471,7 +472,7 @@ export class CupertinoPane {
     // Delta
     let n = screenY;
     const diff = n - this.steps[this.steps.length - 1];
-    const newVal = this.getPanelTransformY() + diff;
+    let newVal = this.getPanelTransformY() + diff;
 
     // Not allow move panel with positive overflow scroll
     if (this.isDragScrollabe(t.path || t.composedPath()) 
@@ -486,10 +487,20 @@ export class CupertinoPane {
       } 
     }
 
-    // Not allow drag upper than topper point
+    // Not allow drag topper than top point
+    if (newVal <= this.topper && !this.settings.upperThanTop) {
+      this.paneEl.style.transform = `translateY(${this.topper}px) translateZ(0px)`;
+      return;
+    }
+
+    // Allow drag topper than top point
+    if (newVal <= this.topper && this.settings.upperThanTop) {
+      const differKoef = ((-this.topper + this.topper - this.getPanelTransformY()) / this.topper) / -8;
+      newVal = this.getPanelTransformY() + (diff * differKoef);
+    }
+
     // Not allow drag lower than bottom if free mode
-    if ((newVal <= this.topper)
-        || (this.settings.freeMode && !this.settings.bottomClose && (newVal >= this.bottomer))) {
+    if (this.settings.freeMode && !this.settings.bottomClose && (newVal >= this.bottomer)) {
       return;
     }
 

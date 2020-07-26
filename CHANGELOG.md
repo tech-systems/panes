@@ -1,7 +1,15 @@
 
 # Change Log
 All notable changes to this project will be documented in this file.
- 
+
+## [Unreleased]
+
+### Features
+- Added `upperThanTop` settings property
+
+### Bug Fixes
+- Improved drag top gesture
+
 ## 1.1.7 - 2020-07-22
  
 ### Features

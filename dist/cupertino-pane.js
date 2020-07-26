@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: July 22, 2020
+ * Released on: July 27, 2020
  */
 
 'use strict';
@@ -171,6 +171,7 @@ class CupertinoPane {
             topperOverflow: true,
             topperOverflowOffset: 0,
             lowerThanBottom: true,
+            upperThanTop: false,
             showDraggable: true,
             draggableOver: false,
             clickBottomOpen: true,
@@ -622,7 +623,7 @@ class CupertinoPane {
         // Delta
         let n = screenY;
         const diff = n - this.steps[this.steps.length - 1];
-        const newVal = this.getPanelTransformY() + diff;
+        let newVal = this.getPanelTransformY() + diff;
         // Not allow move panel with positive overflow scroll
         if (this.isDragScrollabe(t.path || t.composedPath())
             && this.overflowEl.style.overflowY === 'auto') {
@@ -635,10 +636,18 @@ class CupertinoPane {
                 return;
             }
         }
-        // Not allow drag upper than topper point
+        // Not allow drag topper than top point
+        if (newVal <= this.topper && !this.settings.upperThanTop) {
+            this.paneEl.style.transform = `translateY(${this.topper}px) translateZ(0px)`;
+            return;
+        }
+        // Allow drag topper than top point
+        if (newVal <= this.topper && this.settings.upperThanTop) {
+            const differKoef = ((-this.topper + this.topper - this.getPanelTransformY()) / this.topper) / -8;
+            newVal = this.getPanelTransformY() + (diff * differKoef);
+        }
         // Not allow drag lower than bottom if free mode
-        if ((newVal <= this.topper)
-            || (this.settings.freeMode && !this.settings.bottomClose && (newVal >= this.bottomer))) {
+        if (this.settings.freeMode && !this.settings.bottomClose && (newVal >= this.bottomer)) {
             return;
         }
         // Custom Lower then bottom 

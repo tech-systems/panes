@@ -36,6 +36,7 @@ export interface Settings {
     topperOverflow: boolean;
     topperOverflowOffset: number;
     lowerThanBottom: boolean;
+    upperThanTop: boolean;
     showDraggable: boolean;
     draggableOver: boolean;
     clickBottomOpen: boolean;
