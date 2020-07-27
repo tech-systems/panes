@@ -298,11 +298,10 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- [UI] 3D effect
-<!-- https://github.com/ionic-team/ionic-framework/blob/master/core/src/components/modal/animations/ios.enter.ts -->
 - [Quality] Touch angle 45
 - [Quality] Click item/drag pane precision on device (threshold)
-- [Quality] Transition timing: easeOutElastic + release
+- [Quality] Transition timing: easeOutElastic
+- [UI] 3D effect + release
 - [Showcase] Apple Music F7 
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) 
 - [Accurance] Native Touch Plugin
