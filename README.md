@@ -298,7 +298,8 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- [Quality] Touch angle 45
+- [Quality] Topper Than Top by touch point
+- [Quality] Horizontal scroll or swipe gestures
 - [Quality] Click item/drag pane precision on device (threshold)
 - [Quality] Transition timing: easeOutElastic
 - [UI] 3D effect + release
