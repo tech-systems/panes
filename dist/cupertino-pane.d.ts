@@ -12,9 +12,9 @@ export declare class CupertinoPane {
     private bottomer;
     private currentBreakpoint;
     private contentScrollTop;
-    private draggableScrollOffset;
     private disableDragEvents;
     private rendered;
+    private allowClick;
     private breaks;
     private brs;
     private el;
@@ -63,6 +63,12 @@ export declare class CupertinoPane {
      */
     private touchEndCb;
     private touchEnd;
+    /**
+     * Click Event
+     * @param t
+     */
+    private onClickCb;
+    private onClick;
     private swipeNextPoint;
     private isBackdropPresented;
     private renderBackdrop;

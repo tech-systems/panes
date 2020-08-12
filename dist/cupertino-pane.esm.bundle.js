@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: July 27, 2020
+ * Released on: August 12, 2020
  */
 
 class Support {
@@ -171,6 +171,7 @@ class CupertinoPane {
             showDraggable: true,
             draggableOver: false,
             clickBottomOpen: true,
+            preventClicks: true,
             simulateTouch: true,
             passiveListeners: true,
             breaks: {},
@@ -194,9 +195,9 @@ class CupertinoPane {
         this.steps = [];
         this.pointerDown = false;
         this.contentScrollTop = 0;
-        this.draggableScrollOffset = 0;
         this.disableDragEvents = false;
         this.rendered = false;
+        this.allowClick = true;
         this.breaks = {};
         this.brs = [];
         this.device = new Device();
@@ -215,6 +216,11 @@ class CupertinoPane {
          * @param t
          */
         this.touchEndCb = (t) => this.touchEnd(t);
+        /**
+         * Click Event
+         * @param t
+         */
+        this.onClickCb = (t) => this.onClick(t);
         this.swipeNextPoint = (diff, maxDiff, closest) => {
             if (this.currentBreakpoint === this.breaks['top']) {
                 if (diff > maxDiff) {
@@ -370,6 +376,7 @@ class CupertinoPane {
         this.closeEl.style.background = '#ebebeb';
         this.closeEl.style.top = '16px';
         this.closeEl.style.right = '20px';
+        this.closeEl.style.zIndex = '14';
         this.closeEl.style.borderRadius = '100%';
     }
     present(conf = { animate: false }) {
@@ -594,6 +601,8 @@ class CupertinoPane {
         this.settings.onDragStart(t);
         if (this.disableDragEvents)
             return;
+        // Allow clicks by default, disallow on move
+        this.allowClick = true;
         const targetTouch = t.type === 'touchstart' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
         const screenY = t.type === 'touchstart' ? targetTouch.screenY : t.screenY;
         if (t.type === 'mousedown')
@@ -652,6 +661,8 @@ class CupertinoPane {
             this.destroy({ animate: true });
             return;
         }
+        // Disallow accidentaly clicks while slide gestures
+        this.allowClick = false;
         this.checkOpacityAttr(newVal);
         this.checkOverflowAttr(newVal);
         this.doTransition({ type: 'move', translateY: newVal });
@@ -695,6 +706,16 @@ class CupertinoPane {
             return;
         }
         this.doTransition({ type: 'end', translateY: closest });
+    }
+    onClick(t) {
+        // Prevent accidental unwanted clicks events during swiping
+        if (!this.allowClick) {
+            if (this.settings.preventClicks) {
+                t.preventDefault();
+                t.stopPropagation();
+                t.stopImmediatePropagation();
+            }
+        }
     }
     isBackdropPresented() {
         return document.querySelector(`.cupertino-pane-wrapper .backdrop`)
@@ -773,6 +794,10 @@ class CupertinoPane {
                 el.addEventListener('mouseup', this.touchEndCb, false);
             }
         }
+        // Prevent accidental unwanted clicks events during swiping
+        if (this.settings.preventClicks) {
+            el.addEventListener('click', this.onClickCb, true);
+        }
     }
     detachEvents(el) {
         // Touch Events
@@ -796,6 +821,10 @@ class CupertinoPane {
                 el.removeEventListener('mousemove', this.touchMoveCb, false);
                 el.removeEventListener('mouseup', this.touchEndCb, false);
             }
+        }
+        // Prevent accidental unwanted clicks events during swiping
+        if (this.settings.preventClicks) {
+            el.removeEventListener('click', this.onClickCb, true);
         }
     }
     getPanelTransformY() {

@@ -26,6 +26,7 @@ export class CupertinoPane {
     showDraggable: true,
     draggableOver: false,
     clickBottomOpen: true,
+    preventClicks: true,
     simulateTouch: true,
     passiveListeners: true,
     breaks: {},
@@ -54,9 +55,9 @@ export class CupertinoPane {
   private bottomer: number;
   private currentBreakpoint: number;
   private contentScrollTop: number = 0;
-  private draggableScrollOffset: number = 0;
   private disableDragEvents: boolean = false;
   private rendered: boolean = false;
+  private allowClick: boolean = true;
 
   private breaks: {} = {}
   private brs: number[] = [];
@@ -178,6 +179,7 @@ export class CupertinoPane {
       this.closeEl.style.background = '#ebebeb';
       this.closeEl.style.top = '16px';
       this.closeEl.style.right = '20px';
+      this.closeEl.style.zIndex = '14';
       this.closeEl.style.borderRadius = '100%';
   }
 
@@ -439,6 +441,9 @@ export class CupertinoPane {
 
     if (this.disableDragEvents) return;
 
+    // Allow clicks by default, disallow on move
+    this.allowClick = true;
+
     const targetTouch = t.type === 'touchstart' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
     const screenY = t.type === 'touchstart' ? targetTouch.screenY : t.screenY;
     if (t.type === 'mousedown') this.pointerDown = true;
@@ -511,6 +516,9 @@ export class CupertinoPane {
       return;
     }
 
+    // Disallow accidentaly clicks while slide gestures
+    this.allowClick = false;
+
     this.checkOpacityAttr(newVal);
     this.checkOverflowAttr(newVal);
     this.doTransition({type: 'move', translateY: newVal});
@@ -568,6 +576,22 @@ export class CupertinoPane {
     }
 
     this.doTransition({type: 'end', translateY: closest});
+  }
+
+  /**
+   * Click Event
+   * @param t 
+   */
+  private onClickCb = (t) => this.onClick(t);
+  private onClick(t) {
+    // Prevent accidental unwanted clicks events during swiping
+    if (!this.allowClick) {
+      if (this.settings.preventClicks) {
+        t.preventDefault();
+        t.stopPropagation();  
+        t.stopImmediatePropagation();
+      }
+    }
   }
 
   private swipeNextPoint = (diff, maxDiff, closest) => {
@@ -718,6 +742,11 @@ export class CupertinoPane {
         el.addEventListener('mouseup', this.touchEndCb, false);
       }
     }
+
+    // Prevent accidental unwanted clicks events during swiping
+    if (this.settings.preventClicks) {
+      el.addEventListener('click', this.onClickCb, true);
+    }
   }
 
   private detachEvents(el: Element) { 
@@ -741,6 +770,11 @@ export class CupertinoPane {
         el.removeEventListener('mousemove', this.touchMoveCb, false);
         el.removeEventListener('mouseup', this.touchEndCb, false);
       }
+    }
+
+    // Prevent accidental unwanted clicks events during swiping
+    if (this.settings.preventClicks) {
+      el.removeEventListener('click', this.onClickCb, true);
     }
   }
 
@@ -893,7 +927,7 @@ export class CupertinoPane {
           this.backdropEl.style.transition = `initial`;
           this.backdropEl.style.display = `none`;
         }
-      } 
+      }
 
       // Emit event
       if (params.type === 'present') {

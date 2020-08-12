@@ -29,6 +29,7 @@ export interface Settings {
   draggableOver: boolean;
   clickBottomOpen: boolean;
   dragBy: string[];
+  preventClicks: boolean;
   simulateTouch: boolean;
   passiveListeners: boolean;
   breaks: PaneBreaks;

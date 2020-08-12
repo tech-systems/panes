@@ -191,6 +191,7 @@ new CupertinoPane(element); // HTMLElement
 | **draggableOver** | `boolean` | true | Render rectangular shape over a pane
 | **clickBottomOpen** | `boolean` | true | If bottom position reached, simple click to pane will open pane to the next upper point |
 | **dragBy** | `string[]` | null | Array of selectors for whom elements drag events will be attached. By default drag events attached to pane element. If you are about to drag only with draggable component set option to ['.pane .draggable'] |
+| **preventClicks** | `boolean` | true | Prevent accidental unwanted clicks events during move gestures |
 | **simulateTouch** | `boolean` | true | Simulate touch events for Desktop |
 | **passiveListeners** | `boolean` | true | (Indicates that the function specified by listener will never call preventDefault()) |
 ### Breakpoints
@@ -298,9 +299,7 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- [Quality] Topper Than Top by touch point
 - [Quality] Horizontal scroll or swipe gestures
-- [Quality] Click item/drag pane precision on device (threshold)
 - [Quality] Transition timing: easeOutElastic
 - [UI] 3D effect + release
 - [Showcase] Apple Music F7 

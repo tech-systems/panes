@@ -9,6 +9,8 @@ All notable changes to this project will be documented in this file.
 
 ### Bug Fixes
 - Improved drag top gesture
+- Auto-preventing accidental unwanted clicks events during pane move gestures by `preventClicks` parameter
+- Close button touch area fixed
 
 ## 1.1.7 - 2020-07-22
  
