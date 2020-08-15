@@ -208,10 +208,10 @@ const pane = new CupertinoPane('.cupertino-pane', {
   }
 });
 ```
-Default top height: `window.screen.height - (135 * 0.35)`
-Default `timing` for middle and bottom breakpoints are following apple stocks style `cubic-bezier(0.175, 0.885, 0.370, 1.120)`
+- Bottom and middle heights normalized accross devices by default 
+- Default top height: `window.screen.height - (135 * 0.35)`
+- Default `timing` for middle and bottom breakpoints are following apple stocks style `cubic-bezier(0.175, 0.885, 0.370, 1.120)`
 
-Bottom and middle heights normalized accross devices by default 
 ### Callbacks
 The function that executes when the event fires.
 | Name | Type | Description |
