@@ -177,7 +177,6 @@ new CupertinoPane(element); // HTMLElement
 | **darkMode** | `boolean` | false | Initial pane styles |
 | **backdrop** | `boolean` | false | Dimmed overlay will rendered with pane if `true` |
 | **backdropOpacity** | `number` | 0.4 | Dimmed overlay opacity value |
-| **animationType** | `'ease' \| 'ease-in' \| 'ease-out' \| 'ease-in-out' \| 'cubic-bezier'` | 'ease' | Transition property animation type |
 | **animationDuration** | `number` | 300 | Transition property duration |
 | **bottomClose** | `boolean` | false | Close pane with drag to bottom breakpoint |
 | **freeMode** | `boolean` | false | On `true` will remove automatical magnetic effects to near breakpoint |
@@ -201,7 +200,8 @@ const pane = new CupertinoPane('.cupertino-pane', {
   breaks: {
     top: { // Topper point that pane can reach
       enabled: true, // Enable or disable breakpoint
-      height: 0 // Pane breakpoint height
+      height: 700 // Pane breakpoint height
+      timing: 'ease' // Breakpoint transition-timing-function
     },
     middle: { ... },
     bottom: { ... }
@@ -209,6 +209,7 @@ const pane = new CupertinoPane('.cupertino-pane', {
 });
 ```
 Default top height: `window.screen.height - (135 * 0.35)`
+Default `timing` for middle and bottom breakpoints are following apple stocks style `cubic-bezier(0.175, 0.885, 0.370, 1.120)`
 
 Bottom and middle heights normalized accross devices by default 
 ### Callbacks
@@ -300,7 +301,6 @@ By default using for full pane area, but in some cases good useful with header.
 
 ## Future Goals
 - [Quality] Horizontal scroll or swipe gestures
-- [Quality] Transition timing: easeOutElastic
 - [UI] 3D effect + release
 - [Showcase] Apple Music F7 
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) 

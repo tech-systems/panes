@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: August 12, 2020
+ * Released on: August 15, 2020
  */
 
 'use strict';
@@ -160,7 +160,6 @@ class CupertinoPane {
             followerElement: null,
             backdrop: false,
             backdropOpacity: 0.4,
-            animationType: 'ease',
             animationDuration: 300,
             dragBy: null,
             bottomOffset: 0,
@@ -191,9 +190,9 @@ class CupertinoPane {
             onTransitionEnd: () => { }
         };
         this.defaultBreaksConf = {
-            top: { enabled: true, height: window.innerHeight - (135 * 0.35) },
-            middle: { enabled: true, height: 300 },
-            bottom: { enabled: true, height: 100 },
+            top: { enabled: true, height: window.innerHeight - (135 * 0.35), timing: 'ease' },
+            middle: { enabled: true, height: 300, timing: 'cubic-bezier(0.175, 0.885, 0.370, 1.120)' },
+            bottom: { enabled: true, height: 100, timing: 'cubic-bezier(0.175, 0.885, 0.370, 1.120)' },
         };
         this.screen_height = window.innerHeight;
         this.steps = [];
@@ -369,7 +368,7 @@ class CupertinoPane {
         // Content
         this.contentEl = this.el;
         this.contentEl.style.display = 'block';
-        this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+        this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ease 0s`;
         this.contentEl.style.overflowX = 'hidden';
         // Close button
         this.closeEl = document.createElement('div');
@@ -409,6 +408,12 @@ class CupertinoPane {
             // Set default if no exist
             if (!this.settings.breaks[val]) {
                 this.settings.breaks[val] = this.defaultBreaksConf[val];
+            }
+            // Set timings by default 
+            if (this.settings.breaks[val]
+                && this.settings.breaks[val].enabled
+                && !this.settings.breaks[val].timing) {
+                this.settings.breaks[val].timing = this.defaultBreaksConf[val].timing;
             }
             // Add offsets (offset or height, later need remove ofsfset)
             if (this.settings.breaks[val]
@@ -458,7 +463,7 @@ class CupertinoPane {
             this.followerEl = document.querySelector(this.settings.followerElement);
             this.followerEl.style.willChange = 'transform, border-radius';
             this.followerEl.style.transform = `translateY(0px) translateZ(0px)`;
-            this.followerEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+            this.followerEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.breaks[this.currentBreak()].timing} 0s`;
         }
         if (!this.settings.showDraggable) {
             this.draggableEl.style.opacity = '0';
@@ -578,7 +583,7 @@ class CupertinoPane {
         if (!attrElements.length)
             return;
         attrElements.forEach((item) => {
-            item.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+            item.style.transition = `opacity ${this.settings.animationDuration}ms ease 0s`;
             item.style.opacity = (val >= this.breaks['bottom']) ? '0' : '1';
         });
     }
@@ -735,7 +740,7 @@ class CupertinoPane {
         this.backdropEl.style.right = '0';
         this.backdropEl.style.left = '0';
         this.backdropEl.style.top = '0';
-        this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+        this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ease 0s`;
         this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
         this.backdropEl.style.display = 'none';
         this.backdropEl.style.zIndex = '10';
@@ -759,7 +764,7 @@ class CupertinoPane {
             this.backdropEl.style.display = `none`;
             this.backdropEl.removeEventListener('transitionend', transitionEnd);
         };
-        this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+        this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ease 0s`;
         this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
         if (!conf.show) {
             // Destroy
@@ -988,7 +993,7 @@ class CupertinoPane {
                     || params.type === 'destroy'
                     || params.type === 'present') {
                     this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
-                    this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+                    this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ease 0s`;
                     if (params.type !== 'hide' && params.type !== 'destroy') {
                         this.backdropEl.style.display = 'block';
                         setTimeout(() => {
@@ -1000,19 +1005,23 @@ class CupertinoPane {
             // freemode
             if (params.type === 'end' && this.settings.freeMode)
                 return;
+            // Get timing function for next break
+            // TODO: getBreakByHeight()
+            const nextBreak = Object.entries(this.settings.breaks).find(val => val[1].height === (this.screen_height - params.translateY));
+            const timingForNext = nextBreak ? nextBreak[1].timing : 'ease';
             // style
-            this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+            this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${timingForNext} 0s`;
             // Bind for follower same transitions
             if (this.followerEl) {
-                this.followerEl.style.transition = `transform ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+                this.followerEl.style.transition = `transform ${this.settings.animationDuration}ms ${timingForNext} 0s`;
             }
             // Main transitions
             if (params.type === 'present') {
                 this.paneEl.style.transform = `translateY(${this.screen_height}px) translateZ(0px)`;
                 setTimeout(() => {
                     // Emit event
-                    this.settings.onTransitionStart({ translateY: { new: this.breaks[this.settings.initialBreak] } });
-                    this.paneEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+                    this.settings.onTransitionStart({ translateY: { new: params.translateY } });
+                    this.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
                     // Bind for follower same transitions
                     if (this.followerEl) {
                         this.followerEl.style.transform = `translateY(0px) translateZ(0px)`;

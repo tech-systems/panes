@@ -3,16 +3,19 @@ export interface PaneBreaks {
         enabled: boolean;
         height?: number;
         offset?: number;
+        timing?: string;
     };
     middle?: {
         enabled: boolean;
         height?: number;
         offset?: number;
+        timing?: string;
     };
     bottom?: {
         enabled: boolean;
         height?: number;
         offset?: number;
+        timing?: string;
     };
 }
 export interface TransitionStartEvent {
@@ -26,7 +29,6 @@ export interface Settings {
     followerElement: string;
     backdrop: boolean;
     backdropOpacity: number;
-    animationType: ('ease' | 'ease-in' | 'ease-out' | 'ease-in-out' | 'cubic-bezier');
     animationDuration: number;
     bottomOffset: number;
     darkMode: boolean;

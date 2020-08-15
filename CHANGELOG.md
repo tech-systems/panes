@@ -6,6 +6,17 @@ All notable changes to this project will be documented in this file.
 
 ### Features
 - Added `upperThanTop` settings property
+- Base `animationType` parameter in settings replaced with `timing` parameter for each breakpoint
+```javascript
+breaks: {
+    ...
+    middle: {
+      enabled: true,
+      height: 400,
+      timing: 'cubic-bezier(0.175, 0.885, 0.370, 1.120)' // Breakpoint transition-timing-function
+    }
+}
+```
 
 ### Bug Fixes
 - Improved drag top gesture

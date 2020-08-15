@@ -565,8 +565,8 @@
     let drawer = new CupertinoPane(element, { 
         followerElement: '.content',
         breaks: {
-          middle: { enabled: true, height: firstHeight },
-          bottom: { enabled: true, height: 20 }
+          middle: { enabled: true, height: firstHeight, timing: 'ease' },
+          bottom: { enabled: true, height: 20, timing: 'ease' }
         },
         buttonClose: false,
         showDraggable: false,
