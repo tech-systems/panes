@@ -41,11 +41,11 @@
   <script>
     var element = document.querySelector('ion-drawer');
     var drawer = new CupertinoPane(element, { 
-        // breaks: {
-        //   top: { enabled: true, height: window.innerHeight - (135 * 0.35) },
-        //   middle: { enabled: true, height: 300 },
-        //   bottom: { enabled: true, height: 100 },
-        // },
+        breaks: {
+          top: { enabled: true, height: window.innerHeight - (135 * 0.35), bounce: true },
+          middle: { enabled: true, height: 300, bounce: true },
+          bottom: { enabled: true, height: 100, bounce: false },
+        },
         // draggableOver: true,
         // dragByCursor: false,
         // backdrop: true,

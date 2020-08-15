@@ -4,16 +4,28 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### BREAKING CHANGES
+- Property `offset` for breaks are not more under support. Renamed with `height`
+```javascript
+breaks: {
+    ...
+    middle: {
+      enabled: true,
+      height: 400
+    }
+}
+```
+
 ### Features
 - Added `upperThanTop` settings property
-- Base `animationType` parameter in settings replaced with `timing` parameter for each breakpoint
+- Add `bounce` property for breakpoints (transition in apple stocks style)
 ```javascript
 breaks: {
     ...
     middle: {
       enabled: true,
       height: 400,
-      timing: 'cubic-bezier(0.175, 0.885, 0.370, 1.120)' // Breakpoint transition-timing-function
+      bounce: true
     }
 }
 ```

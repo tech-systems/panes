@@ -127,7 +127,7 @@ If you don't want to include Cupertino Pane files in your project, you may use i
       { 
         parentElement: 'body', // Parent container
         breaks: {
-            middle: { enabled: true, height: 300 },
+            middle: { enabled: true, height: 300, bounce: true },
             bottom: { enabled: true, height: 80 },
         },
         onDrag: () => console.log('Drag event')
@@ -177,6 +177,7 @@ new CupertinoPane(element); // HTMLElement
 | **darkMode** | `boolean` | false | Initial pane styles |
 | **backdrop** | `boolean` | false | Dimmed overlay will rendered with pane if `true` |
 | **backdropOpacity** | `number` | 0.4 | Dimmed overlay opacity value |
+| **animationType** | `string` | 'ease' | Base transition timing function |
 | **animationDuration** | `number` | 300 | Transition property duration |
 | **bottomClose** | `boolean` | false | Close pane with drag to bottom breakpoint |
 | **freeMode** | `boolean` | false | On `true` will remove automatical magnetic effects to near breakpoint |
@@ -201,16 +202,18 @@ const pane = new CupertinoPane('.cupertino-pane', {
     top: { // Topper point that pane can reach
       enabled: true, // Enable or disable breakpoint
       height: 700, // Pane breakpoint height
-      timing: 'ease' // Breakpoint transition-timing-function
+      bounce: true // Bounce pane on transition
     },
     middle: { ... },
     bottom: { ... }
   }
 });
 ```
-- Bottom and middle heights normalized accross devices by default 
-- Default top height: `window.screen.height - (135 * 0.35)`
-- Default `timing` for middle and bottom breakpoints are following apple stocks style `cubic-bezier(0.175, 0.885, 0.370, 1.120)`
+Bottom and middle heights normalized accross devices by default 
+
+Default top height: `window.screen.height - (135 * 0.35)`
+
+Add property `bounce` to break and enjoy transitions in apple stocks style with `cubic-bezier(0.175, 0.885, 0.370, 1.120)`
 
 ### Callbacks
 The function that executes when the event fires.

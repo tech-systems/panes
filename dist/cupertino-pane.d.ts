@@ -38,6 +38,7 @@ export declare class CupertinoPane {
      * Private Utils methods
      */
     private scrollElementInit;
+    private getTimingFunction;
     private checkOpacityAttr;
     private checkOverflowAttr;
     private isPanePresented;

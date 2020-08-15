@@ -1,7 +1,7 @@
 export interface PaneBreaks {
-  top?: {enabled: boolean, height?: number, offset?: number, timing?: string};
-  middle?: {enabled: boolean, height?: number, offset?: number, timing?: string};
-  bottom?: {enabled: boolean, height?: number, offset?: number, timing?: string};
+  top?: {enabled: boolean, height?: number, bounce?: boolean};
+  middle?: {enabled: boolean, height?: number, bounce?: boolean};
+  bottom?: {enabled: boolean, height?: number, bounce?: boolean};
 }
 
 export interface TransitionStartEvent {
@@ -14,6 +14,7 @@ export interface Settings {
   followerElement: string;
   backdrop: boolean;
   backdropOpacity: number;
+  animationType: string;
   animationDuration: number;
   bottomOffset: number,
   darkMode: boolean;

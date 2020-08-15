@@ -1,6 +1,6 @@
 import { Support } from './support';
 import { Device } from './device';
-import { Settings } from './models';
+import { Settings, PaneBreaks } from './models';
 export type CupertinoSettings = Partial<Settings>;
 
 export class CupertinoPane {
@@ -11,6 +11,7 @@ export class CupertinoPane {
     followerElement: null,
     backdrop: false,
     backdropOpacity: 0.4,
+    animationType: 'ease',
     animationDuration: 300,
     dragBy: null,
     bottomOffset: 0,
@@ -41,10 +42,10 @@ export class CupertinoPane {
     onTransitionEnd: () => {}
   };
 
-  private defaultBreaksConf = {
-    top: { enabled: true, height: window.innerHeight - (135 * 0.35), timing: 'ease'},
-    middle: { enabled: true, height: 300, timing: 'cubic-bezier(0.175, 0.885, 0.370, 1.120)'},
-    bottom: { enabled: true, height: 100, timing: 'cubic-bezier(0.175, 0.885, 0.370, 1.120)'},
+  private defaultBreaksConf: PaneBreaks = {
+    top: { enabled: true, height: window.innerHeight - (135 * 0.35) },
+    middle: { enabled: true, height: 300 },
+    bottom: { enabled: true, height: 100 },
   };
   
   private screen_height: number = window.innerHeight;
@@ -167,7 +168,7 @@ export class CupertinoPane {
       // Content
       this.contentEl = this.el;
       this.contentEl.style.display = 'block';
-      this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ease 0s`;
+      this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
       this.contentEl.style.overflowX = 'hidden';
 
       // Close button
@@ -215,19 +216,12 @@ export class CupertinoPane {
         if (!this.settings.breaks[val]) {
           this.settings.breaks[val] = this.defaultBreaksConf[val];
         }
-  
-        // Set timings by default 
-        if (this.settings.breaks[val]
-          && this.settings.breaks[val].enabled
-          && !this.settings.breaks[val].timing) {
-            this.settings.breaks[val].timing = this.defaultBreaksConf[val].timing;
-        }
 
         // Add offsets (offset or height, later need remove ofsfset)
         if (this.settings.breaks[val]
             && this.settings.breaks[val].enabled
-            && (this.settings.breaks[val].offset || this.settings.breaks[val].height)) {
-          this.breaks[val] -= (this.settings.breaks[val].offset || this.settings.breaks[val].height);
+            && this.settings.breaks[val].height) {
+          this.breaks[val] -= this.settings.breaks[val].height;
         }
       });
 
@@ -280,7 +274,7 @@ export class CupertinoPane {
         );
         this.followerEl.style.willChange = 'transform, border-radius';
         this.followerEl.style.transform = `translateY(0px) translateZ(0px)`;
-        this.followerEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.breaks[this.currentBreak()].timing} 0s`;
+        this.followerEl.style.transition = `all ${this.settings.animationDuration}ms ${this.getTimingFunction(this.settings.breaks[this.currentBreak()].bounce)} 0s`;
       }
 
       if (!this.settings.showDraggable) {
@@ -409,11 +403,15 @@ export class CupertinoPane {
     }
   }
 
+  private getTimingFunction(bounce) {
+    return bounce ? 'cubic-bezier(0.175, 0.885, 0.370, 1.120)' : this.settings.animationType;
+  }
+
   private checkOpacityAttr(val) {
     let attrElements = this.el.querySelectorAll('[hide-on-bottom]');
     if (!attrElements.length) return;
     attrElements.forEach((item) => {
-      (<HTMLElement>item).style.transition = `opacity ${this.settings.animationDuration}ms ease 0s`;
+      (<HTMLElement>item).style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
       (<HTMLElement>item).style.opacity = (val >= this.breaks['bottom']) ? '0' : '1';
     });
   }
@@ -656,7 +654,7 @@ export class CupertinoPane {
     this.backdropEl.style.right = '0';
     this.backdropEl.style.left = '0';
     this.backdropEl.style.top = '0';
-    this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ease 0s`;
+    this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
     this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
     this.backdropEl.style.display = 'none';
     this.backdropEl.style.zIndex = '10';
@@ -685,7 +683,7 @@ export class CupertinoPane {
       this.backdropEl.removeEventListener('transitionend', transitionEnd); 
     }
     
-    this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ease 0s`;
+    this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
     this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
 
     if (!conf.show) {
@@ -963,7 +961,7 @@ export class CupertinoPane {
             || params.type === 'destroy'
             || params.type === 'present') {
           this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
-          this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ease 0s`;
+          this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
           
           if (params.type !== 'hide' && params.type !== 'destroy') {
             this.backdropEl.style.display = 'block';
@@ -982,7 +980,7 @@ export class CupertinoPane {
       const nextBreak = Object.entries(this.settings.breaks).find(
         val => val[1].height === (this.screen_height - params.translateY)
       );
-      const timingForNext = nextBreak ? nextBreak[1].timing : 'ease';
+      const timingForNext = this.getTimingFunction(nextBreak && nextBreak[1].bounce ? true : false);
 
       // style
       this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${timingForNext} 0s`;
