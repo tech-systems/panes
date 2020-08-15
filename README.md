@@ -200,7 +200,7 @@ const pane = new CupertinoPane('.cupertino-pane', {
   breaks: {
     top: { // Topper point that pane can reach
       enabled: true, // Enable or disable breakpoint
-      height: 700 // Pane breakpoint height
+      height: 700, // Pane breakpoint height
       timing: 'ease' // Breakpoint transition-timing-function
     },
     middle: { ... },
