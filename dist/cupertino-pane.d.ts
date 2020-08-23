@@ -6,13 +6,15 @@ export declare class CupertinoPane {
     private defaultBreaksConf;
     private screen_height;
     private steps;
-    private startP;
+    private startY;
+    private startX;
     private pointerDown;
     private topper;
     private bottomer;
     private currentBreakpoint;
     private contentScrollTop;
     private disableDragEvents;
+    private disableDragAngle;
     private rendered;
     private allowClick;
     private breaks;

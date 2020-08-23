@@ -183,6 +183,7 @@ new CupertinoPane(element); // HTMLElement
 | **freeMode** | `boolean` | false | On `true` will remove automatical magnetic effects to near breakpoint |
 | **lowerThanBottom** | `boolean` | true | By default allow user to drag pane lower than bottom position. On `false` will automatically place pane to bottom position on lower than bottom attemption |
 | **upperThanTop** | `boolean` | false | Allow user to drag pane upper than maximum top position. Useful with bulletin style without overflow-y |
+| **touchAngle** | `number` | null | Allowable angle (in degrees) to trigger touch move |
 | **buttonClose** | `boolean` | true | Determinate whetever close button will render or not |
 | **bottomOffset** | `number` | 0 | Margin bottom for pane from screen bottom point |
 | **topperOverflow** | `boolean` | true | Ability to scroll content inside pane if topper point reached |
@@ -303,12 +304,10 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- [Quality] Horizontal scroll or swipe gestures
-- [UI] 3D effect + release
+- [UI] 3D effect + 1.1.8 release
 - [Showcase] Apple Music F7 
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) 
 - [Accurance] Native Touch Plugin
-- [Quality] Keyboard manual control
 - [Docs] Docs engine (F7)
 - [Platforms] React Native version
 - [Platforms] C++ QT version

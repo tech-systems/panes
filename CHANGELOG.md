@@ -18,7 +18,7 @@ breaks: {
 
 ### Features
 - Added `upperThanTop` settings property
-- Add `bounce` property for breakpoints (transition in apple stocks style)
+- Added `bounce` property for breakpoints (transition in apple stocks style)
 ```javascript
 breaks: {
     ...
@@ -29,6 +29,7 @@ breaks: {
     }
 }
 ```
+- Added `touchAngle` settings property which allow user set possible pane move angle. Helps to handle horizontal slider elements inside pane such as `ion-item-sliding` [#23](https://github.com/roman-rr/cupertino-pane/issues/23)
 
 ### Bug Fixes
 - Improved drag top gesture

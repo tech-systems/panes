@@ -44,6 +44,7 @@ export interface Settings {
     preventClicks: boolean;
     simulateTouch: boolean;
     passiveListeners: boolean;
+    touchAngle: number;
     breaks: PaneBreaks;
     onDidDismiss: (event?: CustomEvent) => void;
     onWillDismiss: (event?: CustomEvent) => void;

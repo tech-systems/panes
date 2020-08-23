@@ -29,6 +29,7 @@ export class CupertinoPane {
     preventClicks: true,
     simulateTouch: true,
     passiveListeners: true,
+    touchAngle: null,
     breaks: {},
     onDidDismiss: () => {},
     onWillDismiss: () => {},
@@ -50,13 +51,15 @@ export class CupertinoPane {
   
   private screen_height: number = window.innerHeight;
   private steps: any[] = [];
-  private startP: any;
+  private startY: number;
+  private startX: number;
   private pointerDown: boolean = false;
   private topper: number;
   private bottomer: number;
   private currentBreakpoint: number;
   private contentScrollTop: number = 0;
   private disableDragEvents: boolean = false;
+  private disableDragAngle: boolean = false;
   private rendered: boolean = false;
   private allowClick: boolean = true;
 
@@ -449,18 +452,23 @@ export class CupertinoPane {
     // Allow clicks by default, disallow on move
     this.allowClick = true;
 
+    // Allow touch angle by default, disallow no move with condition
+    this.disableDragAngle = false;
+
     const targetTouch = t.type === 'touchstart' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
     const screenY = t.type === 'touchstart' ? targetTouch.screenY : t.screenY;
+    const screenX = t.type === 'touchstart' ? targetTouch.screenX : t.screenX;
     if (t.type === 'mousedown') this.pointerDown = true;
 
-    this.startP = screenY;
+    this.startY = screenY;
+    this.startX = screenX;
 
     // if overflow content was scrolled
     // increase to scrolled value
     if (this.isDragScrollabe(t.path || t.composedPath())) {
-      this.startP += this.contentScrollTop;  
+      this.startY += this.contentScrollTop;  
     } 
-    this.steps.push(this.startP);
+    this.steps.push(this.startY);
   }
 
   /** 
@@ -473,16 +481,32 @@ export class CupertinoPane {
     this.settings.onDrag(t as CustomEvent);
 
     if (this.disableDragEvents) return;
+    if (this.disableDragAngle) return;
 
     // Handle desktop/mobile events
     const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
     const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
+    const screenX = t.type === 'touchmove' ? targetTouch.screenX : t.screenX;
     if(t.type === 'mousemove' && !this.pointerDown) return;
     
     // Delta
     let n = screenY;
-    const diff = n - this.steps[this.steps.length - 1];
-    let newVal = this.getPanelTransformY() + diff;
+    let v = screenX;
+    const diffY = n - this.steps[this.steps.length - 1];
+    let newVal = this.getPanelTransformY() + diffY;
+
+    // Touch angle
+    if (this.settings.touchAngle) {
+      let touchAngle;
+      const diffX = v - this.startX;
+      const diffY = n - this.startY;
+      touchAngle = (Math.atan2(Math.abs(diffY), Math.abs(diffX)) * 180) / Math.PI;
+      if (diffX * diffX + diffY * diffY >= 25 
+          && (90 - touchAngle > this.settings.touchAngle)) {
+        this.disableDragAngle = true;
+        return;
+      }
+    }
 
     // Not allow move panel with positive overflow scroll
     if (this.isDragScrollabe(t.path || t.composedPath()) 
@@ -506,7 +530,7 @@ export class CupertinoPane {
     // Allow drag topper than top point
     if (newVal <= this.topper && this.settings.upperThanTop) {
       const differKoef = ((-this.topper + this.topper - this.getPanelTransformY()) / this.topper) / -8;
-      newVal = this.getPanelTransformY() + (diff * differKoef);
+      newVal = this.getPanelTransformY() + (diffY * differKoef);
     }
 
     // Not allow drag lower than bottom if free mode
