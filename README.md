@@ -143,7 +143,7 @@ If you don't want to include Cupertino Pane files in your project, you may use i
 $(document).ready(function () {
   //initialize pane when document ready
   var myPane = new CupertinoPane('.cupertino-pane', { /* ... */ });
-  myPane.present();
+  myPane.present({animate: true});
 });
 ```
 ### As an ES module
@@ -153,7 +153,7 @@ import { CupertinoPane, CupertinoSettings } from 'cupertino-pane';
 
 let settings: CupertinoSettings = { /* ... */ };
 let myPane = new CupertinoPane('.cupertino-pane', CupertinoSettings);
-    myPane.present();
+    myPane.present({animate: true});
 ```
 
 ### Class creation
