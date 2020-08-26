@@ -39,6 +39,9 @@ export declare class CupertinoPane {
     /**
      * Private Utils methods
      */
+    private attachAllEvents;
+    private detachAllEvents;
+    private resetEvents;
     private scrollElementInit;
     private getTimingFunction;
     private checkOpacityAttr;
@@ -54,6 +57,12 @@ export declare class CupertinoPane {
      */
     private touchStartCb;
     private touchStart;
+    /**
+     * Touch Move Event
+     * @param t
+     */
+    private touchMoveBackdropCb;
+    private touchMoveBackdrop;
     /**
      * Touch Move Event
      * @param t

@@ -32,6 +32,7 @@ export interface Settings {
   preventClicks: boolean;
   simulateTouch: boolean;
   passiveListeners: boolean;
+  touchMoveStopPropagation: boolean;
   touchAngle: number;
   breaks: PaneBreaks;
   onDidDismiss: (event?: CustomEvent) => void,

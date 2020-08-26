@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: August 23, 2020
+ * Released on: August 26, 2020
  */
 
 class Support {
@@ -174,6 +174,7 @@ class CupertinoPane {
             preventClicks: true,
             simulateTouch: true,
             passiveListeners: true,
+            touchMoveStopPropagation: false,
             touchAngle: null,
             breaks: {},
             onDidDismiss: () => { },
@@ -208,6 +209,11 @@ class CupertinoPane {
          * @param t
          */
         this.touchStartCb = (t) => this.touchStart(t);
+        /**
+         * Touch Move Event
+         * @param t
+         */
+        this.touchMoveBackdropCb = (t) => this.touchMoveBackdrop(t);
         /**
          * Touch Move Event
          * @param t
@@ -529,16 +535,7 @@ class CupertinoPane {
             }
         }
         /****** Attach Events *******/
-        if (!this.settings.dragBy) {
-            this.attachEvents(this.paneEl);
-        }
-        else {
-            this.settings.dragBy.forEach((selector) => {
-                const el = document.querySelector(selector);
-                if (el)
-                    this.attachEvents(el);
-            });
-        }
+        this.attachAllEvents();
         /****** Animation & Transition ******/
         if (conf.animate) {
             this.doTransition({ type: 'present', translateY: this.breaks[this.settings.initialBreak] });
@@ -551,6 +548,34 @@ class CupertinoPane {
     /**
      * Private Utils methods
      */
+    attachAllEvents() {
+        if (!this.settings.dragBy) {
+            this.attachEvents(this.paneEl);
+        }
+        else {
+            this.settings.dragBy.forEach((selector) => {
+                const el = document.querySelector(selector);
+                if (el)
+                    this.attachEvents(el);
+            });
+        }
+    }
+    detachAllEvents() {
+        if (!this.settings.dragBy) {
+            this.detachEvents(this.paneEl);
+        }
+        else {
+            this.settings.dragBy.forEach((selector) => {
+                const el = document.querySelector(selector);
+                if (el)
+                    this.detachEvents(el);
+            });
+        }
+    }
+    resetEvents() {
+        this.detachAllEvents();
+        this.attachAllEvents();
+    }
     scrollElementInit() {
         let attrElements = this.el.querySelectorAll('[overflow-y]');
         if (!attrElements.length || attrElements.length > 1) {
@@ -624,6 +649,11 @@ class CupertinoPane {
         }
         this.steps.push(this.startY);
     }
+    touchMoveBackdrop(t) {
+        if (this.settings.touchMoveStopPropagation) {
+            t.stopPropagation();
+        }
+    }
     touchMove(t) {
         // Event emitter
         this.settings.onDrag(t);
@@ -631,6 +661,9 @@ class CupertinoPane {
             return;
         if (this.disableDragAngle)
             return;
+        if (this.settings.touchMoveStopPropagation) {
+            t.stopPropagation();
+        }
         // Handle desktop/mobile events
         const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
         const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
@@ -763,6 +796,8 @@ class CupertinoPane {
         this.wrapperEl.appendChild(this.backdropEl);
         this.backdropEl.style.display = 'block';
         this.backdropEl.addEventListener('click', (t) => this.settings.onBackdropTap());
+        // Reset events to attach backdrop stop propagation
+        this.resetEvents();
     }
     /**
      * Backdrop
@@ -797,11 +832,14 @@ class CupertinoPane {
         }
     }
     attachEvents(el) {
+        var _a, _b, _c;
         // Touch Events
         if (!Support.touch && Support.pointerEvents) {
             el.addEventListener(this.touchEvents.start, this.touchStartCb, false);
             el.addEventListener(this.touchEvents.move, this.touchMoveCb, false);
             el.addEventListener(this.touchEvents.end, this.touchEndCb, false);
+            // Backdrop propagation fix
+            (_a = this.backdropEl) === null || _a === void 0 ? void 0 : _a.addEventListener(this.touchEvents.move, this.touchMoveBackdropCb, false);
         }
         else {
             if (Support.touch) {
@@ -809,6 +847,8 @@ class CupertinoPane {
                 el.addEventListener(this.touchEvents.start, this.touchStartCb, passiveListener);
                 el.addEventListener(this.touchEvents.move, this.touchMoveCb, Support.passiveListener ? { passive: false, capture: false } : false);
                 el.addEventListener(this.touchEvents.end, this.touchEndCb, passiveListener);
+                // Backdrop propagation fix
+                (_b = this.backdropEl) === null || _b === void 0 ? void 0 : _b.addEventListener(this.touchEvents.move, this.touchMoveBackdropCb, Support.passiveListener ? { passive: false, capture: false } : false);
                 if (this.touchEvents['cancel']) {
                     el.addEventListener(this.touchEvents['cancel'], this.touchEndCb, passiveListener);
                 }
@@ -817,6 +857,8 @@ class CupertinoPane {
                 el.addEventListener('mousedown', this.touchStartCb, false);
                 el.addEventListener('mousemove', this.touchMoveCb, false);
                 el.addEventListener('mouseup', this.touchEndCb, false);
+                // Backdrop propagation fix
+                (_c = this.backdropEl) === null || _c === void 0 ? void 0 : _c.addEventListener('mousemove', this.touchMoveBackdropCb, false);
             }
         }
         // Prevent accidental unwanted clicks events during swiping
@@ -825,11 +867,14 @@ class CupertinoPane {
         }
     }
     detachEvents(el) {
+        var _a, _b, _c;
         // Touch Events
         if (!Support.touch && Support.pointerEvents) {
             el.removeEventListener(this.touchEvents.start, this.touchStartCb, false);
             el.removeEventListener(this.touchEvents.move, this.touchMoveCb, false);
             el.removeEventListener(this.touchEvents.end, this.touchEndCb, false);
+            // Backdrop propagation fix
+            (_a = this.backdropEl) === null || _a === void 0 ? void 0 : _a.removeEventListener(this.touchEvents.move, this.touchMoveBackdropCb, false);
         }
         else {
             if (Support.touch) {
@@ -837,6 +882,8 @@ class CupertinoPane {
                 el.removeEventListener(this.touchEvents.start, this.touchStartCb, passiveListener);
                 el.removeEventListener(this.touchEvents.move, this.touchMoveCb, false);
                 el.removeEventListener(this.touchEvents.end, this.touchEndCb, passiveListener);
+                // Backdrop propagation fix
+                (_b = this.backdropEl) === null || _b === void 0 ? void 0 : _b.removeEventListener(this.touchEvents.move, this.touchMoveBackdropCb, false);
                 if (this.touchEvents['cancel']) {
                     el.removeEventListener(this.touchEvents['cancel'], this.touchEndCb, passiveListener);
                 }
@@ -845,6 +892,8 @@ class CupertinoPane {
                 el.removeEventListener('mousedown', this.touchStartCb, false);
                 el.removeEventListener('mousemove', this.touchMoveCb, false);
                 el.removeEventListener('mouseup', this.touchEndCb, false);
+                // Backdrop propagation fix
+                (_c = this.backdropEl) === null || _c === void 0 ? void 0 : _c.removeEventListener('mousemove', this.touchMoveBackdropCb, false);
             }
         }
         // Prevent accidental unwanted clicks events during swiping
@@ -921,16 +970,7 @@ class CupertinoPane {
         this.parentEl.appendChild(this.contentEl);
         this.wrapperEl.remove();
         /****** Detach Events *******/
-        if (!this.settings.dragBy) {
-            this.detachEvents(this.paneEl);
-        }
-        else {
-            this.settings.dragBy.forEach((selector) => {
-                const el = document.querySelector(selector);
-                if (el)
-                    this.detachEvents(el);
-            });
-        }
+        this.detachAllEvents();
         // Reset vars
         this.currentBreakpoint = this.breaks[this.settings.initialBreak];
         // Reset styles

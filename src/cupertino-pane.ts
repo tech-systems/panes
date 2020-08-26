@@ -29,6 +29,7 @@ export class CupertinoPane {
     preventClicks: true,
     simulateTouch: true,
     passiveListeners: true,
+    touchMoveStopPropagation: false,
     touchAngle: null,
     breaks: {},
     onDidDismiss: () => {},
@@ -363,14 +364,7 @@ export class CupertinoPane {
       }
 
       /****** Attach Events *******/
-      if (!this.settings.dragBy) {
-        this.attachEvents(this.paneEl);
-      } else {
-        this.settings.dragBy.forEach((selector) => {
-          const el = document.querySelector(selector);
-          if (el) this.attachEvents(el);
-        });
-      }
+      this.attachAllEvents();
 
       /****** Animation & Transition ******/
       if (conf.animate) {
@@ -384,6 +378,33 @@ export class CupertinoPane {
   /**
    * Private Utils methods
    */
+
+  private attachAllEvents() {
+    if (!this.settings.dragBy) {
+      this.attachEvents(this.paneEl);
+    } else {
+      this.settings.dragBy.forEach((selector) => {
+        const el = document.querySelector(selector);
+        if (el) this.attachEvents(el);
+      });
+    }
+  }
+
+  private detachAllEvents() {
+    if (!this.settings.dragBy) {
+      this.detachEvents(this.paneEl);
+    } else {
+      this.settings.dragBy.forEach((selector) => {
+        const el = document.querySelector(selector);
+        if (el) this.detachEvents(el);
+      });
+    }
+  }
+
+  private resetEvents() {
+    this.detachAllEvents();
+    this.attachAllEvents();
+  }
 
   private scrollElementInit() {
     let attrElements = this.el.querySelectorAll('[overflow-y]');
@@ -475,6 +496,17 @@ export class CupertinoPane {
    * Touch Move Event
    * @param t 
    */
+  private touchMoveBackdropCb = (t) => this.touchMoveBackdrop(t);
+  private touchMoveBackdrop(t) {
+    if (this.settings.touchMoveStopPropagation) {
+      t.stopPropagation();
+    }
+  }
+
+  /** 
+   * Touch Move Event
+   * @param t 
+   */
   private touchMoveCb = (t) => this.touchMove(t);
   private touchMove(t) {
     // Event emitter
@@ -482,6 +514,10 @@ export class CupertinoPane {
 
     if (this.disableDragEvents) return;
     if (this.disableDragAngle) return;
+
+    if (this.settings.touchMoveStopPropagation) {
+      t.stopPropagation();
+    }
 
     // Handle desktop/mobile events
     const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
@@ -686,6 +722,9 @@ export class CupertinoPane {
     this.wrapperEl.appendChild(this.backdropEl);
     this.backdropEl.style.display = 'block';
     this.backdropEl.addEventListener('click', (t) => this.settings.onBackdropTap());
+    
+    // Reset events to attach backdrop stop propagation
+    this.resetEvents();
   }
 
   /**
@@ -753,6 +792,9 @@ export class CupertinoPane {
       el.addEventListener(this.touchEvents.start, this.touchStartCb, false);
       el.addEventListener(this.touchEvents.move, this.touchMoveCb, false);
       el.addEventListener(this.touchEvents.end, this.touchEndCb, false);
+      
+      // Backdrop propagation fix
+      this.backdropEl?.addEventListener(this.touchEvents.move, this.touchMoveBackdropCb, false);
     } else {
 
       if (Support.touch) {
@@ -760,6 +802,9 @@ export class CupertinoPane {
         el.addEventListener(this.touchEvents.start, this.touchStartCb, passiveListener);
         el.addEventListener(this.touchEvents.move, this.touchMoveCb, Support.passiveListener ? { passive: false, capture: false } : false);
         el.addEventListener(this.touchEvents.end, this.touchEndCb, passiveListener);
+        
+        // Backdrop propagation fix
+        this.backdropEl?.addEventListener(this.touchEvents.move, this.touchMoveBackdropCb, Support.passiveListener ? { passive: false, capture: false } : false);
         if (this.touchEvents['cancel']) {
           el.addEventListener(this.touchEvents['cancel'], this.touchEndCb, passiveListener);
         }
@@ -769,6 +814,9 @@ export class CupertinoPane {
         el.addEventListener('mousedown', this.touchStartCb, false);
         el.addEventListener('mousemove', this.touchMoveCb, false);
         el.addEventListener('mouseup', this.touchEndCb, false);
+        
+        // Backdrop propagation fix
+        this.backdropEl?.addEventListener('mousemove', this.touchMoveBackdropCb, false);
       }
     }
 
@@ -784,12 +832,18 @@ export class CupertinoPane {
       el.removeEventListener(this.touchEvents.start, this.touchStartCb, false);
       el.removeEventListener(this.touchEvents.move, this.touchMoveCb, false);
       el.removeEventListener(this.touchEvents.end, this.touchEndCb, false);
+      
+      // Backdrop propagation fix
+      this.backdropEl?.removeEventListener(this.touchEvents.move, this.touchMoveBackdropCb, false);
     } else {
       if (Support.touch) {
         const passiveListener = this.touchEvents.start === 'onTouchStart' && Support.passiveListener && this.settings.passiveListeners ? { passive: true, capture: false } : false;
         el.removeEventListener(this.touchEvents.start, this.touchStartCb, passiveListener);
         el.removeEventListener(this.touchEvents.move, this.touchMoveCb, false);
         el.removeEventListener(this.touchEvents.end, this.touchEndCb, passiveListener);
+        
+        // Backdrop propagation fix
+        this.backdropEl?.removeEventListener(this.touchEvents.move, this.touchMoveBackdropCb, false);
         if (this.touchEvents['cancel']) {
           el.removeEventListener(this.touchEvents['cancel'], this.touchEndCb, passiveListener);
         }
@@ -798,6 +852,9 @@ export class CupertinoPane {
         el.removeEventListener('mousedown', this.touchStartCb, false);
         el.removeEventListener('mousemove', this.touchMoveCb, false);
         el.removeEventListener('mouseup', this.touchEndCb, false);
+        
+        // Backdrop propagation fix
+        this.backdropEl?.removeEventListener('mousemove', this.touchMoveBackdropCb, false);
       }
     }
 
@@ -887,14 +944,7 @@ export class CupertinoPane {
     this.wrapperEl.remove();
     
     /****** Detach Events *******/
-    if (!this.settings.dragBy) {
-      this.detachEvents(this.paneEl);
-    } else {
-      this.settings.dragBy.forEach((selector) => {
-        const el = document.querySelector(selector);
-        if (el) this.detachEvents(el);
-      });
-    }
+    this.detachAllEvents();
 
     // Reset vars
     this.currentBreakpoint = this.breaks[this.settings.initialBreak];

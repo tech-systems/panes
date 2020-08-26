@@ -18,6 +18,7 @@ breaks: {
 
 ### Features
 - Added `upperThanTop` settings property
+- Added `touchMoveStopPropagation` settings property. Set `true` to prevent all move events behind pane and backdrop [#55](https://github.com/roman-rr/cupertino-pane/issues/55)
 - Added `bounce` property for breakpoints (transition in apple stocks style)
 ```javascript
 breaks: {
