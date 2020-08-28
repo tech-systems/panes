@@ -57,6 +57,7 @@ let settings = {
 
 ## Demonstration
 - [Base live](https://output.jsbin.com/fuhisey)
+- [3D Push live](https://output.jsbin.com/tutegad)
 - [Overflow top live](https://output.jsbin.com/baguroy)
 - [Overflow top-middle live](https://output.jsbin.com/piwecad)
 - [Follower live](https://output.jsbin.com/xogavec)
