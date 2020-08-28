@@ -116,6 +116,7 @@ export declare class CupertinoPane {
     destroy(conf?: {
         animate: boolean;
     }): any;
+    private pushTransition;
     /***********************************
      * Transitions handler
      */

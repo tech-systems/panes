@@ -2,7 +2,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## 1.1.8 - 2020-08-29
 
 ### BREAKING CHANGES
 - Property `offset` for breaks are not more under support. Renamed with `height`
@@ -31,6 +31,15 @@ breaks: {
 }
 ```
 - Added `touchAngle` settings property which allow user set possible pane move angle. Helps to handle horizontal slider elements inside pane such as `ion-item-sliding` [#23](https://github.com/roman-rr/cupertino-pane/issues/23)
+- Added **3d push effect** within `pushElement` and `pushMinHeight` properties
+```javascript
+ const settings = {
+  ...
+  parentElement: 'ion-tabs',
+  pushElement: 'app-home',
+  pushMinHeight: 350
+}
+```
 
 ### Bug Fixes
 - Improved drag top gesture

@@ -173,6 +173,8 @@ new CupertinoPane(element); // HTMLElement
 | - | - | - | - |
 | **parentElement** | `string` | Parent element selector | Element selector where pane will rendered |
 | **followerElement** | `string` | Follower element selector | Element with selector will following pane transitions |
+| **pushElement** | `string` | Push element selector | DOM Element will be pushed and scaled |
+| **pushMinHeight** | `number` | Most bottom available point | Height from which 3d push effect will be started |
 | **initialBreak** | `'top' \| 'middle' \| 'bottom'` | 'middle' | Initial pane position |
 | **darkMode** | `boolean` | false | Initial pane styles |
 | **backdrop** | `boolean` | false | Dimmed overlay will rendered with pane if `true` |
@@ -305,7 +307,6 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- [UI] 3D effect + 1.1.8 release
 - [Showcase] Apple Music F7 
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) 
 - [Accurance] Native Touch Plugin

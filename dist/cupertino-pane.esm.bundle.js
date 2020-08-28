@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.7
+ * Cupertino Pane 1.1.8
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: August 26, 2020
+ * Released on: August 29, 2020
  */
 
 class Support {
@@ -154,6 +154,8 @@ class CupertinoPane {
             initialBreak: 'middle',
             parentElement: null,
             followerElement: null,
+            pushElement: null,
+            pushMinHeight: null,
             backdrop: false,
             backdropOpacity: 0.4,
             animationType: 'ease',
@@ -464,6 +466,9 @@ class CupertinoPane {
             this.followerEl.style.transform = `translateY(0px) translateZ(0px)`;
             this.followerEl.style.transition = `all ${this.settings.animationDuration}ms ${this.getTimingFunction(this.settings.breaks[this.currentBreak()].bounce)} 0s`;
         }
+        if (this.settings.pushElement) {
+            this.settings.pushElement = document.querySelector(this.settings.pushElement);
+        }
         if (!this.settings.showDraggable) {
             this.draggableEl.style.opacity = '0';
         }
@@ -542,6 +547,9 @@ class CupertinoPane {
         }
         else {
             // Emit event
+            if (this.settings.pushElement) {
+                this.pushTransition(this.breaks[this.settings.initialBreak], 'unset');
+            }
             this.settings.onDidPresent();
         }
     }
@@ -993,6 +1001,32 @@ class CupertinoPane {
             this.settings.onDidDismiss();
         }
     }
+    pushTransition(newPaneY, transition) {
+        newPaneY = this.screen_height - newPaneY;
+        const topHeight = this.settings.pushMinHeight ? this.settings.pushMinHeight : this.screen_height - this.bottomer;
+        const minHeight = this.screen_height - this.topper;
+        this.settings.pushElement.style.transition = transition;
+        const setStyles = (scale, y, border, contrast) => {
+            this.settings.pushElement.style.transform = `translateY(${y}px) scale(${scale})`;
+            this.settings.pushElement.style.borderRadius = `${border}px`;
+            this.settings.pushElement.style.filter = `contrast(${contrast})`;
+        };
+        if (newPaneY <= topHeight) {
+            setStyles(1, 0, 0, 1);
+            return;
+        }
+        const getXbyY = (min, max) => {
+            let val = (minHeight * max - topHeight * min) * -1;
+            val -= (min - max) * newPaneY;
+            val /= (topHeight - minHeight);
+            if (val > max)
+                val = max;
+            if (val < min)
+                val = min;
+            return val;
+        };
+        setStyles(getXbyY(0.93, 1), getXbyY(-6, 0) * -1, getXbyY(-10, 0) * -1, getXbyY(0.85, 1));
+    }
     /***********************************
      * Transitions handler
      */
@@ -1005,6 +1039,10 @@ class CupertinoPane {
             if (this.followerEl) {
                 this.followerEl.style.transition = 'all 0ms linear 0ms';
                 this.followerEl.style.transform = `translateY(${params.translateY - this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+            }
+            // Push transition
+            if (this.settings.pushElement) {
+                this.pushTransition(this.getPanelTransformY(), 'all 0ms linear 0ms');
             }
             return;
         }
@@ -1061,8 +1099,8 @@ class CupertinoPane {
             // freemode
             if (params.type === 'end' && this.settings.freeMode)
                 return;
-            // Get timing function for next break
-            // TODO: getBreakByHeight()
+            // Get timing function && push for next 
+            // TODO: getBreakByHeight or by translateY()
             const nextBreak = Object.entries(this.settings.breaks).find(val => val[1].height === (this.screen_height - params.translateY));
             const timingForNext = this.getTimingFunction(nextBreak && nextBreak[1].bounce ? true : false);
             // style
@@ -1070,6 +1108,10 @@ class CupertinoPane {
             // Bind for follower same transitions
             if (this.followerEl) {
                 this.followerEl.style.transition = `transform ${this.settings.animationDuration}ms ${timingForNext} 0s`;
+            }
+            // Push transition
+            if (this.settings.pushElement) {
+                this.pushTransition(params.translateY, `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`);
             }
             // Main transitions
             if (params.type === 'present') {

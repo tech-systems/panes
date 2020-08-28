@@ -1,19 +1,12 @@
+export interface PaneBreak {
+    enabled: boolean;
+    height?: number;
+    bounce?: boolean;
+}
 export interface PaneBreaks {
-    top?: {
-        enabled: boolean;
-        height?: number;
-        bounce?: boolean;
-    };
-    middle?: {
-        enabled: boolean;
-        height?: number;
-        bounce?: boolean;
-    };
-    bottom?: {
-        enabled: boolean;
-        height?: number;
-        bounce?: boolean;
-    };
+    top?: PaneBreak;
+    middle?: PaneBreak;
+    bottom?: PaneBreak;
 }
 export interface TransitionStartEvent {
     translateY: {
@@ -24,6 +17,8 @@ export interface Settings {
     initialBreak: ('top' | 'middle' | 'bottom');
     parentElement: any;
     followerElement: string;
+    pushElement: any;
+    pushMinHeight: number;
     backdrop: boolean;
     backdropOpacity: number;
     animationType: string;
