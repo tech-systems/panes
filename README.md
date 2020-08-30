@@ -20,6 +20,8 @@ Cupertino Pane is great modern slide-over pane with touch technologies. <br>
 
 > Right like in Apple Maps, Apple Stocks, Apple Music and other modern apps.
 
+⭐ We appreciate your star, it helps!
+
 * [Breaking changes](#breaking-changes)
 * [Demonstration](#demonstration)
 * [Supporting platforms](#supporting-platforms)
