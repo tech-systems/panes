@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.8
+ * Cupertino Pane 1.1.81
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: August 29, 2020
+ * Released on: September 2, 2020
  */
 
 class Support {
@@ -644,8 +644,8 @@ class CupertinoPane {
         // Allow touch angle by default, disallow no move with condition
         this.disableDragAngle = false;
         const targetTouch = t.type === 'touchstart' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
-        const screenY = t.type === 'touchstart' ? targetTouch.screenY : t.screenY;
-        const screenX = t.type === 'touchstart' ? targetTouch.screenX : t.screenX;
+        const screenY = t.type === 'touchstart' ? targetTouch.clientY : t.clientY;
+        const screenX = t.type === 'touchstart' ? targetTouch.clientX : t.clientX;
         if (t.type === 'mousedown')
             this.pointerDown = true;
         this.startY = screenY;
@@ -674,8 +674,8 @@ class CupertinoPane {
         }
         // Handle desktop/mobile events
         const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
-        const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
-        const screenX = t.type === 'touchmove' ? targetTouch.screenX : t.screenX;
+        const screenY = t.type === 'touchmove' ? targetTouch.clientY : t.clientY;
+        const screenX = t.type === 'touchmove' ? targetTouch.clientX : t.clientX;
         if (t.type === 'mousemove' && !this.pointerDown)
             return;
         // Delta
@@ -740,7 +740,7 @@ class CupertinoPane {
         if (this.disableDragEvents)
             return;
         const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
-        const screenY = t.type === 'touchmove' ? targetTouch.screenY : t.screenY;
+        const screenY = t.type === 'touchmove' ? targetTouch.clientY : t.clientY;
         if (t.type === 'mouseup')
             this.pointerDown = false;
         // Determinate nearest point
