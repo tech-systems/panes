@@ -64,7 +64,7 @@ let settings = {
 - [Overflow top-middle live](https://output.jsbin.com/piwecad)
 - [Follower live](https://output.jsbin.com/xogavec)
 - [Apple Clips live](https://output.jsbin.com/luqaxud)
-- [Bulletin live](https://output.jsbin.com/tafahupihe)
+- [Bulletin live](https://output.jsbin.com/maqigod)
 - [Starbucks live](https://output.jsbin.com/jayicip)
 - [Backdrop drag-opacity live](https://output.jsbin.com/riwahab)
 
