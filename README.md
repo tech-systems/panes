@@ -310,6 +310,8 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
+- [Feature] Top-to-bottom direction
+- [Feature] Horizontal directions
 - [Showcase] Apple Music F7 
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) 
 - [Accurance] Native Touch Plugin
