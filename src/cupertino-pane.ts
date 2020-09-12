@@ -474,6 +474,8 @@ export class CupertinoPane {
    */
   private touchStartCb = (t) => this.touchStart(t);
   private touchStart(t) {
+    t.preventDefault();
+
     // Event emitter
     this.settings.onDragStart(t as CustomEvent);
 
@@ -518,6 +520,8 @@ export class CupertinoPane {
    */
   private touchMoveCb = (t) => this.touchMove(t);
   private touchMove(t) {
+    t.preventDefault();
+
     // Event emitter
     this.settings.onDrag(t as CustomEvent);
 
