@@ -127,6 +127,7 @@ export class CupertinoPane {
       this.wrapperEl.style.position = 'absolute';
       this.wrapperEl.style.top = '0';
       this.wrapperEl.style.left = '0';
+      this.wrapperEl.style.touchAction = 'pan-x';
 
       // Panel
       this.paneEl = document.createElement('div');
@@ -474,8 +475,6 @@ export class CupertinoPane {
    */
   private touchStartCb = (t) => this.touchStart(t);
   private touchStart(t) {
-    t.preventDefault();
-
     // Event emitter
     this.settings.onDragStart(t as CustomEvent);
 
@@ -520,8 +519,6 @@ export class CupertinoPane {
    */
   private touchMoveCb = (t) => this.touchMove(t);
   private touchMove(t) {
-    t.preventDefault();
-
     // Event emitter
     this.settings.onDrag(t as CustomEvent);
 
@@ -802,9 +799,9 @@ export class CupertinoPane {
   private attachEvents(el: Element) {
     // Touch Events
     if (!Support.touch && Support.pointerEvents) {
-      el.addEventListener(this.touchEvents.start, this.touchStartCb, false);
-      el.addEventListener(this.touchEvents.move, this.touchMoveCb, false);
-      el.addEventListener(this.touchEvents.end, this.touchEndCb, false);
+      el.addEventListener(this.touchEvents.start, this.touchStartCb, { passive: false });
+      el.addEventListener(this.touchEvents.move, this.touchMoveCb, { passive: false });
+      el.addEventListener(this.touchEvents.end, this.touchEndCb, { passive: false });
       
       // Backdrop propagation fix
       this.backdropEl?.addEventListener(this.touchEvents.move, this.touchMoveBackdropCb, false);
