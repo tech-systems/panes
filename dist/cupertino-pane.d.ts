@@ -81,6 +81,7 @@ export declare class CupertinoPane {
      */
     private onClickCb;
     private onClick;
+    private movePreventDefault;
     private swipeNextPoint;
     private isBackdropPresented;
     private renderBackdrop;

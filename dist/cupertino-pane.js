@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: September 2, 2020
+ * Released on: September 15, 2020
  */
 
 'use strict';
@@ -667,6 +667,10 @@ class CupertinoPane {
         }
     }
     touchMove(t) {
+        /****** Fix android issue https://bugs.chromium.org/p/chromium/issues/detail?id=1123304 *******/
+        if (this.device.android && this.movePreventDefault(t)) {
+            t.preventDefault();
+        }
         // Event emitter
         this.settings.onDrag(t);
         if (this.disableDragEvents)
@@ -709,6 +713,12 @@ class CupertinoPane {
             if ((newVal > this.topper && this.contentScrollTop > 0)
                 || (newVal <= this.topper)) {
                 return;
+            }
+            else {
+                /****** Fix android issue https://bugs.chromium.org/p/chromium/issues/detail?id=1123304 *******/
+                if (this.device.android) {
+                    t.preventDefault();
+                }
             }
         }
         // Not allow drag topper than top point
@@ -786,6 +796,14 @@ class CupertinoPane {
                 t.stopImmediatePropagation();
             }
         }
+    }
+    movePreventDefault(t) {
+        if (!(this.overflowEl.scrollHeight > this.overflowEl.clientHeight
+            && this.overflowEl.style.overflow !== 'hidden'
+            && this.isDragScrollabe(t.path || t.composedPath()))) {
+            return true;
+        }
+        return false;
     }
     isBackdropPresented() {
         return document.querySelector(`.cupertino-pane-wrapper .backdrop`)

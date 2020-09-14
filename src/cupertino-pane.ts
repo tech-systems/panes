@@ -518,6 +518,12 @@ export class CupertinoPane {
    */
   private touchMoveCb = (t) => this.touchMove(t);
   private touchMove(t) {
+
+    /****** Fix android issue https://bugs.chromium.org/p/chromium/issues/detail?id=1123304 *******/
+    if (this.device.android && this.movePreventDefault(t)) {
+      t.preventDefault();
+    }
+
     // Event emitter
     this.settings.onDrag(t as CustomEvent);
 
@@ -563,7 +569,12 @@ export class CupertinoPane {
       if ((newVal > this.topper && this.contentScrollTop > 0) 
           || (newVal <= this.topper)) { 
         return;
-      } 
+      } else {
+        /****** Fix android issue https://bugs.chromium.org/p/chromium/issues/detail?id=1123304 *******/
+        if (this.device.android) {
+          t.preventDefault();
+        }
+      }
     }
 
     // Not allow drag topper than top point
@@ -666,6 +677,15 @@ export class CupertinoPane {
         t.stopImmediatePropagation();
       }
     }
+  }
+
+  private movePreventDefault(t): boolean {
+    if (!(this.overflowEl.scrollHeight > this.overflowEl.clientHeight 
+        && this.overflowEl.style.overflow !== 'hidden'
+        && this.isDragScrollabe(t.path || t.composedPath()))) {
+      return true;
+    }
+    return false;
   }
 
   private swipeNextPoint = (diff, maxDiff, closest) => {
