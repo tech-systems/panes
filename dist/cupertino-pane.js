@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.81
+ * Cupertino Pane 1.1.83
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: September 15, 2020
+ * Released on: September 21, 2020
  */
 
 'use strict';
@@ -595,6 +595,7 @@ class CupertinoPane {
         }
         else {
             this.overflowEl = attrElements[0];
+            this.overflowEl.style.overflowX = 'hidden';
         }
         if (this.settings.topperOverflow) {
             // Good to get rid of timeout

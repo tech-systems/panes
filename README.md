@@ -311,6 +311,7 @@ By default using for full pane area, but in some cases good useful with header.
 
 ## Future Goals
 - [Feature] Top-to-bottom direction
+- [Code] Remove throttling patch on solved [issue](https://bugs.chromium.org/p/chromium/issues/detail?id=1123304)
 - [Feature] Horizontal directions
 - [Showcase] Apple Music F7
 - [Docs] Package branding

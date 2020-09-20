@@ -421,6 +421,7 @@ export class CupertinoPane {
       this.overflowEl = this.contentEl;
     } else {
       this.overflowEl = <HTMLElement>attrElements[0];
+      this.overflowEl.style.overflowX = 'hidden';
     }
     
     if (this.settings.topperOverflow) {       
