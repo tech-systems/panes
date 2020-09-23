@@ -155,7 +155,7 @@ Cupertino Pane package comes with ES module version which can be used where supp
 import { CupertinoPane, CupertinoSettings } from 'cupertino-pane';
 
 let settings: CupertinoSettings = { /* ... */ };
-let myPane = new CupertinoPane('.cupertino-pane', CupertinoSettings);
+let myPane = new CupertinoPane('.cupertino-pane', settings);
     myPane.present({animate: true});
 ```
 
