@@ -109,6 +109,9 @@ export declare class CupertinoPane {
      * Enable pane drag events
      */
     enableDrag(): void;
+    setDarkMode(conf?: {
+        enable: boolean;
+    }): void;
     moveToBreak(val: any): any;
     hide(): any;
     isHidden(): (boolean | null);

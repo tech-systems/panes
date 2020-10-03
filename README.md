@@ -289,6 +289,11 @@ Show/Hide backdrop method
 myPane.backdrop({show: true}); // show
 myPane.backdrop({show: false}); // hide
 ```
+### setDarkMode({enable: **boolean = false**})
+Enable dark scheme color for some elements
+```javascript
+myPane.setDarkMode({enable: true}); // enable darkmode
+```
 
 ## Attributes
 ### hide-on-bottom
@@ -310,7 +315,9 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- [Feature] Top-to-bottom direction
+- [Feature] update pane config breakpoints `.updateBreakpoints()`
+- [Feature] Top-to-bottom direction `.changeDirection()`
+
 - [Feature] Horizontal directions
 - [Showcase] Apple Music F7
 - [Docs] Package branding

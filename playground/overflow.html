@@ -126,6 +126,7 @@
 
       <ion-button expand="block" onclick="hideDrawer()">Hide Drawer</ion-button>
       <ion-button expand="block" onclick="isHiddenDrawer()">Drawer is hidden</ion-button>
+      <ion-button expand="block" onclick="toggleDarkMode()">Toggle dark mode</ion-button>
 
       <ion-button expand="block" color="secondary" onclick="setTopDrawer()">Set Top</ion-button>
       <ion-button expand="block" color="secondary" onclick="setMiddleDrawer()">Set Middle</ion-button>
@@ -133,10 +134,12 @@
   </ion-content>
   <script>
     var element = document.querySelector('ion-drawer');
+    var darkMode = true;
     var drawer = new CupertinoPane(element, { 
         // breaks: {
         //   top: { enabled: false, offset: 700 }
         // },
+        darkMode: true,
         // draggableOver: true,
         // dragByCursor: false,
         // backdrop: true,
@@ -175,6 +178,11 @@
     async function setBottomDrawer() {
       drawer.moveToBreak('bottom');
     };
+
+    async function toggleDarkMode() {
+      darkMode = !darkMode;
+      drawer.setDarkMode({enable: darkMode});
+    }
   </script>
 </body>
 
