@@ -22,7 +22,7 @@ function umd(cb) {
     sourcemap: true,
     exports: 'named',
     sourcemapFile: `./${env === 'development' ? 'build' : 'dist'}/cupertino-pane.js.map`,
-    banner,
+    banner: `${banner} \n \n if (!exports) var exports = {\"__esModule\": true};`,
     file: `./${env === 'development' ? 'build' : 'dist'}/cupertino-pane.js`,
   })).then((bundle) => {
     if (env === 'development') {

@@ -7,6 +7,12 @@ All notable changes to this project will be documented in this file.
 ### Features
 - Added `.setDarkMode({enable: true})` method, to helps maintain color scheme after pane initialization [#68](https://github.com/roman-rr/cupertino-pane/issues/68)
 
+### Bug Fixes
+- Fixed Commonjs bundle. No more line required on import:
+```
+<script>var exports = {"__esModule": true};</script>
+```
+
 ## 1.1.8 - 2020-08-29
 
 ### BREAKING CHANGES

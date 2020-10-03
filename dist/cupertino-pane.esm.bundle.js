@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: October 3, 2020
+ * Released on: October 4, 2020
  */
 
 class Support {
@@ -203,6 +203,7 @@ class CupertinoPane {
         this.disableDragAngle = false;
         this.rendered = false;
         this.allowClick = true;
+        this.iconCloseColor = '#7a7a7e';
         this.breaks = {};
         this.brs = [];
         this.device = new Device();
@@ -497,13 +498,8 @@ class CupertinoPane {
         if (this.settings.buttonClose) {
             this.paneEl.appendChild(this.closeEl);
             this.closeEl.addEventListener('click', (t) => this.destroy({ animate: true }));
-            let iconColor = '#7a7a7e';
-            if (this.settings.darkMode) {
-                this.closeEl.style.background = '#424246';
-                iconColor = '#a8a7ae';
-            }
             this.closeEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <path fill="${iconColor}" d="M278.6 256l68.2-68.2c6.2-6.2 6.2-16.4 0-22.6-6.2-6.2-16.4-6.2-22.6 0L256 233.4l-68.2-68.2c-6.2-6.2-16.4-6.2-22.6 0-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3l68.2 68.2-68.2 68.2c-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3 6.2 6.2 16.4 6.2 22.6 0l68.2-68.2 68.2 68.2c6.2 6.2 16.4 6.2 22.6 0 6.2-6.2 6.2-16.4 0-22.6L278.6 256z"/>
+          <path fill="${this.iconCloseColor}" d="M278.6 256l68.2-68.2c6.2-6.2 6.2-16.4 0-22.6-6.2-6.2-16.4-6.2-22.6 0L256 233.4l-68.2-68.2c-6.2-6.2-16.4-6.2-22.6 0-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3l68.2 68.2-68.2 68.2c-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3 6.2 6.2 16.4 6.2 22.6 0l68.2-68.2 68.2 68.2c6.2 6.2 16.4 6.2 22.6 0 6.2-6.2 6.2-16.4 0-22.6L278.6 256z"/>
         </svg>`;
         }
         if (this.settings.bottomClose) {
@@ -946,14 +942,13 @@ class CupertinoPane {
         this.disableDragEvents = false;
     }
     setDarkMode(conf = { enable: true }) {
-        let iconColor;
         if (conf.enable) {
             this.paneEl.style.background = '#1c1c1d';
             this.paneEl.style.color = '#ffffff';
             this.moveEl.style.background = '#5a5a5e';
             if (this.settings.buttonClose) {
                 this.closeEl.style.background = '#424246';
-                iconColor = '#a8a7ae';
+                this.iconCloseColor = '#a8a7ae';
             }
         }
         else {
@@ -962,12 +957,9 @@ class CupertinoPane {
             this.moveEl.style.background = '#c0c0c0';
             if (this.settings.buttonClose) {
                 this.closeEl.style.background = '#ebebeb';
-                iconColor = '#7a7a7e';
+                this.iconCloseColor = '#7a7a7e';
             }
         }
-        this.closeEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-      <path fill="${iconColor}" d="M278.6 256l68.2-68.2c6.2-6.2 6.2-16.4 0-22.6-6.2-6.2-16.4-6.2-22.6 0L256 233.4l-68.2-68.2c-6.2-6.2-16.4-6.2-22.6 0-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3l68.2 68.2-68.2 68.2c-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3 6.2 6.2 16.4 6.2 22.6 0l68.2-68.2 68.2 68.2c6.2 6.2 16.4 6.2 22.6 0 6.2-6.2 6.2-16.4 0-22.6L278.6 256z"/>
-    </svg>`;
     }
     moveToBreak(val) {
         if (!this.isPanePresented()) {

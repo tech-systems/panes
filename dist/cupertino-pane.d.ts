@@ -17,6 +17,7 @@ export declare class CupertinoPane {
     private disableDragAngle;
     private rendered;
     private allowClick;
+    private iconCloseColor;
     private breaks;
     private brs;
     private el;
