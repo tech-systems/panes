@@ -1109,7 +1109,7 @@ class CupertinoPane {
             if (params.type === 'destroy') {
                 this.settings.onDidDismiss();
             }
-            this.settings.onTransitionEnd();
+            this.settings.onTransitionEnd({ target: document.body.contains(this.paneEl) ? this.paneEl : null });
             // Remove listener
             this.paneEl.removeEventListener('transitionend', transitionEnd);
         };

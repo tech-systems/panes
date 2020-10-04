@@ -51,5 +51,5 @@ export interface Settings {
     onDragEnd: (event?: CustomEvent) => void;
     onBackdropTap: (event?: CustomEvent) => void;
     onTransitionStart: (event?: TransitionStartEvent) => void;
-    onTransitionEnd: (event?: CustomEvent) => void;
+    onTransitionEnd: (event?: any) => void;
 }
