@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: October 4, 2020
+ * Released on: October 5, 2020
  */
 
 class Support {
@@ -405,51 +405,7 @@ class CupertinoPane {
         }
         // Emit event
         this.settings.onWillPresent();
-        this.breaks = {
-            top: this.screen_height,
-            middle: this.screen_height,
-            bottom: this.screen_height
-        };
-        ['top', 'middle', 'bottom'].forEach((val) => {
-            // bottom offset for bulletins
-            this.breaks[val] -= this.settings.bottomOffset;
-            // Set default if no exist
-            if (!this.settings.breaks[val]) {
-                this.settings.breaks[val] = this.defaultBreaksConf[val];
-            }
-            // Add offsets (offset or height, later need remove ofsfset)
-            if (this.settings.breaks[val]
-                && this.settings.breaks[val].enabled
-                && this.settings.breaks[val].height) {
-                this.breaks[val] -= this.settings.breaks[val].height;
-            }
-        });
-        // Warnings 
-        if (!this.settings.breaks[this.settings.initialBreak].enabled) {
-            console.warn('Cupertino Pane: Please set initialBreak for enabled breakpoint');
-        }
-        if (this.settings.breaks['middle'].height >= this.settings.breaks['top'].height) {
-            console.warn('Cupertino Pane: Please set middle height lower than top height');
-        }
-        if (this.settings.breaks['middle'].height <= this.settings.breaks['bottom'].height) {
-            console.warn('Cupertino Pane: Please set bottom height lower than middle height');
-        }
-        // Prepare breakpoint numbers array
-        this.brs = [];
-        ['top', 'middle', 'bottom'].forEach((val) => {
-            if (this.settings.breaks[val].enabled) {
-                this.brs.push(this.breaks[val]);
-            }
-        });
-        // Determinate topper point
-        this.topper = this.brs.reduce((prev, curr) => {
-            return (Math.abs(curr) < Math.abs(prev) ? curr : prev);
-        });
-        // Determinate bottomer point
-        this.bottomer = this.brs.reduce((prev, curr) => {
-            return (Math.abs(curr) > Math.abs(prev) ? curr : prev);
-        });
-        this.currentBreakpoint = this.breaks[this.settings.initialBreak];
+        this.setBreakpoints();
         this.drawElements();
         this.parentEl.appendChild(this.wrapperEl);
         this.wrapperEl.appendChild(this.paneEl);
@@ -577,6 +533,11 @@ class CupertinoPane {
     resetEvents() {
         this.detachAllEvents();
         this.attachAllEvents();
+    }
+    getClosestBreakY() {
+        return this.brs.reduce((prev, curr) => {
+            return (Math.abs(curr - this.getPanelTransformY()) < Math.abs(prev - this.getPanelTransformY()) ? curr : prev);
+        });
     }
     scrollElementInit() {
         let attrElements = this.el.querySelectorAll('[overflow-y]');
@@ -749,9 +710,7 @@ class CupertinoPane {
         if (t.type === 'mouseup')
             this.pointerDown = false;
         // Determinate nearest point
-        let closest = this.brs.reduce((prev, curr) => {
-            return (Math.abs(curr - this.getPanelTransformY()) < Math.abs(prev - this.getPanelTransformY()) ? curr : prev);
-        });
+        let closest = this.getClosestBreakY();
         // Swipe - next (if differ > 10)
         const diff = this.steps[this.steps.length - 1] - this.steps[this.steps.length - 2];
         // Set sensivity lower for web
@@ -959,6 +918,88 @@ class CupertinoPane {
                 this.closeEl.style.background = '#ebebeb';
                 this.iconCloseColor = '#7a7a7e';
             }
+        }
+    }
+    /**
+     * Function builder for breakpoints and heights
+     * @param conf breakpoints
+     */
+    setBreakpoints(conf) {
+        let prevBreak;
+        if (this.isPanePresented() && !conf) {
+            console.warn(`Cupertino Pane: Provide any breaks configuration`);
+            return;
+        }
+        if (this.isPanePresented()) {
+            prevBreak = this.currentBreak();
+        }
+        this.breaks = {
+            top: this.screen_height,
+            middle: this.screen_height,
+            bottom: this.screen_height
+        };
+        ['top', 'middle', 'bottom'].forEach((val) => {
+            // bottom offset for bulletins
+            this.breaks[val] -= this.settings.bottomOffset;
+            // Set default if no exist
+            if (!this.settings.breaks[val]) {
+                this.settings.breaks[val] = this.defaultBreaksConf[val];
+            }
+            // Override from user conf on updating
+            if (conf && conf[val]) {
+                this.settings.breaks[val] = conf[val];
+            }
+            // Assign heights
+            if (this.settings.breaks[val]
+                && this.settings.breaks[val].enabled
+                && this.settings.breaks[val].height) {
+                this.breaks[val] -= this.settings.breaks[val].height;
+            }
+        });
+        // Warnings 
+        if (!this.isPanePresented()) {
+            if (!this.settings.breaks[this.settings.initialBreak].enabled) {
+                console.warn('Cupertino Pane: Please set initialBreak for enabled breakpoint');
+            }
+        }
+        if (this.settings.breaks['middle'].height >= this.settings.breaks['top'].height) {
+            console.warn('Cupertino Pane: Please set middle height lower than top height');
+        }
+        if (this.settings.breaks['middle'].height <= this.settings.breaks['bottom'].height) {
+            console.warn('Cupertino Pane: Please set bottom height lower than middle height');
+        }
+        // Prepare breakpoint numbers array
+        this.brs = [];
+        ['top', 'middle', 'bottom'].forEach((val) => {
+            if (this.settings.breaks[val].enabled) {
+                this.brs.push(this.breaks[val]);
+            }
+        });
+        // Determinate topper point
+        this.topper = this.brs.reduce((prev, curr) => {
+            return (Math.abs(curr) < Math.abs(prev) ? curr : prev);
+        });
+        // Determinate bottomer point
+        this.bottomer = this.brs.reduce((prev, curr) => {
+            return (Math.abs(curr) > Math.abs(prev) ? curr : prev);
+        });
+        if (!this.isPanePresented()) {
+            this.currentBreakpoint = this.breaks[this.settings.initialBreak];
+        }
+        if (this.isPanePresented()) {
+            // Move to current if updated
+            if (!this.currentBreak()
+                && this.settings.breaks[prevBreak].enabled) {
+                this.moveToBreak(prevBreak);
+            }
+            // Move to any if removed
+            if (!this.settings.breaks[prevBreak].enabled) {
+                let nextY = this.swipeNextPoint(1, 1, this.getClosestBreakY());
+                const nextBreak = Object.entries(this.breaks).find(val => val[1] === nextY);
+                this.moveToBreak(nextBreak[0]);
+            }
+            // Re-calc height
+            this.paneEl.style.height = `${this.screen_height - this.topper - this.settings.bottomOffset}px`;
         }
     }
     moveToBreak(val) {

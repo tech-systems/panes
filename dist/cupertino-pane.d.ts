@@ -1,4 +1,4 @@
-import { Settings } from './models';
+import { Settings, PaneBreaks } from './models';
 export declare type CupertinoSettings = Partial<Settings>;
 export declare class CupertinoPane {
     private selector;
@@ -43,6 +43,7 @@ export declare class CupertinoPane {
     private attachAllEvents;
     private detachAllEvents;
     private resetEvents;
+    private getClosestBreakY;
     private scrollElementInit;
     private getTimingFunction;
     private checkOpacityAttr;
@@ -113,6 +114,11 @@ export declare class CupertinoPane {
     setDarkMode(conf?: {
         enable: boolean;
     }): void;
+    /**
+     * Function builder for breakpoints and heights
+     * @param conf breakpoints
+     */
+    setBreakpoints(conf?: PaneBreaks): void;
     moveToBreak(val: any): any;
     hide(): any;
     isHidden(): (boolean | null);

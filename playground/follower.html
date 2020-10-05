@@ -39,6 +39,8 @@
 
       <ion-button expand="block" color="secondary" onclick="setMiddleDrawer()">Set Middle</ion-button>
       <ion-button expand="block" color="secondary" onclick="setBottomDrawer()">Set Bottom</ion-button>
+
+      <ion-button expand="block" color="tertiary" onclick="setBreakpoints()">Set Breakpoints</ion-button>
   </ion-content>
   <script>
     var element = document.querySelector('ion-drawer');
@@ -78,6 +80,14 @@
 
     async function setBottomDrawer() {
       drawer.moveToBreak('bottom');
+    };
+
+    async function setBreakpoints() {
+      drawer.setBreakpoints({
+        top: { enabled: true, height: 700 },
+        middle: { enabled: true, height: 400 },
+        bottom: { enabled: true, height: 150 }
+      });
     };
   </script>
 </body>

@@ -315,8 +315,13 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- [Feature] update pane config breakpoints `.updateBreakpoints()`
-- [Feature] Top-to-bottom direction `.changeDirection()`
+- recalc overflows
+- recalc follower
+- tests
+- update changelog + readme 
+- push
+
+- [Feature] `.setDirection('topToBottom')` + release 1.1.9
 - [Feature] Horizontal directions
 - [Showcase] Apple Music F7
 - [Docs] Package branding
