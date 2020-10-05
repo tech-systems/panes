@@ -33,7 +33,7 @@ export declare class CupertinoPane {
     private followerEl;
     private device;
     constructor(selector: (string | HTMLElement), conf?: CupertinoSettings);
-    private drawElements;
+    private drawBaseElements;
     present(conf?: {
         animate: boolean;
     }): void;

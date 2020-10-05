@@ -294,6 +294,19 @@ Enable dark scheme color for some elements
 ```javascript
 myPane.setDarkMode({enable: true}); // enable darkmode
 ```
+### setBreakpoints(breakpoints: **PaneBreaks**)
+Method updates breakpoints configuration for rendered Pane
+```javascript
+myPane.setBreakpoints({
+  top: {
+      enabled: true,
+      height: 700,
+      bounce: true
+  },
+  middle: { ... },
+  bottom: { ... }
+});
+```
 
 ## Attributes
 ### hide-on-bottom
@@ -315,12 +328,6 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- recalc overflows
-- recalc follower
-- tests
-- update changelog + readme 
-- push
-
 - [Feature] `.setDirection('topToBottom')` + release 1.1.9
 - [Feature] Horizontal directions
 - [Showcase] Apple Music F7

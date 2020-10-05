@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: October 5, 2020
+ * Released on: October 6, 2020
  */
  
  
@@ -331,7 +331,7 @@ class CupertinoPane {
             this.settings.parentElement = this.el.parentElement;
         }
     }
-    drawElements() {
+    drawBaseElements() {
         this.parentEl = this.settings.parentElement;
         // Wrapper
         this.wrapperEl = document.createElement('div');
@@ -395,6 +395,12 @@ class CupertinoPane {
         this.closeEl.style.right = '20px';
         this.closeEl.style.zIndex = '14';
         this.closeEl.style.borderRadius = '100%';
+        // inject DOM
+        this.parentEl.appendChild(this.wrapperEl);
+        this.wrapperEl.appendChild(this.paneEl);
+        this.paneEl.appendChild(this.draggableEl);
+        this.paneEl.appendChild(this.contentEl);
+        this.draggableEl.appendChild(this.moveEl);
     }
     present(conf = { animate: false }) {
         if (!this.el)
@@ -412,12 +418,10 @@ class CupertinoPane {
         // Emit event
         this.settings.onWillPresent();
         this.setBreakpoints();
-        this.drawElements();
-        this.parentEl.appendChild(this.wrapperEl);
-        this.wrapperEl.appendChild(this.paneEl);
-        this.paneEl.appendChild(this.draggableEl);
-        this.paneEl.appendChild(this.contentEl);
-        this.draggableEl.appendChild(this.moveEl);
+        this.drawBaseElements();
+        this.scrollElementInit();
+        this.checkOpacityAttr(this.currentBreakpoint);
+        this.checkOverflowAttr(this.currentBreakpoint);
         this.rendered = true;
         if (this.settings.followerElement) {
             if (!document.querySelector(this.settings.followerElement)) {
@@ -470,9 +474,6 @@ class CupertinoPane {
         if (this.settings.backdrop) {
             this.renderBackdrop();
         }
-        this.scrollElementInit();
-        this.checkOpacityAttr(this.currentBreakpoint);
-        this.checkOverflowAttr(this.currentBreakpoint);
         /****** Fix android issues *******/
         if (this.device.android) {
             // Body patch prevent android pull-to-refresh
@@ -1006,6 +1007,10 @@ class CupertinoPane {
             }
             // Re-calc height
             this.paneEl.style.height = `${this.screen_height - this.topper - this.settings.bottomOffset}px`;
+            // Re-calc overflow elements
+            this.scrollElementInit();
+            this.checkOpacityAttr(this.currentBreakpoint);
+            this.checkOverflowAttr(this.currentBreakpoint);
         }
     }
     moveToBreak(val) {
