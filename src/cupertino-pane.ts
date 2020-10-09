@@ -285,6 +285,10 @@ export class CupertinoPane {
         this.settings.breaks.bottom.enabled = true;
       }
 
+      if (this.settings.freeMode) {
+        this.settings.lowerThanBottom = false;
+      }
+
       if (this.settings.backdrop) {
         this.renderBackdrop();
       }
@@ -527,8 +531,8 @@ export class CupertinoPane {
       }
     }
 
-    // Not allow drag topper than top point
-    if (newVal <= this.topper && !this.settings.upperThanTop) {
+    // Disallow drag topper than top point
+    if (!this.settings.upperThanTop && (newVal <= this.topper)) {
       this.paneEl.style.transform = `translateY(${this.topper}px) translateZ(0px)`;
       return;
     }
@@ -539,15 +543,10 @@ export class CupertinoPane {
       newVal = this.getPanelTransformY() + (diffY * differKoef);
     }
 
-    // Not allow drag lower than bottom if free mode
-    if (this.settings.freeMode && !this.settings.bottomClose && (newVal >= this.bottomer)) {
-      return;
-    }
-
-    // Custom Lower then bottom 
-    // (for example in follower drag events)
+    // Disallow drag lower then bottom 
     if (!this.settings.lowerThanBottom && (newVal >= this.bottomer)) {
-      this.destroy({animate:true});
+      this.paneEl.style.transform = `translateY(${this.bottomer}px) translateZ(0px)`;
+      this.checkOpacityAttr(newVal);
       return;
     }
 

@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: October 6, 2020
+ * Released on: October 9, 2020
  */
  
  
@@ -471,6 +471,9 @@ class CupertinoPane {
         if (this.settings.bottomClose) {
             this.settings.breaks.bottom.enabled = true;
         }
+        if (this.settings.freeMode) {
+            this.settings.lowerThanBottom = false;
+        }
         if (this.settings.backdrop) {
             this.renderBackdrop();
         }
@@ -680,8 +683,8 @@ class CupertinoPane {
                 }
             }
         }
-        // Not allow drag topper than top point
-        if (newVal <= this.topper && !this.settings.upperThanTop) {
+        // Disallow drag topper than top point
+        if (!this.settings.upperThanTop && (newVal <= this.topper)) {
             this.paneEl.style.transform = `translateY(${this.topper}px) translateZ(0px)`;
             return;
         }
@@ -690,14 +693,10 @@ class CupertinoPane {
             const differKoef = ((-this.topper + this.topper - this.getPanelTransformY()) / this.topper) / -8;
             newVal = this.getPanelTransformY() + (diffY * differKoef);
         }
-        // Not allow drag lower than bottom if free mode
-        if (this.settings.freeMode && !this.settings.bottomClose && (newVal >= this.bottomer)) {
-            return;
-        }
-        // Custom Lower then bottom 
-        // (for example in follower drag events)
+        // Disallow drag lower then bottom 
         if (!this.settings.lowerThanBottom && (newVal >= this.bottomer)) {
-            this.destroy({ animate: true });
+            this.paneEl.style.transform = `translateY(${this.bottomer}px) translateZ(0px)`;
+            this.checkOpacityAttr(newVal);
             return;
         }
         // Disallow accidentaly clicks while slide gestures

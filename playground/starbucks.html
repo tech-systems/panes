@@ -529,6 +529,7 @@
     let totalprice = 0;
     let itemprice = 3;
     let size = 'S';
+    let bottomer = 20;
     const contentEl = document.querySelector('.content');
     const firstStep = document.querySelector('.first-step');
     const myBag = document.querySelector('.my-bag');
@@ -546,6 +547,12 @@
       paneEl = document.querySelector('.pane');
       if (!paneEl) return;
       paneY = parseFloat(translateYRegex.exec(paneEl.style.transform)[1]);
+
+      if (window.innerHeight - paneY <= bottomer) {
+        drawer.disableDrag();
+        drawer.destroy({animate: true});
+        return;
+      }
 
       if (window.innerHeight - paneY - 30 > firstHeight) {
         myBagH2.style.transform = 'translate3d(0px, 0px, 0px)';
@@ -565,7 +572,7 @@
         followerElement: '.content',
         breaks: {
           middle: { enabled: true, height: firstHeight, timing: 'ease' },
-          bottom: { enabled: true, height: 20, timing: 'ease' }
+          bottom: { enabled: true, height: bottomer, timing: 'ease' }
         },
         buttonClose: false,
         showDraggable: false,
@@ -579,6 +586,7 @@
 
     function presentPane(e) {
       drawer.present({animate: true});
+      drawer.enableDrag();
 
       // Total price
       totalprice += itemprice;
