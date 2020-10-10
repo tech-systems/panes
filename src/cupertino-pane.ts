@@ -690,15 +690,19 @@ export class CupertinoPane {
   }
 
   private swipeNextPoint = (diff, maxDiff, closest) => {
-    let brs = {...this.breaks};
+    let brs = {};
     let settingsBreaks = {};
 
     if (this.settings.inverse) {
       brs['top'] = this.breaks['bottom'];
+      brs['middle'] = this.breaks['middle'];
       brs['bottom'] = this.breaks['top'];
       settingsBreaks['top'] = {...this.settings.breaks['bottom']};
-      settingsBreaks['bottom'] = {...this.settings.breaks['top']};
       settingsBreaks['middle'] = {...this.settings.breaks['middle']};
+      settingsBreaks['bottom'] = {...this.settings.breaks['top']};
+    } else {
+      brs = {...this.breaks}
+      settingsBreaks = {...this.settings.breaks};
     }
 
     if (this.currentBreakpoint === brs['top']) {
