@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.83
+ * Cupertino Pane 1.1.9
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -242,12 +242,13 @@ class CupertinoPane {
         this.onClickCb = (t) => this.onClick(t);
         this.swipeNextPoint = (diff, maxDiff, closest) => {
             let brs = Object.assign({}, this.breaks);
-            let settingsBreaks = Object.assign({}, this.settings.breaks);
+            let settingsBreaks = {};
             if (this.settings.inverse) {
                 brs['top'] = this.breaks['bottom'];
                 brs['bottom'] = this.breaks['top'];
-                settingsBreaks['top'] = this.settings.breaks['top'];
-                settingsBreaks['bottom'] = this.settings.breaks['bottom'];
+                settingsBreaks['top'] = Object.assign({}, this.settings.breaks['bottom']);
+                settingsBreaks['bottom'] = Object.assign({}, this.settings.breaks['top']);
+                settingsBreaks['middle'] = Object.assign({}, this.settings.breaks['middle']);
             }
             if (this.currentBreakpoint === brs['top']) {
                 if (diff > maxDiff) {

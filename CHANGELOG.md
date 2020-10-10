@@ -2,9 +2,15 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## 1.1.9 - 2020-10-10
 
 ### Features
+- Added `inverse` property which allows to use `top-to-bottom` direction.
+```javascript
+let settings: CupertinoSettings = { 
+  inverse: true
+};
+```
 - Added `.setDarkMode({enable: true})` method, to helps maintain color scheme after pane initialization [#68](https://github.com/roman-rr/cupertino-pane/issues/68)
 - Added `.setBreakpoints(breakpoints: PaneBreaks)` method. Method updates breakpoints configuration for rendered Pane. [#69](https://github.com/roman-rr/cupertino-pane/issues/69)
 - Improved `lowerThanBottom` configuration and become accessable in default mode

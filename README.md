@@ -174,6 +174,7 @@ new CupertinoPane(element); // HTMLElement
 ### Common configuration
 | Property | Type | Default | Description |
 | - | - | - | - |
+| **inverse** | `boolean` | false | On `true` will change pane direction from `bottom-to-top` to `top-to-bottom` |
 | **parentElement** | `string` | Parent element selector | Element selector where pane will rendered |
 | **followerElement** | `string` | Follower element selector | Element with selector will following pane transitions |
 | **pushElement** | `string` | Push element selector | DOM Element will be pushed and scaled |
@@ -328,13 +329,6 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- if overflow - stop drag same example with 2 overflows
-- tests breakpoints + configurations
-- jsfiddle example
-- readme + changelog
-- release 1.1.9
-
-- [Feature] Horizontal directions
 - [Showcase] Apple Music F7
 - [Docs] Package branding
 - [Docs] Docs engine (F7)
