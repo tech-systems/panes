@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 ## 1.1.9 - 2020-10-10
 
 ### Features
-- Added `inverse` property which allows to use `top-to-bottom` direction.
+- Added `inverse` property which allows to use `top-to-bottom` direction. [#58](https://github.com/roman-rr/cupertino-pane/issues/58)
 ```javascript
 let settings: CupertinoSettings = { 
   inverse: true
