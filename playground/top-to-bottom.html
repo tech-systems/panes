@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html dir="ltr">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Cupertino Pane - Top to bottom</title>
+
+  <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+  <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+  <script src="../dist/cupertino-pane.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css"/> 
+  <style>ion-drawer, ion-extra-drawer { padding: 0 20px; } ion-slides { height: 150px; }</style>
+</head>
+
+<body>
+  <ion-content>
+      <ion-drawer>
+        <div class="content">
+          <h1>Header</h1>
+          <p>This is good example of Cupertino Pane with inversed direction.</p>
+          <p>Events switched into <strong>top-to-bottom</strong></p>
+        </div>
+      </ion-drawer>
+
+      <div class="buttons-container">
+        <ion-button expand="block" color="danger" onclick="presentDrawer()">Present Drawer</ion-button>
+        <ion-button expand="block" color="danger" onclick="destroyDrawer()">Destroy Drawer</ion-button>
+
+        <ion-button expand="block" onclick="hideDrawer()">Hide Drawer</ion-button>
+        <ion-button expand="block" onclick="isHiddenDrawer()">Drawer is hidden</ion-button>
+
+        <ion-button expand="block" color="secondary" onclick="setTopDrawer()">Set Top</ion-button>
+        <ion-button expand="block" color="secondary" onclick="setMiddleDrawer()">Set Middle</ion-button>
+        <ion-button expand="block" color="secondary" onclick="setBottomDrawer()">Set Bottom</ion-button>
+
+        <ion-button expand="block" onclick="showBackdrop()">Show Backdrop</ion-button>
+      </div>
+  </ion-content>
+  <style>
+    .buttons-container {
+      display: flex;
+      height: 100vh;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding-bottom: 30px;
+      height: 100%;
+    }
+
+    h1, p {
+      margin-bottom: 0 !important;
+    }
+  </style>
+  <script>
+    var element = document.querySelector('ion-drawer');
+    var drawer = new CupertinoPane(element, { 
+        inverse: true,
+        breaks: {
+          top: { enabled: true, height: 700, bounce: false },
+          middle: { enabled: true, height: 300, bounce: true },
+          bottom: { enabled: true, height: 100, bounce: true },
+        },
+        // clickBottomOpen: false,
+        // lowerThanBottom: false,
+        // draggableOver: true,
+        // dragByCursor: false,
+        // backdrop: true,
+        // topperOverflowOffset: 110
+        // followerElement: 'ion-fab',
+        // onDrag: () => console.log('Drag event'),
+        // onTransitionEnd: (e) => console.log('Transition end', e),
+        onBackdropTap: () => hideBackdrop()
+        // freeMode: true,
+        // onBackdropTap: () => hideDrawer()
+    });
+    setTimeout(() => drawer.present({animate: true}));
+
+    async function presentDrawer() {
+      drawer.present({animate: true});
+    };
+
+    async function destroyDrawer() {
+      drawer.destroy({animate: true});
+    };
+    
+    async function hideDrawer() {
+      drawer.hide();
+    };
+
+    async function isHiddenDrawer() {
+        console.log(await drawer.isHidden());
+    };
+
+    async function setTopDrawer() {
+      drawer.moveToBreak('top');
+    };
+
+    async function setMiddleDrawer() {
+      drawer.moveToBreak('middle');
+    };
+
+    async function setBottomDrawer() {
+      drawer.moveToBreak('bottom');
+    };
+
+    async function showBackdrop() {
+      drawer.backdrop({show: true});
+    }
+
+    async function hideBackdrop() {
+      drawer.backdrop({show: false});
+    }
+  </script>
+</body>
+
+</html>

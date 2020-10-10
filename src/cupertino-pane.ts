@@ -7,6 +7,7 @@ export class CupertinoPane {
 
   public settings: Settings = {
     initialBreak: 'middle',
+    inverse: false,
     parentElement: null,
     followerElement: null,
     pushElement: null,
@@ -53,6 +54,7 @@ export class CupertinoPane {
   };
   
   private screen_height: number = window.innerHeight;
+  private screenHeightOffset: number = this.screen_height;
   private steps: any[] = [];
   private startY: number;
   private startX: number;
@@ -134,34 +136,47 @@ export class CupertinoPane {
       this.paneEl.className = 'pane';
       this.paneEl.style.position = 'fixed';
       this.paneEl.style.zIndex = '11';
-      this.paneEl.style.paddingTop = '15px';
       this.paneEl.style.width = '100%';
       this.paneEl.style.maxWidth = '500px';
       this.paneEl.style.left = '0px';
       this.paneEl.style.right = '0px';
       this.paneEl.style.marginLeft = 'auto';
       this.paneEl.style.marginRight = 'auto';
-      this.paneEl.style.height = `${this.screen_height - this.topper - this.settings.bottomOffset}px`;
+      this.paneEl.style.height = `${this.getPaneHeight()}px`;
       this.paneEl.style.background = '#ffffff';
-      this.paneEl.style.borderTopLeftRadius = '20px';
-      this.paneEl.style.borderTopRightRadius = '20px';
       this.paneEl.style.boxShadow = '0 4px 16px rgba(0,0,0,.12)';
       this.paneEl.style.overflow = 'hidden';
       this.paneEl.style.willChange = 'transform';
       this.paneEl.style.transform = `translateY(${this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+
+      if (!this.settings.inverse) {
+        this.paneEl.style.borderTopLeftRadius = '20px';
+        this.paneEl.style.borderTopRightRadius = '20px';
+        this.paneEl.style.paddingTop = '15px';
+      } else {
+        this.paneEl.style.borderBottomLeftRadius = '20px';
+        this.paneEl.style.borderBottomRightRadius = '20px';
+        this.paneEl.style.paddingBottom = '15px';
+        this.paneEl.style.top = `-${this.bottomer}px`;
+      }
 
       // Draggable
       this.draggableEl = document.createElement('div');
       this.draggableEl.className = 'draggable';
       this.draggableEl.style.padding = '5px';
       this.draggableEl.style.position = 'absolute';
-      this.draggableEl.style.top = '0';
       this.draggableEl.style.left = '0';
       this.draggableEl.style.right = '0';
       this.draggableEl.style.marginLeft = 'auto';
       this.draggableEl.style.marginRight = 'auto';
       this.draggableEl.style.height = '30px';
       this.draggableEl.style.zIndex = '12';
+
+      if (!this.settings.inverse) {
+        this.draggableEl.style.top = '0';
+      } else {
+        this.draggableEl.style.bottom = '0';
+      }
 
       // Move
       this.moveEl = document.createElement('div');
@@ -171,6 +186,9 @@ export class CupertinoPane {
       this.moveEl.style.background = '#c0c0c0';
       this.moveEl.style.width = '36px';
       this.moveEl.style.borderRadius = '4px';
+      if (this.settings.inverse) {
+        this.moveEl.style.marginTop = '15px';
+      }
 
       // Content
       this.contentEl = this.el;
@@ -178,17 +196,23 @@ export class CupertinoPane {
       this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
       this.contentEl.style.overflowX = 'hidden';
 
+      if (this.settings.inverse) {
+        this.contentEl.style.paddingBottom = '30px';
+      }
+
       // Close button
       this.closeEl = document.createElement('div');
-      this.closeEl.className = 'close-button';
-      this.closeEl.style.width = '26px';
-      this.closeEl.style.height = '26px';
-      this.closeEl.style.position = 'absolute';
-      this.closeEl.style.background = '#ebebeb';
-      this.closeEl.style.top = '16px';
-      this.closeEl.style.right = '20px';
-      this.closeEl.style.zIndex = '14';
-      this.closeEl.style.borderRadius = '100%';
+      if (!this.settings.inverse) {
+        this.closeEl.className = 'close-button';
+        this.closeEl.style.width = '26px';
+        this.closeEl.style.height = '26px';
+        this.closeEl.style.position = 'absolute';
+        this.closeEl.style.background = '#ebebeb';
+        this.closeEl.style.right = '20px';
+        this.closeEl.style.zIndex = '14';
+        this.closeEl.style.borderRadius = '100%';
+        this.closeEl.style.top = '16px';
+      }
 
       // inject DOM
       this.parentEl.appendChild(this.wrapperEl);
@@ -216,6 +240,10 @@ export class CupertinoPane {
       // Emit event
       this.settings.onWillPresent();
       
+      if (this.settings.inverse) {
+        this.screenHeightOffset = 0;
+      }
+
       this.setBreakpoints();
       this.drawBaseElements();
       this.scrollElementInit();
@@ -258,7 +286,6 @@ export class CupertinoPane {
         this.contentEl.style.boxShadow = '0 4px 16px rgba(0,0,0,.12)';
 
         this.closeEl.style.top = '45px';
-
         this.draggableEl.style.padding = '15px';
 
         this.moveEl.style.width = '45px';
@@ -335,6 +362,13 @@ export class CupertinoPane {
    * Private Utils methods
    */
 
+  private getPaneHeight(): number {
+    if (!this.settings.inverse) {
+      return this.screen_height - this.topper - this.settings.bottomOffset;
+    } 
+    return this.bottomer + this.settings.bottomOffset;
+  }
+
   private attachAllEvents() {
     if (!this.settings.dragBy) {
       this.attachEvents(this.paneEl);
@@ -381,11 +415,18 @@ export class CupertinoPane {
       // Good to get rid of timeout
       // but render dom take a time  
       setTimeout(() => {
-        this.overflowEl.style.height = `${this.screen_height 
-          - this.topper 
-          - this.settings.bottomOffset
-          - this.settings.topperOverflowOffset
-          - this.overflowEl.offsetTop}px`;
+
+        if (!this.settings.inverse) {
+          this.overflowEl.style.height = `${this.getPaneHeight()
+            - this.settings.topperOverflowOffset
+            - this.overflowEl.offsetTop}px`;
+        } else {
+          this.overflowEl.style.height = `${this.getPaneHeight()
+            - 30
+            - this.settings.topperOverflowOffset
+            - this.overflowEl.offsetTop}px`;
+
+        }
       }, 150);
     }
   }
@@ -397,6 +438,7 @@ export class CupertinoPane {
   private checkOpacityAttr(val) {
     let attrElements = this.el.querySelectorAll('[hide-on-bottom]');
     if (!attrElements.length) return;
+    if (this.settings.inverse) return;
     attrElements.forEach((item) => {
       (<HTMLElement>item).style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
       (<HTMLElement>item).style.opacity = (val >= this.breaks['bottom']) ? '0' : '1';
@@ -405,7 +447,12 @@ export class CupertinoPane {
 
   private checkOverflowAttr(val) {
     if (!this.settings.topperOverflow) return;
-    this.overflowEl.style.overflowY = (val <= this.topper) ? 'auto' : 'hidden';
+
+    if (!this.settings.inverse) {
+      this.overflowEl.style.overflowY = (val <= this.topper) ? 'auto' : 'hidden';
+    } else {
+      this.overflowEl.style.overflowY = (val >= this.bottomer) ? 'auto' : 'hidden';
+    }
   }
 
   private isPanePresented():boolean {
@@ -474,7 +521,7 @@ export class CupertinoPane {
   private touchMove(t) {
 
     /****** Fix android issue https://bugs.chromium.org/p/chromium/issues/detail?id=1123304 *******/
-    if (this.device.android && this.movePreventDefault(t)) {
+    if (this.device.android && !this.willScrolled(t)) {
       t.preventDefault();
     }
 
@@ -519,6 +566,12 @@ export class CupertinoPane {
       this.overflowEl.addEventListener('scroll', (s: any) => {
         this.contentScrollTop = s.target.scrollTop;
       });
+
+      if (this.settings.inverse && this.willScrolled(t)) {
+        this.contentScrollTop = 0;
+        return;
+      }
+
       // Scrolled -> Disable drag
       if ((newVal > this.topper && this.contentScrollTop > 0) 
           || (newVal <= this.topper)) { 
@@ -532,7 +585,8 @@ export class CupertinoPane {
     }
 
     // Disallow drag topper than top point
-    if (!this.settings.upperThanTop && (newVal <= this.topper)) {
+    if (!this.settings.inverse 
+        && !this.settings.upperThanTop && (newVal <= this.topper)) {
       this.paneEl.style.transform = `translateY(${this.topper}px) translateZ(0px)`;
       return;
     }
@@ -544,7 +598,8 @@ export class CupertinoPane {
     }
 
     // Disallow drag lower then bottom 
-    if (!this.settings.lowerThanBottom && (newVal >= this.bottomer)) {
+    if ((!this.settings.lowerThanBottom || this.settings.inverse) 
+        && (newVal >= this.bottomer)) {
       this.paneEl.style.transform = `translateY(${this.bottomer}px) translateZ(0px)`;
       this.checkOpacityAttr(newVal);
       return;
@@ -625,53 +680,63 @@ export class CupertinoPane {
     }
   }
 
-  private movePreventDefault(t): boolean {
+  private willScrolled(t): boolean {
     if (!(this.overflowEl.scrollHeight > this.overflowEl.clientHeight 
         && this.overflowEl.style.overflow !== 'hidden'
         && this.isDragScrollabe(t.path || t.composedPath()))) {
-      return true;
+      return false;
     }
-    return false;
+    return true;
   }
 
   private swipeNextPoint = (diff, maxDiff, closest) => {
-      if (this.currentBreakpoint === this.breaks['top']) {
+    let brs = {...this.breaks};
+    let settingsBreaks = {...this.settings.breaks};
+
+    if (this.settings.inverse) {
+      brs['top'] = this.breaks['bottom'];
+      brs['bottom'] = this.breaks['top'];
+      settingsBreaks['top'] = this.settings.breaks['top'];
+      settingsBreaks['bottom'] = this.settings.breaks['bottom'];
+    }
+
+    if (this.currentBreakpoint === brs['top']) {
         if (diff > maxDiff) {
-          if (this.settings.breaks['middle'].enabled) { return this.breaks['middle']; }
-          if (this.settings.breaks['bottom'].enabled) { 
-            if (this.breaks['middle'] < closest) {
+          if (settingsBreaks['middle'].enabled) { return brs['middle']; }
+          if (settingsBreaks['bottom'].enabled) { 
+            if (brs['middle'] < closest) {
               return closest;
             }
-            return this.breaks['bottom']; 
+            return brs['bottom']; 
           }
         }
-        return this.breaks['top'];
-      }
+        return brs['top'];
+    }
 
-      if (this.currentBreakpoint === this.breaks['middle']) {
+    if (this.currentBreakpoint === brs['middle']) {
         if (diff < -maxDiff) {
-          if (this.settings.breaks['top'].enabled) { return this.breaks['top']; }
+          if (settingsBreaks['top'].enabled) { return brs['top']; }
         }
         if (diff > maxDiff) {
-          if (this.settings.breaks['bottom'].enabled) { return this.breaks['bottom']; }
+          if (settingsBreaks['bottom'].enabled) { return brs['bottom']; }
         }
-        return this.breaks['middle'];
-      }
+        return brs['middle'];
+    }
 
-      if (this.currentBreakpoint === this.breaks['bottom']) {
+    if (this.currentBreakpoint === brs['bottom']) {
         if (diff < -maxDiff) {
-          if (this.settings.breaks['middle'].enabled) { 
-            if (this.breaks['middle'] > closest) {
+          if (settingsBreaks['middle'].enabled) { 
+            if (brs['middle'] > closest) {
               return closest;
             }
-            return this.breaks['middle']; 
+            return brs['middle']; 
           }
-          if (this.settings.breaks['top'].enabled) { return this.breaks['top']; }
+          if (settingsBreaks['top'].enabled) { return brs['top']; }
         }
-        return this.breaks['bottom'];
-      }
+        return brs['bottom'];
+    }
 
-      return closest;
+    return closest;
   }
 
   private isBackdropPresented() {
@@ -898,11 +963,11 @@ export class CupertinoPane {
     if (this.isPanePresented()) {
       prevBreak = this.currentBreak();
     }
-
+    
     this.breaks = {
-      top: this.screen_height,
-      middle: this.screen_height,
-      bottom: this.screen_height
+      top: this.screenHeightOffset,
+      middle: this.screenHeightOffset,
+      bottom: this.screenHeightOffset
     };
     
     ['top', 'middle', 'bottom'].forEach((val) => {
@@ -923,7 +988,11 @@ export class CupertinoPane {
       if (this.settings.breaks[val]
           && this.settings.breaks[val].enabled
           && this.settings.breaks[val].height) {
-        this.breaks[val] -= this.settings.breaks[val].height;
+            if (!this.settings.inverse) {
+              this.breaks[val] -= this.settings.breaks[val].height;
+            } else {
+              this.breaks[val] = this.settings.breaks[val].height;
+            }
       }
     });
 
@@ -976,7 +1045,7 @@ export class CupertinoPane {
       }
 
       // Re-calc height
-      this.paneEl.style.height = `${this.screen_height - this.topper - this.settings.bottomOffset}px`;
+      this.paneEl.style.height = `${this.getPaneHeight()}px`;
 
       // Re-calc overflow elements
       this.scrollElementInit();
@@ -1013,7 +1082,7 @@ export class CupertinoPane {
       return null;
     }
 
-    this.doTransition({type: 'hide', translateY: this.screen_height});
+    this.doTransition({type: 'hide', translateY: this.screenHeightOffset});
   }
 
   public isHidden(): (boolean|null) {
@@ -1022,7 +1091,7 @@ export class CupertinoPane {
       return null;
     }
     
-    return this.paneEl.style.transform === `translateY(${this.screen_height}px) translateZ(0px)`;
+    return this.paneEl.style.transform === `translateY(${this.screenHeightOffset}px) translateZ(0px)`;
   }
 
   public currentBreak(): (string|null) {
@@ -1062,7 +1131,7 @@ export class CupertinoPane {
 
     /****** Animation & Transition ******/
     if (conf.animate) {
-      this.doTransition({type: 'destroy', translateY: this.screen_height}); 
+      this.doTransition({type: 'destroy', translateY: this.screenHeightOffset}); 
     } else {
       this.destroyResets();
       // Emit event
@@ -1071,9 +1140,9 @@ export class CupertinoPane {
   }
 
   private pushTransition(newPaneY: number, transition: string) {
-    newPaneY = this.screen_height - newPaneY;
-    const topHeight = this.settings.pushMinHeight ? this.settings.pushMinHeight : this.screen_height - this.bottomer;
-    const minHeight = this.screen_height - this.topper;
+    newPaneY = this.screenHeightOffset - newPaneY;
+    const topHeight = this.settings.pushMinHeight ? this.settings.pushMinHeight : this.screenHeightOffset - this.bottomer;
+    const minHeight = this.screenHeightOffset - this.topper;
     this.settings.pushElement.style.transition = transition;
 
     const setStyles = (scale, y, border, contrast) => {
@@ -1190,7 +1259,7 @@ export class CupertinoPane {
       // Get timing function && push for next 
       // TODO: getBreakByHeight or by translateY()
       const nextBreak = Object.entries(this.settings.breaks).find(
-        val => val[1].height === (this.screen_height - params.translateY)
+        val => val[1].height === (this.screenHeightOffset - params.translateY)
       );
       const timingForNext = this.getTimingFunction(nextBreak && nextBreak[1].bounce ? true : false);
 
@@ -1208,7 +1277,7 @@ export class CupertinoPane {
 
       // Main transitions
       if (params.type === 'present') {
-        this.paneEl.style.transform = `translateY(${this.screen_height}px) translateZ(0px)`;
+        this.paneEl.style.transform = `translateY(${this.screenHeightOffset}px) translateZ(0px)`;
         setTimeout(() => {
           // Emit event
           this.settings.onTransitionStart({translateY: {new: params.translateY}});

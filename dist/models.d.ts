@@ -15,6 +15,7 @@ export interface TransitionStartEvent {
 }
 export interface Settings {
     initialBreak: ('top' | 'middle' | 'bottom');
+    inverse: boolean;
     parentElement: any;
     followerElement: string;
     pushElement: any;

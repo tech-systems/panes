@@ -5,6 +5,7 @@ export declare class CupertinoPane {
     settings: Settings;
     private defaultBreaksConf;
     private screen_height;
+    private screenHeightOffset;
     private steps;
     private startY;
     private startX;
@@ -40,6 +41,7 @@ export declare class CupertinoPane {
     /**
      * Private Utils methods
      */
+    private getPaneHeight;
     private attachAllEvents;
     private detachAllEvents;
     private resetEvents;
@@ -83,7 +85,7 @@ export declare class CupertinoPane {
      */
     private onClickCb;
     private onClick;
-    private movePreventDefault;
+    private willScrolled;
     private swipeNextPoint;
     private isBackdropPresented;
     private renderBackdrop;

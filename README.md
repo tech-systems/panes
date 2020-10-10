@@ -328,7 +328,12 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- [Feature] `.setDirection('topToBottom')` + release 1.1.9
+- if overflow - stop drag same example with 2 overflows
+- tests breakpoints + configurations
+- jsfiddle example
+- readme + changelog
+- release 1.1.9
+
 - [Feature] Horizontal directions
 - [Showcase] Apple Music F7
 - [Docs] Package branding
