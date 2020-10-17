@@ -121,7 +121,8 @@ export declare class CupertinoPane {
      * @param conf breakpoints
      */
     setBreakpoints(conf?: PaneBreaks): void;
-    moveToBreak(val: any): any;
+    moveToBreak(val: string): any;
+    moveToHeight(val: number): any;
     hide(): any;
     isHidden(): (boolean | null);
     currentBreak(): (string | null);

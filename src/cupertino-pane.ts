@@ -196,10 +196,6 @@ export class CupertinoPane {
       this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
       this.contentEl.style.overflowX = 'hidden';
 
-      if (this.settings.inverse) {
-        this.contentEl.style.paddingBottom = '30px';
-      }
-
       // Close button
       this.closeEl = document.createElement('div');
       if (!this.settings.inverse) {
@@ -1059,7 +1055,7 @@ export class CupertinoPane {
     }
   }
 
-  public moveToBreak(val) {
+  public moveToBreak(val: string) {
     if (!this.isPanePresented()) {
       console.warn(`Cupertino Pane: Present pane before call moveToBreak()`);
       return null;
@@ -1074,6 +1070,17 @@ export class CupertinoPane {
     this.checkOverflowAttr(this.breaks[val]);
     this.doTransition({type: 'breakpoint', translateY: this.breaks[val]});
     this.currentBreakpoint = this.breaks[val];
+  }
+
+  public moveToHeight(val: number) {
+    if (!this.isPanePresented()) {
+      console.warn(`Cupertino Pane: Present pane before call moveToBreak()`);
+      return null;
+    }
+
+    let translateY = this.screenHeightOffset ? this.screen_height - val : val; 
+    this.checkOpacityAttr(translateY);
+    this.doTransition({type: 'breakpoint', translateY });    
   }
 
   public hide() {

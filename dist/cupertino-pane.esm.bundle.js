@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.91
+ * Cupertino Pane 1.1.92
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: October 10, 2020
+ * Released on: October 17, 2020
  */
 
 class Support {
@@ -410,9 +410,6 @@ class CupertinoPane {
         this.contentEl.style.display = 'block';
         this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
         this.contentEl.style.overflowX = 'hidden';
-        if (this.settings.inverse) {
-            this.contentEl.style.paddingBottom = '30px';
-        }
         // Close button
         this.closeEl = document.createElement('div');
         if (!this.settings.inverse) {
@@ -1089,6 +1086,15 @@ class CupertinoPane {
         this.checkOverflowAttr(this.breaks[val]);
         this.doTransition({ type: 'breakpoint', translateY: this.breaks[val] });
         this.currentBreakpoint = this.breaks[val];
+    }
+    moveToHeight(val) {
+        if (!this.isPanePresented()) {
+            console.warn(`Cupertino Pane: Present pane before call moveToBreak()`);
+            return null;
+        }
+        let translateY = this.screenHeightOffset ? this.screen_height - val : val;
+        this.checkOpacityAttr(translateY);
+        this.doTransition({ type: 'breakpoint', translateY });
     }
     hide() {
         if (!this.isPanePresented()) {

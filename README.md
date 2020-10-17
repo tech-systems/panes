@@ -250,6 +250,11 @@ Will change pane position with animation to selected breakpoint.
 ```javascript
 myPane.moveToBreak('top');
 ```
+### moveToHeight(val: **number**)
+Will move pane to exact height with animation. Breakpoints will saved. 
+```javascript
+myPane.moveToHeight(575);
+```
 ### hide()
 Dissappear pane from screen, still keep pane in DOM.
 ```javascript

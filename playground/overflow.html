@@ -126,6 +126,7 @@
       <ion-button expand="block" onclick="hideDrawer()">Hide Drawer</ion-button>
       <ion-button expand="block" onclick="isHiddenDrawer()">Drawer is hidden</ion-button>
       <ion-button expand="block" onclick="toggleDarkMode()">Toggle dark mode</ion-button>
+      <ion-button expand="block" onclick="moveToHeight()">Move to height = 575</ion-button>
 
       <ion-button expand="block" color="secondary" onclick="setTopDrawer()">Set Top</ion-button>
       <ion-button expand="block" color="secondary" onclick="setMiddleDrawer()">Set Middle</ion-button>
@@ -140,7 +141,7 @@
         // breaks: {
         //   top: { enabled: false, offset: 700 }
         // },
-        // inverse: true,
+        inverse: false,
         darkMode: true,
         // draggableOver: true,
         // dragByCursor: false,
@@ -192,6 +193,10 @@
         middle: { enabled: true, height: 400 },
         bottom: { enabled: true, height: 150 }
       });
+    };
+
+    async function moveToHeight() {
+      drawer.moveToHeight(575);
     };
   </script>
 </body>

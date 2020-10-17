@@ -52,6 +52,13 @@
             <h1>Slide 3</h1>
           </ion-slide>
         </ion-slides>
+
+        <!-- Ion-Range -->
+        <ion-list>
+          <ion-item>
+            <ion-range color="danger" pin="true"></ion-range>
+          </ion-item>
+        </ion-list>
       </ion-extra-drawer>
       <ion-button expand="block" color="danger" onclick="presentDrawer()">Present Drawer</ion-button>
       <ion-button expand="block" color="danger" onclick="destroyDrawer()">Destroy Drawer</ion-button>
@@ -95,7 +102,7 @@
         touchAngle: 45,
         breaks: {
           top: {enabled: false},
-          middle: {enabled: true, height: 400},
+          middle: {enabled: true, height: 600},
           bottom: {enabled: true, height: 50},
         }
     });

@@ -2,6 +2,14 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## 1.1.92 - 2020-10-17
+
+### Features
+- Added `moveToHeight(val: **number**)` method. Allow to move pane into exact height position. [#73](https://github.com/roman-rr/cupertino-pane/issues/73)
+
+### Bug Fixes
+- Removed excesive padding from inversed `top-to-bottom` overscrolls. [#75](https://github.com/roman-rr/cupertino-pane/issues/75)
+
 ## 1.1.9 - 2020-10-10
 
 ### Features
