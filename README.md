@@ -337,7 +337,7 @@ By default using for full pane area, but in some cases good useful with header.
 ## Future Goals
 - [Showcase] Apple Music F7
 - [Docs] Package branding
-- [Docs] Docs engine (F7)
+- [Docs] Docs engine (F7, Netlify)
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) - Native Touch Plugin
 - [Platforms] React Native version
 - [Platforms] C++ QT version
