@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: October 17, 2020
+ * Released on: October 27, 2020
  */
 
 class Support {
@@ -165,6 +165,7 @@ class CupertinoPane {
             bottomOffset: 0,
             darkMode: false,
             bottomClose: false,
+            fastSwipeClose: false,
             freeMode: false,
             buttonClose: true,
             topperOverflow: true,
@@ -777,8 +778,15 @@ class CupertinoPane {
         const diff = this.steps[this.steps.length - 1] - this.steps[this.steps.length - 2];
         // Set sensivity lower for web
         const swipeNextSensivity = window.hasOwnProperty('cordova') ? 4 : 3;
-        if (Math.abs(diff) >= swipeNextSensivity) {
+        const fastSwipeNext = (Math.abs(diff) >= swipeNextSensivity);
+        if (fastSwipeNext) {
             closest = this.swipeNextPoint(diff, swipeNextSensivity, closest);
+            // Fast swipe toward bottom - close
+            if (this.settings.fastSwipeClose
+                && this.currentBreakpoint < closest) {
+                this.destroy({ animate: true });
+                return;
+            }
         }
         // Click to bottom - open middle
         if (this.settings.clickBottomOpen) {

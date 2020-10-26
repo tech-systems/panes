@@ -27,6 +27,7 @@ export interface Settings {
     bottomOffset: number;
     darkMode: boolean;
     bottomClose: boolean;
+    fastSwipeClose: boolean;
     freeMode: boolean;
     buttonClose: boolean;
     topperOverflow: boolean;

@@ -187,6 +187,7 @@ new CupertinoPane(element); // HTMLElement
 | **animationType** | `string` | 'ease' | Base transition timing function |
 | **animationDuration** | `number` | 300 | Transition property duration |
 | **bottomClose** | `boolean` | false | Close pane with drag to bottom breakpoint |
+| **fastSwipeClose** | `boolean` | false | Close pane with fast drag to bottom direction |
 | **freeMode** | `boolean` | false | On `true` will remove automatical magnetic effects to near breakpoint |
 | **lowerThanBottom** | `boolean` | true | By default allow user to drag pane lower than bottom position. On `false` will automatically place pane to bottom position on lower than bottom attemption |
 | **upperThanTop** | `boolean` | false | Allow user to drag pane upper than maximum top position. Useful with bulletin style without overflow-y |
