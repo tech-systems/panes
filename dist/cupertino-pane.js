@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: October 27, 2020
+ * Released on: October 29, 2020
  */
  
  
@@ -163,6 +163,7 @@ class CupertinoPane {
             followerElement: null,
             pushElement: null,
             pushMinHeight: null,
+            pushYOffset: 0,
             backdrop: false,
             backdropOpacity: 0.4,
             animationType: 'ease',
@@ -472,7 +473,7 @@ class CupertinoPane {
             this.followerEl.style.transition = `all ${this.settings.animationDuration}ms ${this.getTimingFunction(this.settings.breaks[this.currentBreak()].bounce)} 0s`;
         }
         if (this.settings.pushElement) {
-            this.settings.pushElement = document.querySelector(this.settings.pushElement);
+            this.pushElement = document.querySelector(this.settings.pushElement);
         }
         if (!this.settings.showDraggable) {
             this.draggableEl.style.opacity = '0';
@@ -1173,11 +1174,11 @@ class CupertinoPane {
         newPaneY = this.screenHeightOffset - newPaneY;
         const topHeight = this.settings.pushMinHeight ? this.settings.pushMinHeight : this.screenHeightOffset - this.bottomer;
         const minHeight = this.screenHeightOffset - this.topper;
-        this.settings.pushElement.style.transition = transition;
+        this.pushElement.style.transition = transition;
         const setStyles = (scale, y, border, contrast) => {
-            this.settings.pushElement.style.transform = `translateY(${y}px) scale(${scale})`;
-            this.settings.pushElement.style.borderRadius = `${border}px`;
-            this.settings.pushElement.style.filter = `contrast(${contrast})`;
+            this.pushElement.style.transform = `translateY(${y}px) scale(${scale})`;
+            this.pushElement.style.borderRadius = `${border}px`;
+            this.pushElement.style.filter = `contrast(${contrast})`;
         };
         if (newPaneY <= topHeight) {
             setStyles(1, 0, 0, 1);
@@ -1193,7 +1194,8 @@ class CupertinoPane {
                 val = min;
             return val;
         };
-        setStyles(getXbyY(0.93, 1), getXbyY(-6, 0) * -1, getXbyY(-10, 0) * -1, getXbyY(0.85, 1));
+        setStyles(getXbyY(0.93, 1), getXbyY(-6 - this.settings.pushYOffset, 0), // *-1 for reverse animation
+        getXbyY(-10, 0) * -1, getXbyY(0.85, 1));
     }
     /***********************************
      * Transitions handler

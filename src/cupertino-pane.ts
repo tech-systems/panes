@@ -12,6 +12,7 @@ export class CupertinoPane {
     followerElement: null,
     pushElement: null,
     pushMinHeight: null,
+    pushYOffset: 0,
     backdrop: false,
     backdropOpacity: 0.4,
     animationType: 'ease',
@@ -84,6 +85,7 @@ export class CupertinoPane {
   private closeEl: HTMLDivElement;
   private overflowEl: HTMLElement;
   private followerEl: HTMLElement;
+  private pushElement: HTMLElement;
 
   private device = new Device();
 
@@ -263,7 +265,7 @@ export class CupertinoPane {
       }
 
       if (this.settings.pushElement) {
-        this.settings.pushElement = document.querySelector(this.settings.pushElement);
+        this.pushElement = <HTMLElement>document.querySelector(this.settings.pushElement);
       }
 
       if (!this.settings.showDraggable) {
@@ -1164,12 +1166,12 @@ export class CupertinoPane {
     newPaneY = this.screenHeightOffset - newPaneY;
     const topHeight = this.settings.pushMinHeight ? this.settings.pushMinHeight : this.screenHeightOffset - this.bottomer;
     const minHeight = this.screenHeightOffset - this.topper;
-    this.settings.pushElement.style.transition = transition;
+    this.pushElement.style.transition = transition;
 
     const setStyles = (scale, y, border, contrast) => {
-      this.settings.pushElement.style.transform = `translateY(${y}px) scale(${scale})`;
-      this.settings.pushElement.style.borderRadius = `${border}px`;
-      this.settings.pushElement.style.filter = `contrast(${contrast})`;
+      this.pushElement.style.transform = `translateY(${y}px) scale(${scale})`;
+      this.pushElement.style.borderRadius = `${border}px`;
+      this.pushElement.style.filter = `contrast(${contrast})`;
     };
 
     if (newPaneY <= topHeight) {
@@ -1188,7 +1190,7 @@ export class CupertinoPane {
 
     setStyles(
       getXbyY(0.93, 1), 
-      getXbyY(-6, 0) * -1, 
+      getXbyY(-6 - this.settings.pushYOffset, 0), // *-1 for reverse animation
       getXbyY(-10, 0) * -1,
       getXbyY(0.85, 1)
     );

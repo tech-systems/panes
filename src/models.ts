@@ -21,6 +21,7 @@ export interface Settings {
   followerElement: string;
   pushElement: any;
   pushMinHeight: number;
+  pushYOffset: number;
   backdrop: boolean;
   backdropOpacity: number;
   animationType: string;
