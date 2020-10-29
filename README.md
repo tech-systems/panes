@@ -180,6 +180,7 @@ new CupertinoPane(element); // HTMLElement
 | **followerElement** | `string` | Follower element selector | Element with selector will following pane transitions |
 | **pushElement** | `string` | Push element selector | DOM Element will be pushed and scaled |
 | **pushMinHeight** | `number` | Most bottom available point | Height from which 3d push effect will be started |
+| **pushYOffset** | `number` | Negative margin value to place pushed element upper |
 | **initialBreak** | `'top' \| 'middle' \| 'bottom'` | 'middle' | Initial pane position |
 | **darkMode** | `boolean` | false | Initial pane styles |
 | **backdrop** | `boolean` | false | Dimmed overlay will rendered with pane if `true` |
@@ -188,6 +189,7 @@ new CupertinoPane(element); // HTMLElement
 | **animationDuration** | `number` | 300 | Transition property duration |
 | **bottomClose** | `boolean` | false | Close pane with drag to bottom breakpoint |
 | **fastSwipeClose** | `boolean` | false | Close pane with fast drag to bottom direction |
+| **fastSwipeSensivity** | `number` | 3 | Increase value and fast swipes become heavier |
 | **freeMode** | `boolean` | false | On `true` will remove automatical magnetic effects to near breakpoint |
 | **lowerThanBottom** | `boolean` | true | By default allow user to drag pane lower than bottom position. On `false` will automatically place pane to bottom position on lower than bottom attemption |
 | **upperThanTop** | `boolean` | false | Allow user to drag pane upper than maximum top position. Useful with bulletin style without overflow-y |
@@ -337,6 +339,7 @@ By default using for full pane area, but in some cases good useful with header.
 
 ## Future Goals
 - [Showcase] Apple Music F7
+- [Docs] Open collective
 - [Docs] Package branding
 - [Docs] Docs engine (F7, Netlify)
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) - Native Touch Plugin

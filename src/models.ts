@@ -30,6 +30,7 @@ export interface Settings {
   darkMode: boolean;
   bottomClose: boolean;
   fastSwipeClose: boolean;
+  fastSwipeSensivity: number;
   freeMode: boolean;
   buttonClose: boolean;
   topperOverflow: boolean;

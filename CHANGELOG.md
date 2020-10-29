@@ -2,10 +2,15 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [1.1.93] - 2020-10-29
+
+### Extra
+- Z-Deminsion Stack demo available
 
 ### Features 
 - Added `fastSwipeClose` for close pane with fast drag to bottom direction [#78](https://github.com/roman-rr/cupertino-pane/issues/78)
+- Added `fastSwipeSensivity` property to regulate how long should a swipe event being for automaticaly swipe into next point [#78](https://github.com/roman-rr/cupertino-pane/issues/78)
+- Added `pushYOffset` property to realize Z-Deminsion Stack
 
 ## 1.1.92 - 2020-10-17
 

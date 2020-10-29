@@ -22,6 +22,7 @@ export class CupertinoPane {
     darkMode: false,
     bottomClose: false,
     fastSwipeClose: false,
+    fastSwipeSensivity: 3,
     freeMode: false,
     buttonClose: true,
     topperOverflow: true,
@@ -634,7 +635,8 @@ export class CupertinoPane {
     // Swipe - next (if differ > 10)
     const diff =  this.steps[this.steps.length - 1] - this.steps[this.steps.length - 2];
     // Set sensivity lower for web
-    const swipeNextSensivity = window.hasOwnProperty('cordova') ? 4 : 3; 
+    const swipeNextSensivity = window.hasOwnProperty('cordova') 
+      ? (this.settings.fastSwipeSensivity + 1) : this.settings.fastSwipeSensivity; 
     const fastSwipeNext = (Math.abs(diff) >= swipeNextSensivity);
     if (fastSwipeNext) {
       closest = this.swipeNextPoint(diff, swipeNextSensivity, closest);
