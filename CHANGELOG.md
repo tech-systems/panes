@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 ## [1.1.93] - 2020-10-29
 
 ### Extra
-- Z-Deminsion Stack demo available
+- Z-Deminsion Stack [demo available](https://output.jsbin.com/wedegox)
 
 ### Features 
 - Added `fastSwipeClose` for close pane with fast drag to bottom direction [#78](https://github.com/roman-rr/cupertino-pane/issues/78)
