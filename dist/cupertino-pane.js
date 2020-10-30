@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: October 29, 2020
+ * Released on: October 30, 2020
  */
  
  
@@ -1283,7 +1283,12 @@ class CupertinoPane {
             }
             // Push transition
             if (this.settings.pushElement) {
-                this.pushTransition(params.translateY, `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`);
+                // Reason of timeout is to hide empty space when present pane and push element
+                // we should start push after pushMinHeight but for present 
+                // transition we can't calculate where pane Y is.
+                setTimeout(() => {
+                    this.pushTransition(params.translateY, `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`);
+                }, this.settings.pushYOffset ? 50 : 0);
             }
             // Main transitions
             if (params.type === 'present') {
