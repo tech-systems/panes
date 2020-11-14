@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: October 30, 2020
+ * Released on: November 14, 2020
  */
 
 class Support {
@@ -208,6 +208,7 @@ class CupertinoPane {
         this.disableDragAngle = false;
         this.rendered = false;
         this.allowClick = true;
+        this.preventDismissEvent = false;
         this.iconCloseColor = '#7a7a7e';
         this.breaks = {};
         this.brs = [];
@@ -962,6 +963,12 @@ class CupertinoPane {
      * Public user methods
      */
     /**
+     * Prevent dismiss event
+     */
+    preventDismiss() {
+        this.preventDismissEvent = true;
+    }
+    /**
      * Disable pane drag events
      */
     disableDrag() {
@@ -1156,6 +1163,11 @@ class CupertinoPane {
         }
         // Emit event
         this.settings.onWillDismiss();
+        if (this.preventDismissEvent) {
+            this.moveToBreak(this.prevBreakpoint);
+            this.preventDismissEvent = false;
+            return;
+        }
         /****** Animation & Transition ******/
         if (conf.animate) {
             this.doTransition({ type: 'destroy', translateY: this.screenHeightOffset });
@@ -1306,6 +1318,7 @@ class CupertinoPane {
                     this.followerEl.style.transform = `translateY(${params.translateY - this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
                 }
             }
+            this.prevBreakpoint = Object.entries(this.breaks).find(val => val[1] === params.translateY)[0];
             this.paneEl.addEventListener('transitionend', transitionEnd);
             return;
         }

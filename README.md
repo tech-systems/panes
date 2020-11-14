@@ -1,5 +1,3 @@
-<!-- https://github.com/ai/nanoid - cover -->
-
 # Cupertino Pane
 
 [![CircleCI](https://circleci.com/gh/roman-rr/cupertino-pane.svg?style=svg)](https://circleci.com/gh/roman-rr/cupertino-pane)
@@ -34,32 +32,10 @@ Cupertino Pane is great modern slide-over pane with touch technologies. <br>
 * [Changelog](https://github.com/roman-rr/cupertino-pane/blob/master/CHANGELOG.md)
 * [License](#license)
 
-<!-- ## Breaking Changes
-### v.1.1.2
-- Heights and pane position normalized across all devices and screen heights. Please re-configure heights if needs. 
-- Heights value now calculating from screen bottom position
-- Do not necessary now to specify all breaks in settings configuration. Can be changed one or few:
-
-```javascript
-let settings = {
-    breaks: {
-        top: { 
-          enabled: true, 
-          height: window.screen.height - (135 * 0.35)
-        },
-        middle: {
-          enabled: true,
-          height: 410 // 410 pixels from screen bottom until pane top vertex
-        }
-      }
-    }
-};
-```
--->
-
 ## Demonstration
 - [Base live](https://output.jsbin.com/fuhisey)
 - [Z-Stack live](https://output.jsbin.com/wedegox)
+- [Prevent dismiss live](https://output.jsbin.com/keravam)
 - [Top-to-bottom live](https://output.jsbin.com/muhabuf)
 - [3D Push live](https://output.jsbin.com/tutegad)
 - [Overflow top live](https://output.jsbin.com/baguroy)
@@ -318,6 +294,18 @@ myPane.setBreakpoints({
   bottom: { ... }
 });
 ```
+### preventDismiss()
+Using in pair with `onWillDismiss()` callback to prevent pane from destroy on custom conditions
+```javascript
+const settings = {
+  ...
+  onWillDismiss: () => {
+    if (disallowDismiss) {
+      drawer.preventDismiss();
+    }
+  }
+}
+```
 
 ## Attributes
 ### hide-on-bottom
@@ -339,9 +327,9 @@ By default using for full pane area, but in some cases good useful with header.
 ```
 
 ## Future Goals
-- [Showcase] Apple Music F7
-- [Docs] Open collective
 - [Docs] Package branding
+- [Docs] Open collective
+- [Showcase] Apple Music F7
 - [Docs] Docs engine (F7, Netlify)
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) - Native Touch Plugin
 - [Platforms] React Native version

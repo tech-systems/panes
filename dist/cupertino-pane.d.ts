@@ -13,11 +13,13 @@ export declare class CupertinoPane {
     private topper;
     private bottomer;
     private currentBreakpoint;
+    private prevBreakpoint;
     private contentScrollTop;
     private disableDragEvents;
     private disableDragAngle;
     private rendered;
     private allowClick;
+    private preventDismissEvent;
     private iconCloseColor;
     private breaks;
     private brs;
@@ -106,6 +108,10 @@ export declare class CupertinoPane {
     /************************************
      * Public user methods
      */
+    /**
+     * Prevent dismiss event
+     */
+    preventDismiss(): void;
     /**
      * Disable pane drag events
      */

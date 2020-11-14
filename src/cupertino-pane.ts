@@ -65,11 +65,13 @@ export class CupertinoPane {
   private topper: number;
   private bottomer: number;
   private currentBreakpoint: number;
+  private prevBreakpoint: string;
   private contentScrollTop: number = 0;
   private disableDragEvents: boolean = false;
   private disableDragAngle: boolean = false;
   private rendered: boolean = false;
   private allowClick: boolean = true;
+  private preventDismissEvent: boolean = false;
   private iconCloseColor: string = '#7a7a7e';
 
   private breaks: {} = {}
@@ -928,6 +930,13 @@ export class CupertinoPane {
    */
 
   /**
+   * Prevent dismiss event
+   */
+  public preventDismiss(): void {
+    this.preventDismissEvent = true;
+  }
+
+  /**
    * Disable pane drag events
    */
   public disableDrag(): void {
@@ -1154,6 +1163,12 @@ export class CupertinoPane {
     // Emit event
     this.settings.onWillDismiss();
 
+    if (this.preventDismissEvent) {
+      this.moveToBreak(this.prevBreakpoint)
+      this.preventDismissEvent = false;      
+      return;
+    }
+
     /****** Animation & Transition ******/
     if (conf.animate) {
       this.doTransition({type: 'destroy', translateY: this.screenHeightOffset}); 
@@ -1329,6 +1344,7 @@ export class CupertinoPane {
         } 
       }
 
+      this.prevBreakpoint = Object.entries(this.breaks).find(val => val[1] === params.translateY)[0];
       this.paneEl.addEventListener('transitionend', transitionEnd);      
       return;
     }

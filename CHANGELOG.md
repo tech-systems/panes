@@ -2,6 +2,24 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Extra 
+- Prevent dismiss [demo available](https://output.jsbin.com/keravam)
+
+### Features 
+- Added `preventDismiss()` method. Using in pair with `onWillDismiss()` callback to prevent pane from destroy on custom conditions [#82](https://github.com/roman-rr/cupertino-pane/issues/82)
+```javascript
+const settings = {
+  ...
+  onWillDismiss: () => {
+    if (disallowDismiss) {
+      drawer.preventDismiss();
+    }
+  }
+}
+```
+
 ## [1.1.93] - 2020-10-29
 
 ### Extra
