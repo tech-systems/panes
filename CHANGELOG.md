@@ -2,7 +2,10 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [1.1.94] - 2020-11-15
+
+### BREAKING CHANGES
+- Implemented auto-keyboard handler for cordova applications. Keyboard now will push pane for exact keyboard height. If you would like handle this part by yourself, set option `handleKeyboard: false`.
 
 ### Extra 
 - Prevent dismiss [demo available](https://output.jsbin.com/keravam)

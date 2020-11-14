@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.93
+ * Cupertino Pane 1.1.94
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: November 14, 2020
+ * Released on: November 15, 2020
  */
  
  
@@ -184,6 +184,7 @@ class CupertinoPane {
             draggableOver: false,
             clickBottomOpen: true,
             preventClicks: true,
+            handleKeyboard: true,
             simulateTouch: true,
             passiveListeners: true,
             touchMoveStopPropagation: false,
@@ -215,7 +216,9 @@ class CupertinoPane {
         this.rendered = false;
         this.allowClick = true;
         this.preventDismissEvent = false;
+        this.inputBlured = false;
         this.iconCloseColor = '#7a7a7e';
+        this.formElements = ['input', 'select', 'option', 'textarea', 'button', 'label'];
         this.breaks = {};
         this.brs = [];
         this.device = new Device();
@@ -244,6 +247,16 @@ class CupertinoPane {
          * @param t
          */
         this.onClickCb = (t) => this.onClick(t);
+        /**
+         * Open Cordova Keyboard event
+         * @param e
+         */
+        this.onKeyboardShowCb = (e) => this.onKeyboardShow(e);
+        /**
+         * Close Cordova Keyboard event
+         * @param e
+         */
+        this.onKeyboardHideCb = (e) => this.onKeyboardHide(e);
         this.swipeNextPoint = (diff, maxDiff, closest) => {
             let brs = {};
             let settingsBreaks = {};
@@ -522,23 +535,6 @@ class CupertinoPane {
         if (this.device.android) {
             // Body patch prevent android pull-to-refresh
             document.body.style['overscrollBehaviorY'] = 'none';
-            if (this.device.ionic
-                && this.device.cordova) {
-                // TODO: manual keyboard control (#49 issue)
-                // Fix android keyboard issue with transition (resize height on hide)
-                window.addEventListener('keyboardWillHide', () => {
-                    if (!this.paneEl)
-                        return;
-                    window.requestAnimationFrame(() => {
-                        this.wrapperEl.style.width = '100%';
-                        this.paneEl.style.position = 'absolute';
-                        window.requestAnimationFrame(() => {
-                            this.wrapperEl.style.width = 'unset';
-                            this.paneEl.style.position = 'fixed';
-                        });
-                    });
-                });
-            }
         }
         /****** Attach Events *******/
         this.attachAllEvents();
@@ -574,6 +570,11 @@ class CupertinoPane {
                     this.attachEvents(el);
             });
         }
+        // Handle keyboard events for cordova
+        if (this.settings.handleKeyboard && this.device.cordova) {
+            window.addEventListener('keyboardWillShow', this.onKeyboardShowCb);
+            window.addEventListener('keyboardWillHide', this.onKeyboardHideCb);
+        }
     }
     detachAllEvents() {
         if (!this.settings.dragBy) {
@@ -585,6 +586,11 @@ class CupertinoPane {
                 if (el)
                     this.detachEvents(el);
             });
+        }
+        // Handle keyboard events for cordova
+        if (this.settings.handleKeyboard && this.device.cordova) {
+            window.removeEventListener('keyboardWillShow', this.onKeyboardShowCb);
+            window.removeEventListener('keyboardWillHide', this.onKeyboardHideCb);
         }
     }
     resetEvents() {
@@ -713,6 +719,13 @@ class CupertinoPane {
         let v = screenX;
         const diffY = n - this.steps[this.steps.length - 1];
         let newVal = this.getPanelTransformY() + diffY;
+        if (this.steps.length > 2) {
+            if (this.formElements.includes(document.activeElement && document.activeElement.tagName.toLowerCase())
+                && !(this.formElements.includes(t.target && t.target.tagName.toLowerCase()))) {
+                document.activeElement.blur();
+                this.inputBlured = true;
+            }
+        }
         // Touch angle
         if (this.settings.touchAngle) {
             let touchAngle;
@@ -798,16 +811,19 @@ class CupertinoPane {
                 return;
             }
         }
-        // Click to bottom - open middle
-        if (this.settings.clickBottomOpen) {
-            if (this.currentBreakpoint === this.breaks['bottom'] && isNaN(diff)) {
-                closest = this.settings.breaks['middle'].enabled
-                    ? this.breaks['middle'] : this.settings.breaks['top'].enabled
-                    ? this.breaks['top'] : this.breaks['bottom'];
-            }
+        // blur tap event
+        let blurTapEvent = false;
+        if ((this.formElements.includes(document.activeElement && document.activeElement.tagName.toLowerCase()))
+            && !(this.formElements.includes(t.target && t.target.tagName.toLowerCase()))
+            && this.steps.length === 2) {
+            blurTapEvent = true;
         }
         this.steps = [];
         this.currentBreakpoint = closest;
+        // tap event
+        if (isNaN(diff) || blurTapEvent) {
+            return;
+        }
         this.checkOpacityAttr(this.currentBreakpoint);
         this.checkOverflowAttr(this.currentBreakpoint);
         // Bottom closable
@@ -825,6 +841,51 @@ class CupertinoPane {
                 t.stopPropagation();
                 t.stopImmediatePropagation();
             }
+            return;
+        }
+        // Click to bottom - open middle
+        if (this.settings.clickBottomOpen) {
+            if (this.breaks['bottom'] === this.getPanelTransformY()) {
+                let closest;
+                if (this.settings.breaks['top'].enabled) {
+                    closest = 'top';
+                }
+                if (this.settings.breaks['middle'].enabled) {
+                    closest = 'middle';
+                }
+                this.moveToBreak(closest);
+            }
+        }
+    }
+    onKeyboardShow(e) {
+        this.prevBreakpoint = Object.entries(this.breaks).find(val => val[1] === this.getPanelTransformY())[0];
+        let newHeight = this.settings.breaks[this.currentBreak()].height + e.keyboardHeight;
+        if (this.screen_height < newHeight) {
+            newHeight = this.screen_height - (135 * 0.35);
+        }
+        this.moveToHeight(newHeight);
+    }
+    onKeyboardHide(e) {
+        // Fix android keyboard issue with transition (resize height on hide)
+        if (this.device.android) {
+            window.addEventListener('keyboardWillHide', () => {
+                if (!this.paneEl)
+                    return;
+                window.requestAnimationFrame(() => {
+                    this.wrapperEl.style.width = '100%';
+                    this.paneEl.style.position = 'absolute';
+                    window.requestAnimationFrame(() => {
+                        this.wrapperEl.style.width = 'unset';
+                        this.paneEl.style.position = 'fixed';
+                    });
+                });
+            });
+        }
+        if (this.inputBlured) {
+            this.inputBlured = false;
+        }
+        else {
+            this.moveToBreak(this.prevBreakpoint);
         }
     }
     willScrolled(t) {
@@ -1324,7 +1385,10 @@ class CupertinoPane {
                     this.followerEl.style.transform = `translateY(${params.translateY - this.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
                 }
             }
-            this.prevBreakpoint = Object.entries(this.breaks).find(val => val[1] === params.translateY)[0];
+            let getNextBreakpoint = Object.entries(this.breaks).find(val => val[1] === params.translateY);
+            if (getNextBreakpoint) {
+                this.prevBreakpoint = getNextBreakpoint[0];
+            }
             this.paneEl.addEventListener('transitionend', transitionEnd);
             return;
         }

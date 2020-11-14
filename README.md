@@ -27,6 +27,7 @@ Cupertino Pane is great modern slide-over pane with touch technologies. <br>
 * [Settings](#settings)
 * [Public Methods](#public-methods)
 * [Attributes](#attributes)
+* [Keyboard issues](#keyboard-issues)
 * [Future Goals](#future-goals)
 * [Contributing](#contributing)
 * [Changelog](https://github.com/roman-rr/cupertino-pane/blob/master/CHANGELOG.md)
@@ -180,6 +181,7 @@ new CupertinoPane(element); // HTMLElement
 | **clickBottomOpen** | `boolean` | true | If bottom position reached, simple click to pane will open pane to the next upper point |
 | **dragBy** | `string[]` | null | Array of selectors for whom elements drag events will be attached. By default drag events attached to pane element. If you are about to drag only with draggable component set option to ['.pane .draggable'] |
 | **preventClicks** | `boolean` | true | Prevent accidental unwanted clicks events during move gestures |
+| **handleKeyboard** | `boolean` | true | Pane will be pushed up on open keyboard (only for cordova/capacitor/phonegap applications) |
 | **touchMoveStopPropagation** | `boolean` | false | If enabled, then propagation of "touchmove" will be stopped |
 | **simulateTouch** | `boolean` | true | Simulate touch events for Desktop |
 | **passiveListeners** | `boolean` | true | (Indicates that the function specified by listener will never call preventDefault()) |
@@ -326,8 +328,28 @@ By default using for full pane area, but in some cases good useful with header.
 </div>
 ```
 
+## Keyboard issues
+Inputs and textareas in pane may push mobile keyboard on devices, and close pane visibility. Next cases describe how to proper handle this issues.
+### Browser/WebView
+User's must use input focus/blur callback's to handle keyboard. Example: 
+```html
+<input onfocus="keyboardOpen()" onblur="keyboardClose()" />
+```
+```javascript
+function keyboardOpen () {
+  pane.moveToBreak('top'); // or moveToHeight(current + keyboardHeight);
+}
+function keyboardClose () {
+  pane.moveToBreak('middle'); // or moveToHeight(current - keyboardHeight);
+}
+```
+### Cordova/Phonegap/Capacitor
+By default, we are now handle keyboard in hybrid mobile applications and push pane to exact keyboard height. 
+If you would like handle this part by yourself, set option `handleKeyboard: false`.
+
 ## Future Goals
 - [Docs] Package branding
+- [Code] Divide to files
 - [Docs] Open collective
 - [Showcase] Apple Music F7
 - [Docs] Docs engine (F7, Netlify)

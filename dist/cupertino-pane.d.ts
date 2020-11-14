@@ -20,7 +20,9 @@ export declare class CupertinoPane {
     private rendered;
     private allowClick;
     private preventDismissEvent;
+    private inputBlured;
     private iconCloseColor;
+    private formElements;
     private breaks;
     private brs;
     private el;
@@ -88,6 +90,18 @@ export declare class CupertinoPane {
      */
     private onClickCb;
     private onClick;
+    /**
+     * Open Cordova Keyboard event
+     * @param e
+     */
+    private onKeyboardShowCb;
+    private onKeyboardShow;
+    /**
+     * Close Cordova Keyboard event
+     * @param e
+     */
+    private onKeyboardHideCb;
+    private onKeyboardHide;
     private willScrolled;
     private swipeNextPoint;
     private isBackdropPresented;

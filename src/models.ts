@@ -42,6 +42,7 @@ export interface Settings {
   clickBottomOpen: boolean;
   dragBy: string[];
   preventClicks: boolean;
+  handleKeyboard: boolean;
   simulateTouch: boolean;
   passiveListeners: boolean;
   touchMoveStopPropagation: boolean;

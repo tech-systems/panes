@@ -33,6 +33,7 @@ export class CupertinoPane {
     draggableOver: false,
     clickBottomOpen: true,
     preventClicks: true,
+    handleKeyboard: true,
     simulateTouch: true,
     passiveListeners: true,
     touchMoveStopPropagation: false,
@@ -72,7 +73,9 @@ export class CupertinoPane {
   private rendered: boolean = false;
   private allowClick: boolean = true;
   private preventDismissEvent: boolean = false;
+  private inputBlured: boolean = false;
   private iconCloseColor: string = '#7a7a7e';
+  private formElements: string[] = ['input', 'select', 'option', 'textarea', 'button', 'label'];
 
   private breaks: {} = {}
   private brs: number[] = [];
@@ -326,24 +329,7 @@ export class CupertinoPane {
       if (this.device.android) {
         // Body patch prevent android pull-to-refresh
         document.body.style['overscrollBehaviorY'] = 'none';  
-
-        if (this.device.ionic 
-          && this.device.cordova) {
-          // TODO: manual keyboard control (#49 issue)
-          // Fix android keyboard issue with transition (resize height on hide)
-          window.addEventListener('keyboardWillHide', () => {
-            if (!this.paneEl) return;
-            window.requestAnimationFrame(() => {
-              this.wrapperEl.style.width = '100%';
-              this.paneEl.style.position = 'absolute';
-              window.requestAnimationFrame(() => {
-                this.wrapperEl.style.width = 'unset';
-                this.paneEl.style.position = 'fixed';
-              });
-            });
-          });
-        }
-      }
+      }      
 
       /****** Attach Events *******/
       this.attachAllEvents();
@@ -380,6 +366,12 @@ export class CupertinoPane {
         if (el) this.attachEvents(el);
       });
     }
+
+    // Handle keyboard events for cordova
+    if (this.settings.handleKeyboard && this.device.cordova) {
+      window.addEventListener('keyboardWillShow', this.onKeyboardShowCb);
+      window.addEventListener('keyboardWillHide', this.onKeyboardHideCb);
+    }
   }
 
   private detachAllEvents() {
@@ -390,6 +382,12 @@ export class CupertinoPane {
         const el = document.querySelector(selector);
         if (el) this.detachEvents(el);
       });
+    }
+
+    // Handle keyboard events for cordova
+    if (this.settings.handleKeyboard && this.device.cordova) {
+      window.removeEventListener('keyboardWillShow', this.onKeyboardShowCb);
+      window.removeEventListener('keyboardWillHide', this.onKeyboardHideCb);
     }
   }
 
@@ -500,7 +498,7 @@ export class CupertinoPane {
     // increase to scrolled value
     if (this.isDragScrollabe(t.path || t.composedPath())) {
       this.startY += this.contentScrollTop;  
-    } 
+    }
     this.steps.push(this.startY);
   }
 
@@ -548,6 +546,14 @@ export class CupertinoPane {
     let v = screenX;
     const diffY = n - this.steps[this.steps.length - 1];
     let newVal = this.getPanelTransformY() + diffY;
+
+    if (this.steps.length > 2) {
+      if (this.formElements.includes(document.activeElement && document.activeElement.tagName.toLowerCase())
+      && !(this.formElements.includes(t.target && t.target.tagName.toLowerCase()))) {
+        (<any>document.activeElement).blur();
+        this.inputBlured = true;
+      }
+    }
 
     // Touch angle
     if (this.settings.touchAngle) {
@@ -651,17 +657,22 @@ export class CupertinoPane {
       }
     }
 
-    // Click to bottom - open middle
-    if (this.settings.clickBottomOpen) {
-      if (this.currentBreakpoint === this.breaks['bottom'] && isNaN(diff)) {
-        closest = this.settings.breaks['middle'].enabled
-        ? this.breaks['middle'] : this.settings.breaks['top'].enabled
-        ? this.breaks['top'] : this.breaks['bottom'];
-      }
+    // blur tap event
+    let blurTapEvent = false;
+    if ((this.formElements.includes(document.activeElement && document.activeElement.tagName.toLowerCase()))
+      && !(this.formElements.includes(t.target && t.target.tagName.toLowerCase()))
+      && this.steps.length === 2
+      ) {
+        blurTapEvent = true;
     }
 
     this.steps = [];
     this.currentBreakpoint = closest;
+
+    // tap event
+    if (isNaN(diff) || blurTapEvent) {
+      return;
+    }
 
     this.checkOpacityAttr(this.currentBreakpoint);
     this.checkOverflowAttr(this.currentBreakpoint);
@@ -688,6 +699,64 @@ export class CupertinoPane {
         t.stopPropagation();  
         t.stopImmediatePropagation();
       }
+      return;
+    }
+
+    // Click to bottom - open middle
+    if (this.settings.clickBottomOpen) {
+      if (this.breaks['bottom'] === this.getPanelTransformY()) {
+          let closest;
+          if (this.settings.breaks['top'].enabled) {
+            closest = 'top';
+          }
+          if (this.settings.breaks['middle'].enabled) {
+            closest = 'middle';
+          } 
+          this.moveToBreak(closest);
+      }
+    }
+  }
+
+  /**
+   * Open Cordova Keyboard event
+   * @param e
+   */
+  private onKeyboardShowCb = (e) => this.onKeyboardShow(e);
+  private onKeyboardShow(e) {
+    this.prevBreakpoint = Object.entries(this.breaks).find(val => val[1] === this.getPanelTransformY())[0];
+    let newHeight = this.settings.breaks[this.currentBreak()].height + e.keyboardHeight;
+    if (this.screen_height < newHeight) {
+      newHeight = this.screen_height - (135 * 0.35);
+    }
+
+    this.moveToHeight(newHeight);
+  }
+
+  /**
+   * Close Cordova Keyboard event
+   * @param e
+   */
+  private onKeyboardHideCb = (e) => this.onKeyboardHide(e);
+  private onKeyboardHide(e) {
+    // Fix android keyboard issue with transition (resize height on hide)
+    if (this.device.android) {
+      window.addEventListener('keyboardWillHide', () => {
+        if (!this.paneEl) return;
+        window.requestAnimationFrame(() => {
+          this.wrapperEl.style.width = '100%';
+          this.paneEl.style.position = 'absolute';
+          window.requestAnimationFrame(() => {
+            this.wrapperEl.style.width = 'unset';
+            this.paneEl.style.position = 'fixed';
+          });
+        });
+      });
+    }    
+
+    if (this.inputBlured) {
+      this.inputBlured = false;
+    } else {
+      this.moveToBreak(this.prevBreakpoint);
     }
   }
 
@@ -1164,7 +1233,7 @@ export class CupertinoPane {
     this.settings.onWillDismiss();
 
     if (this.preventDismissEvent) {
-      this.moveToBreak(this.prevBreakpoint)
+      this.moveToBreak(this.prevBreakpoint);
       this.preventDismissEvent = false;      
       return;
     }
@@ -1344,7 +1413,10 @@ export class CupertinoPane {
         } 
       }
 
-      this.prevBreakpoint = Object.entries(this.breaks).find(val => val[1] === params.translateY)[0];
+      let getNextBreakpoint = Object.entries(this.breaks).find(val => val[1] === params.translateY);
+      if (getNextBreakpoint) {
+        this.prevBreakpoint = getNextBreakpoint[0];
+      }
       this.paneEl.addEventListener('transitionend', transitionEnd);      
       return;
     }
