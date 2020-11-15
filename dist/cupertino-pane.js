@@ -616,9 +616,7 @@ class CupertinoPane {
             // but render dom take a time  
             setTimeout(() => {
                 if (!this.settings.inverse) {
-                    this.overflowEl.style.height = `${this.getPaneHeight()
-                        - this.settings.topperOverflowOffset
-                        - this.overflowEl.offsetTop}px`;
+                    this.setOverflowHeight();
                 }
                 else {
                     this.overflowEl.style.height = `${this.getPaneHeight()
@@ -628,6 +626,12 @@ class CupertinoPane {
                 }
             }, 150);
         }
+    }
+    setOverflowHeight(offset = 0) {
+        this.overflowEl.style.height = `${this.getPaneHeight()
+            - this.settings.topperOverflowOffset
+            - this.overflowEl.offsetTop
+            - offset}px`;
     }
     getTimingFunction(bounce) {
         return bounce ? 'cubic-bezier(0.175, 0.885, 0.370, 1.120)' : this.settings.animationType;
@@ -861,9 +865,16 @@ class CupertinoPane {
         this.prevBreakpoint = Object.entries(this.breaks).find(val => val[1] === this.getPanelTransformY())[0];
         let newHeight = this.settings.breaks[this.currentBreak()].height + e.keyboardHeight;
         if (this.screen_height < newHeight) {
+            let diff = newHeight - this.screen_height + (135 * 0.35);
             newHeight = this.screen_height - (135 * 0.35);
+            this.setOverflowHeight(e.keyboardHeight);
+            this.moveToBreak(this.settings.breaks.top.enabled ? 'top' : 'middle');
         }
-        this.moveToHeight(newHeight);
+        else {
+            this.setOverflowHeight(e.keyboardHeight);
+            this.moveToHeight(newHeight);
+            setTimeout(() => this.overflowEl.scrollTop = document.activeElement.offsetTop);
+        }
     }
     onKeyboardHide(e) {
         // Fix android keyboard issue with transition (resize height on hide)
@@ -887,6 +898,7 @@ class CupertinoPane {
         else {
             this.moveToBreak(this.prevBreakpoint);
         }
+        setTimeout(() => this.setOverflowHeight());
     }
     willScrolled(t) {
         if (!(this.overflowEl.scrollHeight > this.overflowEl.clientHeight

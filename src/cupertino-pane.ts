@@ -417,18 +417,22 @@ export class CupertinoPane {
       setTimeout(() => {
 
         if (!this.settings.inverse) {
-          this.overflowEl.style.height = `${this.getPaneHeight()
-            - this.settings.topperOverflowOffset
-            - this.overflowEl.offsetTop}px`;
+          this.setOverflowHeight();
         } else {
           this.overflowEl.style.height = `${this.getPaneHeight()
             - 30
             - this.settings.topperOverflowOffset
             - this.overflowEl.offsetTop}px`;
-
         }
       }, 150);
     }
+  }
+
+  private setOverflowHeight(offset = 0) {
+    this.overflowEl.style.height = `${this.getPaneHeight()
+      - this.settings.topperOverflowOffset
+      - this.overflowEl.offsetTop
+      - offset}px`;
   }
 
   private getTimingFunction(bounce) {
@@ -725,11 +729,17 @@ export class CupertinoPane {
   private onKeyboardShow(e) {
     this.prevBreakpoint = Object.entries(this.breaks).find(val => val[1] === this.getPanelTransformY())[0];
     let newHeight = this.settings.breaks[this.currentBreak()].height + e.keyboardHeight;
-    if (this.screen_height < newHeight) {
-      newHeight = this.screen_height - (135 * 0.35);
-    }
 
-    this.moveToHeight(newHeight);
+    if (this.screen_height < newHeight) {
+      let diff = newHeight - this.screen_height + (135 * 0.35);
+      newHeight = this.screen_height - (135 * 0.35);
+      this.setOverflowHeight(e.keyboardHeight);
+      this.moveToBreak(this.settings.breaks.top.enabled ? 'top' : 'middle');
+    } else {
+      this.setOverflowHeight(e.keyboardHeight);
+      this.moveToHeight(newHeight);
+      setTimeout(() => this.overflowEl.scrollTop = (<any>document.activeElement).offsetTop);
+    }
   }
 
   /**
@@ -758,6 +768,8 @@ export class CupertinoPane {
     } else {
       this.moveToBreak(this.prevBreakpoint);
     }
+
+    setTimeout(() => this.setOverflowHeight());
   }
 
   private willScrolled(t): boolean {

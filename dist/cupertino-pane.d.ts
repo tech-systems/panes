@@ -52,6 +52,7 @@ export declare class CupertinoPane {
     private resetEvents;
     private getClosestBreakY;
     private scrollElementInit;
+    private setOverflowHeight;
     private getTimingFunction;
     private checkOpacityAttr;
     private checkOverflowAttr;
