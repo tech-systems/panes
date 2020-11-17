@@ -1,102 +1,53 @@
 import { Support } from './support';
 import { Device } from './device';
-import { Settings, PaneBreaks } from './models';
-export type CupertinoSettings = Partial<Settings>;
+import { Events } from './events';
+import { PaneSettings, PaneBreaks } from './models';
+import { Settings } from './settings';
+export type CupertinoSettings = Partial<PaneSettings>;
 
 export class CupertinoPane {
-
-  public settings: Settings = {
-    initialBreak: 'middle',
-    inverse: false,
-    parentElement: null,
-    followerElement: null,
-    pushElement: null,
-    pushMinHeight: null,
-    pushYOffset: 0,
-    backdrop: false,
-    backdropOpacity: 0.4,
-    animationType: 'ease',
-    animationDuration: 300,
-    dragBy: null,
-    bottomOffset: 0,
-    darkMode: false,
-    bottomClose: false,
-    fastSwipeClose: false,
-    fastSwipeSensivity: 3,
-    freeMode: false,
-    buttonClose: true,
-    topperOverflow: true,
-    topperOverflowOffset: 0,
-    lowerThanBottom: true,
-    upperThanTop: false,
-    showDraggable: true,
-    draggableOver: false,
-    clickBottomOpen: true,
-    preventClicks: true,
-    handleKeyboard: true,
-    simulateTouch: true,
-    passiveListeners: true,
-    touchMoveStopPropagation: false,
-    touchAngle: null,
-    breaks: {},
-    onDidDismiss: () => {},
-    onWillDismiss: () => {},
-    onDidPresent: () => {},
-    onWillPresent: () => {},
-    onDragStart: () => {},
-    onDrag: () => {},
-    onDragEnd: () => {},
-    onBackdropTap: () => {},
-    onTransitionStart: () => {},
-    onTransitionEnd: () => {}
-  };
-
   private defaultBreaksConf: PaneBreaks = {
     top: { enabled: true, height: window.innerHeight - (135 * 0.35) },
     middle: { enabled: true, height: 300 },
     bottom: { enabled: true, height: 100 },
   };
   
-  private screen_height: number = window.innerHeight;
+  public topper: number;
+  public bottomer: number;
+  public disableDragEvents: boolean = false;
+  public currentBreakpoint: number;
+  public prevBreakpoint: string;
+  public breaks: {} = {}
+  public screen_height: number = window.innerHeight;
   private screenHeightOffset: number = this.screen_height;
-  private steps: any[] = [];
-  private startY: number;
-  private startX: number;
-  private pointerDown: boolean = false;
-  private topper: number;
-  private bottomer: number;
-  private currentBreakpoint: number;
-  private prevBreakpoint: string;
-  private contentScrollTop: number = 0;
-  private disableDragEvents: boolean = false;
-  private disableDragAngle: boolean = false;
   private rendered: boolean = false;
-  private allowClick: boolean = true;
   private preventDismissEvent: boolean = false;
-  private inputBlured: boolean = false;
   private iconCloseColor: string = '#7a7a7e';
-  private formElements: string[] = ['input', 'select', 'option', 'textarea', 'button', 'label'];
 
-  private breaks: {} = {}
   private brs: number[] = [];
   
+  public wrapperEl: HTMLDivElement;
+  public paneEl: HTMLDivElement;
+  public overflowEl: HTMLElement;
   private el: HTMLElement;
   private parentEl: HTMLElement;
-  private wrapperEl: HTMLDivElement;
-  private paneEl: HTMLDivElement;
   private draggableEl: HTMLDivElement;
   private moveEl: HTMLDivElement;
   private contentEl: HTMLElement;
   private backdropEl: HTMLDivElement;
   private closeEl: HTMLDivElement;
-  private overflowEl: HTMLElement;
   private followerEl: HTMLElement;
   private pushElement: HTMLElement;
 
-  private device = new Device();
+  private settings: CupertinoSettings;
+  private events: Events;
+  private device: Device;
 
   constructor(private selector: (string | HTMLElement), 
               conf: CupertinoSettings = {}) {
+    this.device = new Device();
+    this.settings = (new Settings()).instance;
+    
 
     // Element or selector
     if (selector instanceof HTMLElement) {
@@ -128,6 +79,8 @@ export class CupertinoPane {
     } else {
       this.settings.parentElement = this.el.parentElement;
     }
+
+    this.events = new Events(this, this.settings, this.device);
   }
 
   private drawBaseElements() {
@@ -369,8 +322,8 @@ export class CupertinoPane {
 
     // Handle keyboard events for cordova
     if (this.settings.handleKeyboard && this.device.cordova) {
-      window.addEventListener('keyboardWillShow', this.onKeyboardShowCb);
-      window.addEventListener('keyboardWillHide', this.onKeyboardHideCb);
+      window.addEventListener('keyboardWillShow', this.events.onKeyboardShowCb);
+      window.addEventListener('keyboardWillHide', this.events.onKeyboardHideCb);
     }
   }
 
@@ -386,8 +339,8 @@ export class CupertinoPane {
 
     // Handle keyboard events for cordova
     if (this.settings.handleKeyboard && this.device.cordova) {
-      window.removeEventListener('keyboardWillShow', this.onKeyboardShowCb);
-      window.removeEventListener('keyboardWillHide', this.onKeyboardHideCb);
+      window.removeEventListener('keyboardWillShow', this.events.onKeyboardShowCb);
+      window.removeEventListener('keyboardWillHide', this.events.onKeyboardHideCb);
     }
   }
 
@@ -396,7 +349,7 @@ export class CupertinoPane {
     this.attachAllEvents();
   }
 
-  private getClosestBreakY(): number {
+  public getClosestBreakY(): number {
     return this.brs.reduce((prev, curr) => {
       return (Math.abs(curr - this.getPanelTransformY()) < Math.abs(prev - this.getPanelTransformY()) ? curr : prev);
     });
@@ -428,7 +381,7 @@ export class CupertinoPane {
     }
   }
 
-  private setOverflowHeight(offset = 0) {
+  public setOverflowHeight(offset = 0) {
     this.overflowEl.style.height = `${this.getPaneHeight()
       - this.settings.topperOverflowOffset
       - this.overflowEl.offsetTop
@@ -439,7 +392,7 @@ export class CupertinoPane {
     return bounce ? 'cubic-bezier(0.175, 0.885, 0.370, 1.120)' : this.settings.animationType;
   }
 
-  private checkOpacityAttr(val) {
+  public checkOpacityAttr(val) {
     let attrElements = this.el.querySelectorAll('[hide-on-bottom]');
     if (!attrElements.length) return;
     if (this.settings.inverse) return;
@@ -449,7 +402,7 @@ export class CupertinoPane {
     });
   }
 
-  private checkOverflowAttr(val) {
+  public checkOverflowAttr(val) {
     if (!this.settings.topperOverflow) return;
 
     if (!this.settings.inverse) {
@@ -466,322 +419,7 @@ export class CupertinoPane {
     return wrappers.find((item) => item.contains(<HTMLElement>this.selector)) ? true: false;
   }
 
-  /** 
-   * Check if drag event fired by scrollable element
-   */
-  private isDragScrollabe(path):boolean {
-    return !!path.find(item => item === this.overflowEl);
-  }
-
-  /**
-   * Touch Start Event
-   * @param t 
-   */
-  private touchStartCb = (t) => this.touchStart(t);
-  private touchStart(t) {
-    // Event emitter
-    this.settings.onDragStart(t as CustomEvent);
-
-    if (this.disableDragEvents) return;
-
-    // Allow clicks by default, disallow on move
-    this.allowClick = true;
-
-    // Allow touch angle by default, disallow no move with condition
-    this.disableDragAngle = false;
-
-    const targetTouch = t.type === 'touchstart' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
-    const screenY = t.type === 'touchstart' ? targetTouch.clientY : t.clientY;
-    const screenX = t.type === 'touchstart' ? targetTouch.clientX : t.clientX;
-    if (t.type === 'mousedown') this.pointerDown = true;
-
-    this.startY = screenY;
-    this.startX = screenX;
-
-    // if overflow content was scrolled
-    // increase to scrolled value
-    if (this.isDragScrollabe(t.path || t.composedPath())) {
-      this.startY += this.contentScrollTop;  
-    }
-    this.steps.push(this.startY);
-  }
-
-  /** 
-   * Touch Move Event
-   * @param t 
-   */
-  private touchMoveBackdropCb = (t) => this.touchMoveBackdrop(t);
-  private touchMoveBackdrop(t) {
-    if (this.settings.touchMoveStopPropagation) {
-      t.stopPropagation();
-    }
-  }
-
-  /** 
-   * Touch Move Event
-   * @param t 
-   */
-  private touchMoveCb = (t) => this.touchMove(t);
-  private touchMove(t) {
-
-    /****** Fix android issue https://bugs.chromium.org/p/chromium/issues/detail?id=1123304 *******/
-    if (this.device.android && !this.willScrolled(t)) {
-      t.preventDefault();
-    }
-
-    // Event emitter
-    this.settings.onDrag(t as CustomEvent);
-
-    if (this.disableDragEvents) return;
-    if (this.disableDragAngle) return;
-
-    if (this.settings.touchMoveStopPropagation) {
-      t.stopPropagation();
-    }
-
-    // Handle desktop/mobile events
-    const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
-    const screenY = t.type === 'touchmove' ? targetTouch.clientY : t.clientY;
-    const screenX = t.type === 'touchmove' ? targetTouch.clientX : t.clientX;
-    if(t.type === 'mousemove' && !this.pointerDown) return;
-    
-    // Delta
-    let n = screenY;
-    let v = screenX;
-    const diffY = n - this.steps[this.steps.length - 1];
-    let newVal = this.getPanelTransformY() + diffY;
-
-    if (this.steps.length > 2) {
-      if (this.formElements.includes(document.activeElement && document.activeElement.tagName.toLowerCase())
-      && !(this.formElements.includes(t.target && t.target.tagName.toLowerCase()))) {
-        (<any>document.activeElement).blur();
-        this.inputBlured = true;
-      }
-    }
-
-    // Touch angle
-    if (this.settings.touchAngle) {
-      let touchAngle;
-      const diffX = v - this.startX;
-      const diffY = n - this.startY;
-      touchAngle = (Math.atan2(Math.abs(diffY), Math.abs(diffX)) * 180) / Math.PI;
-      if (diffX * diffX + diffY * diffY >= 25 
-          && (90 - touchAngle > this.settings.touchAngle)) {
-        this.disableDragAngle = true;
-        return;
-      }
-    }
-
-    // Not allow move panel with positive overflow scroll
-    if (this.isDragScrollabe(t.path || t.composedPath()) 
-          && this.overflowEl.style.overflowY === 'auto') {
-      this.overflowEl.addEventListener('scroll', (s: any) => {
-        this.contentScrollTop = s.target.scrollTop;
-      });
-
-      if (this.settings.inverse && this.willScrolled(t)) {
-        this.contentScrollTop = 0;
-        return;
-      }
-
-      // Scrolled -> Disable drag
-      if ((newVal > this.topper && this.contentScrollTop > 0) 
-          || (newVal <= this.topper)) { 
-        return;
-      } else {
-        /****** Fix android issue https://bugs.chromium.org/p/chromium/issues/detail?id=1123304 *******/
-        if (this.device.android) {
-          t.preventDefault();
-        }
-      }
-    }
-
-    // Disallow drag topper than top point
-    if (!this.settings.inverse 
-        && !this.settings.upperThanTop && (newVal <= this.topper)) {
-      this.paneEl.style.transform = `translateY(${this.topper}px) translateZ(0px)`;
-      return;
-    }
-
-    // Allow drag topper than top point
-    if (newVal <= this.topper && this.settings.upperThanTop) {
-      const differKoef = ((-this.topper + this.topper - this.getPanelTransformY()) / this.topper) / -8;
-      newVal = this.getPanelTransformY() + (diffY * differKoef);
-    }
-
-    // Disallow drag lower then bottom 
-    if ((!this.settings.lowerThanBottom || this.settings.inverse) 
-        && (newVal >= this.bottomer)) {
-      this.paneEl.style.transform = `translateY(${this.bottomer}px) translateZ(0px)`;
-      this.checkOpacityAttr(newVal);
-      return;
-    }
-
-    // Disallow accidentaly clicks while slide gestures
-    this.allowClick = false;
-
-    this.checkOpacityAttr(newVal);
-    this.checkOverflowAttr(newVal);
-    this.doTransition({type: 'move', translateY: newVal});
-    this.steps.push(n);
-  }
-
-  /**
-   * Touch End Event
-   * @param t 
-   */
-  private touchEndCb = (t) => this.touchEnd(t);
-  private touchEnd(t) {
-
-    // Event emitter
-    this.settings.onDragEnd(t as CustomEvent);
-
-    if (this.disableDragEvents) return;
-
-    const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
-    const screenY = t.type === 'touchmove' ? targetTouch.clientY : t.clientY;
-    if (t.type === 'mouseup') this.pointerDown = false;
-
-    // Determinate nearest point
-    let closest = this.getClosestBreakY();
-    // Swipe - next (if differ > 10)
-    const diff =  this.steps[this.steps.length - 1] - this.steps[this.steps.length - 2];
-    // Set sensivity lower for web
-    const swipeNextSensivity = window.hasOwnProperty('cordova') 
-      ? (this.settings.fastSwipeSensivity + 1) : this.settings.fastSwipeSensivity; 
-    const fastSwipeNext = (Math.abs(diff) >= swipeNextSensivity);
-    if (fastSwipeNext) {
-      closest = this.swipeNextPoint(diff, swipeNextSensivity, closest);
-
-      // Fast swipe toward bottom - close
-      if (this.settings.fastSwipeClose 
-          && this.currentBreakpoint < closest) {        
-        this.destroy({animate:true});
-        return;
-      }
-    }
-
-    // blur tap event
-    let blurTapEvent = false;
-    if ((this.formElements.includes(document.activeElement && document.activeElement.tagName.toLowerCase()))
-      && !(this.formElements.includes(t.target && t.target.tagName.toLowerCase()))
-      && this.steps.length === 2
-      ) {
-        blurTapEvent = true;
-    }
-
-    this.steps = [];
-    this.currentBreakpoint = closest;
-
-    // tap event
-    if (isNaN(diff) || blurTapEvent) {
-      return;
-    }
-
-    this.checkOpacityAttr(this.currentBreakpoint);
-    this.checkOverflowAttr(this.currentBreakpoint);
-
-    // Bottom closable
-    if (this.settings.bottomClose && closest === this.breaks['bottom']) {
-      this.destroy({animate:true});
-      return;
-    }
-
-    this.doTransition({type: 'end', translateY: closest});
-  }
-
-  /**
-   * Click Event
-   * @param t 
-   */
-  private onClickCb = (t) => this.onClick(t);
-  private onClick(t) {
-    // Prevent accidental unwanted clicks events during swiping
-    if (!this.allowClick) {
-      if (this.settings.preventClicks) {
-        t.preventDefault();
-        t.stopPropagation();  
-        t.stopImmediatePropagation();
-      }
-      return;
-    }
-
-    // Click to bottom - open middle
-    if (this.settings.clickBottomOpen) {
-      if (this.breaks['bottom'] === this.getPanelTransformY()) {
-          let closest;
-          if (this.settings.breaks['top'].enabled) {
-            closest = 'top';
-          }
-          if (this.settings.breaks['middle'].enabled) {
-            closest = 'middle';
-          } 
-          this.moveToBreak(closest);
-      }
-    }
-  }
-
-  /**
-   * Open Cordova Keyboard event
-   * @param e
-   */
-  private onKeyboardShowCb = (e) => this.onKeyboardShow(e);
-  private onKeyboardShow(e) {
-    this.prevBreakpoint = Object.entries(this.breaks).find(val => val[1] === this.getPanelTransformY())[0];
-    let newHeight = this.settings.breaks[this.currentBreak()].height + e.keyboardHeight;
-
-    if (this.screen_height < newHeight) {
-      let diff = newHeight - this.screen_height + (135 * 0.35);
-      newHeight = this.screen_height - (135 * 0.35);
-      this.setOverflowHeight(e.keyboardHeight);
-      this.moveToBreak(this.settings.breaks.top.enabled ? 'top' : 'middle');
-    } else {
-      this.setOverflowHeight(e.keyboardHeight);
-      this.moveToHeight(newHeight);
-      setTimeout(() => this.overflowEl.scrollTop = (<any>document.activeElement).offsetTop);
-    }
-  }
-
-  /**
-   * Close Cordova Keyboard event
-   * @param e
-   */
-  private onKeyboardHideCb = (e) => this.onKeyboardHide(e);
-  private onKeyboardHide(e) {
-    // Fix android keyboard issue with transition (resize height on hide)
-    if (this.device.android) {
-      window.addEventListener('keyboardWillHide', () => {
-        if (!this.paneEl) return;
-        window.requestAnimationFrame(() => {
-          this.wrapperEl.style.width = '100%';
-          this.paneEl.style.position = 'absolute';
-          window.requestAnimationFrame(() => {
-            this.wrapperEl.style.width = 'unset';
-            this.paneEl.style.position = 'fixed';
-          });
-        });
-      });
-    }    
-
-    if (this.inputBlured) {
-      this.inputBlured = false;
-    } else {
-      this.moveToBreak(this.prevBreakpoint);
-    }
-
-    setTimeout(() => this.setOverflowHeight());
-  }
-
-  private willScrolled(t): boolean {
-    if (!(this.overflowEl.scrollHeight > this.overflowEl.clientHeight 
-        && this.overflowEl.style.overflow !== 'hidden'
-        && this.isDragScrollabe(t.path || t.composedPath()))) {
-      return false;
-    }
-    return true;
-  }
-
-  private swipeNextPoint = (diff, maxDiff, closest) => {
+  public swipeNextPoint = (diff, maxDiff, closest) => {
     let brs = {};
     let settingsBreaks = {};
 
@@ -926,82 +564,83 @@ export class CupertinoPane {
   private attachEvents(el: Element) {
     // Touch Events
     if (!Support.touch && Support.pointerEvents) {
-      el.addEventListener(this.touchEvents.start, this.touchStartCb, false);
-      el.addEventListener(this.touchEvents.move, this.touchMoveCb, false);
-      el.addEventListener(this.touchEvents.end, this.touchEndCb, false);
+      el.addEventListener(this.touchEvents.start, this.events.touchStartCb, false);
+      el.addEventListener(this.touchEvents.move, this.events.touchMoveCb, false);
+      el.addEventListener(this.touchEvents.end, this.events.touchEndCb, false);
       
       // Backdrop propagation fix
-      this.backdropEl?.addEventListener(this.touchEvents.move, this.touchMoveBackdropCb, false);
+      this.backdropEl?.addEventListener(this.touchEvents.move, this.events.touchMoveBackdropCb, false);
     } else {
 
       if (Support.touch) {
         const passiveListener = this.touchEvents.start === 'touchstart' && Support.passiveListener && this.settings.passiveListeners ? { passive: true, capture: false } : false;
-        el.addEventListener(this.touchEvents.start, this.touchStartCb, passiveListener);
-        el.addEventListener(this.touchEvents.move, this.touchMoveCb, Support.passiveListener ? { passive: false, capture: false } : false);
-        el.addEventListener(this.touchEvents.end, this.touchEndCb, passiveListener);
+        el.addEventListener(this.touchEvents.start, this.events.touchStartCb, passiveListener);
+        el.addEventListener(this.touchEvents.move, this.events.touchMoveCb, Support.passiveListener ? { passive: false, capture: false } : false);
+        el.addEventListener(this.touchEvents.end, this.events.touchEndCb, passiveListener);
         
         // Backdrop propagation fix
-        this.backdropEl?.addEventListener(this.touchEvents.move, this.touchMoveBackdropCb, Support.passiveListener ? { passive: false, capture: false } : false);
+        this.backdropEl?.addEventListener(this.touchEvents.move, this.events.touchMoveBackdropCb, Support.passiveListener ? { passive: false, capture: false } : false);
         if (this.touchEvents['cancel']) {
-          el.addEventListener(this.touchEvents['cancel'], this.touchEndCb, passiveListener);
+          el.addEventListener(this.touchEvents['cancel'], this.events.touchEndCb, passiveListener);
         }
       }
 
       if ((this.settings.simulateTouch && !this.device.ios && !this.device.android) || (this.settings.simulateTouch && !Support.touch && this.device.ios)) {
-        el.addEventListener('mousedown', this.touchStartCb, false);
-        el.addEventListener('mousemove', this.touchMoveCb, false);
-        el.addEventListener('mouseup', this.touchEndCb, false);
+        el.addEventListener('mousedown', this.events.touchStartCb, false);
+        el.addEventListener('mousemove', this.events.touchMoveCb, false);
+        el.addEventListener('mouseup', this.events.touchEndCb, false);
         
         // Backdrop propagation fix
-        this.backdropEl?.addEventListener('mousemove', this.touchMoveBackdropCb, false);
+        this.backdropEl?.addEventListener('mousemove', this.events.touchMoveBackdropCb, false);
       }
     }
 
     // Prevent accidental unwanted clicks events during swiping
     if (this.settings.preventClicks) {
-      el.addEventListener('click', this.onClickCb, true);
+      el.addEventListener('click', this.events.onClickCb, true);
     }
   }
 
   private detachEvents(el: Element) { 
     // Touch Events
     if (!Support.touch && Support.pointerEvents) {
-      el.removeEventListener(this.touchEvents.start, this.touchStartCb, false);
-      el.removeEventListener(this.touchEvents.move, this.touchMoveCb, false);
-      el.removeEventListener(this.touchEvents.end, this.touchEndCb, false);
+      el.removeEventListener(this.touchEvents.start, this.events.touchStartCb, false);
+      el.removeEventListener(this.touchEvents.move, this.events.touchMoveCb, false);
+      el.removeEventListener(this.touchEvents.end, this.events.touchEndCb, false);
       
       // Backdrop propagation fix
-      this.backdropEl?.removeEventListener(this.touchEvents.move, this.touchMoveBackdropCb, false);
+      this.backdropEl?.removeEventListener(this.touchEvents.move, this.events.touchMoveBackdropCb, false);
     } else {
       if (Support.touch) {
         const passiveListener = this.touchEvents.start === 'onTouchStart' && Support.passiveListener && this.settings.passiveListeners ? { passive: true, capture: false } : false;
-        el.removeEventListener(this.touchEvents.start, this.touchStartCb, passiveListener);
-        el.removeEventListener(this.touchEvents.move, this.touchMoveCb, false);
-        el.removeEventListener(this.touchEvents.end, this.touchEndCb, passiveListener);
+        el.removeEventListener(this.touchEvents.start, this.events.touchStartCb, passiveListener);
+        el.removeEventListener(this.touchEvents.move, this.events.touchMoveCb, false);
+        el.removeEventListener(this.touchEvents.end, this.events.touchEndCb, passiveListener);
         
         // Backdrop propagation fix
-        this.backdropEl?.removeEventListener(this.touchEvents.move, this.touchMoveBackdropCb, false);
+        this.backdropEl?.removeEventListener(this.touchEvents.move, this.events.touchMoveBackdropCb, false);
         if (this.touchEvents['cancel']) {
-          el.removeEventListener(this.touchEvents['cancel'], this.touchEndCb, passiveListener);
+          el.removeEventListener(this.touchEvents['cancel'], this.events.touchEndCb, passiveListener);
         }
       }
       if ((this.settings.simulateTouch && !this.device.ios && !this.device.android) || (this.settings.simulateTouch && !Support.touch && this.device.ios)) {
-        el.removeEventListener('mousedown', this.touchStartCb, false);
-        el.removeEventListener('mousemove', this.touchMoveCb, false);
-        el.removeEventListener('mouseup', this.touchEndCb, false);
+        el.removeEventListener('mousedown', this.events.touchStartCb, false);
+        el.removeEventListener('mousemove', this.events.touchMoveCb, false);
+        el.removeEventListener('mouseup', this.events.touchEndCb, false);
         
         // Backdrop propagation fix
-        this.backdropEl?.removeEventListener('mousemove', this.touchMoveBackdropCb, false);
+        this.backdropEl?.removeEventListener('mousemove', this.events.touchMoveBackdropCb, false);
       }
     }
 
     // Prevent accidental unwanted clicks events during swiping
     if (this.settings.preventClicks) {
-      el.removeEventListener('click', this.onClickCb, true);
+      el.removeEventListener('click', this.events.onClickCb, true);
     }
   }
 
-  private getPanelTransformY():number {
+  // TODO: static method
+  public getPanelTransformY():number {
     const translateYRegex = /\.*translateY\((.*)px\)/i;
     return parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
   }
@@ -1297,7 +936,7 @@ export class CupertinoPane {
   /***********************************
    * Transitions handler
    */
-  private doTransition(params:any = {}): void {
+  public doTransition(params:any = {}): void {
 
     // touchmove simple event
     if (params.type === 'move') {

@@ -1,42 +1,34 @@
-import { Settings, PaneBreaks } from './models';
-export declare type CupertinoSettings = Partial<Settings>;
+import { PaneSettings, PaneBreaks } from './models';
+export declare type CupertinoSettings = Partial<PaneSettings>;
 export declare class CupertinoPane {
     private selector;
-    settings: Settings;
     private defaultBreaksConf;
-    private screen_height;
+    topper: number;
+    bottomer: number;
+    disableDragEvents: boolean;
+    currentBreakpoint: number;
+    prevBreakpoint: string;
+    breaks: {};
+    screen_height: number;
     private screenHeightOffset;
-    private steps;
-    private startY;
-    private startX;
-    private pointerDown;
-    private topper;
-    private bottomer;
-    private currentBreakpoint;
-    private prevBreakpoint;
-    private contentScrollTop;
-    private disableDragEvents;
-    private disableDragAngle;
     private rendered;
-    private allowClick;
     private preventDismissEvent;
-    private inputBlured;
     private iconCloseColor;
-    private formElements;
-    private breaks;
     private brs;
+    wrapperEl: HTMLDivElement;
+    paneEl: HTMLDivElement;
+    overflowEl: HTMLElement;
     private el;
     private parentEl;
-    private wrapperEl;
-    private paneEl;
     private draggableEl;
     private moveEl;
     private contentEl;
     private backdropEl;
     private closeEl;
-    private overflowEl;
     private followerEl;
     private pushElement;
+    private settings;
+    private events;
     private device;
     constructor(selector: (string | HTMLElement), conf?: CupertinoSettings);
     private drawBaseElements;
@@ -50,61 +42,14 @@ export declare class CupertinoPane {
     private attachAllEvents;
     private detachAllEvents;
     private resetEvents;
-    private getClosestBreakY;
+    getClosestBreakY(): number;
     private scrollElementInit;
-    private setOverflowHeight;
+    setOverflowHeight(offset?: number): void;
     private getTimingFunction;
-    private checkOpacityAttr;
-    private checkOverflowAttr;
+    checkOpacityAttr(val: any): void;
+    checkOverflowAttr(val: any): void;
     private isPanePresented;
-    /**
-     * Check if drag event fired by scrollable element
-     */
-    private isDragScrollabe;
-    /**
-     * Touch Start Event
-     * @param t
-     */
-    private touchStartCb;
-    private touchStart;
-    /**
-     * Touch Move Event
-     * @param t
-     */
-    private touchMoveBackdropCb;
-    private touchMoveBackdrop;
-    /**
-     * Touch Move Event
-     * @param t
-     */
-    private touchMoveCb;
-    private touchMove;
-    /**
-     * Touch End Event
-     * @param t
-     */
-    private touchEndCb;
-    private touchEnd;
-    /**
-     * Click Event
-     * @param t
-     */
-    private onClickCb;
-    private onClick;
-    /**
-     * Open Cordova Keyboard event
-     * @param e
-     */
-    private onKeyboardShowCb;
-    private onKeyboardShow;
-    /**
-     * Close Cordova Keyboard event
-     * @param e
-     */
-    private onKeyboardHideCb;
-    private onKeyboardHide;
-    private willScrolled;
-    private swipeNextPoint;
+    swipeNextPoint: (diff: any, maxDiff: any, closest: any) => any;
     private isBackdropPresented;
     private renderBackdrop;
     /**
@@ -119,7 +64,7 @@ export declare class CupertinoPane {
     private touchEvents;
     private attachEvents;
     private detachEvents;
-    private getPanelTransformY;
+    getPanelTransformY(): number;
     /************************************
      * Public user methods
      */
@@ -156,5 +101,5 @@ export declare class CupertinoPane {
     /***********************************
      * Transitions handler
      */
-    private doTransition;
+    doTransition(params?: any): void;
 }

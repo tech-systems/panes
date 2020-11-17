@@ -348,9 +348,6 @@ By default, we are now handle keyboard in hybrid mobile applications and push pa
 If you would like handle this part by yourself, set option `handleKeyboard: false`.
 
 ## Future Goals
-<!-- Show keyboard - revert moveToHeight (need for cases where top lower than keyboard) -->
-<!-- start/move/end/click events to file -->
-<!-- debug issue #85 -->
 - [Docs] Package branding (100+ stars)
 - [Docs] Open collective
 - [Showcase] Apple Music F7

@@ -13,7 +13,7 @@ export interface TransitionStartEvent {
         new: number;
     };
 }
-export interface Settings {
+export interface PaneSettings {
     initialBreak: ('top' | 'middle' | 'bottom');
     inverse: boolean;
     parentElement: any;
