@@ -258,7 +258,7 @@ export class CupertinoPane {
         this.setDarkMode({enable: true});
       }
 
-      if (this.settings.buttonClose) {
+      if (this.settings.buttonClose && !this.settings.inverse) {
         this.paneEl.appendChild(this.closeEl);
         this.closeEl.addEventListener('click', (t) => this.destroy({animate:true}));
         this.closeEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -367,25 +367,28 @@ export class CupertinoPane {
     if (this.settings.topperOverflow) {       
       // Good to get rid of timeout
       // but render dom take a time  
-      setTimeout(() => {
-
-        if (!this.settings.inverse) {
-          this.setOverflowHeight();
-        } else {
-          this.overflowEl.style.height = `${this.getPaneHeight()
-            - 30
-            - this.settings.topperOverflowOffset
-            - this.overflowEl.offsetTop}px`;
-        }
-      }, 150);
+      
+      if (!this.rendered) {
+        // Timeout, this.overflowEl.offsetTop get time to render
+        setTimeout(() => this.setOverflowHeight(), 150);
+      } else {
+        this.setOverflowHeight();
+      }
     }
   }
 
   public setOverflowHeight(offset = 0) {
-    this.overflowEl.style.height = `${this.getPaneHeight()
-      - this.settings.topperOverflowOffset
-      - this.overflowEl.offsetTop
-      - offset}px`;
+    if (!this.settings.inverse) {
+      this.overflowEl.style.height = `${this.getPaneHeight()
+        - this.settings.topperOverflowOffset
+        - this.overflowEl.offsetTop
+        - offset}px`;
+    } else {
+      this.overflowEl.style.height = `${this.getPaneHeight()
+        - 30
+        - this.settings.topperOverflowOffset
+        - this.overflowEl.offsetTop}px`;
+    }
   }
 
   private getTimingFunction(bounce) {
@@ -697,14 +700,9 @@ export class CupertinoPane {
    * @param conf breakpoints
    */
   public setBreakpoints(conf?: PaneBreaks) {
-    let prevBreak: string;
     if (this.isPanePresented() && !conf) {
       console.warn(`Cupertino Pane: Provide any breaks configuration`);
       return;
-    } 
-
-    if (this.isPanePresented()) {
-      prevBreak = this.currentBreak();
     }
     
     this.breaks = {
@@ -775,23 +773,22 @@ export class CupertinoPane {
 
     if (this.isPanePresented()) {
       // Move to current if updated
-      if (!this.currentBreak()
-          && this.settings.breaks[prevBreak].enabled) {
-        this.moveToBreak(prevBreak);
+      if (this.settings.breaks[this.prevBreakpoint].enabled) {
+        this.moveToBreak(this.prevBreakpoint);
       }
 
       // Move to any if removed
-      if (!this.settings.breaks[prevBreak].enabled) {
+      if (!this.settings.breaks[this.prevBreakpoint].enabled) {
         let nextY = this.swipeNextPoint(1, 1, this.getClosestBreakY());
         const nextBreak = Object.entries(this.breaks).find(val => val[1] === nextY);
         this.moveToBreak(nextBreak[0]);
       }
 
-      // Re-calc height
+      // Re-calc height and top
+      this.paneEl.style.top = this.settings.inverse ? `-${this.bottomer}px` : `unset`;
       this.paneEl.style.height = `${this.getPaneHeight()}px`;
-
-      // Re-calc overflow elements
       this.scrollElementInit();
+
       this.checkOpacityAttr(this.currentBreakpoint);
       this.checkOverflowAttr(this.currentBreakpoint);
     }

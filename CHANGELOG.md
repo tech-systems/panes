@@ -2,6 +2,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Bug Fixes
+- Fixed `setBreakpoints()` method for inversed pane [#92](https://github.com/roman-rr/cupertino-pane/issues/92)
+
 ## [1.1.94] - 2020-11-15
 
 ### BREAKING CHANGES
