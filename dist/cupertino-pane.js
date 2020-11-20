@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: November 18, 2020
+ * Released on: November 20, 2020
  */
  
  
@@ -168,10 +168,6 @@ class Events {
         this.contentScrollTop = 0;
         this.steps = [];
         this.inputBlured = false;
-        this.formElements = [
-            'input', 'select', 'option',
-            'textarea', 'button', 'label'
-        ];
         /**
          * Touch Start Event
          * @param t
@@ -261,9 +257,15 @@ class Events {
         let v = screenX;
         const diffY = n - this.steps[this.steps.length - 1];
         let newVal = this.instance.getPanelTransformY() + diffY;
+        // textarea scrollbar
+        if (this.isFormElement(t.target)
+            && this.isElementScrollable(t.target)) {
+            return;
+        }
+        // Detect if input was blured
         if (this.steps.length > 2) {
-            if (this.formElements.includes(document.activeElement && document.activeElement.tagName.toLowerCase())
-                && !(this.formElements.includes(t.target && t.target.tagName.toLowerCase()))) {
+            if (this.isFormElement(document.activeElement)
+                && !(this.isFormElement(t.target))) {
                 document.activeElement.blur();
                 this.inputBlured = true;
             }
@@ -355,8 +357,8 @@ class Events {
         }
         // blur tap event
         let blurTapEvent = false;
-        if ((this.formElements.includes(document.activeElement && document.activeElement.tagName.toLowerCase()))
-            && !(this.formElements.includes(t.target && t.target.tagName.toLowerCase()))
+        if ((this.isFormElement(document.activeElement))
+            && !(this.isFormElement(t.target))
             && this.steps.length === 2) {
             blurTapEvent = true;
         }
@@ -448,12 +450,26 @@ class Events {
         return !!path.find(item => item === this.instance.overflowEl);
     }
     willScrolled(t) {
-        if (!(this.instance.overflowEl.scrollHeight > this.instance.overflowEl.clientHeight
+        if (!(this.isElementScrollable(this.instance.overflowEl)
             && this.instance.overflowEl.style.overflow !== 'hidden'
             && this.isDragScrollabe(t.path || t.composedPath()))) {
             return false;
         }
         return true;
+    }
+    isFormElement(el) {
+        const formElements = [
+            'input', 'select', 'option',
+            'textarea', 'button', 'label'
+        ];
+        if (el && el.tagName
+            && formElements.includes(el.tagName.toLowerCase())) {
+            return true;
+        }
+        return false;
+    }
+    isElementScrollable(el) {
+        return el.scrollHeight > el.clientHeight ? true : false;
     }
 }
 

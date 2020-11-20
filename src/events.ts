@@ -16,11 +16,7 @@ export class Events {
   private startX: number;
   private steps: any[] = [];  
   private inputBlured: boolean = false;
-  private formElements: string[] = [
-    'input', 'select', 'option', 
-    'textarea', 'button', 'label'
-  ];
-
+  
   constructor(private instance: CupertinoPane, 
               private settings: CupertinoSettings, 
               private device: Device) {
@@ -104,9 +100,16 @@ export class Events {
     const diffY = n - this.steps[this.steps.length - 1];
     let newVal = this.instance.getPanelTransformY() + diffY;
 
+    // textarea scrollbar
+    if (this.isFormElement(t.target) 
+      && this.isElementScrollable(t.target)) {
+      return;
+    }
+        
+    // Detect if input was blured
     if (this.steps.length > 2) {
-      if (this.formElements.includes(document.activeElement && document.activeElement.tagName.toLowerCase())
-      && !(this.formElements.includes(t.target && t.target.tagName.toLowerCase()))) {
+      if (this.isFormElement(document.activeElement)
+      && !(this.isFormElement(t.target))) {
         (<any>document.activeElement).blur();
         this.inputBlured = true;
       }
@@ -216,8 +219,8 @@ export class Events {
 
     // blur tap event
     let blurTapEvent = false;
-    if ((this.formElements.includes(document.activeElement && document.activeElement.tagName.toLowerCase()))
-      && !(this.formElements.includes(t.target && t.target.tagName.toLowerCase()))
+    if ((this.isFormElement(document.activeElement))
+      && !(this.isFormElement(t.target))
       && this.steps.length === 2
       ) {
         blurTapEvent = true;
@@ -337,11 +340,28 @@ export class Events {
   }
 
   private willScrolled(t): boolean {
-    if (!(this.instance.overflowEl.scrollHeight > this.instance.overflowEl.clientHeight 
+    if (!(this.isElementScrollable(this.instance.overflowEl)
         && this.instance.overflowEl.style.overflow !== 'hidden'
         && this.isDragScrollabe(t.path || t.composedPath()))) {
       return false;
     }
     return true;
+  }
+
+  private isFormElement(el):boolean {
+    const formElements: string[] = [
+      'input', 'select', 'option', 
+      'textarea', 'button', 'label'
+    ];
+
+    if (el && el.tagName 
+        && formElements.includes(el.tagName.toLowerCase())) {
+      return true;
+    }
+    return false;
+  }
+
+  private isElementScrollable(el):boolean {
+    return el.scrollHeight > el.clientHeight ? true : false;
   }
 }

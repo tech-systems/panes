@@ -14,7 +14,7 @@
 </head>
 
 <body>
-  <ion-content>
+  <ion-content scroll-y="false">
       <ion-drawer>
         <h1>Header</h1>
         <p hide-on-bottom>Content</p> 
@@ -23,6 +23,13 @@
       <ion-extra-drawer>
         <h1>Extra header</h1>
         <p hide-on-bottom>Extra content</p> 
+
+        <!-- textareas -->
+        <ion-list>
+          <ion-item>
+            <ion-textarea placeholder="Enter more information here..."></ion-textarea>
+          </ion-item>
+        </ion-list>
 
         <!-- Horizontal slide items example -->
         <ion-list>
@@ -41,7 +48,7 @@
         </ion-list>
 
         <!-- Horizontal slides example -->
-        <ion-slides pager="true">
+        <ion-slides pager="true">          
           <ion-slide>
             <h1>Slide 1</h1>
           </ion-slide>
@@ -96,7 +103,7 @@
         // freeMode: true,
         // onBackdropTap: () => hideDrawer()
     });
-    setTimeout(() => drawer.present({animate: true}));
+    setTimeout(() => extraDrawer.present({animate: true}));
 
     // Extra pane
     var extraDrawer = new CupertinoPane('ion-extra-drawer', {
@@ -104,9 +111,9 @@
         topperOverflow: false,
         touchAngle: 45,
         breaks: {
-          top: {enabled: false},
-          middle: {enabled: true, height: 600},
-          bottom: {enabled: true, height: 50},
+          top: {enabled: true, height: 700},
+          middle: {enabled: true, height: 400},
+          bottom: {enabled: true, height: 250},
         }
     });
 

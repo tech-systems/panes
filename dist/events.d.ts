@@ -16,7 +16,6 @@ export declare class Events {
     private startX;
     private steps;
     private inputBlured;
-    private formElements;
     constructor(instance: CupertinoPane, settings: CupertinoSettings, device: Device);
     /**
      * Touch Start Event
@@ -68,4 +67,6 @@ export declare class Events {
      */
     private isDragScrollabe;
     private willScrolled;
+    private isFormElement;
+    private isElementScrollable;
 }
