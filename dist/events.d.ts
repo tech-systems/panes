@@ -63,6 +63,11 @@ export declare class Events {
      * Private class methods
      */
     /**
+     * Fix android keyboard issue with transition
+     * (resize window frame height on hide/show)
+     */
+    private fixAndroidResize;
+    /**
      * Check if drag event fired by scrollable element
      */
     private isDragScrollabe;

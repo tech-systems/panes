@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: November 20, 2020
+ * Released on: November 22, 2020
  */
 
 class Support {
@@ -396,6 +396,9 @@ class Events {
         }
     }
     onKeyboardShow(e) {
+        if (this.device.android) {
+            this.fixAndroidResize();
+        }
         this.instance.prevBreakpoint = Object.entries(this.instance.breaks).find(val => val[1] === this.instance.getPanelTransformY())[0];
         let newHeight = this.settings.breaks[this.instance.currentBreak()].height + e.keyboardHeight;
         if (this.instance.screen_height < newHeight) {
@@ -411,21 +414,6 @@ class Events {
         }
     }
     onKeyboardHide(e) {
-        // Fix android keyboard issue with transition (resize height on hide)
-        if (this.device.android) {
-            window.addEventListener('keyboardWillHide', () => {
-                if (!this.instance.paneEl)
-                    return;
-                window.requestAnimationFrame(() => {
-                    this.instance.wrapperEl.style.width = '100%';
-                    this.instance.paneEl.style.position = 'absolute';
-                    window.requestAnimationFrame(() => {
-                        this.instance.wrapperEl.style.width = 'unset';
-                        this.instance.paneEl.style.position = 'fixed';
-                    });
-                });
-            });
-        }
         if (this.inputBlured) {
             this.inputBlured = false;
         }
@@ -437,6 +425,22 @@ class Events {
     /**
      * Private class methods
      */
+    /**
+     * Fix android keyboard issue with transition
+     * (resize window frame height on hide/show)
+     */
+    fixAndroidResize() {
+        if (!this.instance.paneEl)
+            return;
+        window.requestAnimationFrame(() => {
+            this.instance.wrapperEl.style.width = '100%';
+            this.instance.paneEl.style.position = 'absolute';
+            window.requestAnimationFrame(() => {
+                this.instance.wrapperEl.style.width = 'unset';
+                this.instance.paneEl.style.position = 'fixed';
+            });
+        });
+    }
     /**
      * Check if drag event fired by scrollable element
      */

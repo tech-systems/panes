@@ -283,6 +283,10 @@ export class Events {
    */
   public onKeyboardShowCb = (e) => this.onKeyboardShow(e);
   private onKeyboardShow(e) {
+    if (this.device.android) {
+      this.fixAndroidResize();
+    }    
+
     this.instance.prevBreakpoint = Object.entries(this.instance.breaks).find(val => val[1] === this.instance.getPanelTransformY())[0];
     let newHeight = this.settings.breaks[this.instance.currentBreak()].height + e.keyboardHeight;
 
@@ -304,21 +308,6 @@ export class Events {
    */
   public onKeyboardHideCb = (e) => this.onKeyboardHide(e);
   private onKeyboardHide(e) {
-    // Fix android keyboard issue with transition (resize height on hide)
-    if (this.device.android) {
-      window.addEventListener('keyboardWillHide', () => {
-        if (!this.instance.paneEl) return;
-        window.requestAnimationFrame(() => {
-          this.instance.wrapperEl.style.width = '100%';
-          this.instance.paneEl.style.position = 'absolute';
-          window.requestAnimationFrame(() => {
-            this.instance.wrapperEl.style.width = 'unset';
-            this.instance.paneEl.style.position = 'fixed';
-          });
-        });
-      });
-    }    
-
     if (this.inputBlured) {
       this.inputBlured = false;
     } else {
@@ -331,6 +320,22 @@ export class Events {
   /**
    * Private class methods
    */
+
+  /**
+   * Fix android keyboard issue with transition 
+   * (resize window frame height on hide/show)
+   */
+  private fixAndroidResize() {
+    if (!this.instance.paneEl) return;
+    window.requestAnimationFrame(() => {
+      this.instance.wrapperEl.style.width = '100%';
+      this.instance.paneEl.style.position = 'absolute';
+      window.requestAnimationFrame(() => {
+        this.instance.wrapperEl.style.width = 'unset';
+        this.instance.paneEl.style.position = 'fixed';
+      });
+    });
+  }
 
   /** 
    * Check if drag event fired by scrollable element
