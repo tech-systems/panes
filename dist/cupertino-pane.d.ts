@@ -28,8 +28,8 @@ export declare class CupertinoPane {
     private followerEl;
     private pushElement;
     private settings;
-    private events;
     private device;
+    private events;
     constructor(selector: (string | HTMLElement), conf?: CupertinoSettings);
     private drawBaseElements;
     present(conf?: {

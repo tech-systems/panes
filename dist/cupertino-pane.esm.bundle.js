@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: November 22, 2020
+ * Released on: November 23, 2020
  */
 
 class Support {
@@ -537,6 +537,8 @@ class CupertinoPane {
         this.preventDismissEvent = false;
         this.iconCloseColor = '#7a7a7e';
         this.brs = [];
+        this.settings = (new Settings()).instance;
+        this.device = new Device();
         this.swipeNextPoint = (diff, maxDiff, closest) => {
             let brs = {};
             let settingsBreaks = {};
@@ -617,8 +619,6 @@ class CupertinoPane {
             };
             return Support.touch || !this.settings.simulateTouch ? touchEventsTouch : touchEventsDesktop;
         })();
-        this.device = new Device();
-        this.settings = (new Settings()).instance;
         // Element or selector
         if (selector instanceof HTMLElement) {
             this.selector = selector;

@@ -39,16 +39,12 @@ export class CupertinoPane {
   private followerEl: HTMLElement;
   private pushElement: HTMLElement;
 
-  private settings: CupertinoSettings;
+  private settings: CupertinoSettings = (new Settings()).instance;
+  private device: Device = new Device();
   private events: Events;
-  private device: Device;
 
   constructor(private selector: (string | HTMLElement), 
               conf: CupertinoSettings = {}) {
-    this.device = new Device();
-    this.settings = (new Settings()).instance;
-    
-
     // Element or selector
     if (selector instanceof HTMLElement) {
       this.selector = selector;
