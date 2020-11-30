@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: November 23, 2020
+ * Released on: November 30, 2020
  */
 
 class Support {
@@ -895,6 +895,9 @@ class CupertinoPane {
             this.overflowEl.style.overflowX = 'hidden';
         }
         if (this.settings.topperOverflow) {
+            if (this.settings.upperThanTop) {
+                console.warn('Cupertino Pane: "upperThanTop" allowed for disabled "topperOverflow"');
+            }
             // Good to get rid of timeout
             // but render dom take a time  
             if (!this.rendered) {
@@ -1270,7 +1273,8 @@ class CupertinoPane {
         /****** Detach Events *******/
         this.detachAllEvents();
         // Reset vars
-        this.currentBreakpoint = this.breaks[this.settings.initialBreak];
+        delete this.rendered;
+        delete this.prevBreakpoint;
         // Reset styles
         this.contentEl.style.display = 'none';
     }
