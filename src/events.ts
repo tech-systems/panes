@@ -72,12 +72,6 @@ export class Events {
    */
   public touchMoveCb = (t) => this.touchMove(t);
   private touchMove(t) {
-
-    /****** Fix android issue https://bugs.chromium.org/p/chromium/issues/detail?id=1123304 *******/
-    if (this.device.android && !this.willScrolled(t)) {
-      t.preventDefault();
-    }
-
     // Event emitter
     this.settings.onDrag(t as CustomEvent);
 
@@ -144,11 +138,6 @@ export class Events {
       if ((newVal > this.instance.topper && this.contentScrollTop > 0) 
           || (newVal <= this.instance.topper)) { 
         return;
-      } else {
-        /****** Fix android issue https://bugs.chromium.org/p/chromium/issues/detail?id=1123304 *******/
-        if (this.device.android) {
-          t.preventDefault();
-        }
       }
     }
 
