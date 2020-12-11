@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: November 30, 2020
+ * Released on: December 12, 2020
  */
 
 class Support {
@@ -397,7 +397,7 @@ class Events {
     }
     onKeyboardShow(e) {
         if (this.device.android) {
-            this.fixAndroidResize();
+            setTimeout(() => this.fixAndroidResize(), 20);
         }
         this.instance.prevBreakpoint = Object.entries(this.instance.breaks).find(val => val[1] === this.instance.getPanelTransformY())[0];
         let newHeight = this.settings.breaks[this.instance.currentBreak()].height + e.keyboardHeight;
@@ -414,6 +414,9 @@ class Events {
         }
     }
     onKeyboardHide(e) {
+        if (this.device.android) {
+            this.fixAndroidResize();
+        }
         if (this.inputBlured) {
             this.inputBlured = false;
         }
@@ -432,6 +435,7 @@ class Events {
     fixAndroidResize() {
         if (!this.instance.paneEl)
             return;
+        const ionApp = document.querySelector('ion-app');
         window.requestAnimationFrame(() => {
             this.instance.wrapperEl.style.width = '100%';
             this.instance.paneEl.style.position = 'absolute';
