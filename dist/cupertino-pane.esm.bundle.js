@@ -852,6 +852,16 @@ class CupertinoPane {
             window.addEventListener('keyboardWillShow', this.events.onKeyboardShowCb);
             window.addEventListener('keyboardWillHide', this.events.onKeyboardHideCb);
         }
+        // Fix Android issue with resize if not handle
+        if (!this.settings.handleKeyboard
+            && this.device.cordova
+            && this.device.android) {
+            window.addEventListener('keyboardWillHide', () => {
+                this.parentEl.scrollTop = 0;
+                this.parentEl.parentElement.scrollTop = 0;
+                this.parentEl.parentElement.parentElement.scrollTop = 0;
+            });
+        }
     }
     detachAllEvents() {
         if (!this.settings.dragBy) {

@@ -8,6 +8,7 @@ All notable changes to this project will be documented in this file.
 - Fixed `setBreakpoints()` method for inversed pane [#92](https://github.com/roman-rr/cupertino-pane/issues/92)
 - Fixed `textarea` overflow scroll. Pane disallowed from drag if scroll available and target element is textarea [#88](https://github.com/roman-rr/cupertino-pane/issues/88)
 - Fixed horizontal scroll inside pane [#102](https://github.com/roman-rr/cupertino-pane/issues/102)
+- Fixed keyboard issues on Android devices with cordova webview
 
 ## [1.1.94] - 2020-11-15
 
