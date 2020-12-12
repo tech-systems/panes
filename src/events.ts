@@ -189,9 +189,6 @@ export class Events {
   public touchEndCb = (t) => this.touchEnd(t);
   private touchEnd(t) {
 
-    // Event emitter
-    this.settings.onDragEnd(t as CustomEvent);
-
     if (this.instance.disableDragEvents) return;
 
     const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
@@ -228,6 +225,9 @@ export class Events {
 
     this.steps = [];
     this.instance.currentBreakpoint = closest;
+
+    // Event emitter
+    this.settings.onDragEnd(t as CustomEvent);
 
     // tap event
     if (isNaN(diff) || blurTapEvent) {
