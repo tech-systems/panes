@@ -261,13 +261,15 @@ class Events {
             }
         }
         // Touch angle
+        // Only for initial gesture
         if (this.settings.touchAngle) {
             let touchAngle;
             const diffX = v - this.startX;
             const diffY = n - this.startY;
             touchAngle = (Math.atan2(Math.abs(diffY), Math.abs(diffX)) * 180) / Math.PI;
             if (diffX * diffX + diffY * diffY >= 25
-                && (90 - touchAngle > this.settings.touchAngle)) {
+                && (90 - touchAngle > this.settings.touchAngle)
+                && this.steps.length === 1) {
                 this.disableDragAngle = true;
                 return;
             }

@@ -9,6 +9,7 @@ All notable changes to this project will be documented in this file.
 - Fixed `textarea` overflow scroll. Pane disallowed from drag if scroll available and target element is textarea [#88](https://github.com/roman-rr/cupertino-pane/issues/88)
 - Fixed horizontal scroll inside pane [#102](https://github.com/roman-rr/cupertino-pane/issues/102)
 - Fixed keyboard issues on Android devices with cordova webview
+- Fixed drag event and stops laggy on drag pane with touchAngle option [#102](https://github.com/roman-rr/cupertino-pane/issues/102)
 
 ## [1.1.94] - 2020-11-15
 
