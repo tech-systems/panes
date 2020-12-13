@@ -320,8 +320,6 @@ class Events {
         this.steps.push(n);
     }
     touchEnd(t) {
-        // Event emitter
-        this.settings.onDragEnd(t);
         if (this.instance.disableDragEvents)
             return;
         const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
@@ -354,6 +352,8 @@ class Events {
         }
         this.steps = [];
         this.instance.currentBreakpoint = closest;
+        // Event emitter
+        this.settings.onDragEnd(t);
         // tap event
         if (isNaN(diff) || blurTapEvent) {
             return;
