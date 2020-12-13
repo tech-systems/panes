@@ -72,12 +72,6 @@ export class Events {
    */
   public touchMoveCb = (t) => this.touchMove(t);
   private touchMove(t) {
-
-    /****** Fix android issue https://bugs.chromium.org/p/chromium/issues/detail?id=1123304 *******/
-    if (this.device.android && !this.willScrolled(t)) {
-      t.preventDefault();
-    }
-
     // Event emitter
     this.settings.onDrag(t as CustomEvent);
 
@@ -144,11 +138,6 @@ export class Events {
       if ((newVal > this.instance.topper && this.contentScrollTop > 0) 
           || (newVal <= this.instance.topper)) { 
         return;
-      } else {
-        /****** Fix android issue https://bugs.chromium.org/p/chromium/issues/detail?id=1123304 *******/
-        if (this.device.android) {
-          t.preventDefault();
-        }
       }
     }
 
@@ -284,8 +273,8 @@ export class Events {
   public onKeyboardShowCb = (e) => this.onKeyboardShow(e);
   private onKeyboardShow(e) {
     if (this.device.android) {
-      this.fixAndroidResize();
-    }    
+      setTimeout(() => this.fixAndroidResize(), 20);
+    }
 
     this.instance.prevBreakpoint = Object.entries(this.instance.breaks).find(val => val[1] === this.instance.getPanelTransformY())[0];
     let newHeight = this.settings.breaks[this.instance.currentBreak()].height + e.keyboardHeight;
@@ -308,6 +297,10 @@ export class Events {
    */
   public onKeyboardHideCb = (e) => this.onKeyboardHide(e);
   private onKeyboardHide(e) {
+    if (this.device.android) {
+      this.fixAndroidResize();
+    }    
+
     if (this.inputBlured) {
       this.inputBlured = false;
     } else {
@@ -327,6 +320,8 @@ export class Events {
    */
   private fixAndroidResize() {
     if (!this.instance.paneEl) return;
+    const ionApp:any = document.querySelector('ion-app');
+
     window.requestAnimationFrame(() => {
       this.instance.wrapperEl.style.width = '100%';
       this.instance.paneEl.style.position = 'absolute';

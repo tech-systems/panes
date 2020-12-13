@@ -233,10 +233,6 @@ class Events {
         }
     }
     touchMove(t) {
-        /****** Fix android issue https://bugs.chromium.org/p/chromium/issues/detail?id=1123304 *******/
-        if (this.device.android && !this.willScrolled(t)) {
-            t.preventDefault();
-        }
         // Event emitter
         this.settings.onDrag(t);
         if (this.instance.disableDragEvents)
@@ -296,12 +292,6 @@ class Events {
             if ((newVal > this.instance.topper && this.contentScrollTop > 0)
                 || (newVal <= this.instance.topper)) {
                 return;
-            }
-            else {
-                /****** Fix android issue https://bugs.chromium.org/p/chromium/issues/detail?id=1123304 *******/
-                if (this.device.android) {
-                    t.preventDefault();
-                }
             }
         }
         // Disallow drag topper than top point
@@ -403,7 +393,7 @@ class Events {
     }
     onKeyboardShow(e) {
         if (this.device.android) {
-            this.fixAndroidResize();
+            setTimeout(() => this.fixAndroidResize(), 20);
         }
         this.instance.prevBreakpoint = Object.entries(this.instance.breaks).find(val => val[1] === this.instance.getPanelTransformY())[0];
         let newHeight = this.settings.breaks[this.instance.currentBreak()].height + e.keyboardHeight;
@@ -420,6 +410,9 @@ class Events {
         }
     }
     onKeyboardHide(e) {
+        if (this.device.android) {
+            this.fixAndroidResize();
+        }
         if (this.inputBlured) {
             this.inputBlured = false;
         }
@@ -438,6 +431,7 @@ class Events {
     fixAndroidResize() {
         if (!this.instance.paneEl)
             return;
+        const ionApp = document.querySelector('ion-app');
         window.requestAnimationFrame(() => {
             this.instance.wrapperEl.style.width = '100%';
             this.instance.paneEl.style.position = 'absolute';
@@ -863,6 +857,16 @@ class CupertinoPane {
         if (this.settings.handleKeyboard && this.device.cordova) {
             window.addEventListener('keyboardWillShow', this.events.onKeyboardShowCb);
             window.addEventListener('keyboardWillHide', this.events.onKeyboardHideCb);
+        }
+        // Fix Android issue with resize if not handle
+        if (!this.settings.handleKeyboard
+            && this.device.cordova
+            && this.device.android) {
+            window.addEventListener('keyboardWillHide', () => {
+                this.parentEl.scrollTop = 0;
+                this.parentEl.parentElement.scrollTop = 0;
+                this.parentEl.parentElement.parentElement.scrollTop = 0;
+            });
         }
     }
     detachAllEvents() {
