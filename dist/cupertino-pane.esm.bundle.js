@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: December 12, 2020
+ * Released on: December 13, 2020
  */
 
 class Support {
@@ -358,6 +358,10 @@ class Events {
         if (this.settings.bottomClose && closest === this.instance.breaks['bottom']) {
             this.instance.destroy({ animate: true });
             return;
+        }
+        // Simulationiusly emit event when touchend exact with next position (top)
+        if (this.instance.getPanelTransformY() === closest) {
+            this.settings.onTransitionEnd({ target: this.instance.paneEl });
         }
         this.instance.doTransition({ type: 'end', translateY: closest });
     }

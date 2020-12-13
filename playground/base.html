@@ -85,8 +85,8 @@
     var drawer = new CupertinoPane(element, { 
         breaks: {
           top: { enabled: true, height: window.innerHeight - (135 * 0.35), bounce: false },
-          middle: { enabled: true, height: 300, bounce: true },
-          bottom: { enabled: true, height: 100, bounce: true },
+          middle: { enabled: true, height: 300, bounce: false },
+          bottom: { enabled: true, height: 100, bounce: false },
         },
         fastSwipeSensivity: 3,
         // lowerThanBottom: false,
@@ -97,7 +97,7 @@
         // fastSwipeClose: true,
         // topperOverflowOffset: 110
         // followerElement: 'ion-fab',
-        // onDrag: () => console.log('Drag event'),
+        // onDragEnd: () => console.log('On drag end event'),
         onTransitionEnd: (e) => console.log('Transition end', e),
         onBackdropTap: () => hideBackdrop()
         // freeMode: true,

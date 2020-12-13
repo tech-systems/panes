@@ -231,6 +231,11 @@ export class Events {
       this.instance.destroy({animate:true});
       return;
     }
+    
+    // Simulationiusly emit event when touchend exact with next position (top)
+    if (this.instance.getPanelTransformY() === closest) {
+      this.settings.onTransitionEnd({target: this.instance.paneEl});
+    }
 
     this.instance.doTransition({type: 'end', translateY: closest});
   }
