@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: December 13, 2020
+ * Released on: December 14, 2020
  */
 
 class Support {
@@ -920,6 +920,11 @@ class CupertinoPane {
         }
     }
     setOverflowHeight(offset = 0) {
+        const isHidden = this.overflowEl.offsetHeight === 0 && this.overflowEl.offsetWidth === 0;
+        if (isHidden) {
+            console.debug("setOverflowHeight(): overflowEl is not visible - ignoring execution");
+            return;
+        }
         if (!this.settings.inverse) {
             this.overflowEl.style.height = `${this.getPaneHeight()
                 - this.settings.topperOverflowOffset
