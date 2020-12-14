@@ -377,24 +377,22 @@ export class CupertinoPane {
       }
 
       // Good to get rid of timeout
-      // but render dom take a time  
-      
+      // but render dom take a time
       if (!this.rendered) {
         // Timeout, this.overflowEl.offsetTop get time to render
         setTimeout(() => this.setOverflowHeight(), 150);
       } else {
+        // overflowEl is not visible - ignoring execution
+        if (this.overflowEl.offsetHeight === 0 
+            && this.overflowEl.offsetWidth === 0) {
+          return;
+        }
         this.setOverflowHeight();
       }
     }
   }
 
   public setOverflowHeight(offset = 0) {
-    const isHidden = this.overflowEl.offsetHeight === 0 && this.overflowEl.offsetWidth === 0;
-    if (isHidden) {
-      console.debug("setOverflowHeight(): overflowEl is not visible - ignoring execution");
-      return;
-    }
-
     if (!this.settings.inverse) {
       this.overflowEl.style.height = `${this.getPaneHeight()
         - this.settings.topperOverflowOffset
