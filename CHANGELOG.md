@@ -2,7 +2,7 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [1.2.0] - 2020-12-15
 
 ### BREAKING CHANGES
 - Improved `.preventDismiss()` method and gesture [#87](https://github.com/roman-rr/cupertino-pane/issues/87)
