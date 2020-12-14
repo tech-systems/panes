@@ -389,6 +389,12 @@ export class CupertinoPane {
   }
 
   public setOverflowHeight(offset = 0) {
+    const isHidden = this.overflowEl.offsetHeight === 0 && this.overflowEl.offsetWidth === 0;
+    if (isHidden) {
+      console.debug("setOverflowHeight(): overflowEl is not visible - ignoring execution");
+      return;
+    }
+
     if (!this.settings.inverse) {
       this.overflowEl.style.height = `${this.getPaneHeight()
         - this.settings.topperOverflowOffset
