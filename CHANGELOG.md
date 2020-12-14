@@ -4,12 +4,32 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### BREAKING CHANGES
+- Improved `.preventDismiss()` method and gesture [#87](https://github.com/roman-rr/cupertino-pane/issues/87)
+```javascript
+const settings = {
+  ...
+  onWillDismiss: (e) => {
+    if (e) {
+      console.log(e.prevented);
+    }
+  }
+}
+
+const myPane = new CupertinoPane('.cupertino-pane', settings);
+myPane.present({animate: true});
+myPane.preventDismiss(true);
+``` 
+
 ### Bug Fixes
 - Fixed `setBreakpoints()` method for inversed pane [#92](https://github.com/roman-rr/cupertino-pane/issues/92)
 - Fixed `textarea` overflow scroll. Pane disallowed from drag if scroll available and target element is textarea [#88](https://github.com/roman-rr/cupertino-pane/issues/88)
 - Fixed horizontal scroll inside pane [#102](https://github.com/roman-rr/cupertino-pane/issues/102)
 - Fixed keyboard issues on Android devices with cordova webview
 - Fixed drag event and stops laggy on drag pane with touchAngle option [#102](https://github.com/roman-rr/cupertino-pane/issues/102)
+- Fixed `onTransitionEnd` callback with top position [#105](https://github.com/roman-rr/cupertino-pane/issues/105) 
+- Fixed `currentBreak()` detection for `onDragEnd` callbac [#106](https://github.com/roman-rr/cupertino-pane/pull/106)
+- Fixed height calculation for overflow element [#104](https://github.com/roman-rr/cupertino-pane/issues/104) 
 
 ## [1.1.94] - 2020-11-15
 

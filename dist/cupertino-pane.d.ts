@@ -12,7 +12,8 @@ export declare class CupertinoPane {
     screen_height: number;
     private screenHeightOffset;
     private rendered;
-    private preventDismissEvent;
+    preventDismissEvent: boolean;
+    preventedDismiss: boolean;
     private iconCloseColor;
     private brs;
     wrapperEl: HTMLDivElement;
@@ -71,7 +72,7 @@ export declare class CupertinoPane {
     /**
      * Prevent dismiss event
      */
-    preventDismiss(): void;
+    preventDismiss(val?: boolean): void;
     /**
      * Disable pane drag events
      */

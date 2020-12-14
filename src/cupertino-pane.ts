@@ -21,7 +21,8 @@ export class CupertinoPane {
   public screen_height: number = window.innerHeight;
   private screenHeightOffset: number = this.screen_height;
   private rendered: boolean = false;
-  private preventDismissEvent: boolean = false;
+  public preventDismissEvent: boolean = false;
+  public preventedDismiss: boolean = false;
   private iconCloseColor: string = '#7a7a7e';
 
   private brs: number[] = [];
@@ -670,8 +671,8 @@ export class CupertinoPane {
   /**
    * Prevent dismiss event
    */
-  public preventDismiss(): void {
-    this.preventDismissEvent = true;
+  public preventDismiss(val: boolean = false): void {
+    this.preventDismissEvent = val;
   }
 
   /**
@@ -893,14 +894,18 @@ export class CupertinoPane {
       return null;
     }
 
-    // Emit event
-    this.settings.onWillDismiss();
-
+    // Prevent dismiss
     if (this.preventDismissEvent) {
-      this.moveToBreak(this.prevBreakpoint);
-      this.preventDismissEvent = false;      
+      // Emit event with prevent dismiss if not already sent from drag event
+      if (!this.preventedDismiss) {
+        this.settings.onWillDismiss({prevented: true} as any);
+        this.moveToBreak(this.prevBreakpoint);
+      }
       return;
     }
+
+    // Emit event
+    this.settings.onWillDismiss();
 
     /****** Animation & Transition ******/
     if (conf.animate) {

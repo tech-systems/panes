@@ -17,6 +17,7 @@ export class Events {
   private steps: any[] = [];  
   private inputBlured: boolean = false;
   
+  
   constructor(private instance: CupertinoPane, 
               private settings: CupertinoSettings, 
               private device: Device) {
@@ -38,6 +39,9 @@ export class Events {
 
     // Allow touch angle by default, disallow no move with condition
     this.disableDragAngle = false;
+
+    // Allow pereventDismiss by default
+    this.instance.preventedDismiss = false;
 
     const targetTouch = t.type === 'touchstart' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
     const screenY = t.type === 'touchstart' ? targetTouch.clientY : t.clientY;
@@ -77,6 +81,7 @@ export class Events {
 
     if (this.instance.disableDragEvents) return;
     if (this.disableDragAngle) return;
+    if (this.instance.preventedDismiss) return;
 
     if (this.settings.touchMoveStopPropagation) {
       t.stopPropagation();
@@ -162,6 +167,22 @@ export class Events {
       this.instance.paneEl.style.transform = `translateY(${this.instance.bottomer}px) translateZ(0px)`;
       this.instance.checkOpacityAttr(newVal);
       return;
+    }
+
+    // Prevent Dismiss gesture
+    if (!this.instance.preventedDismiss
+          && this.instance.preventDismissEvent && this.settings.bottomClose) {
+      let differKoef = ((-this.instance.topper + this.instance.topper - this.instance.getPanelTransformY()) / this.instance.topper) / -8;
+      newVal = this.instance.getPanelTransformY() + (diffY * (0.5 - differKoef));
+      
+      let mousePointY = (t.touches[0].screenY - 220 - this.instance.screen_height) * -1;
+      if (mousePointY <= this.instance.screen_height - this.instance.bottomer) {
+        this.instance.preventedDismiss = true; 
+        // Emit event with prevent dismiss
+        this.settings.onWillDismiss({prevented: true} as any);
+        this.instance.moveToBreak(this.instance.prevBreakpoint);
+        return;
+      }
     }
 
     // Disallow accidentaly clicks while slide gestures

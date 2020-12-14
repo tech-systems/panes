@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: December 14, 2020
+ * Released on: December 15, 2020
  */
  
  
@@ -213,6 +213,8 @@ class Events {
         this.allowClick = true;
         // Allow touch angle by default, disallow no move with condition
         this.disableDragAngle = false;
+        // Allow pereventDismiss by default
+        this.instance.preventedDismiss = false;
         const targetTouch = t.type === 'touchstart' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
         const screenY = t.type === 'touchstart' ? targetTouch.clientY : t.clientY;
         const screenX = t.type === 'touchstart' ? targetTouch.clientX : t.clientX;
@@ -238,6 +240,8 @@ class Events {
         if (this.instance.disableDragEvents)
             return;
         if (this.disableDragAngle)
+            return;
+        if (this.instance.preventedDismiss)
             return;
         if (this.settings.touchMoveStopPropagation) {
             t.stopPropagation();
@@ -313,6 +317,20 @@ class Events {
             this.instance.paneEl.style.transform = `translateY(${this.instance.bottomer}px) translateZ(0px)`;
             this.instance.checkOpacityAttr(newVal);
             return;
+        }
+        // Prevent Dismiss gesture
+        if (!this.instance.preventedDismiss
+            && this.instance.preventDismissEvent && this.settings.bottomClose) {
+            let differKoef = ((-this.instance.topper + this.instance.topper - this.instance.getPanelTransformY()) / this.instance.topper) / -8;
+            newVal = this.instance.getPanelTransformY() + (diffY * (0.5 - differKoef));
+            let mousePointY = (t.touches[0].screenY - 220 - this.instance.screen_height) * -1;
+            if (mousePointY <= this.instance.screen_height - this.instance.bottomer) {
+                this.instance.preventedDismiss = true;
+                // Emit event with prevent dismiss
+                this.settings.onWillDismiss({ prevented: true });
+                this.instance.moveToBreak(this.instance.prevBreakpoint);
+                return;
+            }
         }
         // Disallow accidentaly clicks while slide gestures
         this.allowClick = false;
@@ -541,6 +559,7 @@ class CupertinoPane {
         this.screenHeightOffset = this.screen_height;
         this.rendered = false;
         this.preventDismissEvent = false;
+        this.preventedDismiss = false;
         this.iconCloseColor = '#7a7a7e';
         this.brs = [];
         this.settings = (new Settings()).instance;
@@ -915,22 +934,22 @@ class CupertinoPane {
                 console.warn('Cupertino Pane: "upperThanTop" allowed for disabled "topperOverflow"');
             }
             // Good to get rid of timeout
-            // but render dom take a time  
+            // but render dom take a time
             if (!this.rendered) {
                 // Timeout, this.overflowEl.offsetTop get time to render
                 setTimeout(() => this.setOverflowHeight(), 150);
             }
             else {
+                // overflowEl is not visible - ignoring execution
+                if (this.overflowEl.offsetHeight === 0
+                    && this.overflowEl.offsetWidth === 0) {
+                    return;
+                }
                 this.setOverflowHeight();
             }
         }
     }
     setOverflowHeight(offset = 0) {
-        const isHidden = this.overflowEl.offsetHeight === 0 && this.overflowEl.offsetWidth === 0;
-        if (isHidden) {
-            console.debug("setOverflowHeight(): overflowEl is not visible - ignoring execution");
-            return;
-        }
         if (!this.settings.inverse) {
             this.overflowEl.style.height = `${this.getPaneHeight()
                 - this.settings.topperOverflowOffset
@@ -1112,8 +1131,8 @@ class CupertinoPane {
     /**
      * Prevent dismiss event
      */
-    preventDismiss() {
-        this.preventDismissEvent = true;
+    preventDismiss(val = false) {
+        this.preventDismissEvent = val;
     }
     /**
      * Disable pane drag events
@@ -1304,13 +1323,17 @@ class CupertinoPane {
             console.warn(`Cupertino Pane: Present pane before call destroy()`);
             return null;
         }
-        // Emit event
-        this.settings.onWillDismiss();
+        // Prevent dismiss
         if (this.preventDismissEvent) {
-            this.moveToBreak(this.prevBreakpoint);
-            this.preventDismissEvent = false;
+            // Emit event with prevent dismiss if not already sent from drag event
+            if (!this.preventedDismiss) {
+                this.settings.onWillDismiss({ prevented: true });
+                this.moveToBreak(this.prevBreakpoint);
+            }
             return;
         }
+        // Emit event
+        this.settings.onWillDismiss();
         /****** Animation & Transition ******/
         if (conf.animate) {
             this.doTransition({ type: 'destroy', translateY: this.screenHeightOffset });

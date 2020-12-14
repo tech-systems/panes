@@ -296,18 +296,23 @@ myPane.setBreakpoints({
   bottom: { ... }
 });
 ```
-### preventDismiss()
-Using in pair with `onWillDismiss()` callback to prevent pane from destroy on custom conditions
+### preventDismiss(**boolean = false**)
+Use this method to prevent dismiss events. Use `onWillDismiss()` callback to listen if dismiss event prevented. 
 ```javascript
 const settings = {
   ...
-  onWillDismiss: () => {
-    if (disallowDismiss) {
-      drawer.preventDismiss();
+  onWillDismiss: (e) => {
+    if (e) {
+      console.log(e.prevented);
     }
   }
 }
+
+const myPane = new CupertinoPane('.cupertino-pane', settings);
+myPane.present({animate: true});
+myPane.preventDismiss(true);
 ```
+
 
 ## Attributes
 ### hide-on-bottom
