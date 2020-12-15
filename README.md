@@ -353,10 +353,9 @@ By default, we are now handle keyboard in hybrid mobile applications and push pa
 If you would like handle this part by yourself, set option `handleKeyboard: false`.
 
 ## Future Goals
-- [Docs] Package branding (100+ stars)
-- [Docs] Open collective
+- [Docs] ($150 budget) -> Package branding
+- [Docs] (Traffic + Carbon ads) -> Docs engine (F7, Netlify, GH pages)
 - [Showcase] Apple Music F7
-- [Docs] Docs engine (F7, Netlify)
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) - Native Touch Plugin
 - [Platforms] React Native version
 - [Platforms] C++ QT version
