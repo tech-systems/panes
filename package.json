@@ -1,5 +1,5 @@
 {
-  "name": "cupertino-pane",
+  "name": "@roman-rr/cupertino-pane",
   "description": "Multiplatform slide-over pane",
   "version": "1.2.0",
   "author": "Roman Antonov (roman-rr)",
@@ -9,6 +9,9 @@
   "main": "dist/cupertino-pane.min.js",
   "module": "dist/cupertino-pane.esm.bundle.js",
   "types": "dist/cupertino-pane.d.ts",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/roman-rr"
+  },
   "scripts": {
     "build": "gulp build",
     "tslint": "tslint src/**/*.ts",
