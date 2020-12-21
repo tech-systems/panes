@@ -300,6 +300,12 @@ export class Events {
    */
   public onKeyboardShowCb = (e) => this.onKeyboardShow(e);
   private onKeyboardShow(e) {
+    if (this.instance.paneEl 
+      && this.instance.paneEl.offsetWidth === 0 
+      && this.instance.paneEl.offsetHeight === 0 ) {
+      return;
+    }
+
     if (this.device.android) {
       setTimeout(() => this.fixAndroidResize(), 20);
     }
@@ -325,6 +331,12 @@ export class Events {
    */
   public onKeyboardHideCb = (e) => this.onKeyboardHide(e);
   private onKeyboardHide(e) {
+    if (this.instance.paneEl 
+      && this.instance.paneEl.offsetWidth === 0 
+      && this.instance.paneEl.offsetHeight === 0 ) {
+      return;
+    }
+
     if (this.device.android) {
       this.fixAndroidResize();
     }    
