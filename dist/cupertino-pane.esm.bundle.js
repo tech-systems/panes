@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.1.94
+ * Cupertino Pane 1.2.1
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: December 15, 2020
+ * Released on: December 21, 2020
  */
 
 class Support {
@@ -410,6 +410,11 @@ class Events {
         }
     }
     onKeyboardShow(e) {
+        if (this.instance.paneEl
+            && this.instance.paneEl.offsetWidth === 0
+            && this.instance.paneEl.offsetHeight === 0) {
+            return;
+        }
         if (this.device.android) {
             setTimeout(() => this.fixAndroidResize(), 20);
         }
@@ -428,6 +433,11 @@ class Events {
         }
     }
     onKeyboardHide(e) {
+        if (this.instance.paneEl
+            && this.instance.paneEl.offsetWidth === 0
+            && this.instance.paneEl.offsetHeight === 0) {
+            return;
+        }
         if (this.device.android) {
             this.fixAndroidResize();
         }
@@ -934,16 +944,16 @@ class CupertinoPane {
                 setTimeout(() => this.setOverflowHeight(), 150);
             }
             else {
-                // overflowEl is not visible - ignoring execution
-                if (this.overflowEl.offsetHeight === 0
-                    && this.overflowEl.offsetWidth === 0) {
-                    return;
-                }
                 this.setOverflowHeight();
             }
         }
     }
     setOverflowHeight(offset = 0) {
+        // overflowEl is not visible - ignoring execution
+        if (this.overflowEl.offsetHeight === 0
+            && this.overflowEl.offsetWidth === 0) {
+            return;
+        }
         if (!this.settings.inverse) {
             this.overflowEl.style.height = `${this.getPaneHeight()
                 - this.settings.topperOverflowOffset
