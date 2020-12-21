@@ -106,6 +106,7 @@ export class Events {
     }
         
     // Detect if input was blured
+    // TODO: Check that blured from pane child instance
     if (this.steps.length > 2) {
       if (this.isFormElement(document.activeElement)
       && !(this.isFormElement(t.target))) {
@@ -300,11 +301,13 @@ export class Events {
    */
   public onKeyboardShowCb = (e) => this.onKeyboardShow(e);
   private onKeyboardShow(e) {
+    // TODO: instead of this -> check that inputBlured is instance child
     if (this.instance.paneEl 
       && this.instance.paneEl.offsetWidth === 0 
       && this.instance.paneEl.offsetHeight === 0 ) {
       return;
     }
+    // TODO!
 
     if (this.device.android) {
       setTimeout(() => this.fixAndroidResize(), 20);
@@ -331,11 +334,13 @@ export class Events {
    */
   public onKeyboardHideCb = (e) => this.onKeyboardHide(e);
   private onKeyboardHide(e) {
+    // TODO: instead of this -> check that inputBlured is instance child
     if (this.instance.paneEl 
       && this.instance.paneEl.offsetWidth === 0 
       && this.instance.paneEl.offsetHeight === 0 ) {
       return;
     }
+    // TODO! 
 
     if (this.device.android) {
       this.fixAndroidResize();
