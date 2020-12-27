@@ -356,6 +356,8 @@ If you would like handle this part by yourself, set option `handleKeyboard: fals
 - [Docs] ($150 budget) -> Package branding
 - [Docs] (Traffic + Carbon ads) -> Docs engine (F7, Netlify, Gatsby, GH pages)
 - [Showcase] Apple Music F7
+- [Technologies] CSS3D
+- [Technologies] Web Animation
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) - Native Touch Plugin
 - [Platforms] React Native version
 - [Platforms] C++ QT version
