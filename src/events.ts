@@ -349,7 +349,9 @@ export class Events {
     if (this.inputBlured) {
       this.inputBlured = false;
     } else {
-      this.instance.moveToBreak(this.instance.prevBreakpoint);
+      if (!this.instance.isHidden()) {
+        this.instance.moveToBreak(this.instance.prevBreakpoint);
+      }
     }
 
     setTimeout(() => this.instance.setOverflowHeight());

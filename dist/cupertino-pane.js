@@ -3,11 +3,11 @@
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
- * Copyright 2019-2020 Roman Antonov (roman-rr)
+ * Copyright 2019-2021 Roman Antonov (roman-rr)
  *
  * Released under the MIT License
  *
- * Released on: December 21, 2020
+ * Released on: January 5, 2021
  */
  
  
@@ -263,6 +263,7 @@ class Events {
             return;
         }
         // Detect if input was blured
+        // TODO: Check that blured from pane child instance
         if (this.steps.length > 2) {
             if (this.isFormElement(document.activeElement)
                 && !(this.isFormElement(t.target))) {
@@ -416,11 +417,13 @@ class Events {
         }
     }
     onKeyboardShow(e) {
+        // TODO: instead of this -> check that inputBlured is instance child
         if (this.instance.paneEl
             && this.instance.paneEl.offsetWidth === 0
             && this.instance.paneEl.offsetHeight === 0) {
             return;
         }
+        // TODO!
         if (this.device.android) {
             setTimeout(() => this.fixAndroidResize(), 20);
         }
@@ -439,11 +442,13 @@ class Events {
         }
     }
     onKeyboardHide(e) {
+        // TODO: instead of this -> check that inputBlured is instance child
         if (this.instance.paneEl
             && this.instance.paneEl.offsetWidth === 0
             && this.instance.paneEl.offsetHeight === 0) {
             return;
         }
+        // TODO! 
         if (this.device.android) {
             this.fixAndroidResize();
         }
@@ -451,7 +456,9 @@ class Events {
             this.inputBlured = false;
         }
         else {
-            this.instance.moveToBreak(this.instance.prevBreakpoint);
+            if (!this.instance.isHidden()) {
+                this.instance.moveToBreak(this.instance.prevBreakpoint);
+            }
         }
         setTimeout(() => this.instance.setOverflowHeight());
     }

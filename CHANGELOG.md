@@ -2,6 +2,11 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Bug Fixes
+- Cordova keyboard hide if pane is hidden [#112](https://github.com/roman-rr/cupertino-pane/issues/112)
+
 ## [1.2.0] - 2020-12-15
 
 ### BREAKING CHANGES
