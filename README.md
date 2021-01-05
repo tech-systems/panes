@@ -355,6 +355,7 @@ If you would like handle this part by yourself, set option `handleKeyboard: fals
 ## Future Goals
 - [Docs] ($150 budget) -> Package branding
 - [Enhancements] Handle keyboard only for Pane inputs
+- [Enhancements] Represent constructor without issues
 - [Docs] (Traffic + Carbon ads) -> Docs engine (F7, Netlify, Gatsby, GH pages)
 - [Showcase] Apple Music F7
 - [Technologies] CSS3D

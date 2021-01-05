@@ -61,7 +61,7 @@ export class CupertinoPane {
     
     // Pane class created
     if (this.isPanePresented()) {
-      console.warn('Cupertino Pane: specified selector or DOM element already in use', this.selector);
+      console.error('Cupertino Pane: specified selector or DOM element already in use', this.selector);
       return;
     }
 
