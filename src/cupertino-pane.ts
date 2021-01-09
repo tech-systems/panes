@@ -329,8 +329,8 @@ export class CupertinoPane {
         && this.device.android) {
       window.addEventListener('keyboardWillHide', () => {
         this.parentEl.scrollTop = 0;
-        this.parentEl.parentElement.scrollTop = 0;
-        this.parentEl.parentElement.parentElement.scrollTop = 0;
+        this.parentEl.parentElement?.scrollTop = 0;
+        this.parentEl.parentElement?.parentElement?.scrollTop = 0;
       });
     }
   }
