@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Enhancements
+- Button close renamed to button destroy to avoid confuses. Option renamed `buttonClose` -> `buttonDestroy` [#116](https://github.com/roman-rr/cupertino-pane/issues/112)
+
 ### Bug Fixes
 - Cordova keyboard hide if pane is hidden [#112](https://github.com/roman-rr/cupertino-pane/issues/112)
 

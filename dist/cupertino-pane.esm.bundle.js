@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: January 5, 2021
+ * Released on: January 11, 2021
  */
 
 class Support {
@@ -527,6 +527,7 @@ class Settings {
             fastSwipeClose: false,
             fastSwipeSensivity: 3,
             freeMode: false,
+            buttonDestroy: true,
             buttonClose: true,
             topperOverflow: true,
             topperOverflowOffset: 0,
@@ -753,17 +754,17 @@ class CupertinoPane {
         this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
         this.contentEl.style.overflowX = 'hidden';
         // Close button
-        this.closeEl = document.createElement('div');
+        this.destroyButtonEl = document.createElement('div');
         if (!this.settings.inverse) {
-            this.closeEl.className = 'close-button';
-            this.closeEl.style.width = '26px';
-            this.closeEl.style.height = '26px';
-            this.closeEl.style.position = 'absolute';
-            this.closeEl.style.background = '#ebebeb';
-            this.closeEl.style.right = '20px';
-            this.closeEl.style.zIndex = '14';
-            this.closeEl.style.borderRadius = '100%';
-            this.closeEl.style.top = '16px';
+            this.destroyButtonEl.className = 'destroy-button';
+            this.destroyButtonEl.style.width = '26px';
+            this.destroyButtonEl.style.height = '26px';
+            this.destroyButtonEl.style.position = 'absolute';
+            this.destroyButtonEl.style.background = '#ebebeb';
+            this.destroyButtonEl.style.right = '20px';
+            this.destroyButtonEl.style.zIndex = '14';
+            this.destroyButtonEl.style.borderRadius = '100%';
+            this.destroyButtonEl.style.top = '16px';
         }
         // inject DOM
         this.parentEl.appendChild(this.wrapperEl);
@@ -822,7 +823,7 @@ class CupertinoPane {
             this.contentEl.style.borderTopLeftRadius = '20px';
             this.contentEl.style.borderTopRightRadius = '20px';
             this.contentEl.style.boxShadow = '0 4px 16px rgba(0,0,0,.12)';
-            this.closeEl.style.top = '45px';
+            this.destroyButtonEl.style.top = '45px';
             this.draggableEl.style.padding = '15px';
             this.moveEl.style.width = '45px';
             this.moveEl.style.background = 'rgba(225, 225, 225, 0.6)';
@@ -834,10 +835,10 @@ class CupertinoPane {
         if (this.settings.darkMode) {
             this.setDarkMode({ enable: true });
         }
-        if (this.settings.buttonClose && !this.settings.inverse) {
-            this.paneEl.appendChild(this.closeEl);
-            this.closeEl.addEventListener('click', (t) => this.destroy({ animate: true }));
-            this.closeEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+        if ((this.settings.buttonClose && this.settings.buttonDestroy) && !this.settings.inverse) {
+            this.paneEl.appendChild(this.destroyButtonEl);
+            this.destroyButtonEl.addEventListener('click', (t) => this.destroy({ animate: true }));
+            this.destroyButtonEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
           <path fill="${this.iconCloseColor}" d="M278.6 256l68.2-68.2c6.2-6.2 6.2-16.4 0-22.6-6.2-6.2-16.4-6.2-22.6 0L256 233.4l-68.2-68.2c-6.2-6.2-16.4-6.2-22.6 0-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3l68.2 68.2-68.2 68.2c-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3 6.2 6.2 16.4 6.2 22.6 0l68.2-68.2 68.2 68.2c6.2 6.2 16.4 6.2 22.6 0 6.2-6.2 6.2-16.4 0-22.6L278.6 256z"/>
         </svg>`;
         }
@@ -900,8 +901,12 @@ class CupertinoPane {
             && this.device.android) {
             window.addEventListener('keyboardWillHide', () => {
                 this.parentEl.scrollTop = 0;
-                this.parentEl.parentElement.scrollTop = 0;
-                this.parentEl.parentElement.parentElement.scrollTop = 0;
+                if (this.parentEl.parentElement) {
+                    this.parentEl.parentElement.scrollTop = 0;
+                    if (this.parentEl.parentElement.parentElement) {
+                        this.parentEl.parentElement.parentElement.scrollTop = 0;
+                    }
+                }
             });
         }
     }
@@ -1162,8 +1167,8 @@ class CupertinoPane {
             this.paneEl.style.background = '#1c1c1d';
             this.paneEl.style.color = '#ffffff';
             this.moveEl.style.background = '#5a5a5e';
-            if (this.settings.buttonClose) {
-                this.closeEl.style.background = '#424246';
+            if (this.settings.buttonClose && this.settings.buttonDestroy) {
+                this.destroyButtonEl.style.background = '#424246';
                 this.iconCloseColor = '#a8a7ae';
             }
         }
@@ -1171,8 +1176,8 @@ class CupertinoPane {
             this.paneEl.style.background = '#ffffff';
             this.paneEl.style.color = 'unset';
             this.moveEl.style.background = '#c0c0c0';
-            if (this.settings.buttonClose) {
-                this.closeEl.style.background = '#ebebeb';
+            if (this.settings.buttonClose && this.settings.buttonDestroy) {
+                this.destroyButtonEl.style.background = '#ebebeb';
                 this.iconCloseColor = '#7a7a7e';
             }
         }

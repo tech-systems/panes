@@ -32,6 +32,7 @@ export interface PaneSettings {
   fastSwipeClose: boolean;
   fastSwipeSensivity: number;
   freeMode: boolean;
+  buttonDestroy: boolean;
   buttonClose: boolean;
   topperOverflow: boolean;
   topperOverflowOffset: number;

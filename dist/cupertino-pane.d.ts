@@ -25,7 +25,7 @@ export declare class CupertinoPane {
     private moveEl;
     private contentEl;
     private backdropEl;
-    private closeEl;
+    private destroyButtonEl;
     private followerEl;
     private pushElement;
     private settings;
