@@ -172,7 +172,7 @@ new CupertinoPane(element); // HTMLElement
 | **lowerThanBottom** | `boolean` | true | By default allow user to drag pane lower than bottom position. On `false` will automatically place pane to bottom position on lower than bottom attemption |
 | **upperThanTop** | `boolean` | false | Allow user to drag pane upper than maximum top position. Useful with bulletin style without overflow-y |
 | **touchAngle** | `number` | null | Allowable angle (in degrees) to trigger touch move |
-| **buttonClose** | `boolean` | true | Determinate whetever close button will render or not |
+| **buttonDestroy** | `boolean` | true | Determinate whetever close button will render or not |
 | **bottomOffset** | `number` | 0 | Margin bottom for pane from screen bottom point |
 | **topperOverflow** | `boolean` | true | Ability to scroll content inside pane if topper point reached |
 | **topperOverflowOffset** | `number` | 0 | Offset from screen bottom to the end of overflow content |
