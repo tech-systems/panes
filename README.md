@@ -156,6 +156,7 @@ new CupertinoPane(element); // HTMLElement
 | **inverse** | `boolean` | false | On `true` will change pane direction from `bottom-to-top` to `top-to-bottom` |
 | **parentElement** | `string` | Parent element selector | Element selector where pane will rendered |
 | **followerElement** | `string` | Follower element selector | Element with selector will following pane transitions |
+| **fitHeight** | `boolean` | 'false' | Automatically calc and define content height as top breakpoint. Middle and bottom breakpoint will be disabled |
 | **pushElement** | `string` | Push element selector | DOM Element will be pushed and scaled |
 | **pushMinHeight** | `number` | Most bottom available point | Height from which 3d push effect will be started |
 | **pushYOffset** | `number` | Negative margin value to place pushed element upper |

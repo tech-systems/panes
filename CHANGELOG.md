@@ -4,6 +4,9 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Features 
+- Added `fitHeight` property for usage pane without breakpoints. On `fitHeight: true`, pane height will automatically calculated before present. Then height will be applied as top breakpoint height, bottom and middle breakpoint will be disabled. See [Bulletin demo](https://output.jsbin.com/maqigod) on example. [#113](https://github.com/roman-rr/cupertino-pane/issues/113)
+
 ### Enhancements
 - Button close renamed to button destroy to avoid confuses. Option renamed `buttonClose` -> `buttonDestroy` [#116](https://github.com/roman-rr/cupertino-pane/issues/112)
 

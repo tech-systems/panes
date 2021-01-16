@@ -18,6 +18,7 @@ export interface PaneSettings {
     inverse: boolean;
     parentElement: any;
     followerElement: string;
+    fitHeight: boolean;
     pushElement: any;
     pushMinHeight: number;
     pushYOffset: number;

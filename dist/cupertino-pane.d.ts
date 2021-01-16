@@ -35,7 +35,7 @@ export declare class CupertinoPane {
     private drawBaseElements;
     present(conf?: {
         animate: boolean;
-    }): void;
+    }): Promise<void>;
     /**
      * Private Utils methods
      */
@@ -46,6 +46,7 @@ export declare class CupertinoPane {
     getClosestBreakY(): number;
     private scrollElementInit;
     setOverflowHeight(offset?: number): void;
+    private getPaneFitHeight;
     private getTimingFunction;
     checkOpacityAttr(val: any): void;
     checkOverflowAttr(val: any): void;
@@ -88,7 +89,7 @@ export declare class CupertinoPane {
      * Function builder for breakpoints and heights
      * @param conf breakpoints
      */
-    setBreakpoints(conf?: PaneBreaks): void;
+    setBreakpoints(conf?: PaneBreaks): Promise<void>;
     moveToBreak(val: string): any;
     moveToHeight(val: number): any;
     hide(): any;

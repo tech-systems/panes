@@ -7,8 +7,33 @@
  *
  * Released under the MIT License
  *
- * Released on: January 11, 2021
+ * Released on: January 17, 2021
  */
+
+/*! *****************************************************************************
+Copyright (c) Microsoft Corporation.
+
+Permission to use, copy, modify, and/or distribute this software for any
+purpose with or without fee is hereby granted.
+
+THE SOFTWARE IS PROVIDED "AS IS" AND THE AUTHOR DISCLAIMS ALL WARRANTIES WITH
+REGARD TO THIS SOFTWARE INCLUDING ALL IMPLIED WARRANTIES OF MERCHANTABILITY
+AND FITNESS. IN NO EVENT SHALL THE AUTHOR BE LIABLE FOR ANY SPECIAL, DIRECT,
+INDIRECT, OR CONSEQUENTIAL DAMAGES OR ANY DAMAGES WHATSOEVER RESULTING FROM
+LOSS OF USE, DATA OR PROFITS, WHETHER IN AN ACTION OF CONTRACT, NEGLIGENCE OR
+OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
+PERFORMANCE OF THIS SOFTWARE.
+***************************************************************************** */
+
+function __awaiter(thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+}
 
 class Support {
     static get touch() {
@@ -513,6 +538,7 @@ class Settings {
             inverse: false,
             parentElement: null,
             followerElement: null,
+            fitHeight: false,
             pushElement: null,
             pushMinHeight: null,
             pushYOffset: 0,
@@ -774,101 +800,107 @@ class CupertinoPane {
         this.draggableEl.appendChild(this.moveEl);
     }
     present(conf = { animate: false }) {
-        if (!this.el)
-            return;
-        // Pane already exist and was rendered
-        if (this.isPanePresented() && this.rendered) {
-            this.moveToBreak(this.settings.initialBreak);
-            return;
-        }
-        // Pane already exist but not rendered in this class
-        if (this.isPanePresented() && !this.rendered) {
-            console.warn('Cupertino Pane: specified selector or DOM element already in use', this.selector);
-            return;
-        }
-        // Emit event
-        this.settings.onWillPresent();
-        if (this.settings.inverse) {
-            this.screenHeightOffset = 0;
-        }
-        this.setBreakpoints();
-        this.drawBaseElements();
-        this.scrollElementInit();
-        this.checkOpacityAttr(this.currentBreakpoint);
-        this.checkOverflowAttr(this.currentBreakpoint);
-        this.rendered = true;
-        if (this.settings.followerElement) {
-            if (!document.querySelector(this.settings.followerElement)) {
-                console.warn('Cupertino Pane: wrong follower element selector specified', this.settings.followerElement);
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.el)
+                return;
+            // Pane already exist and was rendered
+            if (this.isPanePresented() && this.rendered) {
+                this.moveToBreak(this.settings.initialBreak);
                 return;
             }
-            this.followerEl = document.querySelector(this.settings.followerElement);
-            this.followerEl.style.willChange = 'transform, border-radius';
-            this.followerEl.style.transform = `translateY(0px) translateZ(0px)`;
-            this.followerEl.style.transition = `all ${this.settings.animationDuration}ms ${this.getTimingFunction(this.settings.breaks[this.currentBreak()].bounce)} 0s`;
-        }
-        if (this.settings.pushElement) {
-            this.pushElement = document.querySelector(this.settings.pushElement);
-        }
-        if (!this.settings.showDraggable) {
-            this.draggableEl.style.opacity = '0';
-        }
-        // Draggable over pane position
-        if (this.settings.draggableOver) {
-            this.paneEl.style.background = 'transparent';
-            this.paneEl.style.boxShadow = 'none';
-            this.paneEl.style.paddingTop = '30px';
-            this.contentEl.style.background = '#ffffff';
-            this.contentEl.style.display = 'block';
-            this.contentEl.style.borderTopLeftRadius = '20px';
-            this.contentEl.style.borderTopRightRadius = '20px';
-            this.contentEl.style.boxShadow = '0 4px 16px rgba(0,0,0,.12)';
-            this.destroyButtonEl.style.top = '45px';
-            this.draggableEl.style.padding = '15px';
-            this.moveEl.style.width = '45px';
-            this.moveEl.style.background = 'rgba(225, 225, 225, 0.6)';
-            if (Support.backdropFilter) {
-                this.moveEl.style['backdropFilter'] = 'saturate(180%) blur(20px)';
-                this.moveEl.style['webkitBackdropFilter'] = 'saturate(180%) blur(20px)';
+            // Pane already exist but not rendered in this class
+            if (this.isPanePresented() && !this.rendered) {
+                console.warn('Cupertino Pane: specified selector or DOM element already in use', this.selector);
+                return;
             }
-        }
-        if (this.settings.darkMode) {
-            this.setDarkMode({ enable: true });
-        }
-        if ((this.settings.buttonClose && this.settings.buttonDestroy) && !this.settings.inverse) {
-            this.paneEl.appendChild(this.destroyButtonEl);
-            this.destroyButtonEl.addEventListener('click', (t) => this.destroy({ animate: true }));
-            this.destroyButtonEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+            // Emit event
+            this.settings.onWillPresent();
+            if (this.settings.inverse) {
+                this.screenHeightOffset = 0;
+            }
+            if (this.settings.fitHeight) {
+                this.settings.initialBreak = 'top';
+                this.settings.topperOverflow = false;
+            }
+            yield this.setBreakpoints();
+            this.drawBaseElements();
+            this.scrollElementInit();
+            this.checkOpacityAttr(this.currentBreakpoint);
+            this.checkOverflowAttr(this.currentBreakpoint);
+            this.rendered = true;
+            if (this.settings.followerElement) {
+                if (!document.querySelector(this.settings.followerElement)) {
+                    console.warn('Cupertino Pane: wrong follower element selector specified', this.settings.followerElement);
+                    return;
+                }
+                this.followerEl = document.querySelector(this.settings.followerElement);
+                this.followerEl.style.willChange = 'transform, border-radius';
+                this.followerEl.style.transform = `translateY(0px) translateZ(0px)`;
+                this.followerEl.style.transition = `all ${this.settings.animationDuration}ms ${this.getTimingFunction(this.settings.breaks[this.currentBreak()].bounce)} 0s`;
+            }
+            if (this.settings.pushElement) {
+                this.pushElement = document.querySelector(this.settings.pushElement);
+            }
+            if (!this.settings.showDraggable) {
+                this.draggableEl.style.opacity = '0';
+            }
+            // Draggable over pane position
+            if (this.settings.draggableOver) {
+                this.paneEl.style.background = 'transparent';
+                this.paneEl.style.boxShadow = 'none';
+                this.paneEl.style.paddingTop = '30px';
+                this.contentEl.style.background = '#ffffff';
+                this.contentEl.style.display = 'block';
+                this.contentEl.style.borderTopLeftRadius = '20px';
+                this.contentEl.style.borderTopRightRadius = '20px';
+                this.contentEl.style.boxShadow = '0 4px 16px rgba(0,0,0,.12)';
+                this.destroyButtonEl.style.top = '45px';
+                this.draggableEl.style.padding = '15px';
+                this.moveEl.style.width = '45px';
+                this.moveEl.style.background = 'rgba(225, 225, 225, 0.6)';
+                if (Support.backdropFilter) {
+                    this.moveEl.style['backdropFilter'] = 'saturate(180%) blur(20px)';
+                    this.moveEl.style['webkitBackdropFilter'] = 'saturate(180%) blur(20px)';
+                }
+            }
+            if (this.settings.darkMode) {
+                this.setDarkMode({ enable: true });
+            }
+            if ((this.settings.buttonClose && this.settings.buttonDestroy) && !this.settings.inverse) {
+                this.paneEl.appendChild(this.destroyButtonEl);
+                this.destroyButtonEl.addEventListener('click', (t) => this.destroy({ animate: true }));
+                this.destroyButtonEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
           <path fill="${this.iconCloseColor}" d="M278.6 256l68.2-68.2c6.2-6.2 6.2-16.4 0-22.6-6.2-6.2-16.4-6.2-22.6 0L256 233.4l-68.2-68.2c-6.2-6.2-16.4-6.2-22.6 0-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3l68.2 68.2-68.2 68.2c-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3 6.2 6.2 16.4 6.2 22.6 0l68.2-68.2 68.2 68.2c6.2 6.2 16.4 6.2 22.6 0 6.2-6.2 6.2-16.4 0-22.6L278.6 256z"/>
         </svg>`;
-        }
-        if (this.settings.bottomClose) {
-            this.settings.breaks.bottom.enabled = true;
-        }
-        if (this.settings.freeMode) {
-            this.settings.lowerThanBottom = false;
-        }
-        if (this.settings.backdrop) {
-            this.renderBackdrop();
-        }
-        /****** Fix android issues *******/
-        if (this.device.android) {
-            // Body patch prevent android pull-to-refresh
-            document.body.style['overscrollBehaviorY'] = 'none';
-        }
-        /****** Attach Events *******/
-        this.attachAllEvents();
-        /****** Animation & Transition ******/
-        if (conf.animate) {
-            this.doTransition({ type: 'present', translateY: this.breaks[this.settings.initialBreak] });
-        }
-        else {
-            // Emit event
-            if (this.settings.pushElement) {
-                this.pushTransition(this.breaks[this.settings.initialBreak], 'unset');
             }
-            this.settings.onDidPresent();
-        }
+            if (this.settings.bottomClose) {
+                this.settings.breaks.bottom.enabled = true;
+            }
+            if (this.settings.freeMode) {
+                this.settings.lowerThanBottom = false;
+            }
+            if (this.settings.backdrop) {
+                this.renderBackdrop();
+            }
+            /****** Fix android issues *******/
+            if (this.device.android) {
+                // Body patch prevent android pull-to-refresh
+                document.body.style['overscrollBehaviorY'] = 'none';
+            }
+            /****** Attach Events *******/
+            this.attachAllEvents();
+            /****** Animation & Transition ******/
+            if (conf.animate) {
+                this.doTransition({ type: 'present', translateY: this.breaks[this.settings.initialBreak] });
+            }
+            else {
+                // Emit event
+                if (this.settings.pushElement) {
+                    this.pushTransition(this.breaks[this.settings.initialBreak], 'unset');
+                }
+                this.settings.onDidPresent();
+            }
+        });
     }
     /**
      * Private Utils methods
@@ -978,6 +1010,32 @@ class CupertinoPane {
                 - this.settings.topperOverflowOffset
                 - this.overflowEl.offsetTop}px`;
         }
+    }
+    getPaneFitHeight() {
+        return __awaiter(this, void 0, void 0, function* () {
+            let images = this.el.querySelectorAll('img');
+            let height;
+            // Make element visible to calculate height
+            this.el.style.visibility = 'hidden';
+            this.el.style.pointerEvents = 'none';
+            this.el.style.display = 'block';
+            if (images.length) {
+                // Bulletins with image height we get after image render
+                let promises = Array.from(images).map((image) => new Promise((resolve) => image.onload = () => resolve(true)));
+                yield Promise.all(promises);
+                height = this.el.offsetHeight;
+            }
+            else {
+                // Bulletins without image we get at least after simple timeout
+                yield new Promise((resolve) => setTimeout(() => resolve(true), 100));
+                height = this.el.offsetHeight;
+            }
+            // Reset element
+            this.el.style.visibility = 'unset';
+            this.el.style.pointerEvents = 'unset';
+            this.el.style.display = 'none';
+            return height;
+        });
     }
     getTimingFunction(bounce) {
         return bounce ? 'cubic-bezier(0.175, 0.885, 0.370, 1.120)' : this.settings.animationType;
@@ -1187,86 +1245,97 @@ class CupertinoPane {
      * @param conf breakpoints
      */
     setBreakpoints(conf) {
-        if (this.isPanePresented() && !conf) {
-            console.warn(`Cupertino Pane: Provide any breaks configuration`);
-            return;
-        }
-        this.breaks = {
-            top: this.screenHeightOffset,
-            middle: this.screenHeightOffset,
-            bottom: this.screenHeightOffset
-        };
-        ['top', 'middle', 'bottom'].forEach((val) => {
-            // bottom offset for bulletins
-            this.breaks[val] -= this.settings.bottomOffset;
-            // Set default if no exist
-            if (!this.settings.breaks[val]) {
-                this.settings.breaks[val] = this.defaultBreaksConf[val];
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.isPanePresented() && !conf) {
+                console.warn(`Cupertino Pane: Provide any breaks configuration`);
+                return;
             }
-            // Override from user conf on updating
-            if (conf && conf[val]) {
-                this.settings.breaks[val] = conf[val];
+            this.breaks = {
+                top: this.screenHeightOffset,
+                middle: this.screenHeightOffset,
+                bottom: this.screenHeightOffset
+            };
+            // Fit Height & Bulletin cases
+            if (this.settings.fitHeight) {
+                let height = yield this.getPaneFitHeight();
+                conf = {
+                    top: { enabled: true, height },
+                    middle: { enabled: false },
+                    bottom: { enabled: false }
+                };
             }
-            // Assign heights
-            if (this.settings.breaks[val]
-                && this.settings.breaks[val].enabled
-                && this.settings.breaks[val].height) {
-                if (!this.settings.inverse) {
-                    this.breaks[val] -= this.settings.breaks[val].height;
+            ['top', 'middle', 'bottom'].forEach((val) => {
+                // bottom offset for bulletins
+                this.breaks[val] -= this.settings.bottomOffset;
+                // Set default if no exist
+                if (!this.settings.breaks[val]) {
+                    this.settings.breaks[val] = this.defaultBreaksConf[val];
                 }
-                else {
-                    this.breaks[val] = this.settings.breaks[val].height;
+                // Override from user conf on updating
+                if (conf && conf[val]) {
+                    this.settings.breaks[val] = conf[val];
+                }
+                // Assign heights
+                if (this.settings.breaks[val]
+                    && this.settings.breaks[val].enabled
+                    && this.settings.breaks[val].height) {
+                    if (!this.settings.inverse) {
+                        this.breaks[val] -= this.settings.breaks[val].height;
+                    }
+                    else {
+                        this.breaks[val] = this.settings.breaks[val].height;
+                    }
+                }
+            });
+            // Warnings 
+            if (!this.isPanePresented()) {
+                if (!this.settings.breaks[this.settings.initialBreak].enabled) {
+                    console.warn('Cupertino Pane: Please set initialBreak for enabled breakpoint');
                 }
             }
-        });
-        // Warnings 
-        if (!this.isPanePresented()) {
-            if (!this.settings.breaks[this.settings.initialBreak].enabled) {
-                console.warn('Cupertino Pane: Please set initialBreak for enabled breakpoint');
+            if (this.settings.breaks['middle'].height >= this.settings.breaks['top'].height) {
+                console.warn('Cupertino Pane: Please set middle height lower than top height');
             }
-        }
-        if (this.settings.breaks['middle'].height >= this.settings.breaks['top'].height) {
-            console.warn('Cupertino Pane: Please set middle height lower than top height');
-        }
-        if (this.settings.breaks['middle'].height <= this.settings.breaks['bottom'].height) {
-            console.warn('Cupertino Pane: Please set bottom height lower than middle height');
-        }
-        // Prepare breakpoint numbers array
-        this.brs = [];
-        ['top', 'middle', 'bottom'].forEach((val) => {
-            if (this.settings.breaks[val].enabled) {
-                this.brs.push(this.breaks[val]);
+            if (this.settings.breaks['middle'].height <= this.settings.breaks['bottom'].height) {
+                console.warn('Cupertino Pane: Please set bottom height lower than middle height');
+            }
+            // Prepare breakpoint numbers array
+            this.brs = [];
+            ['top', 'middle', 'bottom'].forEach((val) => {
+                if (this.settings.breaks[val].enabled) {
+                    this.brs.push(this.breaks[val]);
+                }
+            });
+            // Determinate topper point
+            this.topper = this.brs.reduce((prev, curr) => {
+                return (Math.abs(curr) < Math.abs(prev) ? curr : prev);
+            });
+            // Determinate bottomer point
+            this.bottomer = this.brs.reduce((prev, curr) => {
+                return (Math.abs(curr) > Math.abs(prev) ? curr : prev);
+            });
+            if (!this.isPanePresented()) {
+                this.currentBreakpoint = this.breaks[this.settings.initialBreak];
+            }
+            if (this.isPanePresented()) {
+                // Move to current if updated
+                if (this.settings.breaks[this.prevBreakpoint].enabled) {
+                    this.moveToBreak(this.prevBreakpoint);
+                }
+                // Move to any if removed
+                if (!this.settings.breaks[this.prevBreakpoint].enabled) {
+                    let nextY = this.swipeNextPoint(1, 1, this.getClosestBreakY());
+                    const nextBreak = Object.entries(this.breaks).find(val => val[1] === nextY);
+                    this.moveToBreak(nextBreak[0]);
+                }
+                // Re-calc height and top
+                this.paneEl.style.top = this.settings.inverse ? `-${this.bottomer}px` : `unset`;
+                this.paneEl.style.height = `${this.getPaneHeight()}px`;
+                this.scrollElementInit();
+                this.checkOpacityAttr(this.currentBreakpoint);
+                this.checkOverflowAttr(this.currentBreakpoint);
             }
         });
-        // Determinate topper point
-        this.topper = this.brs.reduce((prev, curr) => {
-            return (Math.abs(curr) < Math.abs(prev) ? curr : prev);
-        });
-        // Determinate bottomer point
-        this.bottomer = this.brs.reduce((prev, curr) => {
-            return (Math.abs(curr) > Math.abs(prev) ? curr : prev);
-        });
-        if (!this.isPanePresented()) {
-            this.currentBreakpoint = this.breaks[this.settings.initialBreak];
-        }
-        if (this.isPanePresented()) {
-            // Move to current if updated
-            if (this.settings.breaks[this.prevBreakpoint].enabled) {
-                this.moveToBreak(this.prevBreakpoint);
-            }
-            // Move to any if removed
-            if (!this.settings.breaks[this.prevBreakpoint].enabled) {
-                let nextY = this.swipeNextPoint(1, 1, this.getClosestBreakY());
-                const nextBreak = Object.entries(this.breaks).find(val => val[1] === nextY);
-                this.moveToBreak(nextBreak[0]);
-            }
-            // Re-calc height and top
-            this.paneEl.style.top = this.settings.inverse ? `-${this.bottomer}px` : `unset`;
-            this.paneEl.style.height = `${this.getPaneHeight()}px`;
-            this.scrollElementInit();
-            this.checkOpacityAttr(this.currentBreakpoint);
-            this.checkOverflowAttr(this.currentBreakpoint);
-        }
     }
     moveToBreak(val) {
         if (!this.isPanePresented()) {

@@ -27,6 +27,7 @@
       margin: 20px;
       margin-top: 5px;
       text-align: center;
+      /* padding-bottom: 48px; */
     }
 
       ion-bulletin h1 {
@@ -123,19 +124,14 @@
         var element = document.querySelector('ion-bulletin');
         bulletin = new CupertinoPane(element, { 
           initialBreak: 'top',
-          breaks: {
-            top: { enabled: true, height: height + 48},
-            middle: { enabled: false},
-            bottom: { enabled: false},
-          },
+          fitHeight: true,
           backdrop: true,
-          topperOverflow: false,
           backdropOpacity: 0.8,
           bottomClose: true,
           buttonClose: false,
           showDraggable: false,
           upperThanTop: true,
-          bottomOffset: 38,
+          bottomOffset: 48,
           onBackdropTap: () => bulletin.destroy({animate: true})
         });
         bulletin.present({animate: true});

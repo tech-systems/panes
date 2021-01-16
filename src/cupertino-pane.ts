@@ -177,7 +177,7 @@ export class CupertinoPane {
       this.draggableEl.appendChild(this.moveEl);
   }
 
-  present(conf: {animate: boolean} = {animate: false}) {
+  async present(conf: {animate: boolean} = {animate: false}) {
       if (!this.el) return;
 
       // Pane already exist and was rendered
@@ -199,7 +199,12 @@ export class CupertinoPane {
         this.screenHeightOffset = 0;
       }
 
-      this.setBreakpoints();
+      if (this.settings.fitHeight) {
+        this.settings.initialBreak = 'top';
+        this.settings.topperOverflow = false;
+      }
+
+      await this.setBreakpoints();
       this.drawBaseElements();
       this.scrollElementInit();
       this.checkOpacityAttr(this.currentBreakpoint);
@@ -410,6 +415,37 @@ export class CupertinoPane {
         - this.settings.topperOverflowOffset
         - this.overflowEl.offsetTop}px`;
     }
+  }
+
+  private async getPaneFitHeight(): Promise<number> {
+    let images: NodeListOf<HTMLImageElement> = this.el.querySelectorAll('img'); 
+    let height: number;
+
+    // Make element visible to calculate height
+    this.el.style.visibility = 'hidden';
+    this.el.style.pointerEvents = 'none';
+    this.el.style.display = 'block';
+
+    if (images.length) {
+      // Bulletins with image height we get after image render
+      let promises = Array.from(images).map(
+        (image) => new Promise((resolve) => image.onload = () => resolve(true))
+      );
+     
+      await Promise.all(promises);
+      height = this.el.offsetHeight;
+    } else {
+      // Bulletins without image we get at least after simple timeout
+      await new Promise((resolve) => setTimeout(() => resolve(true), 100));
+      height = this.el.offsetHeight;
+    }
+
+    // Reset element
+    this.el.style.visibility = 'unset';
+    this.el.style.pointerEvents = 'unset';
+    this.el.style.display = 'none';
+
+    return height;
   }
 
   private getTimingFunction(bounce) {
@@ -720,7 +756,7 @@ export class CupertinoPane {
    * Function builder for breakpoints and heights
    * @param conf breakpoints
    */
-  public setBreakpoints(conf?: PaneBreaks) {
+  public async setBreakpoints(conf?: PaneBreaks) {
     if (this.isPanePresented() && !conf) {
       console.warn(`Cupertino Pane: Provide any breaks configuration`);
       return;
@@ -731,6 +767,16 @@ export class CupertinoPane {
       middle: this.screenHeightOffset,
       bottom: this.screenHeightOffset
     };
+
+    // Fit Height & Bulletin cases
+    if (this.settings.fitHeight) {
+      let height = await this.getPaneFitHeight();
+      conf = {
+        top: { enabled: true, height },
+        middle: { enabled: false},
+        bottom: { enabled: false}
+      };
+    }
     
     ['top', 'middle', 'bottom'].forEach((val) => {
       // bottom offset for bulletins

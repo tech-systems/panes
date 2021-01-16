@@ -9,6 +9,7 @@ export class Settings {
       inverse: false,
       parentElement: null,
       followerElement: null,
+      fitHeight: false,
       pushElement: null,
       pushMinHeight: null,
       pushYOffset: 0,
