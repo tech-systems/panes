@@ -1,5 +1,6 @@
 import { CupertinoPane, CupertinoSettings } from 'cupertino-pane';
 import { Device } from './device';
+import { Breakpoints } from './breakpoints';
 
 /**
  * Touch start, Touch move, Touch end,
@@ -20,7 +21,8 @@ export class Events {
   
   constructor(private instance: CupertinoPane, 
               private settings: CupertinoSettings, 
-              private device: Device) {
+              private device: Device,
+              private breakpoints: Breakpoints) {
   }
 
   /**
@@ -143,29 +145,29 @@ export class Events {
       }
 
       // Scrolled -> Disable drag
-      if ((newVal > this.instance.topper && this.contentScrollTop > 0) 
-          || (newVal <= this.instance.topper)) { 
+      if ((newVal > this.breakpoints.topper && this.contentScrollTop > 0) 
+          || (newVal <= this.breakpoints.topper)) { 
         return;
       }
     }
 
     // Disallow drag topper than top point
     if (!this.settings.inverse 
-        && !this.settings.upperThanTop && (newVal <= this.instance.topper)) {
-      this.instance.paneEl.style.transform = `translateY(${this.instance.topper}px) translateZ(0px)`;
+        && !this.settings.upperThanTop && (newVal <= this.breakpoints.topper)) {
+      this.instance.paneEl.style.transform = `translateY(${this.breakpoints.topper}px) translateZ(0px)`;
       return;
     }
 
     // Allow drag topper than top point
-    if (newVal <= this.instance.topper && this.settings.upperThanTop) {
-      const differKoef = ((-this.instance.topper + this.instance.topper - this.instance.getPanelTransformY()) / this.instance.topper) / -8;
+    if (newVal <= this.breakpoints.topper && this.settings.upperThanTop) {
+      const differKoef = ((-this.breakpoints.topper + this.breakpoints.topper - this.instance.getPanelTransformY()) / this.breakpoints.topper) / -8;
       newVal = this.instance.getPanelTransformY() + (diffY * differKoef);
     }
 
     // Disallow drag lower then bottom 
     if ((!this.settings.lowerThanBottom || this.settings.inverse) 
-        && (newVal >= this.instance.bottomer)) {
-      this.instance.paneEl.style.transform = `translateY(${this.instance.bottomer}px) translateZ(0px)`;
+        && (newVal >= this.breakpoints.bottomer)) {
+      this.instance.paneEl.style.transform = `translateY(${this.breakpoints.bottomer}px) translateZ(0px)`;
       this.instance.checkOpacityAttr(newVal);
       return;
     }
@@ -173,15 +175,15 @@ export class Events {
     // Prevent Dismiss gesture
     if (!this.instance.preventedDismiss
           && this.instance.preventDismissEvent && this.settings.bottomClose) {
-      let differKoef = ((-this.instance.topper + this.instance.topper - this.instance.getPanelTransformY()) / this.instance.topper) / -8;
+      let differKoef = ((-this.breakpoints.topper + this.breakpoints.topper - this.instance.getPanelTransformY()) / this.breakpoints.topper) / -8;
       newVal = this.instance.getPanelTransformY() + (diffY * (0.5 - differKoef));
       
       let mousePointY = (t.touches[0].screenY - 220 - this.instance.screen_height) * -1;
-      if (mousePointY <= this.instance.screen_height - this.instance.bottomer) {
+      if (mousePointY <= this.instance.screen_height - this.breakpoints.bottomer) {
         this.instance.preventedDismiss = true; 
         // Emit event with prevent dismiss
         this.settings.onWillDismiss({prevented: true} as any);
-        this.instance.moveToBreak(this.instance.prevBreakpoint);
+        this.instance.moveToBreak(this.breakpoints.prevBreakpoint);
         return;
       }
     }
@@ -209,7 +211,7 @@ export class Events {
     if (t.type === 'mouseup') this.pointerDown = false;
 
     // Determinate nearest point
-    let closest = this.instance.getClosestBreakY();
+    let closest = this.breakpoints.getClosestBreakY();
     // Swipe - next (if differ > 10)
     const diff =  this.steps[this.steps.length - 1] - this.steps[this.steps.length - 2];
     // Set sensivity lower for web
@@ -221,7 +223,7 @@ export class Events {
 
       // Fast swipe toward bottom - close
       if (this.settings.fastSwipeClose 
-          && this.instance.currentBreakpoint < closest) {        
+          && this.breakpoints.currentBreakpoint < closest) {        
         this.instance.destroy({animate:true});
         return;
       }
@@ -237,7 +239,7 @@ export class Events {
     }
 
     this.steps = [];
-    this.instance.currentBreakpoint = closest;
+    this.breakpoints.currentBreakpoint = closest;
 
     // Event emitter
     this.settings.onDragEnd(t as CustomEvent);
@@ -247,11 +249,11 @@ export class Events {
       return;
     }
 
-    this.instance.checkOpacityAttr(this.instance.currentBreakpoint);
-    this.instance.checkOverflowAttr(this.instance.currentBreakpoint);
+    this.instance.checkOpacityAttr(this.breakpoints.currentBreakpoint);
+    this.instance.checkOverflowAttr(this.breakpoints.currentBreakpoint);
 
     // Bottom closable
-    if (this.settings.bottomClose && closest === this.instance.breaks['bottom']) {
+    if (this.settings.bottomClose && closest === this.breakpoints.breaks['bottom']) {
       this.instance.destroy({animate:true});
       return;
     }
@@ -282,7 +284,7 @@ export class Events {
 
     // Click to bottom - open middle
     if (this.settings.clickBottomOpen) {
-      if (this.instance.breaks['bottom'] === this.instance.getPanelTransformY()) {
+      if (this.breakpoints.breaks['bottom'] === this.instance.getPanelTransformY()) {
           let closest;
           if (this.settings.breaks['top'].enabled) {
             closest = 'top';
@@ -313,7 +315,7 @@ export class Events {
       setTimeout(() => this.fixAndroidResize(), 20);
     }
 
-    this.instance.prevBreakpoint = Object.entries(this.instance.breaks).find(val => val[1] === this.instance.getPanelTransformY())[0];
+    this.breakpoints.prevBreakpoint = Object.entries(this.breakpoints.breaks).find(val => val[1] === this.instance.getPanelTransformY())[0];
     let newHeight = this.settings.breaks[this.instance.currentBreak()].height + e.keyboardHeight;
 
     if (this.instance.screen_height < newHeight) {
@@ -350,11 +352,22 @@ export class Events {
       this.inputBlured = false;
     } else {
       if (!this.instance.isHidden()) {
-        this.instance.moveToBreak(this.instance.prevBreakpoint);
+        this.instance.moveToBreak(this.breakpoints.prevBreakpoint);
       }
     }
 
     setTimeout(() => this.instance.setOverflowHeight());
+  }
+
+  /**
+   * Window resize event
+   * @param e
+   */
+  public onWindowResizeCb = (e) => this.onWindowResize(e);
+  private onWindowResize(e) {
+    this.instance.screen_height = window.innerHeight;
+    this.instance.screenHeightOffset = this.instance.screen_height;
+    this.breakpoints.buildBreakpoints(JSON.parse(this.breakpoints.lockedBreakpoints), false);
   }
 
   /**

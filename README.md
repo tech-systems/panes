@@ -157,6 +157,7 @@ new CupertinoPane(element); // HTMLElement
 | **parentElement** | `string` | Parent element selector | Element selector where pane will rendered |
 | **followerElement** | `string` | Follower element selector | Element with selector will following pane transitions |
 | **fitHeight** | `boolean` | 'false' | Automatically calc and define content height as top breakpoint. Middle and bottom breakpoint will be disabled |
+| **fitScreenHeight** | `boolean` | 'false' | On `true` will automatically adjust pane maximum height to screen height |
 | **pushElement** | `string` | Push element selector | DOM Element will be pushed and scaled |
 | **pushMinHeight** | `number` | Most bottom available point | Height from which 3d push effect will be started |
 | **pushYOffset** | `number` | Negative margin value to place pushed element upper |
@@ -355,15 +356,11 @@ If you would like handle this part by yourself, set option `handleKeyboard: fals
 
 ## Future Goals
 - [Docs] ($150 budget) -> Package branding
-- [Bugs] Fix `window.resize` events
 - [Enhancements] Handle keyboard only for Pane inputs
-- [Enhancements] Represent constructor without issues
+- [Code] Fix immutable issue in breakpoint class
+- [Accurance] Draw experiment application (Normal/TimeStamp/Native) - Native Touch Plugin
 - [Docs] (Traffic + Carbon ads) -> Docs engine (F7, Netlify, Gatsby, GH pages)
 - [Showcase] Apple Music F7
-- [Technologies] CSS3D
-- [Technologies] Web Animation
-- [Accurance] Draw experiment application (Normal/TimeStamp/Native) - Native Touch Plugin
-- [Platforms] React Native version
 - [Platforms] C++ QT version
 
 ## Contributing

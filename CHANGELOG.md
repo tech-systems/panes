@@ -2,13 +2,15 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [1.2.2] - 2021-01-20
 
 ### Features 
 - Added `fitHeight` property for usage pane without breakpoints. On `fitHeight: true`, pane height will automatically calculated before present. Then height will be applied as top breakpoint height, bottom and middle breakpoint will be disabled. See [Bulletin demo](https://output.jsbin.com/maqigod) on example. [#113](https://github.com/roman-rr/cupertino-pane/issues/113)
+- Added `fitScreenHeight` property. On `fitScreenHeight: true`, pane height will not be more than screen height. 
 
 ### Enhancements
 - Button close renamed to button destroy to avoid confuses. Option renamed `buttonClose` -> `buttonDestroy` [#116](https://github.com/roman-rr/cupertino-pane/issues/112)
+- `window.resize` events and orientation changing now automatically reset breakpoints and pane to proper position. May be good using in pair with `fitScreenHeight: true` [#119](https://github.com/roman-rr/cupertino-pane/issues/119)
 
 ### Bug Fixes
 - Cordova keyboard hide if pane is hidden [#112](https://github.com/roman-rr/cupertino-pane/issues/112)

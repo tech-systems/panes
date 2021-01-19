@@ -1,6 +1,5 @@
 import { CupertinoPane, CupertinoSettings } from 'cupertino-pane';
 import { Device } from './device';
-import { Breakpoints } from './breakpoints';
 /**
  * Touch start, Touch move, Touch end,
  * Click, Keyboard show, Keyboard hide
@@ -9,7 +8,6 @@ export declare class Events {
     private instance;
     private settings;
     private device;
-    private breakpoints;
     private allowClick;
     private disableDragAngle;
     private pointerDown;
@@ -18,7 +16,7 @@ export declare class Events {
     private startX;
     private steps;
     private inputBlured;
-    constructor(instance: CupertinoPane, settings: CupertinoSettings, device: Device, breakpoints: Breakpoints);
+    constructor(instance: CupertinoPane, settings: CupertinoSettings, device: Device);
     /**
      * Touch Start Event
      * @param t

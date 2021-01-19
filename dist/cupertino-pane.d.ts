@@ -2,28 +2,21 @@ import { PaneSettings, PaneBreaks } from './models';
 export declare type CupertinoSettings = Partial<PaneSettings>;
 export declare class CupertinoPane {
     private selector;
-    private defaultBreaksConf;
-    topper: number;
-    bottomer: number;
     disableDragEvents: boolean;
-    currentBreakpoint: number;
-    prevBreakpoint: string;
-    breaks: {};
     screen_height: number;
-    private screenHeightOffset;
-    private rendered;
+    screenHeightOffset: number;
     preventDismissEvent: boolean;
     preventedDismiss: boolean;
     private iconCloseColor;
-    private brs;
+    private rendered;
     wrapperEl: HTMLDivElement;
     paneEl: HTMLDivElement;
     overflowEl: HTMLElement;
-    private el;
+    el: HTMLElement;
+    contentEl: HTMLElement;
     private parentEl;
     private draggableEl;
     private moveEl;
-    private contentEl;
     private backdropEl;
     private destroyButtonEl;
     private followerEl;
@@ -31,26 +24,25 @@ export declare class CupertinoPane {
     private settings;
     private device;
     private events;
+    private breakpoints;
     constructor(selector: (string | HTMLElement), conf?: CupertinoSettings);
     private drawBaseElements;
     present(conf?: {
         animate: boolean;
     }): Promise<void>;
+    getPaneHeight(): number;
     /**
      * Private Utils methods
      */
-    private getPaneHeight;
     private attachAllEvents;
     private detachAllEvents;
     private resetEvents;
-    getClosestBreakY(): number;
-    private scrollElementInit;
+    scrollElementInit(): void;
     setOverflowHeight(offset?: number): void;
-    private getPaneFitHeight;
     private getTimingFunction;
     checkOpacityAttr(val: any): void;
     checkOverflowAttr(val: any): void;
-    private isPanePresented;
+    isPanePresented(): boolean;
     swipeNextPoint: (diff: any, maxDiff: any, closest: any) => any;
     private isBackdropPresented;
     private renderBackdrop;
@@ -86,8 +78,8 @@ export declare class CupertinoPane {
         enable: boolean;
     }): void;
     /**
-     * Function builder for breakpoints and heights
-     * @param conf breakpoints
+     * Public user method to reset breakpoints
+     * @param conf
      */
     setBreakpoints(conf?: PaneBreaks): Promise<void>;
     moveToBreak(val: string): any;
@@ -98,6 +90,7 @@ export declare class CupertinoPane {
     private destroyResets;
     destroy(conf?: {
         animate: boolean;
+        destroyButton?: boolean;
     }): any;
     private pushTransition;
     /***********************************

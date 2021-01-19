@@ -19,6 +19,7 @@ export interface PaneSettings {
     parentElement: any;
     followerElement: string;
     fitHeight: boolean;
+    fitScreenHeight: boolean;
     pushElement: any;
     pushMinHeight: number;
     pushYOffset: number;
