@@ -20,6 +20,7 @@ export interface PaneSettings {
   parentElement: any;
   followerElement: string;
   fitHeight: boolean;
+  maxFitHeight: number;
   fitScreenHeight: boolean;
   pushElement: any;
   pushMinHeight: number;

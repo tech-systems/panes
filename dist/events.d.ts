@@ -65,8 +65,8 @@ export declare class Events {
      * Window resize event
      * @param e
      */
-    onWindowResizeCb: (e: any) => void;
-    private onWindowResize;
+    onOrientationChangeCb: (e: any) => Promise<void>;
+    private onOrientationChange;
     /**
      * Private class methods
      */

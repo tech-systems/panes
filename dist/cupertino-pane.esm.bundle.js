@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.2.1
+ * Cupertino Pane 1.2.3
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: January 19, 2021
+ * Released on: January 22, 2021
  */
 
 /*! *****************************************************************************
@@ -227,7 +227,7 @@ class Events {
          * Window resize event
          * @param e
          */
-        this.onWindowResizeCb = (e) => this.onWindowResize(e);
+        this.onOrientationChangeCb = (e) => this.onOrientationChange(e);
     }
     touchStart(t) {
         // Event emitter
@@ -487,10 +487,14 @@ class Events {
         }
         setTimeout(() => this.instance.setOverflowHeight());
     }
-    onWindowResize(e) {
-        this.instance.screen_height = window.innerHeight;
-        this.instance.screenHeightOffset = this.instance.screen_height;
-        this.breakpoints.buildBreakpoints(JSON.parse(this.breakpoints.lockedBreakpoints), false);
+    onOrientationChange(e) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Browsers issue: Currently no proper way to get window.innerHeight without timeout
+            yield new Promise((resolve) => setTimeout(() => resolve(true), 150));
+            this.instance.screen_height = window.innerHeight;
+            this.instance.screenHeightOffset = this.instance.screen_height;
+            this.breakpoints.buildBreakpoints(JSON.parse(this.breakpoints.lockedBreakpoints), false);
+        });
     }
     /**
      * Private class methods
@@ -550,6 +554,7 @@ class Settings {
             parentElement: null,
             followerElement: null,
             fitHeight: false,
+            maxFitHeight: null,
             fitScreenHeight: false,
             pushElement: null,
             pushMinHeight: null,
@@ -627,8 +632,13 @@ class Breakpoints {
                 this.settings.fitScreenHeight = false;
                 this.settings.initialBreak = 'top';
                 this.settings.topperOverflow = false;
-                this.instance.el.style.height = 'unset';
                 let height = yield this.getPaneFitHeight();
+                // maxFitHeight
+                if (this.settings.maxFitHeight
+                    && height > this.settings.maxFitHeight) {
+                    height = this.settings.maxFitHeight;
+                    this.settings.topperOverflow = true;
+                }
                 conf = {
                     top: { enabled: true, height },
                     middle: { enabled: false },
@@ -650,7 +660,7 @@ class Breakpoints {
                 // fitScreenHeight (breaks styles fit screen)
                 if (this.settings.fitScreenHeight) {
                     if (((_a = this.settings.breaks[val]) === null || _a === void 0 ? void 0 : _a.height) > this.instance.screen_height) {
-                        this.settings.breaks[val].height = this.instance.screen_height;
+                        this.settings.breaks[val].height = this.instance.screen_height - this.settings.bottomOffset;
                     }
                     if (((_b = this.settings.breaks['top']) === null || _b === void 0 ? void 0 : _b.height) === ((_c = this.settings.breaks['middle']) === null || _c === void 0 ? void 0 : _c.height)) {
                         this.settings.breaks['middle'].enabled = false;
@@ -664,7 +674,7 @@ class Breakpoints {
                         this.settings.topperOverflow = true;
                     }
                     else {
-                        if (this.instance.overflowEl) {
+                        if (this.instance.overflowEl && !this.settings.maxFitHeight) {
                             this.settings.topperOverflow = false;
                             this.instance.overflowEl.style.overflowY = 'hidden';
                         }
@@ -754,12 +764,14 @@ class Breakpoints {
             let images = this.instance.el.querySelectorAll('img');
             let height;
             // Make element visible to calculate height
+            this.instance.el.style.height = 'unset';
             this.instance.el.style.visibility = 'hidden';
             this.instance.el.style.pointerEvents = 'none';
             this.instance.el.style.display = 'block';
+            let promises = [];
             if (images.length) {
                 // Bulletins with image height we get after image render
-                let promises = Array.from(images).map((image) => new Promise((resolve) => {
+                promises = Array.from(images).map((image) => new Promise((resolve) => {
                     // Already rendered
                     if (image.complete && image.naturalHeight) {
                         resolve(true);
@@ -768,12 +780,10 @@ class Breakpoints {
                         image.onload = () => resolve(true);
                     }
                 }));
-                yield Promise.all(promises);
             }
-            else {
-                // Bulletins without image we get at least after simple timeout
-                yield new Promise((resolve) => setTimeout(() => resolve(true), 150));
-            }
+            // resized timeouts - 0, render - 150
+            promises.push(new Promise((resolve) => setTimeout(() => resolve(true), this.instance.rendered ? 0 : 150)));
+            yield Promise.all(promises);
             // height include margins
             let elmHeight = parseInt(document.defaultView.getComputedStyle(this.instance.el, '').getPropertyValue('height'));
             let elmMargin = parseInt(document.defaultView.getComputedStyle(this.instance.el, '').getPropertyValue('margin-top')) + parseInt(document.defaultView.getComputedStyle(this.instance.el, '').getPropertyValue('margin-bottom'));
@@ -1144,7 +1154,7 @@ class CupertinoPane {
                 }
             });
         }
-        window.addEventListener('resize', this.events.onWindowResizeCb);
+        window.addEventListener('orientationchange', this.events.onOrientationChangeCb);
     }
     detachAllEvents() {
         if (!this.settings.dragBy) {
@@ -1162,7 +1172,7 @@ class CupertinoPane {
             window.removeEventListener('keyboardWillShow', this.events.onKeyboardShowCb);
             window.removeEventListener('keyboardWillHide', this.events.onKeyboardHideCb);
         }
-        window.removeEventListener('resize', this.events.onWindowResizeCb);
+        window.removeEventListener('orientationchange', this.events.onOrientationChangeCb);
     }
     resetEvents() {
         this.detachAllEvents();
@@ -1425,6 +1435,11 @@ class CupertinoPane {
                 return;
             }
             yield this.breakpoints.buildBreakpoints(conf);
+        });
+    }
+    calcFitHeight() {
+        return __awaiter(this, void 0, void 0, function* () {
+            yield this.breakpoints.buildBreakpoints(this.breakpoints.lockedBreakpoints);
         });
     }
     moveToBreak(val) {

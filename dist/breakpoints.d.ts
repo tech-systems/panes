@@ -1,4 +1,4 @@
-import { CupertinoPane, CupertinoSettings } from 'cupertino-pane';
+import { CupertinoPane, CupertinoSettings } from './cupertino-pane';
 import { PaneBreaks } from './models';
 /**
  * Breakpoints builde

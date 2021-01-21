@@ -13,7 +13,7 @@ export class CupertinoPane {
   public preventDismissEvent: boolean = false;
   public preventedDismiss: boolean = false;
   private iconCloseColor: string = '#7a7a7e';
-  private rendered: boolean = false;
+  public rendered: boolean = false;
   
   public wrapperEl: HTMLDivElement;
   public paneEl: HTMLDivElement;
@@ -327,7 +327,7 @@ export class CupertinoPane {
       });
     }
 
-    window.addEventListener('resize', this.events.onWindowResizeCb);
+    window.addEventListener('orientationchange', this.events.onOrientationChangeCb);
   }
 
   private detachAllEvents() {
@@ -346,7 +346,7 @@ export class CupertinoPane {
       window.removeEventListener('keyboardWillHide', this.events.onKeyboardHideCb);
     }
 
-    window.removeEventListener('resize', this.events.onWindowResizeCb);
+    window.removeEventListener('orientationchange', this.events.onOrientationChangeCb);
   }
 
   private resetEvents() {
@@ -713,6 +713,10 @@ export class CupertinoPane {
     }
     
     await this.breakpoints.buildBreakpoints(conf);
+  }
+
+  public async calcFitHeight() {
+    await this.breakpoints.buildBreakpoints(this.breakpoints.lockedBreakpoints);
   }
 
   public moveToBreak(val: string) {

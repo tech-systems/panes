@@ -10,6 +10,7 @@ export class Settings {
       parentElement: null,
       followerElement: null,
       fitHeight: false,
+      maxFitHeight: null,
       fitScreenHeight: false,
       pushElement: null,
       pushMinHeight: null,

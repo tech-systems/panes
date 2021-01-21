@@ -157,6 +157,7 @@ new CupertinoPane(element); // HTMLElement
 | **parentElement** | `string` | Parent element selector | Element selector where pane will rendered |
 | **followerElement** | `string` | Follower element selector | Element with selector will following pane transitions |
 | **fitHeight** | `boolean` | 'false' | Automatically calc and define content height as top breakpoint. Middle and bottom breakpoint will be disabled |
+| **maxFitHeight** | `number` | 'null' | Define a maximum possible automatically calculated height with `fitHeight` property |
 | **fitScreenHeight** | `boolean` | 'false' | On `true` will automatically adjust pane maximum height to screen height |
 | **pushElement** | `string` | Push element selector | DOM Element will be pushed and scaled |
 | **pushMinHeight** | `number` | Most bottom available point | Height from which 3d push effect will be started |
@@ -313,6 +314,11 @@ const settings = {
 const myPane = new CupertinoPane('.cupertino-pane', settings);
 myPane.present({animate: true});
 myPane.preventDismiss(true);
+```
+### calcFitHeight()
+Force re-calculate height for `fitHeight: true` in cases when height was calculated not properly.
+```javascript
+myPane.calcFitHeight();
 ```
 
 

@@ -363,8 +363,10 @@ export class Events {
    * Window resize event
    * @param e
    */
-  public onWindowResizeCb = (e) => this.onWindowResize(e);
-  private onWindowResize(e) {
+  public onOrientationChangeCb = (e) => this.onOrientationChange(e);
+  private async onOrientationChange(e) {
+    // Browsers issue: Currently no proper way to get window.innerHeight without timeout
+    await new Promise((resolve) => setTimeout(() => resolve(true), 150));
     this.instance.screen_height = window.innerHeight;
     this.instance.screenHeightOffset = this.instance.screen_height;
     this.breakpoints.buildBreakpoints(JSON.parse(this.breakpoints.lockedBreakpoints), false);

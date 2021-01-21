@@ -8,7 +8,7 @@ export declare class CupertinoPane {
     preventDismissEvent: boolean;
     preventedDismiss: boolean;
     private iconCloseColor;
-    private rendered;
+    rendered: boolean;
     wrapperEl: HTMLDivElement;
     paneEl: HTMLDivElement;
     overflowEl: HTMLElement;
@@ -82,6 +82,7 @@ export declare class CupertinoPane {
      * @param conf
      */
     setBreakpoints(conf?: PaneBreaks): Promise<void>;
+    calcFitHeight(): Promise<void>;
     moveToBreak(val: string): any;
     moveToHeight(val: number): any;
     hide(): any;

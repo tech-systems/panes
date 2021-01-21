@@ -1,4 +1,4 @@
-import { CupertinoPane, CupertinoSettings } from 'cupertino-pane';
+import { CupertinoPane, CupertinoSettings } from './cupertino-pane';
 import { PaneBreaks } from './models';
 
 /**
@@ -29,7 +29,6 @@ export class Breakpoints {
    * @param conf breakpoints
    */  
   public async buildBreakpoints(conf?: PaneBreaks, lock: boolean = true) {
-
     this.breaks = {
       top: this.instance.screenHeightOffset,
       middle: this.instance.screenHeightOffset,
@@ -41,8 +40,15 @@ export class Breakpoints {
       this.settings.fitScreenHeight = false;
       this.settings.initialBreak = 'top';
       this.settings.topperOverflow = false;
-      this.instance.el.style.height = 'unset';
       let height = await this.getPaneFitHeight();
+      
+      // maxFitHeight
+      if (this.settings.maxFitHeight 
+        && height > this.settings.maxFitHeight) {
+          height = this.settings.maxFitHeight;
+          this.settings.topperOverflow = true;
+      }
+
       conf = {
         top: { enabled: true, height },
         middle: { enabled: false},
@@ -67,7 +73,7 @@ export class Breakpoints {
       // fitScreenHeight (breaks styles fit screen)
       if (this.settings.fitScreenHeight) {
         if (this.settings.breaks[val]?.height > this.instance.screen_height) { 
-          this.settings.breaks[val].height = this.instance.screen_height;
+          this.settings.breaks[val].height = this.instance.screen_height - this.settings.bottomOffset;
         }
         if (this.settings.breaks['top']?.height === this.settings.breaks['middle']?.height) {
           this.settings.breaks['middle'].enabled = false;
@@ -81,7 +87,7 @@ export class Breakpoints {
           this.settings.breaks[val].height = this.instance.screen_height - (this.settings.bottomOffset * 2);
           this.settings.topperOverflow = true;
         } else {
-          if (this.instance.overflowEl) {
+          if (this.instance.overflowEl && !this.settings.maxFitHeight) {
             this.settings.topperOverflow = false;
             this.instance.overflowEl.style.overflowY = 'hidden';
           }
@@ -178,13 +184,16 @@ export class Breakpoints {
     let height: number;
 
     // Make element visible to calculate height
+    this.instance.el.style.height = 'unset';
     this.instance.el.style.visibility = 'hidden';
     this.instance.el.style.pointerEvents = 'none';
     this.instance.el.style.display = 'block';
 
+    let promises = [];
+
     if (images.length) {
       // Bulletins with image height we get after image render
-      let promises = Array.from(images).map(
+      promises = Array.from(images).map(
         (image) => new Promise((resolve) => {
           // Already rendered
           if (image.complete && image.naturalHeight) {
@@ -194,12 +203,15 @@ export class Breakpoints {
           }
         })
       );
+    } 
 
-      await Promise.all(promises);
-    } else {
-      // Bulletins without image we get at least after simple timeout
-      await new Promise((resolve) => setTimeout(() => resolve(true), 150));
-    }
+    // resized timeouts - 0, render - 150
+    promises.push(
+      new Promise((resolve) => 
+        setTimeout(() => resolve(true), this.instance.rendered ? 0 : 150)
+      )
+    );
+    await Promise.all(promises);
 
     // height include margins
     let elmHeight = parseInt(document.defaultView.getComputedStyle(this.instance.el, '').getPropertyValue('height'));

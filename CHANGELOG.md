@@ -2,6 +2,15 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.2.3] - 2021-01-22
+
+### Features
+- Added `.calcFitHeight()` method to re-calculate automatically height `fitHeight: true`, if this value was not proper calculated due DOM issues [#123](https://github.com/roman-rr/cupertino-pane/issues/123)
+- Added `maxFitHeight` property to settings to define maximum possible automatically calculated height [#122](https://github.com/roman-rr/cupertino-pane/issues/122)
+
+### Bug Fixes
+- Switched `resize` callback to `orientationchange` callback for device orientation changes. Fixed issues regarding resize and keyboards. [#125](https://github.com/roman-rr/cupertino-pane/issues/125)
+
 ## [1.2.2] - 2021-01-20
 
 ### Features 
