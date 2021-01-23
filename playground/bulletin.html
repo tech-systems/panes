@@ -123,7 +123,6 @@
         
         var element = document.querySelector('ion-bulletin');
         bulletin = new CupertinoPane(element, { 
-          initialBreak: 'top',
           fitHeight: true,
           backdrop: true,
           backdropOpacity: 0.8,
@@ -131,7 +130,7 @@
           buttonClose: false,
           showDraggable: false,
           upperThanTop: true,
-          bottomOffset: 48,
+          bottomOffset: 8,
           onBackdropTap: () => bulletin.destroy({animate: true})
         });
         bulletin.present({animate: true});

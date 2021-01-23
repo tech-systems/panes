@@ -13,6 +13,7 @@ export class Breakpoints {
   public lockedBreakpoints: any;
   public currentBreakpoint: number;
   public prevBreakpoint: string;
+  public calcHeightInProcess: boolean = false;
   public brs: number[] = [];
   private defaultBreaksConf: PaneBreaks = {
     top: { enabled: true, height: window.innerHeight - (135 * 0.35) },
@@ -162,8 +163,8 @@ export class Breakpoints {
       // Re-calc height and top
       this.instance.paneEl.style.top = this.settings.inverse ? `-${this.bottomer}px` : `unset`;
       this.instance.paneEl.style.height = `${this.instance.getPaneHeight()}px`;
+      
       this.instance.scrollElementInit();
-
       this.instance.checkOpacityAttr(this.currentBreakpoint);
       this.instance.checkOverflowAttr(this.currentBreakpoint);
     }
@@ -180,14 +181,21 @@ export class Breakpoints {
    * Private class methods
    */
   private async getPaneFitHeight(): Promise<number> {
+    this.calcHeightInProcess = true;
     let images: NodeListOf<HTMLImageElement> = this.instance.el.querySelectorAll('img'); 
     let height: number;
 
     // Make element visible to calculate height
     this.instance.el.style.height = 'unset';
-    this.instance.el.style.visibility = 'hidden';
-    this.instance.el.style.pointerEvents = 'none';
-    this.instance.el.style.display = 'block';
+    
+    if (!this.instance.rendered) {
+      this.instance.el.style.visibility = 'hidden';
+      this.instance.el.style.pointerEvents = 'none';
+      this.instance.el.style.display = 'block';
+      this.instance.wrapperEl.style.visibility = 'hidden';
+      this.instance.wrapperEl.style.pointerEvents = 'none';
+      this.instance.wrapperEl.style.display = 'block';
+    }
 
     let promises = [];
 
@@ -217,16 +225,19 @@ export class Breakpoints {
     let elmHeight = parseInt(document.defaultView.getComputedStyle(this.instance.el, '').getPropertyValue('height'));
     let elmMargin = parseInt(document.defaultView.getComputedStyle(this.instance.el, '').getPropertyValue('margin-top')) + parseInt(document.defaultView.getComputedStyle(this.instance.el, '').getPropertyValue('margin-bottom'));
     height = elmHeight + elmMargin
+    height += this.instance.el.offsetTop;
 
-    // Reset element
-    this.instance.el.style.visibility = 'unset';
-    this.instance.el.style.pointerEvents = 'unset';
-    this.instance.el.style.display = 'none';
-
-    if (this.instance.contentEl) {
-      this.instance.el.style.display = 'block';
+    // Hide elements back
+    if (!this.instance.rendered) {
+      this.instance.el.style.visibility = 'unset';
+      this.instance.el.style.pointerEvents = 'unset';
+      this.instance.el.style.display = 'none';
+      this.instance.wrapperEl.style.visibility = 'unset';
+      this.instance.wrapperEl.style.pointerEvents = 'unset';
+      this.instance.wrapperEl.style.display = 'none';
     }
 
+    this.calcHeightInProcess = false;
     return height;
   }
 

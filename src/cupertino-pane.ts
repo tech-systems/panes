@@ -71,100 +71,98 @@ export class CupertinoPane {
   }
 
   private drawBaseElements() {
-      this.parentEl = this.settings.parentElement;
+    this.parentEl = this.settings.parentElement;
     
-      // Wrapper
-      this.wrapperEl = document.createElement('div');
-      this.wrapperEl.className = `cupertino-pane-wrapper ${this.el.className}`;
-      this.wrapperEl.style.position = 'absolute';
-      this.wrapperEl.style.top = '0';
-      this.wrapperEl.style.left = '0';
+    // Wrapper
+    this.wrapperEl = document.createElement('div');
+    this.wrapperEl.className = `cupertino-pane-wrapper ${this.el.className}`;
+    this.wrapperEl.style.display = 'none';
+    this.wrapperEl.style.position = 'absolute';
+    this.wrapperEl.style.top = '0';
+    this.wrapperEl.style.left = '0';
 
-      // Panel
-      this.paneEl = document.createElement('div');
-      this.paneEl.className = 'pane';
-      this.paneEl.style.position = 'fixed';
-      this.paneEl.style.zIndex = '11';
-      this.paneEl.style.width = '100%';
-      this.paneEl.style.maxWidth = '500px';
-      this.paneEl.style.left = '0px';
-      this.paneEl.style.right = '0px';
-      this.paneEl.style.marginLeft = 'auto';
-      this.paneEl.style.marginRight = 'auto';
-      this.paneEl.style.height = `${this.getPaneHeight()}px`;
-      this.paneEl.style.background = '#ffffff';
-      this.paneEl.style.boxShadow = '0 4px 16px rgba(0,0,0,.12)';
-      this.paneEl.style.overflow = 'hidden';
-      this.paneEl.style.willChange = 'transform';
-      this.paneEl.style.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+    // Panel
+    this.paneEl = document.createElement('div');
+    this.paneEl.className = 'pane';
+    this.paneEl.style.position = 'fixed';
+    this.paneEl.style.zIndex = '11';
+    this.paneEl.style.width = '100%';
+    this.paneEl.style.maxWidth = '500px';
+    this.paneEl.style.left = '0px';
+    this.paneEl.style.right = '0px';
+    this.paneEl.style.marginLeft = 'auto';
+    this.paneEl.style.marginRight = 'auto';
+    this.paneEl.style.background = '#ffffff';
+    this.paneEl.style.boxShadow = '0 4px 16px rgba(0,0,0,.12)';
+    this.paneEl.style.overflow = 'hidden';
+    this.paneEl.style.willChange = 'transform';
+    this.paneEl.style.transform = `translateY(${this.screenHeightOffset}px) translateZ(0px)`;
 
-      if (!this.settings.inverse) {
-        this.paneEl.style.borderTopLeftRadius = '20px';
-        this.paneEl.style.borderTopRightRadius = '20px';
-        this.paneEl.style.paddingTop = '15px';
-      } else {
-        this.paneEl.style.borderBottomLeftRadius = '20px';
-        this.paneEl.style.borderBottomRightRadius = '20px';
-        this.paneEl.style.paddingBottom = '15px';
-        this.paneEl.style.top = `-${this.breakpoints.bottomer}px`;
-      }
+    if (!this.settings.inverse) {
+      this.paneEl.style.borderTopLeftRadius = '20px';
+      this.paneEl.style.borderTopRightRadius = '20px';
+      this.paneEl.style.paddingTop = '15px';
+    } else {
+      this.paneEl.style.borderBottomLeftRadius = '20px';
+      this.paneEl.style.borderBottomRightRadius = '20px';
+      this.paneEl.style.paddingBottom = '15px';
+    }
 
-      // Draggable
-      this.draggableEl = document.createElement('div');
-      this.draggableEl.className = 'draggable';
-      this.draggableEl.style.padding = '5px';
-      this.draggableEl.style.position = 'absolute';
-      this.draggableEl.style.left = '0';
-      this.draggableEl.style.right = '0';
-      this.draggableEl.style.marginLeft = 'auto';
-      this.draggableEl.style.marginRight = 'auto';
-      this.draggableEl.style.height = '30px';
-      this.draggableEl.style.zIndex = '12';
+    // Draggable
+    this.draggableEl = document.createElement('div');
+    this.draggableEl.className = 'draggable';
+    this.draggableEl.style.padding = '5px';
+    this.draggableEl.style.position = 'absolute';
+    this.draggableEl.style.left = '0';
+    this.draggableEl.style.right = '0';
+    this.draggableEl.style.marginLeft = 'auto';
+    this.draggableEl.style.marginRight = 'auto';
+    this.draggableEl.style.height = '30px';
+    this.draggableEl.style.zIndex = '12';
 
-      if (!this.settings.inverse) {
-        this.draggableEl.style.top = '0';
-      } else {
-        this.draggableEl.style.bottom = '0';
-      }
+    if (!this.settings.inverse) {
+      this.draggableEl.style.top = '0';
+    } else {
+      this.draggableEl.style.bottom = '0';
+    }
 
-      // Move
-      this.moveEl = document.createElement('div');
-      this.moveEl.className = 'move';
-      this.moveEl.style.margin = '0 auto';
-      this.moveEl.style.height = '5px';
-      this.moveEl.style.background = '#c0c0c0';
-      this.moveEl.style.width = '36px';
-      this.moveEl.style.borderRadius = '4px';
-      if (this.settings.inverse) {
-        this.moveEl.style.marginTop = '15px';
-      }
+    // Move
+    this.moveEl = document.createElement('div');
+    this.moveEl.className = 'move';
+    this.moveEl.style.margin = '0 auto';
+    this.moveEl.style.height = '5px';
+    this.moveEl.style.background = '#c0c0c0';
+    this.moveEl.style.width = '36px';
+    this.moveEl.style.borderRadius = '4px';
+    if (this.settings.inverse) {
+      this.moveEl.style.marginTop = '15px';
+    }
 
-      // Content
-      this.contentEl = this.el;
-      this.contentEl.style.display = 'block';
-      this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-      this.contentEl.style.overflowX = 'hidden';
+    // Content
+    this.contentEl = this.el;
+    this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+    this.contentEl.style.overflowX = 'hidden';
 
-      // Close button
-      this.destroyButtonEl = document.createElement('div');
-      if (!this.settings.inverse) {
-        this.destroyButtonEl.className = 'destroy-button';
-        this.destroyButtonEl.style.width = '26px';
-        this.destroyButtonEl.style.height = '26px';
-        this.destroyButtonEl.style.position = 'absolute';
-        this.destroyButtonEl.style.background = '#ebebeb';
-        this.destroyButtonEl.style.right = '20px';
-        this.destroyButtonEl.style.zIndex = '14';
-        this.destroyButtonEl.style.borderRadius = '100%';
-        this.destroyButtonEl.style.top = '16px';
-      }
-
-      // inject DOM
-      this.parentEl.appendChild(this.wrapperEl);
-      this.wrapperEl.appendChild(this.paneEl);
-      this.paneEl.appendChild(this.draggableEl);
-      this.paneEl.appendChild(this.contentEl);
-      this.draggableEl.appendChild(this.moveEl);
+    // Close button
+    this.destroyButtonEl = document.createElement('div');
+    if (!this.settings.inverse) {
+      this.destroyButtonEl.className = 'destroy-button';
+      this.destroyButtonEl.style.width = '26px';
+      this.destroyButtonEl.style.height = '26px';
+      this.destroyButtonEl.style.position = 'absolute';
+      this.destroyButtonEl.style.background = '#ebebeb';
+      this.destroyButtonEl.style.right = '20px';
+      this.destroyButtonEl.style.zIndex = '14';
+      this.destroyButtonEl.style.borderRadius = '100%';
+      this.destroyButtonEl.style.top = '16px';
+    }
+    
+     // inject DOM
+     this.parentEl.appendChild(this.wrapperEl);
+     this.wrapperEl.appendChild(this.paneEl);
+     this.paneEl.appendChild(this.draggableEl);
+     this.paneEl.appendChild(this.contentEl);
+     this.draggableEl.appendChild(this.moveEl);
   }
 
   async present(conf: {animate: boolean} = {animate: false}) {
@@ -189,11 +187,16 @@ export class CupertinoPane {
         this.screenHeightOffset = 0;
       }
 
+      await this.drawBaseElements();
       await this.setBreakpoints();
-      this.drawBaseElements();
-      this.scrollElementInit();
-      this.checkOpacityAttr(this.breakpoints.currentBreakpoint);
-      this.checkOverflowAttr(this.breakpoints.currentBreakpoint);
+
+      this.paneEl.style.height = `${this.getPaneHeight()}px`;
+      if (this.settings.inverse) {
+        this.paneEl.style.top = `-${this.breakpoints.bottomer}px`;
+      }
+      this.wrapperEl.style.display = 'block';
+      this.contentEl.style.display = 'block';
+      this.wrapperEl.classList.add('rendered');
       this.rendered = true;
 
       if (this.settings.followerElement) {
@@ -225,7 +228,6 @@ export class CupertinoPane {
         this.paneEl.style.paddingTop = '30px';
 
         this.contentEl.style.background = '#ffffff';
-        this.contentEl.style.display = 'block';
         this.contentEl.style.borderTopLeftRadius = '20px';
         this.contentEl.style.borderTopRightRadius = '20px';
         this.contentEl.style.boxShadow = '0 4px 16px rgba(0,0,0,.12)';
@@ -278,12 +280,20 @@ export class CupertinoPane {
       if (conf.animate) {
         this.doTransition({type: 'present', translateY: this.breakpoints.breaks[this.settings.initialBreak]}); 
       } else {
-        // Emit event
+        this.paneEl.style.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
         if (this.settings.pushElement) {
           this.pushTransition(this.breakpoints.breaks[this.settings.initialBreak], 'unset');
         }
+        // Emit event
         this.settings.onDidPresent();
       }
+
+      this.checkOpacityAttr(this.breakpoints.currentBreakpoint);
+
+      // Some timeout to get offsetTop
+      await new Promise((resolve) => setTimeout(() => resolve(true), 150));
+      this.scrollElementInit();
+      this.checkOverflowAttr(this.breakpoints.currentBreakpoint);
   }
 
   public getPaneHeight(): number {
@@ -368,19 +378,13 @@ export class CupertinoPane {
         console.warn('Cupertino Pane: "upperThanTop" allowed for disabled "topperOverflow"');
       }
 
-      // Good to get rid of timeout
-      // but render dom take a time
-      if (!this.rendered) {
-        // Timeout, this.overflowEl.offsetTop get time to render
-        setTimeout(() => this.setOverflowHeight(), 150);
-      } else {
-        this.setOverflowHeight();
-      }
+      this.setOverflowHeight();
     }
   }
 
   public setOverflowHeight(offset = 0) {
     // overflowEl is not visible - ignoring execution
+    // TODO: inputs only for visible elements
     if (this.overflowEl.offsetHeight === 0 
          && this.overflowEl.offsetWidth === 0) {
       return;
@@ -425,7 +429,7 @@ export class CupertinoPane {
 
   public isPanePresented():boolean {
     // Check through all presented panes
-    let wrappers = Array.from(document.querySelectorAll('.cupertino-pane-wrapper'));
+    let wrappers = Array.from(document.querySelectorAll('.cupertino-pane-wrapper.rendered'));
     if (!wrappers.length) return false;
     return wrappers.find((item) => item.contains(<HTMLElement>this.selector)) ? true: false;
   }
@@ -506,7 +510,6 @@ export class CupertinoPane {
     this.backdropEl.style.zIndex = '10';
 
     this.wrapperEl.appendChild(this.backdropEl);
-    this.backdropEl.style.display = 'block';
     this.backdropEl.addEventListener('click', (t) => this.settings.onBackdropTap());
   }
 
@@ -716,6 +719,11 @@ export class CupertinoPane {
   }
 
   public async calcFitHeight() {
+    if (this.breakpoints.calcHeightInProcess) {
+      console.warn(`Cupertino Pane: calcFitHeight() already in process`);
+      return;
+    }
+
     await this.breakpoints.buildBreakpoints(this.breakpoints.lockedBreakpoints);
   }
 

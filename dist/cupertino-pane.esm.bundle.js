@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: January 22, 2021
+ * Released on: January 24, 2021
  */
 
 /*! *****************************************************************************
@@ -608,6 +608,7 @@ class Breakpoints {
         this.instance = instance;
         this.settings = settings;
         this.breaks = {};
+        this.calcHeightInProcess = false;
         this.brs = [];
         this.defaultBreaksConf = {
             top: { enabled: true, height: window.innerHeight - (135 * 0.35) },
@@ -761,13 +762,19 @@ class Breakpoints {
      */
     getPaneFitHeight() {
         return __awaiter(this, void 0, void 0, function* () {
+            this.calcHeightInProcess = true;
             let images = this.instance.el.querySelectorAll('img');
             let height;
             // Make element visible to calculate height
             this.instance.el.style.height = 'unset';
-            this.instance.el.style.visibility = 'hidden';
-            this.instance.el.style.pointerEvents = 'none';
-            this.instance.el.style.display = 'block';
+            if (!this.instance.rendered) {
+                this.instance.el.style.visibility = 'hidden';
+                this.instance.el.style.pointerEvents = 'none';
+                this.instance.el.style.display = 'block';
+                this.instance.wrapperEl.style.visibility = 'hidden';
+                this.instance.wrapperEl.style.pointerEvents = 'none';
+                this.instance.wrapperEl.style.display = 'block';
+            }
             let promises = [];
             if (images.length) {
                 // Bulletins with image height we get after image render
@@ -788,13 +795,17 @@ class Breakpoints {
             let elmHeight = parseInt(document.defaultView.getComputedStyle(this.instance.el, '').getPropertyValue('height'));
             let elmMargin = parseInt(document.defaultView.getComputedStyle(this.instance.el, '').getPropertyValue('margin-top')) + parseInt(document.defaultView.getComputedStyle(this.instance.el, '').getPropertyValue('margin-bottom'));
             height = elmHeight + elmMargin;
-            // Reset element
-            this.instance.el.style.visibility = 'unset';
-            this.instance.el.style.pointerEvents = 'unset';
-            this.instance.el.style.display = 'none';
-            if (this.instance.contentEl) {
-                this.instance.el.style.display = 'block';
+            height += this.instance.el.offsetTop;
+            // Hide elements back
+            if (!this.instance.rendered) {
+                this.instance.el.style.visibility = 'unset';
+                this.instance.el.style.pointerEvents = 'unset';
+                this.instance.el.style.display = 'none';
+                this.instance.wrapperEl.style.visibility = 'unset';
+                this.instance.wrapperEl.style.pointerEvents = 'unset';
+                this.instance.wrapperEl.style.display = 'none';
             }
+            this.calcHeightInProcess = false;
             return height;
         });
     }
@@ -931,6 +942,7 @@ class CupertinoPane {
         // Wrapper
         this.wrapperEl = document.createElement('div');
         this.wrapperEl.className = `cupertino-pane-wrapper ${this.el.className}`;
+        this.wrapperEl.style.display = 'none';
         this.wrapperEl.style.position = 'absolute';
         this.wrapperEl.style.top = '0';
         this.wrapperEl.style.left = '0';
@@ -945,12 +957,11 @@ class CupertinoPane {
         this.paneEl.style.right = '0px';
         this.paneEl.style.marginLeft = 'auto';
         this.paneEl.style.marginRight = 'auto';
-        this.paneEl.style.height = `${this.getPaneHeight()}px`;
         this.paneEl.style.background = '#ffffff';
         this.paneEl.style.boxShadow = '0 4px 16px rgba(0,0,0,.12)';
         this.paneEl.style.overflow = 'hidden';
         this.paneEl.style.willChange = 'transform';
-        this.paneEl.style.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+        this.paneEl.style.transform = `translateY(${this.screenHeightOffset}px) translateZ(0px)`;
         if (!this.settings.inverse) {
             this.paneEl.style.borderTopLeftRadius = '20px';
             this.paneEl.style.borderTopRightRadius = '20px';
@@ -960,7 +971,6 @@ class CupertinoPane {
             this.paneEl.style.borderBottomLeftRadius = '20px';
             this.paneEl.style.borderBottomRightRadius = '20px';
             this.paneEl.style.paddingBottom = '15px';
-            this.paneEl.style.top = `-${this.breakpoints.bottomer}px`;
         }
         // Draggable
         this.draggableEl = document.createElement('div');
@@ -992,7 +1002,6 @@ class CupertinoPane {
         }
         // Content
         this.contentEl = this.el;
-        this.contentEl.style.display = 'block';
         this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
         this.contentEl.style.overflowX = 'hidden';
         // Close button
@@ -1035,11 +1044,15 @@ class CupertinoPane {
             if (this.settings.inverse) {
                 this.screenHeightOffset = 0;
             }
+            yield this.drawBaseElements();
             yield this.setBreakpoints();
-            this.drawBaseElements();
-            this.scrollElementInit();
-            this.checkOpacityAttr(this.breakpoints.currentBreakpoint);
-            this.checkOverflowAttr(this.breakpoints.currentBreakpoint);
+            this.paneEl.style.height = `${this.getPaneHeight()}px`;
+            if (this.settings.inverse) {
+                this.paneEl.style.top = `-${this.breakpoints.bottomer}px`;
+            }
+            this.wrapperEl.style.display = 'block';
+            this.contentEl.style.display = 'block';
+            this.wrapperEl.classList.add('rendered');
             this.rendered = true;
             if (this.settings.followerElement) {
                 if (!document.querySelector(this.settings.followerElement)) {
@@ -1063,7 +1076,6 @@ class CupertinoPane {
                 this.paneEl.style.boxShadow = 'none';
                 this.paneEl.style.paddingTop = '30px';
                 this.contentEl.style.background = '#ffffff';
-                this.contentEl.style.display = 'block';
                 this.contentEl.style.borderTopLeftRadius = '20px';
                 this.contentEl.style.borderTopRightRadius = '20px';
                 this.contentEl.style.boxShadow = '0 4px 16px rgba(0,0,0,.12)';
@@ -1107,12 +1119,18 @@ class CupertinoPane {
                 this.doTransition({ type: 'present', translateY: this.breakpoints.breaks[this.settings.initialBreak] });
             }
             else {
-                // Emit event
+                this.paneEl.style.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
                 if (this.settings.pushElement) {
                     this.pushTransition(this.breakpoints.breaks[this.settings.initialBreak], 'unset');
                 }
+                // Emit event
                 this.settings.onDidPresent();
             }
+            this.checkOpacityAttr(this.breakpoints.currentBreakpoint);
+            // Some timeout to get offsetTop
+            yield new Promise((resolve) => setTimeout(() => resolve(true), 150));
+            this.scrollElementInit();
+            this.checkOverflowAttr(this.breakpoints.currentBreakpoint);
         });
     }
     getPaneHeight() {
@@ -1191,19 +1209,12 @@ class CupertinoPane {
             if (this.settings.upperThanTop) {
                 console.warn('Cupertino Pane: "upperThanTop" allowed for disabled "topperOverflow"');
             }
-            // Good to get rid of timeout
-            // but render dom take a time
-            if (!this.rendered) {
-                // Timeout, this.overflowEl.offsetTop get time to render
-                setTimeout(() => this.setOverflowHeight(), 150);
-            }
-            else {
-                this.setOverflowHeight();
-            }
+            this.setOverflowHeight();
         }
     }
     setOverflowHeight(offset = 0) {
         // overflowEl is not visible - ignoring execution
+        // TODO: inputs only for visible elements
         if (this.overflowEl.offsetHeight === 0
             && this.overflowEl.offsetWidth === 0) {
             return;
@@ -1247,7 +1258,7 @@ class CupertinoPane {
     }
     isPanePresented() {
         // Check through all presented panes
-        let wrappers = Array.from(document.querySelectorAll('.cupertino-pane-wrapper'));
+        let wrappers = Array.from(document.querySelectorAll('.cupertino-pane-wrapper.rendered'));
         if (!wrappers.length)
             return false;
         return wrappers.find((item) => item.contains(this.selector)) ? true : false;
@@ -1271,7 +1282,6 @@ class CupertinoPane {
         this.backdropEl.style.display = 'none';
         this.backdropEl.style.zIndex = '10';
         this.wrapperEl.appendChild(this.backdropEl);
-        this.backdropEl.style.display = 'block';
         this.backdropEl.addEventListener('click', (t) => this.settings.onBackdropTap());
     }
     /**
@@ -1439,6 +1449,10 @@ class CupertinoPane {
     }
     calcFitHeight() {
         return __awaiter(this, void 0, void 0, function* () {
+            if (this.breakpoints.calcHeightInProcess) {
+                console.warn(`Cupertino Pane: calcFitHeight() already in process`);
+                return;
+            }
             yield this.breakpoints.buildBreakpoints(this.breakpoints.lockedBreakpoints);
         });
     }

@@ -12,6 +12,7 @@ export declare class Breakpoints {
     lockedBreakpoints: any;
     currentBreakpoint: number;
     prevBreakpoint: string;
+    calcHeightInProcess: boolean;
     brs: number[];
     private defaultBreaksConf;
     constructor(instance: CupertinoPane, settings: CupertinoSettings);
