@@ -1,11 +1,13 @@
 # Cupertino Pane
 
 [![CircleCI](https://circleci.com/gh/roman-rr/cupertino-pane.svg?style=svg)](https://circleci.com/gh/roman-rr/cupertino-pane)
-[![Financial Contributors on Open Collective](https://opencollective.com/cupertino-pane/all/badge.svg?label=financial+contributors)](https://opencollective.com/cupertino-pane) ![npm](https://img.shields.io/npm/v/cupertino-pane)
+![npm](https://img.shields.io/npm/v/cupertino-pane)
 ![npm](https://img.shields.io/npm/dm/cupertino-pane?color=%23007DC5)
 ![NPM](https://img.shields.io/npm/l/cupertino-pane?color=%23007DC5)
 [![Code Style](https://badgen.net/badge/icon/typescript?icon=typescript&label)](https://www.typescriptlang.org/)
 [![Code Style](https://badgen.net/badge/code%20style/airbnb/ff5a5f?icon=airbnb)](https://github.com/airbnb/javascript)
+[![Financial Contributors on Open Collective](https://opencollective.com/cupertino-pane/all/badge.svg?label=financial+contributors)](https://opencollective.com/cupertino-pane)
+
 
 <!-- <img src="https://user-images.githubusercontent.com/10646478/79794348-4846bc00-837c-11ea-8b74-7c71fac120aa.png" 
      align="right" alt="Cupertino Pane logo Roman Antonov" width="260px" height="421px"> -->
