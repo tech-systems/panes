@@ -59,6 +59,7 @@ export class Breakpoints {
 
     ['top', 'middle', 'bottom'].forEach((val) => {
       // bottom offset for bulletins
+      
       this.breaks[val] -= this.settings.bottomOffset;
 
       // Set default if no exist
@@ -76,7 +77,8 @@ export class Breakpoints {
         if (this.settings.breaks[val]?.height > this.instance.screen_height) { 
           this.settings.breaks[val].height = this.instance.screen_height - this.settings.bottomOffset;
         }
-        if (this.settings.breaks['top']?.height === this.settings.breaks['middle']?.height) {
+        if (this.settings.breaks['top'] && this.settings.breaks['middle'] 
+            && this.settings.breaks['top'].height === this.settings.breaks['middle']?.height) {
           this.settings.breaks['middle'].enabled = false;
           this.settings.initialBreak = 'top';
         }

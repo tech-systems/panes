@@ -11,7 +11,7 @@ export class Settings {
       followerElement: null,
       fitHeight: false,
       maxFitHeight: null,
-      fitScreenHeight: false,
+      fitScreenHeight: true,
       pushElement: null,
       pushMinHeight: null,
       pushYOffset: 0,

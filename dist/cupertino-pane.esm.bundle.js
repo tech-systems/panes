@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.2.3
+ * Cupertino Pane 1.2.32
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: January 24, 2021
+ * Released on: January 25, 2021
  */
 
 /*! *****************************************************************************
@@ -491,8 +491,7 @@ class Events {
         return __awaiter(this, void 0, void 0, function* () {
             // Browsers issue: Currently no proper way to get window.innerHeight without timeout
             yield new Promise((resolve) => setTimeout(() => resolve(true), 150));
-            this.instance.screen_height = window.innerHeight;
-            this.instance.screenHeightOffset = this.instance.screen_height;
+            this.instance.updateScreenHeights();
             this.breakpoints.buildBreakpoints(JSON.parse(this.breakpoints.lockedBreakpoints), false);
         });
     }
@@ -555,7 +554,7 @@ class Settings {
             followerElement: null,
             fitHeight: false,
             maxFitHeight: null,
-            fitScreenHeight: false,
+            fitScreenHeight: true,
             pushElement: null,
             pushMinHeight: null,
             pushYOffset: 0,
@@ -647,8 +646,8 @@ class Breakpoints {
                 };
             }
             ['top', 'middle', 'bottom'].forEach((val) => {
-                var _a, _b, _c;
                 // bottom offset for bulletins
+                var _a, _b;
                 this.breaks[val] -= this.settings.bottomOffset;
                 // Set default if no exist
                 if (!this.settings.breaks[val]) {
@@ -663,7 +662,8 @@ class Breakpoints {
                     if (((_a = this.settings.breaks[val]) === null || _a === void 0 ? void 0 : _a.height) > this.instance.screen_height) {
                         this.settings.breaks[val].height = this.instance.screen_height - this.settings.bottomOffset;
                     }
-                    if (((_b = this.settings.breaks['top']) === null || _b === void 0 ? void 0 : _b.height) === ((_c = this.settings.breaks['middle']) === null || _c === void 0 ? void 0 : _c.height)) {
+                    if (this.settings.breaks['top'] && this.settings.breaks['middle']
+                        && this.settings.breaks['top'].height === ((_b = this.settings.breaks['middle']) === null || _b === void 0 ? void 0 : _b.height)) {
                         this.settings.breaks['middle'].enabled = false;
                         this.settings.initialBreak = 'top';
                     }
@@ -820,8 +820,6 @@ class CupertinoPane {
     constructor(selector, conf = {}) {
         this.selector = selector;
         this.disableDragEvents = false;
-        this.screen_height = window.innerHeight;
-        this.screenHeightOffset = this.screen_height;
         this.preventDismissEvent = false;
         this.preventedDismiss = false;
         this.iconCloseColor = '#7a7a7e';
@@ -942,81 +940,106 @@ class CupertinoPane {
         // Wrapper
         this.wrapperEl = document.createElement('div');
         this.wrapperEl.className = `cupertino-pane-wrapper ${this.el.className}`;
-        this.wrapperEl.style.display = 'none';
-        this.wrapperEl.style.position = 'absolute';
-        this.wrapperEl.style.top = '0';
-        this.wrapperEl.style.left = '0';
+        this.addStyle(`
+      .cupertino-pane-wrapper {
+        display: none;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+    `);
         // Panel
         this.paneEl = document.createElement('div');
         this.paneEl.className = 'pane';
-        this.paneEl.style.position = 'fixed';
-        this.paneEl.style.zIndex = '11';
-        this.paneEl.style.width = '100%';
-        this.paneEl.style.maxWidth = '500px';
-        this.paneEl.style.left = '0px';
-        this.paneEl.style.right = '0px';
-        this.paneEl.style.marginLeft = 'auto';
-        this.paneEl.style.marginRight = 'auto';
-        this.paneEl.style.background = '#ffffff';
-        this.paneEl.style.boxShadow = '0 4px 16px rgba(0,0,0,.12)';
-        this.paneEl.style.overflow = 'hidden';
-        this.paneEl.style.willChange = 'transform';
-        this.paneEl.style.transform = `translateY(${this.screenHeightOffset}px) translateZ(0px)`;
-        if (!this.settings.inverse) {
-            this.paneEl.style.borderTopLeftRadius = '20px';
-            this.paneEl.style.borderTopRightRadius = '20px';
-            this.paneEl.style.paddingTop = '15px';
-        }
-        else {
-            this.paneEl.style.borderBottomLeftRadius = '20px';
-            this.paneEl.style.borderBottomRightRadius = '20px';
-            this.paneEl.style.paddingBottom = '15px';
-        }
+        this.addStyle(`
+      .cupertino-pane-wrapper .pane {
+        position: fixed;
+        z-index: 11;
+        width: 100%;
+        max-width: 500px;
+        left: 0px;
+        right: 0px;
+        margin-left: auto;
+        margin-right: auto;
+        background: #ffffff;
+        box-shadow: 0 4px 16px rgba(0,0,0,.12);
+        overflow = hidden;
+        will-change = transform;
+        transform: translateY(${this.screenHeightOffset}px) translateZ(0px);
+        ${!this.settings.inverse ?
+            `padding-top: 15px; border-radius: 20px 20px 0 0;`
+            : `padding-bottom: 15px; border-radius: 0 0 20px 20px;`}
+      }
+      .cupertino-pane-wrapper.darkmode .pane {
+        background: #1c1c1d; 
+        color: #ffffff;
+      }
+    `);
         // Draggable
         this.draggableEl = document.createElement('div');
         this.draggableEl.className = 'draggable';
-        this.draggableEl.style.padding = '5px';
-        this.draggableEl.style.position = 'absolute';
-        this.draggableEl.style.left = '0';
-        this.draggableEl.style.right = '0';
-        this.draggableEl.style.marginLeft = 'auto';
-        this.draggableEl.style.marginRight = 'auto';
-        this.draggableEl.style.height = '30px';
-        this.draggableEl.style.zIndex = '12';
-        if (!this.settings.inverse) {
-            this.draggableEl.style.top = '0';
-        }
-        else {
-            this.draggableEl.style.bottom = '0';
-        }
+        this.addStyle(`
+      .cupertino-pane-wrapper .draggable {
+        padding: 5px;
+        position: absolute;
+        left: 0;
+        right: 0;
+        margin-left: auto;
+        margin-right: auto;
+        height: 30px;
+        z-index: 12;
+        ${!this.settings.inverse ?
+            `top: 0;`
+            : `bottom: 0;`}
+        ${!this.settings.showDraggable ? `opacity: 0;` : ``}
+        ${this.settings.draggableOver ? `top: -30px;padding: 15px;` : ``}
+      }
+    `);
         // Move
         this.moveEl = document.createElement('div');
         this.moveEl.className = 'move';
-        this.moveEl.style.margin = '0 auto';
-        this.moveEl.style.height = '5px';
-        this.moveEl.style.background = '#c0c0c0';
-        this.moveEl.style.width = '36px';
-        this.moveEl.style.borderRadius = '4px';
-        if (this.settings.inverse) {
-            this.moveEl.style.marginTop = '15px';
-        }
-        // Content
+        this.addStyle(`
+      .cupertino-pane-wrapper .move {
+        margin: 0 auto;
+        height: 5px;
+        background: #c0c0c0;
+        width: 36px;
+        border-radius: 4px;
+        ${this.settings.inverse ? `margin-top: 15px;` : ``}
+        ${this.settings.draggableOver ? `width: 70px; background: rgba(225, 225, 225, 0.6);` : ``}
+        ${this.settings.draggableOver && Support.backdropFilter ? `
+          backdrop-filter: saturate(180%) blur(20px);
+          -webkit-backdrop-filter: saturate(180%) blur(20px);
+        ` : ``}
+      }
+      .cupertino-pane-wrapper.darkmode .move {
+        background: #5a5a5e;
+      }
+    `);
+        // Close button
+        this.destroyButtonEl = document.createElement('div');
+        this.destroyButtonEl.className = 'destroy-button';
+        this.addStyle(`
+      .cupertino-pane-wrapper .destroy-button {
+        ${!this.settings.inverse ? `
+        width: 26px;
+        height: 26px;
+        position: absolute;
+        background: #ebebeb;
+        right: 20px;
+        z-index: 14;
+        border-radius: 100%;
+        top: 16px;
+        ` : ``}
+      }
+      .cupertino-pane-wrapper.darkmode .destroy-button {
+        background: #424246;
+      }
+    `);
+        // Content user element
         this.contentEl = this.el;
         this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
         this.contentEl.style.overflowX = 'hidden';
-        // Close button
-        this.destroyButtonEl = document.createElement('div');
-        if (!this.settings.inverse) {
-            this.destroyButtonEl.className = 'destroy-button';
-            this.destroyButtonEl.style.width = '26px';
-            this.destroyButtonEl.style.height = '26px';
-            this.destroyButtonEl.style.position = 'absolute';
-            this.destroyButtonEl.style.background = '#ebebeb';
-            this.destroyButtonEl.style.right = '20px';
-            this.destroyButtonEl.style.zIndex = '14';
-            this.destroyButtonEl.style.borderRadius = '100%';
-            this.destroyButtonEl.style.top = '16px';
-        }
         // inject DOM
         this.parentEl.appendChild(this.wrapperEl);
         this.wrapperEl.appendChild(this.paneEl);
@@ -1041,9 +1064,7 @@ class CupertinoPane {
             }
             // Emit event
             this.settings.onWillPresent();
-            if (this.settings.inverse) {
-                this.screenHeightOffset = 0;
-            }
+            this.updateScreenHeights();
             yield this.drawBaseElements();
             yield this.setBreakpoints();
             this.paneEl.style.height = `${this.getPaneHeight()}px`;
@@ -1066,27 +1087,6 @@ class CupertinoPane {
             }
             if (this.settings.pushElement) {
                 this.pushElement = document.querySelector(this.settings.pushElement);
-            }
-            if (!this.settings.showDraggable) {
-                this.draggableEl.style.opacity = '0';
-            }
-            // Draggable over pane position
-            if (this.settings.draggableOver) {
-                this.paneEl.style.background = 'transparent';
-                this.paneEl.style.boxShadow = 'none';
-                this.paneEl.style.paddingTop = '30px';
-                this.contentEl.style.background = '#ffffff';
-                this.contentEl.style.borderTopLeftRadius = '20px';
-                this.contentEl.style.borderTopRightRadius = '20px';
-                this.contentEl.style.boxShadow = '0 4px 16px rgba(0,0,0,.12)';
-                this.destroyButtonEl.style.top = '45px';
-                this.draggableEl.style.padding = '15px';
-                this.moveEl.style.width = '45px';
-                this.moveEl.style.background = 'rgba(225, 225, 225, 0.6)';
-                if (Support.backdropFilter) {
-                    this.moveEl.style['backdropFilter'] = 'saturate(180%) blur(20px)';
-                    this.moveEl.style['webkitBackdropFilter'] = 'saturate(180%) blur(20px)';
-                }
             }
             if (this.settings.darkMode) {
                 this.setDarkMode({ enable: true });
@@ -1119,6 +1119,8 @@ class CupertinoPane {
                 this.doTransition({ type: 'present', translateY: this.breakpoints.breaks[this.settings.initialBreak] });
             }
             else {
+                // No initial transitions
+                this.breakpoints.prevBreakpoint = this.settings.initialBreak;
                 this.paneEl.style.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
                 if (this.settings.pushElement) {
                     this.pushTransition(this.breakpoints.breaks[this.settings.initialBreak], 'unset');
@@ -1196,6 +1198,16 @@ class CupertinoPane {
         this.detachAllEvents();
         this.attachAllEvents();
     }
+    updateScreenHeights() {
+        if (this.settings.inverse) {
+            this.screen_height = window.innerHeight;
+            this.screenHeightOffset = 0;
+        }
+        else {
+            this.screen_height = window.innerHeight;
+            this.screenHeightOffset = window.innerHeight;
+        }
+    }
     scrollElementInit() {
         let attrElements = this.el.querySelectorAll('[overflow-y]');
         if (!attrElements.length || attrElements.length > 1) {
@@ -1270,20 +1282,34 @@ class CupertinoPane {
     renderBackdrop() {
         this.backdropEl = document.createElement('div');
         this.backdropEl.className = 'backdrop';
-        this.backdropEl.style.overflow = 'hidden';
-        this.backdropEl.style.position = 'fixed';
-        this.backdropEl.style.width = '100%';
-        this.backdropEl.style.bottom = '0';
-        this.backdropEl.style.right = '0';
-        this.backdropEl.style.left = '0';
-        this.backdropEl.style.top = '0';
-        this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-        this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
-        this.backdropEl.style.display = 'none';
-        this.backdropEl.style.zIndex = '10';
+        this.addStyle(`
+      .cupertino-pane-wrapper .backdrop {
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        top: 0;
+        display: none;
+        z-index: 10;
+        transition: all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s;
+        background-color: rgba(0,0,0, ${this.settings.backdropOpacity});
+      }
+    `);
         this.wrapperEl.appendChild(this.backdropEl);
         this.backdropEl.addEventListener('click', (t) => this.settings.onBackdropTap());
     }
+    /**
+     * Utility function to add CSS in multiple passes.
+     * @param {string} styleString
+     */
+    addStyle(styleString) {
+        const style = document.createElement('style');
+        style.textContent = styleString;
+        document.head.prepend(style);
+    }
+    ;
     /**
      * Backdrop
      */
@@ -1416,22 +1442,12 @@ class CupertinoPane {
     }
     setDarkMode(conf = { enable: true }) {
         if (conf.enable) {
-            this.paneEl.style.background = '#1c1c1d';
-            this.paneEl.style.color = '#ffffff';
-            this.moveEl.style.background = '#5a5a5e';
-            if (this.settings.buttonClose && this.settings.buttonDestroy) {
-                this.destroyButtonEl.style.background = '#424246';
-                this.iconCloseColor = '#a8a7ae';
-            }
+            this.wrapperEl.classList.add('darkmode');
+            this.iconCloseColor = '#a8a7ae';
         }
         else {
-            this.paneEl.style.background = '#ffffff';
-            this.paneEl.style.color = 'unset';
-            this.moveEl.style.background = '#c0c0c0';
-            if (this.settings.buttonClose && this.settings.buttonDestroy) {
-                this.destroyButtonEl.style.background = '#ebebeb';
-                this.iconCloseColor = '#7a7a7e';
-            }
+            this.wrapperEl.classList.remove('darkmode');
+            this.iconCloseColor = '#7a7a7e';
         }
     }
     /**
@@ -1472,7 +1488,7 @@ class CupertinoPane {
     }
     moveToHeight(val) {
         if (!this.isPanePresented()) {
-            console.warn(`Cupertino Pane: Present pane before call moveToBreak()`);
+            console.warn(`Cupertino Pane: Present pane before call moveToHeight()`);
             return null;
         }
         let translateY = this.screenHeightOffset ? this.screen_height - val : val;
@@ -1665,19 +1681,7 @@ class CupertinoPane {
                 }, this.settings.pushYOffset ? 50 : 0);
             }
             // Main transitions
-            if (params.type === 'present') {
-                this.paneEl.style.transform = `translateY(${this.screenHeightOffset}px) translateZ(0px)`;
-                setTimeout(() => {
-                    // Emit event
-                    this.settings.onTransitionStart({ translateY: { new: params.translateY } });
-                    this.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
-                    // Bind for follower same transitions
-                    if (this.followerEl) {
-                        this.followerEl.style.transform = `translateY(0px) translateZ(0px)`;
-                    }
-                }, 50);
-            }
-            else {
+            setTimeout(() => {
                 // Emit event
                 this.settings.onTransitionStart({ translateY: { new: params.translateY } });
                 this.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
@@ -1685,7 +1689,7 @@ class CupertinoPane {
                 if (this.followerEl) {
                     this.followerEl.style.transform = `translateY(${params.translateY - this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
                 }
-            }
+            }, params.type === 'present' ? 50 : 0);
             let getNextBreakpoint = Object.entries(this.breakpoints.breaks).find(val => val[1] === params.translateY);
             if (getNextBreakpoint) {
                 this.breakpoints.prevBreakpoint = getNextBreakpoint[0];

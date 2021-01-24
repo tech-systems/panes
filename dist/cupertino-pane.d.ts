@@ -37,6 +37,7 @@ export declare class CupertinoPane {
     private attachAllEvents;
     private detachAllEvents;
     private resetEvents;
+    updateScreenHeights(): void;
     scrollElementInit(): void;
     setOverflowHeight(offset?: number): void;
     private getTimingFunction;
@@ -46,6 +47,11 @@ export declare class CupertinoPane {
     swipeNextPoint: (diff: any, maxDiff: any, closest: any) => any;
     private isBackdropPresented;
     private renderBackdrop;
+    /**
+     * Utility function to add CSS in multiple passes.
+     * @param {string} styleString
+     */
+    private addStyle;
     /**
      * Backdrop
      */

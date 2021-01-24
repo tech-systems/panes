@@ -158,7 +158,7 @@ new CupertinoPane(element); // HTMLElement
 | **followerElement** | `string` | Follower element selector | Element with selector will following pane transitions |
 | **fitHeight** | `boolean` | 'false' | Automatically calc and define content height as top breakpoint. Middle and bottom breakpoint will be disabled |
 | **maxFitHeight** | `number` | 'null' | Define a maximum possible automatically calculated height with `fitHeight` property |
-| **fitScreenHeight** | `boolean` | 'false' | On `true` will automatically adjust pane maximum height to screen height |
+| **fitScreenHeight** | `boolean` | 'true' | On `true` will automatically adjust pane maximum height to screen height |
 | **pushElement** | `string` | Push element selector | DOM Element will be pushed and scaled |
 | **pushMinHeight** | `number` | Most bottom available point | Height from which 3d push effect will be started |
 | **pushYOffset** | `number` | Negative margin value to place pushed element upper |
@@ -361,8 +361,8 @@ By default, we are now handle keyboard in hybrid mobile applications and push pa
 If you would like handle this part by yourself, set option `handleKeyboard: false`.
 
 ## Future Goals
+- [Issues] Handle keyboard only for Pane inputs, #125, #127
 - [Docs] ($150 budget) -> Package branding
-- [Enhancements] Handle keyboard only for Pane inputs
 - [Code] Fix immutable issue in breakpoint class
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) - Native Touch Plugin
 - [Docs] (Traffic + Carbon ads) -> Docs engine (F7, Netlify, Gatsby, GH pages)
