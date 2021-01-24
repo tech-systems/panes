@@ -1,7 +1,7 @@
 # Cupertino Pane
 
 [![CircleCI](https://circleci.com/gh/roman-rr/cupertino-pane.svg?style=svg)](https://circleci.com/gh/roman-rr/cupertino-pane)
-![npm](https://img.shields.io/npm/v/cupertino-pane)
+[![Financial Contributors on Open Collective](https://opencollective.com/cupertino-pane/all/badge.svg?label=financial+contributors)](https://opencollective.com/cupertino-pane) ![npm](https://img.shields.io/npm/v/cupertino-pane)
 ![npm](https://img.shields.io/npm/dm/cupertino-pane?color=%23007DC5)
 ![NPM](https://img.shields.io/npm/l/cupertino-pane?color=%23007DC5)
 [![Code Style](https://badgen.net/badge/icon/typescript?icon=typescript&label)](https://www.typescriptlang.org/)
@@ -370,9 +370,32 @@ If you would like handle this part by yourself, set option `handleKeyboard: fals
 - [Showcase] Apple Music F7
 - [Platforms] C++ QT version
 
-## Contributing
+## Contributors
 We are welcome contributions of all kinds from anyone. 
 Please review the [contributing](https://github.com/roman-rr/cupertino-pane/blob/master/CONTRIBUTING.md) guideline.
+
+### Financial Contributors
+
+Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/cupertino-pane/contribute)]
+
+#### Individuals
+
+<a href="https://opencollective.com/cupertino-pane"><img src="https://opencollective.com/cupertino-pane/individuals.svg?width=890"></a>
+
+#### Organizations
+
+Support this project with your organization. Your logo will show up here with a link to your website. [[Contribute](https://opencollective.com/cupertino-pane/contribute)]
+
+<a href="https://opencollective.com/cupertino-pane/organization/0/website"><img src="https://opencollective.com/cupertino-pane/organization/0/avatar.svg"></a>
+<a href="https://opencollective.com/cupertino-pane/organization/1/website"><img src="https://opencollective.com/cupertino-pane/organization/1/avatar.svg"></a>
+<a href="https://opencollective.com/cupertino-pane/organization/2/website"><img src="https://opencollective.com/cupertino-pane/organization/2/avatar.svg"></a>
+<a href="https://opencollective.com/cupertino-pane/organization/3/website"><img src="https://opencollective.com/cupertino-pane/organization/3/avatar.svg"></a>
+<a href="https://opencollective.com/cupertino-pane/organization/4/website"><img src="https://opencollective.com/cupertino-pane/organization/4/avatar.svg"></a>
+<a href="https://opencollective.com/cupertino-pane/organization/5/website"><img src="https://opencollective.com/cupertino-pane/organization/5/avatar.svg"></a>
+<a href="https://opencollective.com/cupertino-pane/organization/6/website"><img src="https://opencollective.com/cupertino-pane/organization/6/avatar.svg"></a>
+<a href="https://opencollective.com/cupertino-pane/organization/7/website"><img src="https://opencollective.com/cupertino-pane/organization/7/avatar.svg"></a>
+<a href="https://opencollective.com/cupertino-pane/organization/8/website"><img src="https://opencollective.com/cupertino-pane/organization/8/avatar.svg"></a>
+<a href="https://opencollective.com/cupertino-pane/organization/9/website"><img src="https://opencollective.com/cupertino-pane/organization/9/avatar.svg"></a>
 
 ## License
 Licensed under the MIT License. [View license](/LICENSE).
