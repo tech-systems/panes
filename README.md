@@ -10,7 +10,7 @@
 <!-- <img src="https://user-images.githubusercontent.com/10646478/79794348-4846bc00-837c-11ea-8b74-7c71fac120aa.png" 
      align="right" alt="Cupertino Pane logo Roman Antonov" width="260px" height="421px"> -->
      
-Cupertino Pane is great modern slide-over pane with touch technologies. <br>
+Cupertino Pane is multi-functional panes & boards with touch technologies. <br>
 
 * **Small.** 5kb (minified and gzipped). No dependencies.
 * **Accelerated.** Hardware accelerated transitions and amazing native behavior.
