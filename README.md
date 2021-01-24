@@ -36,6 +36,7 @@ Cupertino Pane is multi-functional panes & boards with touch technologies. <br>
 ## Demonstration
 - [Base live](https://output.jsbin.com/fuhisey)
 - [Z-Stack live](https://output.jsbin.com/wedegox)
+- [Draggable over live](https://jsbin.com/hamedec)
 - [Prevent dismiss live](https://output.jsbin.com/keravam)
 - [Top-to-bottom live](https://output.jsbin.com/muhabuf)
 - [3D Push live](https://output.jsbin.com/tutegad)
