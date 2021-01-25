@@ -20,10 +20,10 @@ export class CupertinoPane {
   public overflowEl: HTMLElement;
   public el: HTMLElement;
   public contentEl: HTMLElement;
-  private parentEl: HTMLElement;
+  public parentEl: HTMLElement;
+  public backdropEl: HTMLDivElement;
   private draggableEl: HTMLDivElement;
   private moveEl: HTMLDivElement;
-  private backdropEl: HTMLDivElement;
   private destroyButtonEl: HTMLDivElement;
   private followerEl: HTMLElement;
   private pushElement: HTMLElement;
@@ -274,7 +274,7 @@ export class CupertinoPane {
       }      
 
       /****** Attach Events *******/
-      this.attachAllEvents();
+      this.events.attachAllEvents();
 
       /****** Animation & Transition ******/
       if (conf.animate) {
@@ -303,67 +303,6 @@ export class CupertinoPane {
       return this.screen_height - this.breakpoints.topper - this.settings.bottomOffset;
     } 
     return this.breakpoints.bottomer + this.settings.bottomOffset;
-  }
-
-  /**
-   * Private Utils methods
-   */  
-  private attachAllEvents() {
-    if (!this.settings.dragBy) {
-      this.attachEvents(this.paneEl);
-    } else {
-      this.settings.dragBy.forEach((selector) => {
-        const el = document.querySelector(selector);
-        if (el) this.attachEvents(el);
-      });
-    }
-
-    // Handle keyboard events for cordova
-    if (this.settings.handleKeyboard && this.device.cordova) {
-      window.addEventListener('keyboardWillShow', this.events.onKeyboardShowCb);
-      window.addEventListener('keyboardWillHide', this.events.onKeyboardHideCb);
-    }
-
-    // Fix Android issue with resize if not handle
-    if (!this.settings.handleKeyboard 
-        && this.device.cordova
-        && this.device.android) {
-      window.addEventListener('keyboardWillHide', () => {
-        this.parentEl.scrollTop = 0;
-        if (this.parentEl.parentElement) {
-          this.parentEl.parentElement.scrollTop = 0;
-          if (this.parentEl.parentElement.parentElement) {
-            this.parentEl.parentElement.parentElement.scrollTop = 0;
-          }
-        }
-      });
-    }
-
-    window.addEventListener('orientationchange', this.events.onOrientationChangeCb);
-  }
-
-  private detachAllEvents() {
-    if (!this.settings.dragBy) {
-      this.detachEvents(this.paneEl);
-    } else {
-      this.settings.dragBy.forEach((selector) => {
-        const el = document.querySelector(selector);
-        if (el) this.detachEvents(el);
-      });
-    }
-
-    // Handle keyboard events for cordova
-    if (this.settings.handleKeyboard && this.device.cordova) {
-      window.removeEventListener('keyboardWillShow', this.events.onKeyboardShowCb);
-      window.removeEventListener('keyboardWillHide', this.events.onKeyboardHideCb);
-    }
-
-    window.removeEventListener('orientationchange', this.events.onOrientationChangeCb);
-  }
-
-  private resetEvents() {
-    this.detachAllEvents();
-    this.attachAllEvents();
   }
 
   public updateScreenHeights():void {
@@ -413,10 +352,6 @@ export class CupertinoPane {
         - this.settings.topperOverflowOffset
         - this.overflowEl.offsetTop}px`;
     }
-  }
-
-  private getTimingFunction(bounce) {
-    return bounce ? 'cubic-bezier(0.175, 0.885, 0.370, 1.120)' : this.settings.animationType;
   }
 
   public checkOpacityAttr(val) {
@@ -501,6 +436,13 @@ export class CupertinoPane {
     return closest;
   }
 
+  /**
+   * Private Utils methods
+   */  
+  private getTimingFunction(bounce) {
+    return bounce ? 'cubic-bezier(0.175, 0.885, 0.370, 1.120)' : this.settings.animationType;
+  }
+
   private isBackdropPresented() {
     return document.querySelector(`.cupertino-pane-wrapper .backdrop`) 
     ? true : false;
@@ -551,7 +493,7 @@ export class CupertinoPane {
     if (!this.isBackdropPresented()) {
       this.renderBackdrop();
       // Reset events to attach backdrop stop propagation
-      this.resetEvents();
+      this.events.resetEvents();
     }
 
     const transitionEnd = () => {
@@ -573,108 +515,6 @@ export class CupertinoPane {
       setTimeout(() => {
         this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
       }, 50);
-    }
-  }
-
- 
-  /************************************
-   * Events
-   */
-  private touchEvents = (() => {
-    const touch = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
-    let desktop = ['mousedown', 'mousemove', 'mouseup'];
-    if (Support.pointerEvents) {
-      desktop = ['pointerdown', 'pointermove', 'pointerup'];
-    }
-    const touchEventsTouch = {
-      start: touch[0],
-      move: touch[1],
-      end: touch[2],
-      cancel: touch[3],
-    };
-    const touchEventsDesktop = {
-      start: desktop[0],
-      move: desktop[1],
-      end: desktop[2],
-    };
-    return Support.touch || !this.settings.simulateTouch ? touchEventsTouch : touchEventsDesktop;
-  })();
-
-  private attachEvents(el: Element) {
-    // Touch Events
-    if (!Support.touch && Support.pointerEvents) {
-      el.addEventListener(this.touchEvents.start, this.events.touchStartCb, false);
-      el.addEventListener(this.touchEvents.move, this.events.touchMoveCb, false);
-      el.addEventListener(this.touchEvents.end, this.events.touchEndCb, false);
-      
-      // Backdrop propagation fix
-      this.backdropEl?.addEventListener(this.touchEvents.move, this.events.touchMoveBackdropCb, false);
-    } else {
-
-      if (Support.touch) {
-        const passiveListener = this.touchEvents.start === 'touchstart' && Support.passiveListener && this.settings.passiveListeners ? { passive: true, capture: false } : false;
-        el.addEventListener(this.touchEvents.start, this.events.touchStartCb, passiveListener);
-        el.addEventListener(this.touchEvents.move, this.events.touchMoveCb, Support.passiveListener ? { passive: false, capture: false } : false);
-        el.addEventListener(this.touchEvents.end, this.events.touchEndCb, passiveListener);
-        
-        // Backdrop propagation fix
-        this.backdropEl?.addEventListener(this.touchEvents.move, this.events.touchMoveBackdropCb, Support.passiveListener ? { passive: false, capture: false } : false);
-        if (this.touchEvents['cancel']) {
-          el.addEventListener(this.touchEvents['cancel'], this.events.touchEndCb, passiveListener);
-        }
-      }
-
-      if ((this.settings.simulateTouch && !this.device.ios && !this.device.android) || (this.settings.simulateTouch && !Support.touch && this.device.ios)) {
-        el.addEventListener('mousedown', this.events.touchStartCb, false);
-        el.addEventListener('mousemove', this.events.touchMoveCb, false);
-        el.addEventListener('mouseup', this.events.touchEndCb, false);
-        
-        // Backdrop propagation fix
-        this.backdropEl?.addEventListener('mousemove', this.events.touchMoveBackdropCb, false);
-      }
-    }
-
-    // Prevent accidental unwanted clicks events during swiping
-    if (this.settings.preventClicks) {
-      el.addEventListener('click', this.events.onClickCb, true);
-    }
-  }
-
-  private detachEvents(el: Element) { 
-    // Touch Events
-    if (!Support.touch && Support.pointerEvents) {
-      el.removeEventListener(this.touchEvents.start, this.events.touchStartCb, false);
-      el.removeEventListener(this.touchEvents.move, this.events.touchMoveCb, false);
-      el.removeEventListener(this.touchEvents.end, this.events.touchEndCb, false);
-      
-      // Backdrop propagation fix
-      this.backdropEl?.removeEventListener(this.touchEvents.move, this.events.touchMoveBackdropCb, false);
-    } else {
-      if (Support.touch) {
-        const passiveListener = this.touchEvents.start === 'onTouchStart' && Support.passiveListener && this.settings.passiveListeners ? { passive: true, capture: false } : false;
-        el.removeEventListener(this.touchEvents.start, this.events.touchStartCb, passiveListener);
-        el.removeEventListener(this.touchEvents.move, this.events.touchMoveCb, false);
-        el.removeEventListener(this.touchEvents.end, this.events.touchEndCb, passiveListener);
-        
-        // Backdrop propagation fix
-        this.backdropEl?.removeEventListener(this.touchEvents.move, this.events.touchMoveBackdropCb, false);
-        if (this.touchEvents['cancel']) {
-          el.removeEventListener(this.touchEvents['cancel'], this.events.touchEndCb, passiveListener);
-        }
-      }
-      if ((this.settings.simulateTouch && !this.device.ios && !this.device.android) || (this.settings.simulateTouch && !Support.touch && this.device.ios)) {
-        el.removeEventListener('mousedown', this.events.touchStartCb, false);
-        el.removeEventListener('mousemove', this.events.touchMoveCb, false);
-        el.removeEventListener('mouseup', this.events.touchEndCb, false);
-        
-        // Backdrop propagation fix
-        this.backdropEl?.removeEventListener('mousemove', this.events.touchMoveBackdropCb, false);
-      }
-    }
-
-    // Prevent accidental unwanted clicks events during swiping
-    if (this.settings.preventClicks) {
-      el.removeEventListener('click', this.events.onClickCb, true);
     }
   }
 
@@ -798,7 +638,7 @@ export class CupertinoPane {
       return null;
     }
 
-    this.breakpoints.getCurrentBreakName();
+    return this.breakpoints.getCurrentBreakName();
   };
 
   private destroyResets(): void {
@@ -806,7 +646,7 @@ export class CupertinoPane {
     this.wrapperEl.remove();
     
     /****** Detach Events *******/
-    this.detachAllEvents();
+    this.events.detachAllEvents();
 
     // Reset vars
     delete this.rendered;

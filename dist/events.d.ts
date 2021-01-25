@@ -19,6 +19,11 @@ export declare class Events {
     private steps;
     private inputBlured;
     constructor(instance: CupertinoPane, settings: CupertinoSettings, device: Device, breakpoints: Breakpoints);
+    attachAllEvents(): void;
+    detachAllEvents(): void;
+    resetEvents(): void;
+    private touchEvents;
+    private eventListeners;
     /**
      * Touch Start Event
      * @param t

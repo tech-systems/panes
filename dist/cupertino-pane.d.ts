@@ -14,10 +14,10 @@ export declare class CupertinoPane {
     overflowEl: HTMLElement;
     el: HTMLElement;
     contentEl: HTMLElement;
-    private parentEl;
+    parentEl: HTMLElement;
+    backdropEl: HTMLDivElement;
     private draggableEl;
     private moveEl;
-    private backdropEl;
     private destroyButtonEl;
     private followerEl;
     private pushElement;
@@ -31,20 +31,17 @@ export declare class CupertinoPane {
         animate: boolean;
     }): Promise<void>;
     getPaneHeight(): number;
-    /**
-     * Private Utils methods
-     */
-    private attachAllEvents;
-    private detachAllEvents;
-    private resetEvents;
     updateScreenHeights(): void;
     scrollElementInit(): void;
     setOverflowHeight(offset?: number): void;
-    private getTimingFunction;
     checkOpacityAttr(val: any): void;
     checkOverflowAttr(val: any): void;
     isPanePresented(): boolean;
     swipeNextPoint: (diff: any, maxDiff: any, closest: any) => any;
+    /**
+     * Private Utils methods
+     */
+    private getTimingFunction;
     private isBackdropPresented;
     private renderBackdrop;
     /**
@@ -58,12 +55,6 @@ export declare class CupertinoPane {
     backdrop(conf?: {
         show: boolean;
     }): any;
-    /************************************
-     * Events
-     */
-    private touchEvents;
-    private attachEvents;
-    private detachEvents;
     getPanelTransformY(): number;
     /************************************
      * Public user methods

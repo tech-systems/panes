@@ -1,5 +1,6 @@
 import { CupertinoPane, CupertinoSettings } from 'cupertino-pane';
 import { Device } from './device';
+import { Support } from './support';
 import { Breakpoints } from './breakpoints';
 
 /**
@@ -25,6 +26,124 @@ export class Events {
               private breakpoints: Breakpoints) {
   }
 
+  public attachAllEvents() {
+    if (!this.settings.dragBy) {
+      this.eventListeners('addEventListener', this.instance.paneEl);
+    } else {
+      this.settings.dragBy.forEach((selector) => {
+        const el = document.querySelector(selector);
+        if (el) this.eventListeners('addEventListener', el);
+      });
+    }
+
+    // Handle keyboard events for cordova
+    if (this.settings.handleKeyboard && this.device.cordova) {
+      window.addEventListener('keyboardWillShow', this.onKeyboardShowCb);
+      window.addEventListener('keyboardWillHide', this.onKeyboardHideCb);
+    }
+
+    // Fix Android issue with resize if not handle
+    if (!this.settings.handleKeyboard 
+        && this.device.cordova
+        && this.device.android) {
+      window.addEventListener('keyboardWillHide', () => {
+        this.instance.parentEl.scrollTop = 0;
+        if (this.instance.parentEl.parentElement) {
+          this.instance.parentEl.parentElement.scrollTop = 0;
+          if (this.instance.parentEl.parentElement.parentElement) {
+            this.instance.parentEl.parentElement.parentElement.scrollTop = 0;
+          }
+        }
+      });
+    }
+
+    window.addEventListener('orientationchange', this.onOrientationChangeCb);
+  }
+
+  public detachAllEvents() {
+    if (!this.settings.dragBy) {
+      this.eventListeners('removeEventListener', this.instance.paneEl);
+    } else {
+      this.settings.dragBy.forEach((selector) => {
+        const el = document.querySelector(selector);
+        if (el) this.eventListeners('removeEventListener', el);
+      });
+    }
+
+    // Handle keyboard events for cordova
+    if (this.settings.handleKeyboard && this.device.cordova) {
+      window.removeEventListener('keyboardWillShow', this.onKeyboardShowCb);
+      window.removeEventListener('keyboardWillHide', this.onKeyboardHideCb);
+    }
+
+    window.removeEventListener('orientationchange', this.onOrientationChangeCb);
+  }
+
+  public resetEvents() {
+    this.detachAllEvents();
+    this.attachAllEvents();
+  }
+
+  private touchEvents = (() => {
+    const touch = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
+    let desktop = ['mousedown', 'mousemove', 'mouseup'];
+    if (Support.pointerEvents) {
+      desktop = ['pointerdown', 'pointermove', 'pointerup'];
+    }
+    const touchEventsTouch = {
+      start: touch[0],
+      move: touch[1],
+      end: touch[2],
+      cancel: touch[3],
+    };
+    const touchEventsDesktop = {
+      start: desktop[0],
+      move: desktop[1],
+      end: desktop[2],
+    };
+    return Support.touch || !this.settings.simulateTouch ? touchEventsTouch : touchEventsDesktop;
+  })();
+
+  private eventListeners(type: 'addEventListener' | 'removeEventListener', el: Element) {
+    // Touch Events
+    if (!Support.touch && Support.pointerEvents) {
+      el[type](this.touchEvents.start, this.touchStartCb, false);
+      el[type](this.touchEvents.move, this.touchMoveCb, false);
+      el[type](this.touchEvents.end, this.touchEndCb, false);
+      
+      // Backdrop propagation fix
+      this.instance.backdropEl?.[type](this.touchEvents.move, this.touchMoveBackdropCb, false);
+    } else {
+
+      if (Support.touch) {
+        const passiveListener = this.touchEvents.start === 'touchstart' && Support.passiveListener && this.settings.passiveListeners ? { passive: true, capture: false } : false;
+        el[type](this.touchEvents.start, this.touchStartCb, passiveListener);
+        el[type](this.touchEvents.move, this.touchMoveCb, Support.passiveListener ? { passive: false, capture: false } : false);
+        el[type](this.touchEvents.end, this.touchEndCb, passiveListener);
+        
+        // Backdrop propagation fix
+        this.instance.backdropEl?.[type](this.touchEvents.move, this.touchMoveBackdropCb, Support.passiveListener ? { passive: false, capture: false } : false);
+        if (this.touchEvents['cancel']) {
+          el[type](this.touchEvents['cancel'], this.touchEndCb, passiveListener);
+        }
+      }
+
+      if ((this.settings.simulateTouch && !this.device.ios && !this.device.android) || (this.settings.simulateTouch && !Support.touch && this.device.ios)) {
+        el[type]('mousedown', this.touchStartCb, false);
+        el[type]('mousemove', this.touchMoveCb, false);
+        el[type]('mouseup', this.touchEndCb, false);
+        
+        // Backdrop propagation fix
+        this.instance.backdropEl?.[type]('mousemove', this.touchMoveBackdropCb, false);
+      }
+    }
+
+    // Prevent accidental unwanted clicks events during swiping
+    if (this.settings.preventClicks) {
+      el[type]('click', this.onClickCb, true);
+    }
+  }
+  
   /**
    * Touch Start Event
    * @param t 
