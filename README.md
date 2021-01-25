@@ -35,7 +35,7 @@ Cupertino Pane is multi-functional panes & boards with touch technologies. <br>
 * [Changelog](https://github.com/roman-rr/cupertino-pane/blob/master/CHANGELOG.md)
 * [License](#license)
 
-### Financial Contributors
+## Financial Contributors
 
 Become a financial contributor and help us sustain our community. [[Contribute](https://opencollective.com/cupertino-pane/contribute)]
 
