@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.2.32
+ * Cupertino Pane 1.2.4
  * Multiplatform slide-over pane
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: January 26, 2021
+ * Released on: January 28, 2021
  */
 
 /*! *****************************************************************************
@@ -187,7 +187,8 @@ class Events {
         this.pointerDown = false;
         this.contentScrollTop = 0;
         this.steps = [];
-        this.inputBlured = false;
+        this.inputBluredbyMove = false;
+        this.movedByKeyboard = false;
         this.touchEvents = (() => {
             const touch = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
             let desktop = ['mousedown', 'mousemove', 'mouseup'];
@@ -246,7 +247,7 @@ class Events {
          * Window resize event
          * @param e
          */
-        this.onOrientationChangeCb = (e) => this.onOrientationChange(e);
+        this.onWindowResizeCb = (e) => this.onWindowResize(e);
     }
     attachAllEvents() {
         if (!this.settings.dragBy) {
@@ -278,7 +279,8 @@ class Events {
                 }
             });
         }
-        window.addEventListener('orientationchange', this.onOrientationChangeCb);
+        // Orientation change + window resize
+        window.addEventListener('resize', this.onWindowResizeCb);
     }
     detachAllEvents() {
         if (!this.settings.dragBy) {
@@ -296,7 +298,8 @@ class Events {
             window.removeEventListener('keyboardWillShow', this.onKeyboardShowCb);
             window.removeEventListener('keyboardWillHide', this.onKeyboardHideCb);
         }
-        window.removeEventListener('orientationchange', this.onOrientationChangeCb);
+        // Orientation change + window resize
+        window.removeEventListener('resize', this.onWindowResizeCb);
     }
     resetEvents() {
         this.detachAllEvents();
@@ -401,7 +404,7 @@ class Events {
             if (this.isFormElement(document.activeElement)
                 && !(this.isFormElement(t.target))) {
                 document.activeElement.blur();
-                this.inputBlured = true;
+                this.inputBluredbyMove = true;
             }
         }
         // Touch angle
@@ -550,54 +553,64 @@ class Events {
         }
     }
     onKeyboardShow(e) {
-        // TODO: instead of this -> check that inputBlured is instance child
-        if (this.instance.paneEl
-            && this.instance.paneEl.offsetWidth === 0
-            && this.instance.paneEl.offsetHeight === 0) {
+        // focud element not inside pane
+        if (!this.isPaneDescendant(document.activeElement)) {
             return;
         }
-        // TODO!
+        // pane not visible on viewport
+        if (!this.isOnViewport()) {
+            return;
+        }
         if (this.device.android) {
             setTimeout(() => this.fixAndroidResize(), 20);
         }
+        this.movedByKeyboard = true;
         this.breakpoints.prevBreakpoint = Object.entries(this.breakpoints.breaks).find(val => val[1] === this.instance.getPanelTransformY())[0];
         let newHeight = this.settings.breaks[this.instance.currentBreak()].height + e.keyboardHeight;
-        if (this.instance.screen_height < newHeight) {
-            let diff = newHeight - this.instance.screen_height + (135 * 0.35);
-            newHeight = this.instance.screen_height - (135 * 0.35);
-            this.instance.setOverflowHeight(e.keyboardHeight);
-            this.instance.moveToBreak(this.settings.breaks.top.enabled ? 'top' : 'middle');
+        // Landscape case
+        let isLandscape = window.matchMedia('(orientation: landscape)').matches;
+        if (isLandscape) {
+            newHeight = this.instance.screen_height;
         }
-        else {
-            this.instance.setOverflowHeight(e.keyboardHeight);
+        // higher than screen + offsets
+        if (newHeight > this.instance.screen_height - 80) {
+            newHeight = this.instance.screen_height - 80;
+        }
+        // Move pane up if new position more than 50px
+        if (newHeight - 50 >= this.settings.breaks[this.instance.currentBreak()].height) {
             this.instance.moveToHeight(newHeight);
-            setTimeout(() => this.instance.overflowEl.scrollTop = document.activeElement.offsetTop);
         }
+        // Remove offset because on new height no offsets needs
+        // Timeout await for keyboard presented
+        setTimeout(() => {
+            this.instance.setOverflowHeight(e.keyboardHeight - this.settings.topperOverflowOffset);
+            this.instance.overflowEl.scrollTop = document.activeElement.offsetTop;
+        }, 300);
     }
     onKeyboardHide(e) {
-        // TODO: instead of this -> check that inputBlured is instance child
-        if (this.instance.paneEl
-            && this.instance.paneEl.offsetWidth === 0
-            && this.instance.paneEl.offsetHeight === 0) {
+        // Move back
+        if (!this.movedByKeyboard) {
             return;
         }
-        // TODO! 
+        // pane not visible on viewport
+        if (!this.isOnViewport()) {
+            return;
+        }
         if (this.device.android) {
             this.fixAndroidResize();
         }
-        if (this.inputBlured) {
-            this.inputBlured = false;
+        this.movedByKeyboard = false;
+        this.instance.setOverflowHeight();
+        if (this.inputBluredbyMove) {
+            this.inputBluredbyMove = false;
+            return;
         }
-        else {
-            if (!this.instance.isHidden()) {
-                this.instance.moveToBreak(this.breakpoints.prevBreakpoint);
-            }
+        if (!this.instance.isHidden()) {
+            this.instance.moveToBreak(this.breakpoints.prevBreakpoint);
         }
-        setTimeout(() => this.instance.setOverflowHeight());
     }
-    onOrientationChange(e) {
+    onWindowResize(e) {
         return __awaiter(this, void 0, void 0, function* () {
-            // Browsers issue: Currently no proper way to get window.innerHeight without timeout
             yield new Promise((resolve) => setTimeout(() => resolve(true), 150));
             this.instance.updateScreenHeights();
             this.breakpoints.buildBreakpoints(JSON.parse(this.breakpoints.lockedBreakpoints), false);
@@ -637,6 +650,16 @@ class Events {
         }
         return true;
     }
+    isPaneDescendant(el) {
+        let node = el.parentNode;
+        while (node != null) {
+            if (node == this.instance.paneEl) {
+                return true;
+            }
+            node = node.parentNode;
+        }
+        return false;
+    }
     isFormElement(el) {
         const formElements = [
             'input', 'select', 'option',
@@ -650,6 +673,14 @@ class Events {
     }
     isElementScrollable(el) {
         return el.scrollHeight > el.clientHeight ? true : false;
+    }
+    isOnViewport() {
+        if (this.instance.paneEl
+            && this.instance.paneEl.offsetWidth === 0
+            && this.instance.paneEl.offsetHeight === 0) {
+            return false;
+        }
+        return true;
     }
 }
 
@@ -755,7 +786,7 @@ class Breakpoints {
             }
             ['top', 'middle', 'bottom'].forEach((val) => {
                 // bottom offset for bulletins
-                var _a, _b;
+                var _a;
                 this.breaks[val] -= this.settings.bottomOffset;
                 // Set default if no exist
                 if (!this.settings.breaks[val]) {
@@ -770,10 +801,11 @@ class Breakpoints {
                     if (((_a = this.settings.breaks[val]) === null || _a === void 0 ? void 0 : _a.height) > this.instance.screen_height) {
                         this.settings.breaks[val].height = this.instance.screen_height - this.settings.bottomOffset;
                     }
-                    if (this.settings.breaks['top'] && this.settings.breaks['middle']
-                        && this.settings.breaks['top'].height === ((_b = this.settings.breaks['middle']) === null || _b === void 0 ? void 0 : _b.height)) {
-                        this.settings.breaks['middle'].enabled = false;
-                        this.settings.initialBreak = 'top';
+                    if (this.settings.breaks['top'] && this.settings.breaks['middle']) {
+                        if (this.settings.breaks['top'].height - 50 <= this.settings.breaks['middle'].height) {
+                            this.settings.breaks['middle'].enabled = false;
+                            this.settings.initialBreak = 'top';
+                        }
                     }
                 }
                 // fitHeight (bullet-in styles fir screen)
@@ -801,12 +833,11 @@ class Breakpoints {
                     }
                 }
             });
-            // Save breakpoints (not for resize event)
-            // TODO: solve immutable issue: 1.Weak set 2. Use In events.ts
-            if (lock) {
+            // initial lock on present
+            if (!this.lockedBreakpoints) {
                 this.lockedBreakpoints = JSON.stringify(this.settings.breaks);
             }
-            // Warnings 
+            // Warnings
             if (!this.instance.isPanePresented()) {
                 if (!this.settings.breaks[this.settings.initialBreak].enabled) {
                     console.warn('Cupertino Pane: Please set initialBreak for enabled breakpoint');
@@ -1254,12 +1285,6 @@ class CupertinoPane {
         }
     }
     setOverflowHeight(offset = 0) {
-        // overflowEl is not visible - ignoring execution
-        // TODO: inputs only for visible elements
-        if (this.overflowEl.offsetHeight === 0
-            && this.overflowEl.offsetWidth === 0) {
-            return;
-        }
         if (!this.settings.inverse) {
             this.overflowEl.style.height = `${this.getPaneHeight()
                 - this.settings.topperOverflowOffset

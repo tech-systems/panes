@@ -17,7 +17,8 @@ export declare class Events {
     private startY;
     private startX;
     private steps;
-    private inputBlured;
+    private inputBluredbyMove;
+    private movedByKeyboard;
     constructor(instance: CupertinoPane, settings: CupertinoSettings, device: Device, breakpoints: Breakpoints);
     attachAllEvents(): void;
     detachAllEvents(): void;
@@ -70,8 +71,8 @@ export declare class Events {
      * Window resize event
      * @param e
      */
-    onOrientationChangeCb: (e: any) => Promise<void>;
-    private onOrientationChange;
+    onWindowResizeCb: (e: any) => Promise<void>;
+    private onWindowResize;
     /**
      * Private class methods
      */
@@ -85,6 +86,8 @@ export declare class Events {
      */
     private isDragScrollabe;
     private willScrolled;
+    private isPaneDescendant;
     private isFormElement;
     private isElementScrollable;
+    private isOnViewport;
 }

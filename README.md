@@ -387,9 +387,7 @@ By default, we are now handle keyboard in hybrid mobile applications and push pa
 If you would like handle this part by yourself, set option `handleKeyboard: false`.
 
 ## Future Goals
-- [Issues] Handle keyboard only for Pane inputs, #125, #127
 - [Docs] ($150 budget) -> Package branding
-- [Code] Fix immutable issue in breakpoint class
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) - Native Touch Plugin
 - [Docs] (Traffic + Carbon ads) -> Docs engine (F7, Netlify, Gatsby, GH pages)
 - [Showcase] Apple Music F7

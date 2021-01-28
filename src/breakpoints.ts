@@ -77,10 +77,11 @@ export class Breakpoints {
         if (this.settings.breaks[val]?.height > this.instance.screen_height) { 
           this.settings.breaks[val].height = this.instance.screen_height - this.settings.bottomOffset;
         }
-        if (this.settings.breaks['top'] && this.settings.breaks['middle'] 
-            && this.settings.breaks['top'].height === this.settings.breaks['middle']?.height) {
-          this.settings.breaks['middle'].enabled = false;
-          this.settings.initialBreak = 'top';
+        if (this.settings.breaks['top'] && this.settings.breaks['middle']) {
+          if (this.settings.breaks['top'].height - 50 <= this.settings.breaks['middle'].height) {
+            this.settings.breaks['middle'].enabled = false;
+            this.settings.initialBreak = 'top';
+          }
         }
       }
 
@@ -109,13 +110,12 @@ export class Breakpoints {
       }
     });
 
-    // Save breakpoints (not for resize event)
-    // TODO: solve immutable issue: 1.Weak set 2. Use In events.ts
-    if (lock) {
+    // initial lock on present
+    if (!this.lockedBreakpoints) {
       this.lockedBreakpoints = JSON.stringify(this.settings.breaks);
     }
-
-    // Warnings 
+    
+    // Warnings
     if (!this.instance.isPanePresented()) {
       if (!this.settings.breaks[this.settings.initialBreak].enabled) {
         console.warn('Cupertino Pane: Please set initialBreak for enabled breakpoint');

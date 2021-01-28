@@ -2,6 +2,16 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.2.4] - 2021-01-28
+
+### Enhancements
+- Keyboard will move pane up, only if focused element is child of Pane
+- `window.resize` events are now automatically managed [#127](https://github.com/roman-rr/cupertino-pane/issues/127)
+
+### Bug Fixes
+- Fixed `currentBreak()` method
+- Fixed and improved keyboard events [#125](https://github.com/roman-rr/cupertino-pane/issues/125)
+
 ## [1.2.3] - 2021-01-22
 
 ### Features

@@ -334,13 +334,6 @@ export class CupertinoPane {
   }
 
   public setOverflowHeight(offset = 0) {
-    // overflowEl is not visible - ignoring execution
-    // TODO: inputs only for visible elements
-    if (this.overflowEl.offsetHeight === 0 
-         && this.overflowEl.offsetWidth === 0) {
-      return;
-    }
-    
     if (!this.settings.inverse) {
       this.overflowEl.style.height = `${this.getPaneHeight()
         - this.settings.topperOverflowOffset
@@ -730,7 +723,6 @@ export class CupertinoPane {
    * Transitions handler
    */
   public doTransition(params:any = {}): void {
-
     // touchmove simple event
     if (params.type === 'move') {
       this.paneEl.style.transition = 'all 0ms linear 0ms';

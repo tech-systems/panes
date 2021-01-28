@@ -17,7 +17,8 @@ export class Events {
   private startY: number;
   private startX: number;
   private steps: any[] = [];  
-  private inputBlured: boolean = false;
+  private inputBluredbyMove: boolean = false;
+  private movedByKeyboard: boolean = false;
   
   
   constructor(private instance: CupertinoPane, 
@@ -57,7 +58,8 @@ export class Events {
       });
     }
 
-    window.addEventListener('orientationchange', this.onOrientationChangeCb);
+    // Orientation change + window resize
+    window.addEventListener('resize', this.onWindowResizeCb);
   }
 
   public detachAllEvents() {
@@ -76,7 +78,8 @@ export class Events {
       window.removeEventListener('keyboardWillHide', this.onKeyboardHideCb);
     }
 
-    window.removeEventListener('orientationchange', this.onOrientationChangeCb);
+    // Orientation change + window resize
+    window.removeEventListener('resize', this.onWindowResizeCb);
   }
 
   public resetEvents() {
@@ -232,7 +235,7 @@ export class Events {
       if (this.isFormElement(document.activeElement)
       && !(this.isFormElement(t.target))) {
         (<any>document.activeElement).blur();
-        this.inputBlured = true;
+        this.inputBluredbyMove = true;
       }
     }
 
@@ -422,31 +425,46 @@ export class Events {
    */
   public onKeyboardShowCb = (e) => this.onKeyboardShow(e);
   private onKeyboardShow(e) {
-    // TODO: instead of this -> check that inputBlured is instance child
-    if (this.instance.paneEl 
-      && this.instance.paneEl.offsetWidth === 0 
-      && this.instance.paneEl.offsetHeight === 0 ) {
+    // focud element not inside pane
+    if (!this.isPaneDescendant(document.activeElement)) {
       return;
     }
-    // TODO!
+
+    // pane not visible on viewport
+    if (!this.isOnViewport()) {
+      return;
+    }
 
     if (this.device.android) {
       setTimeout(() => this.fixAndroidResize(), 20);
     }
 
+    this.movedByKeyboard = true;
     this.breakpoints.prevBreakpoint = Object.entries(this.breakpoints.breaks).find(val => val[1] === this.instance.getPanelTransformY())[0];
     let newHeight = this.settings.breaks[this.instance.currentBreak()].height + e.keyboardHeight;
-
-    if (this.instance.screen_height < newHeight) {
-      let diff = newHeight - this.instance.screen_height + (135 * 0.35);
-      newHeight = this.instance.screen_height - (135 * 0.35);
-      this.instance.setOverflowHeight(e.keyboardHeight);
-      this.instance.moveToBreak(this.settings.breaks.top.enabled ? 'top' : 'middle');
-    } else {
-      this.instance.setOverflowHeight(e.keyboardHeight);
-      this.instance.moveToHeight(newHeight);
-      setTimeout(() => this.instance.overflowEl.scrollTop = (<any>document.activeElement).offsetTop);
+    
+    // Landscape case
+    let isLandscape = window.matchMedia('(orientation: landscape)').matches;
+    if (isLandscape) {
+      newHeight = this.instance.screen_height;
     }
+
+    // higher than screen + offsets
+    if (newHeight > this.instance.screen_height - 80) {
+      newHeight = this.instance.screen_height - 80;
+    }
+
+    // Move pane up if new position more than 50px
+    if (newHeight - 50 >= this.settings.breaks[this.instance.currentBreak()].height) {
+      this.instance.moveToHeight(newHeight);
+    } 
+
+    // Remove offset because on new height no offsets needs
+    // Timeout await for keyboard presented
+    setTimeout(() => {
+      this.instance.setOverflowHeight(e.keyboardHeight - this.settings.topperOverflowOffset);
+      this.instance.overflowEl.scrollTop = (<any>document.activeElement).offsetTop;
+    }, 300);
   }
 
   /**
@@ -455,36 +473,40 @@ export class Events {
    */
   public onKeyboardHideCb = (e) => this.onKeyboardHide(e);
   private onKeyboardHide(e) {
-    // TODO: instead of this -> check that inputBlured is instance child
-    if (this.instance.paneEl 
-      && this.instance.paneEl.offsetWidth === 0 
-      && this.instance.paneEl.offsetHeight === 0 ) {
+    // Move back
+    if (!this.movedByKeyboard) {
       return;
     }
-    // TODO! 
+
+    // pane not visible on viewport
+    if (!this.isOnViewport()) {
+      return;
+    }
 
     if (this.device.android) {
       this.fixAndroidResize();
     }    
 
-    if (this.inputBlured) {
-      this.inputBlured = false;
-    } else {
-      if (!this.instance.isHidden()) {
-        this.instance.moveToBreak(this.breakpoints.prevBreakpoint);
-      }
-    }
+    this.movedByKeyboard = false;
 
-    setTimeout(() => this.instance.setOverflowHeight());
+    this.instance.setOverflowHeight();
+
+    if (this.inputBluredbyMove) {
+      this.inputBluredbyMove = false;
+      return;
+    } 
+
+    if (!this.instance.isHidden()) {
+      this.instance.moveToBreak(this.breakpoints.prevBreakpoint);
+    }
   }
 
   /**
    * Window resize event
    * @param e
    */
-  public onOrientationChangeCb = (e) => this.onOrientationChange(e);
-  private async onOrientationChange(e) {
-    // Browsers issue: Currently no proper way to get window.innerHeight without timeout
+  public onWindowResizeCb = (e) => this.onWindowResize(e);
+  private async onWindowResize(e) {
     await new Promise((resolve) => setTimeout(() => resolve(true), 150));
     this.instance.updateScreenHeights();
     this.breakpoints.buildBreakpoints(JSON.parse(this.breakpoints.lockedBreakpoints), false);
@@ -528,6 +550,17 @@ export class Events {
     return true;
   }
 
+  private isPaneDescendant(el): boolean {
+    let node = el.parentNode;
+    while (node != null) {
+        if (node == this.instance.paneEl) {
+            return true;
+        }
+        node = node.parentNode;
+    }
+    return false;
+  }
+
   private isFormElement(el):boolean {
     const formElements: string[] = [
       'input', 'select', 'option', 
@@ -544,4 +577,15 @@ export class Events {
   private isElementScrollable(el):boolean {
     return el.scrollHeight > el.clientHeight ? true : false;
   }
+
+  private isOnViewport(): boolean {
+    if (this.instance.paneEl 
+        && this.instance.paneEl.offsetWidth === 0 
+        && this.instance.paneEl.offsetHeight === 0 ) {
+      return false;
+    }
+
+    return true;
+  }
+
 }
