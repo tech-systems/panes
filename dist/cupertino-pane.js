@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: January 28, 2021
+ * Released on: January 30, 2021
  */
  
  
@@ -1458,9 +1458,13 @@ class CupertinoPane {
     }
     calcFitHeight() {
         return __awaiter(this, void 0, void 0, function* () {
+            // Allow user to call method asap, dont check with this.isPanePresented()
+            if (!this.wrapperEl || !this.el) {
+                return null;
+            }
             if (this.breakpoints.calcHeightInProcess) {
                 console.warn(`Cupertino Pane: calcFitHeight() already in process`);
-                return;
+                return null;
             }
             yield this.breakpoints.buildBreakpoints(this.breakpoints.lockedBreakpoints);
         });

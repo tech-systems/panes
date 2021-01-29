@@ -566,8 +566,8 @@ export class CupertinoPane {
   }
 
   public async calcFitHeight() {
-    if (!this.isPanePresented()) {
-      console.warn(`Cupertino Pane: Present pane before call calcFitHeight()`);
+    // Allow user to call method asap, dont check with this.isPanePresented()
+    if (!this.wrapperEl || !this.el) {
       return null;
     }
     
