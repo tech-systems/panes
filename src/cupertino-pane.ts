@@ -566,9 +566,14 @@ export class CupertinoPane {
   }
 
   public async calcFitHeight() {
+    if (!this.isPanePresented()) {
+      console.warn(`Cupertino Pane: Present pane before call calcFitHeight()`);
+      return null;
+    }
+    
     if (this.breakpoints.calcHeightInProcess) {
       console.warn(`Cupertino Pane: calcFitHeight() already in process`);
-      return;
+      return null;
     }
 
     await this.breakpoints.buildBreakpoints(this.breakpoints.lockedBreakpoints);
