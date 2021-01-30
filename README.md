@@ -387,7 +387,7 @@ By default, we are now handle keyboard in hybrid mobile applications and push pa
 If you would like handle this part by yourself, set option `handleKeyboard: false`.
 
 ## Future Goals
-<!-- https://codepen.io/TurkAysenur/full/ZEpxeYm -->
+<!-- https://codepen.io/TurkAysenur/full/ZEpxeYm + glass + metal three -->
 - [Docs] ($150 budget) -> Package branding
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) - Native Touch Plugin
 - [Docs] (Traffic + Carbon ads) -> Docs engine (F7, Netlify, Gatsby, GH pages)
