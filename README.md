@@ -390,6 +390,7 @@ If you would like handle this part by yourself, set option `handleKeyboard: fals
 - [Docs] ($150 budget) -> Package branding
 - [Enhancement] Z-stack with N cards
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) - Native Touch Plugin
+- [Feature] R-Pane (Rectangular pane - safari video frame example)
 - [Docs] (Traffic + Carbon ads) -> Docs engine (F7, Netlify, Gatsby, GH pages)
 - [Showcase] Materials (glass/metal/blur) <!-- https://codepen.io/TurkAysenur/full/ZEpxeYm + glass + metal three -->
 - [Showcase] Apple Music F7
