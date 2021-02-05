@@ -1,4 +1,4 @@
-# Cupertino Pane
+# Cupertino Panes
 
 [![CircleCI](https://circleci.com/gh/roman-rr/cupertino-pane.svg?style=svg)](https://circleci.com/gh/roman-rr/cupertino-pane)
 ![npm](https://img.shields.io/npm/v/cupertino-pane)
@@ -387,7 +387,6 @@ By default, we are now handle keyboard in hybrid mobile applications and push pa
 If you would like handle this part by yourself, set option `handleKeyboard: false`.
 
 ## Future Goals
-- [Docs] ($150 budget) -> Package branding
 - [Enhancement] Z-stack with N cards
 - [Feature] Chevron-up draggable
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) - Native Touch Plugin
