@@ -398,6 +398,7 @@ If you would like handle this part by yourself, set option `handleKeyboard: fals
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) - Native Touch Plugin
 - [Feature] R-Pane (Rectangular pane - safari video frame example)
 - [Docs] (Traffic + Carbon ads) -> Docs engine <!-- Ask Vladimir first + check https://github.com/denoland/doc_website https://github.com/ionic-team/ionic-docs (Swiper, F7, Netlify, Gatsby, DO, GH pages) -->
+- [Showcase] No background - glow for view + (collaboration with arwes)
 - [Showcase] Materials (glass/metal/blur) <!-- https://codepen.io/TurkAysenur/full/ZEpxeYm + glass + metal three -->
 - [Showcase] Apple Music F7
 - [Platforms] C++ QT version
