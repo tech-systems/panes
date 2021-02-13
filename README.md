@@ -393,6 +393,7 @@ If you would like handle this part by yourself, set option `handleKeyboard: fals
 ## Future Goals
 - [Enhancement] Z-stack with N cards
 - [Feature] Chevron-up draggable
+- [Platforms] RN - bridge to existed swift panes
 - [Platforms] Expo wrapper + Example + Twitter
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) - Native Touch Plugin
 - [Feature] R-Pane (Rectangular pane - safari video frame example)
