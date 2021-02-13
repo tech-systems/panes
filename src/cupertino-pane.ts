@@ -70,14 +70,18 @@ export class CupertinoPane {
     this.events = new Events(this, this.settings, this.device, this.breakpoints);
   }
 
+  private get wrapperClassName() {
+    return `cupertino-pane-wrapper${ this.settings.inverse ? '-inverse' : ''}`
+  }
+
   private drawBaseElements() {
     this.parentEl = this.settings.parentElement;
     
     // Wrapper
     this.wrapperEl = document.createElement('div');
-    this.wrapperEl.className = `cupertino-pane-wrapper ${this.el.className}`;
+    this.wrapperEl.className = `${this.wrapperClassName} ${this.el.className}`;
     this.addStyle(`
-      .cupertino-pane-wrapper {
+      .${this.wrapperClassName} {
         display: none;
         position: absolute;
         top: 0;
@@ -89,7 +93,7 @@ export class CupertinoPane {
     this.paneEl = document.createElement('div');
     this.paneEl.className = 'pane';
     this.addStyle(`
-      .cupertino-pane-wrapper .pane {
+      .${this.wrapperClassName} .pane {
         position: fixed;
         z-index: 11;
         width: 100%;
@@ -109,7 +113,7 @@ export class CupertinoPane {
           : `padding-bottom: 15px; border-radius: 0 0 20px 20px;`
         }
       }
-      .cupertino-pane-wrapper.darkmode .pane {
+      .${this.wrapperClassName}.darkmode .pane {
         background: #1c1c1d; 
         color: #ffffff;
       }
@@ -119,7 +123,7 @@ export class CupertinoPane {
     this.draggableEl = document.createElement('div');
     this.draggableEl.className = 'draggable';
     this.addStyle(`
-      .cupertino-pane-wrapper .draggable {
+      .${this.wrapperClassName} .draggable {
         padding: 5px;
         position: absolute;
         left: 0;
@@ -142,7 +146,7 @@ export class CupertinoPane {
     this.moveEl = document.createElement('div');
     this.moveEl.className = 'move';
     this.addStyle(`
-      .cupertino-pane-wrapper .move {
+      .${this.wrapperClassName} .move {
         margin: 0 auto;
         height: 5px;
         background: #c0c0c0;
@@ -155,7 +159,7 @@ export class CupertinoPane {
           -webkit-backdrop-filter: saturate(180%) blur(20px);
         ` : ``}
       }
-      .cupertino-pane-wrapper.darkmode .move {
+      .${this.wrapperClassName}.darkmode .move {
         background: #5a5a5e;
       }
     `);
@@ -164,7 +168,7 @@ export class CupertinoPane {
     this.destroyButtonEl = document.createElement('div');
     this.destroyButtonEl.className = 'destroy-button';
     this.addStyle(`
-      .cupertino-pane-wrapper .destroy-button {
+      .${this.wrapperClassName} .destroy-button {
         ${!this.settings.inverse ? `
         width: 26px;
         height: 26px;
@@ -176,7 +180,7 @@ export class CupertinoPane {
         top: 16px;
         `:``}
       }
-      .cupertino-pane-wrapper.darkmode .destroy-button {
+      .${this.wrapperClassName}.darkmode .destroy-button {
         background: #424246;
       }
     `);
@@ -369,7 +373,7 @@ export class CupertinoPane {
 
   public isPanePresented():boolean {
     // Check through all presented panes
-    let wrappers = Array.from(document.querySelectorAll('.cupertino-pane-wrapper.rendered'));
+    let wrappers = Array.from(document.querySelectorAll(`.${this.wrapperClassName}.rendered`));
     if (!wrappers.length) return false;
     return wrappers.find((item) => item.contains(<HTMLElement>this.selector)) ? true: false;
   }
@@ -437,7 +441,7 @@ export class CupertinoPane {
   }
 
   private isBackdropPresented() {
-    return document.querySelector(`.cupertino-pane-wrapper .backdrop`) 
+    return document.querySelector(`.${this.wrapperClassName} .backdrop`) 
     ? true : false;
   }
 
@@ -445,7 +449,7 @@ export class CupertinoPane {
     this.backdropEl = document.createElement('div');
     this.backdropEl.className = 'backdrop';
     this.addStyle(`
-      .cupertino-pane-wrapper .backdrop {
+      .${this.wrapperClassName} .backdrop {
         overflow: hidden;
         position: fixed;
         width: 100%;
