@@ -687,6 +687,7 @@ class Events {
 class Settings {
     constructor() {
         this.instance = {
+            paneClassName: '',
             initialBreak: 'middle',
             inverse: false,
             parentElement: null,
@@ -1068,7 +1069,7 @@ class CupertinoPane {
         });
         // Panel
         this.paneEl = document.createElement('div');
-        this.paneEl.className = 'pane';
+        this.paneEl.className = `pane ${this.settings.paneClassName}`;
         const paneElStyleList = {
             position: 'fixed',
             'z-index': '11',

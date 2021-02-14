@@ -5,6 +5,7 @@ export class Settings {
   public instance: CupertinoSettings;
   constructor() {
     this.instance = {
+      paneClassName: '',
       initialBreak: 'middle',
       inverse: false,
       parentElement: null,

@@ -15,6 +15,7 @@ export interface TransitionStartEvent {
 }
 
 export interface PaneSettings {
+  paneClassName: string;
   initialBreak: ('top' | 'middle' | 'bottom');
   inverse: boolean;
   parentElement: any;

@@ -92,7 +92,7 @@ export class CupertinoPane {
 
     // Panel
     this.paneEl = document.createElement('div');
-    this.paneEl.className = 'pane';
+    this.paneEl.className = `pane ${ this.settings.paneClassName }`;
 
     const paneElStyleList = {
       position: 'fixed',
