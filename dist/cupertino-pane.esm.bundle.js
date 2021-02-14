@@ -1078,8 +1078,8 @@ class CupertinoPane {
             right: '0px',
             'margin-left': 'auto',
             'margin-right': 'auto',
-            background: '#ffffff',
-            'box-shadow': '0 4px 16px rgba(0,0,0,.12)',
+            background: 'var(--cupertino-pane-bg, #fff)',
+            'box-shadow': 'var(--cupertino-pane-shadow, 0 4px 16px rgba(0,0,0,.12))',
             overflow: 'hidden',
             'will-change': 'transform',
             transform: `translateY(${this.screenHeightOffset}px) translateZ(0px)`,
@@ -1089,12 +1089,12 @@ class CupertinoPane {
         if (!this.settings.inverse) {
             paneElStyleList['padding-top'] = '15px';
             paneElStyleList['padding-bottom'] = '0';
-            paneElStyleList['border-radius'] = '20px 20px 0 0';
+            paneElStyleList['border-radius'] = 'var(--cupertino-pane-border-radius, 20px) var(--cupertino-pane-border-radius, 20px) 0 0';
         }
         else {
             paneElStyleList['padding-top'] = '0';
             paneElStyleList['padding-bottom'] = '15px';
-            paneElStyleList['border-radius'] = '0 0 20px 20px';
+            paneElStyleList['border-radius'] = '0 0 var(--cupertino-pane-border-radius, 20px) var(--cupertino-pane-border-radius, 20px)';
         }
         this.addStyle(this.paneEl, paneElStyleList);
         // .${this.wrapperClassName}.darkmode .pane {
