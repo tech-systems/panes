@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: January 30, 2021
+ * Released on: February 14, 2021
  */
  
  
@@ -1058,13 +1058,16 @@ class CupertinoPane {
         this.breakpoints = new Breakpoints(this, this.settings);
         this.events = new Events(this, this.settings, this.device, this.breakpoints);
     }
+    get wrapperClassName() {
+        return `cupertino-pane-wrapper${this.settings.inverse ? '-inverse' : ''}`;
+    }
     drawBaseElements() {
         this.parentEl = this.settings.parentElement;
         // Wrapper
         this.wrapperEl = document.createElement('div');
-        this.wrapperEl.className = `cupertino-pane-wrapper ${this.el.className}`;
+        this.wrapperEl.className = `${this.wrapperClassName} ${this.el.className}`;
         this.addStyle(`
-      .cupertino-pane-wrapper {
+      .${this.wrapperClassName} {
         display: none;
         position: absolute;
         top: 0;
@@ -1075,7 +1078,7 @@ class CupertinoPane {
         this.paneEl = document.createElement('div');
         this.paneEl.className = 'pane';
         this.addStyle(`
-      .cupertino-pane-wrapper .pane {
+      .${this.wrapperClassName} .pane {
         position: fixed;
         z-index: 11;
         width: 100%;
@@ -1093,7 +1096,7 @@ class CupertinoPane {
             `padding-top: 15px; border-radius: 20px 20px 0 0;`
             : `padding-bottom: 15px; border-radius: 0 0 20px 20px;`}
       }
-      .cupertino-pane-wrapper.darkmode .pane {
+      .${this.wrapperClassName}.darkmode .pane {
         background: #1c1c1d; 
         color: #ffffff;
       }
@@ -1102,7 +1105,7 @@ class CupertinoPane {
         this.draggableEl = document.createElement('div');
         this.draggableEl.className = 'draggable';
         this.addStyle(`
-      .cupertino-pane-wrapper .draggable {
+      .${this.wrapperClassName} .draggable {
         padding: 5px;
         position: absolute;
         left: 0;
@@ -1122,7 +1125,7 @@ class CupertinoPane {
         this.moveEl = document.createElement('div');
         this.moveEl.className = 'move';
         this.addStyle(`
-      .cupertino-pane-wrapper .move {
+      .${this.wrapperClassName} .move {
         margin: 0 auto;
         height: 5px;
         background: #c0c0c0;
@@ -1135,7 +1138,7 @@ class CupertinoPane {
           -webkit-backdrop-filter: saturate(180%) blur(20px);
         ` : ``}
       }
-      .cupertino-pane-wrapper.darkmode .move {
+      .${this.wrapperClassName}.darkmode .move {
         background: #5a5a5e;
       }
     `);
@@ -1143,7 +1146,7 @@ class CupertinoPane {
         this.destroyButtonEl = document.createElement('div');
         this.destroyButtonEl.className = 'destroy-button';
         this.addStyle(`
-      .cupertino-pane-wrapper .destroy-button {
+      .${this.wrapperClassName} .destroy-button {
         ${!this.settings.inverse ? `
         width: 26px;
         height: 26px;
@@ -1155,7 +1158,7 @@ class CupertinoPane {
         top: 16px;
         ` : ``}
       }
-      .cupertino-pane-wrapper.darkmode .destroy-button {
+      .${this.wrapperClassName}.darkmode .destroy-button {
         background: #424246;
       }
     `);
@@ -1327,7 +1330,7 @@ class CupertinoPane {
     }
     isPanePresented() {
         // Check through all presented panes
-        let wrappers = Array.from(document.querySelectorAll('.cupertino-pane-wrapper.rendered'));
+        let wrappers = Array.from(document.querySelectorAll(`.${this.wrapperClassName}.rendered`));
         if (!wrappers.length)
             return false;
         return wrappers.find((item) => item.contains(this.selector)) ? true : false;
@@ -1339,14 +1342,14 @@ class CupertinoPane {
         return bounce ? 'cubic-bezier(0.175, 0.885, 0.370, 1.120)' : this.settings.animationType;
     }
     isBackdropPresented() {
-        return document.querySelector(`.cupertino-pane-wrapper .backdrop`)
+        return document.querySelector(`.${this.wrapperClassName} .backdrop`)
             ? true : false;
     }
     renderBackdrop() {
         this.backdropEl = document.createElement('div');
         this.backdropEl.className = 'backdrop';
         this.addStyle(`
-      .cupertino-pane-wrapper .backdrop {
+      .${this.wrapperClassName} .backdrop {
         overflow: hidden;
         position: fixed;
         width: 100%;

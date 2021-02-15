@@ -26,6 +26,7 @@ export declare class CupertinoPane {
     private events;
     private breakpoints;
     constructor(selector: (string | HTMLElement), conf?: CupertinoSettings);
+    private get wrapperClassName();
     private drawBaseElements;
     present(conf?: {
         animate: boolean;
