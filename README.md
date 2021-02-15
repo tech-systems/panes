@@ -391,6 +391,7 @@ By default, we are now handle keyboard in hybrid mobile applications and push pa
 If you would like handle this part by yourself, set option `handleKeyboard: false`.
 
 ## Future Goals
+- [Bugs] `isPanePresented()` for few wrappers
 - [Enhancement] Z-stack with N cards
 - [Feature] Chevron-up draggable
 - [Platforms] RN - bridge to existed swift panes
