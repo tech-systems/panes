@@ -391,7 +391,7 @@ By default, we are now handle keyboard in hybrid mobile applications and push pa
 If you would like handle this part by yourself, set option `handleKeyboard: false`.
 
 ## Future Goals
-- [Bugs] Check and fix pair of inversed + normal panes present function
+- [Bugs] Check and fix pair of inversed + normal panes present function (no change main class name)
 - [Enhancement] Z-stack with N cards
 - [Feature] Chevron-up draggable
 - [Platforms] RN - bridge to existed swift panes
