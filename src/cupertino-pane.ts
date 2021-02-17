@@ -126,7 +126,6 @@ export class CupertinoPane {
       this.paneEl,
       paneElStyleList,
     );
-
     // Draggable
     this.draggableEl = document.createElement('div');
     this.draggableEl.className = 'draggable';
