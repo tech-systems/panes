@@ -22,7 +22,6 @@ export class Settings {
       animationDuration: 300,
       dragBy: null,
       bottomOffset: 0,
-      darkMode: false,
       bottomClose: false,
       fastSwipeClose: false,
       fastSwipeSensivity: 3,

@@ -30,7 +30,6 @@ export interface PaneSettings {
     animationType: string;
     animationDuration: number;
     bottomOffset: number;
-    darkMode: boolean;
     bottomClose: boolean;
     fastSwipeClose: boolean;
     fastSwipeSensivity: number;

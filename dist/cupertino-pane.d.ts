@@ -7,7 +7,6 @@ export declare class CupertinoPane {
     screenHeightOffset: number;
     preventDismissEvent: boolean;
     preventedDismiss: boolean;
-    private iconCloseColor;
     rendered: boolean;
     wrapperEl: HTMLDivElement;
     paneEl: HTMLDivElement;
@@ -72,9 +71,6 @@ export declare class CupertinoPane {
      * Enable pane drag events
      */
     enableDrag(): void;
-    setDarkMode(conf?: {
-        enable: boolean;
-    }): void;
     /**
      * Public user method to reset breakpoints
      * @param conf

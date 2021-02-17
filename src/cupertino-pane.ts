@@ -12,7 +12,6 @@ export class CupertinoPane {
   public screenHeightOffset: number;
   public preventDismissEvent: boolean = false;
   public preventedDismiss: boolean = false;
-  private iconCloseColor: string = '#7a7a7e';
   public rendered: boolean = false;
   
   public wrapperEl: HTMLDivElement;
@@ -104,6 +103,7 @@ export class CupertinoPane {
       'margin-left': 'auto',
       'margin-right': 'auto',
       background: 'var(--cupertino-pane-bg, #fff)',
+      color: 'var(--cupertino-pane-color)',
       'box-shadow': 'var(--cupertino-pane-shadow, 0 4px 16px rgba(0,0,0,.12))',
       overflow: 'hidden',
       'will-change': 'transform',
@@ -126,11 +126,6 @@ export class CupertinoPane {
       this.paneEl,
       paneElStyleList,
     );
-
-    // .${this.wrapperClassName}.darkmode .pane {
-    //   background: #1c1c1d; 
-    //   color: #ffffff;
-    // }
 
     // Draggable
     this.draggableEl = document.createElement('div');
@@ -177,7 +172,7 @@ export class CupertinoPane {
     const moveElStyleList = {
       margin: `${this.settings.inverse ? 15 : 0}px  auto 0 auto`,
       height: '5px',
-      background: '#c0c0c0',
+      background: 'var(--cupertino-pane-move-background, #c0c0c0)',
       width: '36px',
       'border-radius': '4px',
       'backdrop-filter': 'none',
@@ -185,7 +180,7 @@ export class CupertinoPane {
 
     if (this.settings.draggableOver) {
       moveElStyleList.width = '70px';
-      moveElStyleList.background = 'background: rgba(225, 225, 225, 0.6)';
+      moveElStyleList.background = 'var(--cupertino-pane-move-background, rgba(225, 225, 225, 0.6))';
 
       if (Support.backdropFilter) {
         moveElStyleList['backdrop-filter'] = 'saturate(180%) blur(20px)';
@@ -196,31 +191,22 @@ export class CupertinoPane {
       this.moveEl,
       moveElStyleList,
     );
-    // .${this.wrapperClassName}.darkmode .move {
-    //   background: #5a5a5e;
-    // }
     
     // Close button
     this.destroyButtonEl = document.createElement('div');
     this.destroyButtonEl.className = 'destroy-button';
-    const destroyButtonEltyleList = this.settings.inverse ? {
-
-    } : {
+    const destroyButtonEltyleList = !this.settings.inverse ? {
       width: '26px',
       height: '26px',
       position: 'absolute',
-      background: '#ebebeb',
+      background: 'var(--cupertino-pane-destroy-button-background, #ebebeb)',
       right: '20px',
       'z-index': '14',
       'border-radius': '100%',
       top: '16px',
-    }
+    } : {};
   
     this.addStyle(this.destroyButtonEl, destroyButtonEltyleList);
-
-    // .${this.wrapperClassName}.darkmode .destroy-button {
-    //   background: #424246;
-    // }
 
     // Content user element
     this.contentEl = this.el;
@@ -284,15 +270,11 @@ export class CupertinoPane {
         this.pushElement = <HTMLElement>document.querySelector(this.settings.pushElement);
       }
 
-      if (this.settings.darkMode) {
-        this.setDarkMode({enable: true});
-      }
-
       if ((this.settings.buttonClose && this.settings.buttonDestroy) && !this.settings.inverse) {
         this.paneEl.appendChild(this.destroyButtonEl);
         this.destroyButtonEl.addEventListener('click', (t) => this.destroy({animate:true, destroyButton: true}));
         this.destroyButtonEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <path fill="${this.iconCloseColor}" d="M278.6 256l68.2-68.2c6.2-6.2 6.2-16.4 0-22.6-6.2-6.2-16.4-6.2-22.6 0L256 233.4l-68.2-68.2c-6.2-6.2-16.4-6.2-22.6 0-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3l68.2 68.2-68.2 68.2c-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3 6.2 6.2 16.4 6.2 22.6 0l68.2-68.2 68.2 68.2c6.2 6.2 16.4 6.2 22.6 0 6.2-6.2 6.2-16.4 0-22.6L278.6 256z"/>
+          <path fill="var(--cupertino-pane-icon-close-color, #7a7a7e)" d="M278.6 256l68.2-68.2c6.2-6.2 6.2-16.4 0-22.6-6.2-6.2-16.4-6.2-22.6 0L256 233.4l-68.2-68.2c-6.2-6.2-16.4-6.2-22.6 0-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3l68.2 68.2-68.2 68.2c-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3 6.2 6.2 16.4 6.2 22.6 0l68.2-68.2 68.2 68.2c6.2 6.2 16.4 6.2 22.6 0 6.2-6.2 6.2-16.4 0-22.6L278.6 256z"/>
         </svg>`;
       }
 
@@ -582,16 +564,6 @@ export class CupertinoPane {
    */  
   public enableDrag(): void {
     this.disableDragEvents = false;
-  }
-
-  public setDarkMode(conf: {enable: boolean} = {enable: true}) {    
-    if (conf.enable) {
-      this.wrapperEl.classList.add('darkmode');
-      this.iconCloseColor = '#a8a7ae';  
-    } else {
-      this.wrapperEl.classList.remove('darkmode');
-      this.iconCloseColor = '#7a7a7e';
-    }
   }
 
   /**

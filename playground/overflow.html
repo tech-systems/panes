@@ -134,14 +134,29 @@
 
       <ion-button expand="block" color="tertiary" onclick="setBreakpoints()">Set Breakpoints</ion-button>
   </ion-content>
+  <style>
+    body .test-pane {
+      --ion-background-color: transparent;
+      --ion-text-color: var(--cupertino-pane-color);
+    }
+
+    body.-dark .test-pane {
+      --cupertino-pane-icon-close-color: #a8a7ae;
+      --cupertino-pane-bg: #1c1c1d;
+      --cupertino-pane-color: #ffffff;
+      --cupertino-pane-shadow: 0 4px 16px rgb(0 0 0 / 12%);
+      --cupertino-pane-border-radius: 20px;
+      --cupertino-pane-move-background: #424246;
+      --cupertino-pane-destroy-button-background: #424246;
+    }
+  </style>
   <script>
     var element = document.querySelector('ion-drawer');
-    var darkMode = true;
     var drawer = new CupertinoPane(element, { 
+        paneClassName: 'test-pane'
         // breaks: {
         //   top: { enabled: false, offset: 700 }
         // },
-        darkMode: true,
         // draggableOver: true,
         // dragByCursor: false,
         // backdrop: true,
@@ -182,8 +197,7 @@
     };
 
     async function toggleDarkMode() {
-      darkMode = !darkMode;
-      drawer.setDarkMode({enable: darkMode});
+      document.body.classList.toggle('-dark')
     }
 
     async function setBreakpoints() {

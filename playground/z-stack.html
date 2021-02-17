@@ -78,6 +78,18 @@
     </div>
 
   </ion-content>
+
+  <style>
+    body {
+      --cupertino-pane-icon-close-color: #a8a7ae;
+      --cupertino-pane-bg: #1c1c1d;
+      --cupertino-pane-color: #ffffff;
+      --cupertino-pane-shadow: 0 4px 16px rgb(0 0 0 / 12%);
+      --cupertino-pane-border-radius: 20px;
+      --cupertino-pane-move-background: #424246;
+      --cupertino-pane-destroy-button-background: #424246;
+    }
+  </style>
   <script>
     let firstPoint;
     let activeNum = 3;
@@ -95,7 +107,6 @@
           middle: { enabled: false },
           bottom: { enabled: true, height: 0 },
         },
-        darkMode: true,
         showDraggable: false,
         buttonClose: false,
         bottomClose: true,
