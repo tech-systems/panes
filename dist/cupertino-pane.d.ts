@@ -26,7 +26,6 @@ export declare class CupertinoPane {
     private events;
     private breakpoints;
     constructor(selector: (string | HTMLElement), conf?: CupertinoSettings);
-    private get wrapperClassName();
     private drawBaseElements;
     present(conf?: {
         animate: boolean;
@@ -46,7 +45,7 @@ export declare class CupertinoPane {
     private isBackdropPresented;
     private renderBackdrop;
     /**
-     * Utility function to add CSS in multiple passes.
+     * Utility function to add minified internal CSS to head.
      * @param {string} styleString
      */
     private addStyle;

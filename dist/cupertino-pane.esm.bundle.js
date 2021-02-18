@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: February 14, 2021
+ * Released on: February 19, 2021
  */
 
 /*! *****************************************************************************
@@ -341,6 +341,7 @@ class Events {
         }
     }
     touchStart(t) {
+        // Liam the best :)
         // Event emitter
         this.settings.onDragStart(t);
         if (this.instance.disableDragEvents)
@@ -1052,27 +1053,34 @@ class CupertinoPane {
         this.breakpoints = new Breakpoints(this, this.settings);
         this.events = new Events(this, this.settings, this.device, this.breakpoints);
     }
-    get wrapperClassName() {
-        return `cupertino-pane-wrapper${this.settings.inverse ? '-inverse' : ''}`;
-    }
     drawBaseElements() {
+        // Parent 
         this.parentEl = this.settings.parentElement;
+        // Content user element
+        this.contentEl = this.el;
         // Wrapper
         this.wrapperEl = document.createElement('div');
-        this.wrapperEl.className = `${this.wrapperClassName} ${this.el.className}`;
-        this.addStyle(`
-      .${this.wrapperClassName} {
+        this.wrapperEl.classList.add('cupertino-pane-wrapper');
+        if (this.settings.inverse) {
+            this.wrapperEl.classList.add('inverse');
+        }
+        if (this.el.className) {
+            this.wrapperEl.classList.add(this.el.className);
+        }
+        let internalStyles = '';
+        internalStyles += `
+      .cupertino-pane-wrapper {
         display: none;
         position: absolute;
         top: 0;
         left: 0;
       }
-    `);
+    `;
         // Panel
         this.paneEl = document.createElement('div');
-        this.paneEl.className = 'pane';
-        this.addStyle(`
-      .${this.wrapperClassName} .pane {
+        this.paneEl.classList.add('pane');
+        internalStyles += `
+      .cupertino-pane-wrapper .pane {
         position: fixed;
         z-index: 11;
         width: 100%;
@@ -1083,23 +1091,27 @@ class CupertinoPane {
         margin-right: auto;
         background: #ffffff;
         box-shadow: 0 4px 16px rgba(0,0,0,.12);
-        overflow = hidden;
-        will-change = transform;
-        transform: translateY(${this.screenHeightOffset}px) translateZ(0px);
-        ${!this.settings.inverse ?
-            `padding-top: 15px; border-radius: 20px 20px 0 0;`
-            : `padding-bottom: 15px; border-radius: 0 0 20px 20px;`}
+        will-change: transform;
+        padding-top: 15px; 
+        border-radius: 20px 20px 0 0;
       }
-      .${this.wrapperClassName}.darkmode .pane {
+      .cupertino-pane-wrapper.inverse .pane {
+        padding-bottom: 15px; 
+        border-radius: 0 0 20px 20px;
+      }
+      .cupertino-pane-wrapper.darkmode .pane {
         background: #1c1c1d; 
         color: #ffffff;
       }
-    `);
+    `;
         // Draggable
         this.draggableEl = document.createElement('div');
-        this.draggableEl.className = 'draggable';
-        this.addStyle(`
-      .${this.wrapperClassName} .draggable {
+        this.draggableEl.classList.add('draggable');
+        if (this.settings.draggableOver) {
+            this.draggableEl.classList.add('over');
+        }
+        internalStyles += `
+      .cupertino-pane-wrapper .draggable {
         padding: 5px;
         position: absolute;
         left: 0;
@@ -1108,40 +1120,56 @@ class CupertinoPane {
         margin-right: auto;
         height: 30px;
         z-index: 12;
-        ${!this.settings.inverse ?
-            `top: 0;`
-            : `bottom: 0;`}
-        ${!this.settings.showDraggable ? `opacity: 0;` : ``}
-        ${this.settings.draggableOver ? `top: -30px;padding: 15px;` : ``}
+        top: 0;
+        bottom: initial;
       }
-    `);
+      .cupertino-pane-wrapper .draggable.over {
+        top: -30px;
+        padding: 15px;
+      }
+      .cupertino-pane-wrapper.inverse .draggable {
+        bottom: 0;
+        top: initial;
+      }
+      .cupertino-pane-wrapper.inverse .draggable.over {
+        bottom: -30px;
+        top: initial;
+      }
+    `;
         // Move
         this.moveEl = document.createElement('div');
-        this.moveEl.className = 'move';
-        this.addStyle(`
-      .${this.wrapperClassName} .move {
+        this.moveEl.classList.add('move');
+        internalStyles += `
+      .cupertino-pane-wrapper .move {
         margin: 0 auto;
         height: 5px;
         background: #c0c0c0;
         width: 36px;
         border-radius: 4px;
-        ${this.settings.inverse ? `margin-top: 15px;` : ``}
-        ${this.settings.draggableOver ? `width: 70px; background: rgba(225, 225, 225, 0.6);` : ``}
-        ${this.settings.draggableOver && Support.backdropFilter ? `
+      }
+      .cupertino-pane-wrapper.darkmode .move {
+        background: #5a5a5e;
+      }
+      .cupertino-pane-wrapper .draggable.over .move {
+        width: 70px; 
+        background: rgba(225, 225, 225, 0.6);
+        ${Support.backdropFilter ? `
           backdrop-filter: saturate(180%) blur(20px);
           -webkit-backdrop-filter: saturate(180%) blur(20px);
         ` : ``}
       }
-      .${this.wrapperClassName}.darkmode .move {
-        background: #5a5a5e;
+      .cupertino-pane-wrapper.inverse .move {
+        margin-top: 15px;
       }
-    `);
-        // Close button
+      .cupertino-pane-wrapper.inverse .draggable.over .move {
+        margin-top: -5px;
+      }
+    `;
+        // Destroy button
         this.destroyButtonEl = document.createElement('div');
-        this.destroyButtonEl.className = 'destroy-button';
-        this.addStyle(`
-      .${this.wrapperClassName} .destroy-button {
-        ${!this.settings.inverse ? `
+        this.destroyButtonEl.classList.add('destroy-button');
+        internalStyles += `
+      .cupertino-pane-wrapper .destroy-button {
         width: 26px;
         height: 26px;
         position: absolute;
@@ -1150,22 +1178,35 @@ class CupertinoPane {
         z-index: 14;
         border-radius: 100%;
         top: 16px;
-        ` : ``}
       }
-      .${this.wrapperClassName}.darkmode .destroy-button {
+      .cupertino-pane-wrapper.darkmode .destroy-button {
         background: #424246;
       }
-    `);
-        // Content user element
-        this.contentEl = this.el;
-        this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-        this.contentEl.style.overflowX = 'hidden';
+    `;
+        // Backdrop
+        internalStyles += `
+      .cupertino-pane-wrapper .backdrop {
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+        bottom: 0;
+        right: 0;
+        left: 0;
+        top: 0;
+        display: none;
+        z-index: 10;
+      }
+    `;
+        // Inject internal CSS
+        this.addStyle(internalStyles);
         // inject DOM
         this.parentEl.appendChild(this.wrapperEl);
         this.wrapperEl.appendChild(this.paneEl);
-        this.paneEl.appendChild(this.draggableEl);
         this.paneEl.appendChild(this.contentEl);
-        this.draggableEl.appendChild(this.moveEl);
+        if (this.settings.showDraggable) {
+            this.paneEl.appendChild(this.draggableEl);
+            this.draggableEl.appendChild(this.moveEl);
+        }
     }
     present(conf = { animate: false }) {
         var _a;
@@ -1185,12 +1226,17 @@ class CupertinoPane {
             // Emit event
             this.settings.onWillPresent();
             this.updateScreenHeights();
-            yield this.drawBaseElements();
+            this.drawBaseElements();
             yield this.setBreakpoints();
+            // Necessary Inlines
             this.paneEl.style.height = `${this.getPaneHeight()}px`;
             if (this.settings.inverse) {
                 this.paneEl.style.top = `-${this.breakpoints.bottomer}px`;
             }
+            this.paneEl.style.transform = `translateY(${this.screenHeightOffset}px) translateZ(0px)`;
+            this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+            this.contentEl.style.overflowX = 'hidden';
+            // Show elements
             this.wrapperEl.style.display = 'block';
             this.contentEl.style.display = 'block';
             this.wrapperEl.classList.add('rendered');
@@ -1242,6 +1288,9 @@ class CupertinoPane {
                 // No initial transitions
                 this.breakpoints.prevBreakpoint = this.settings.initialBreak;
                 this.paneEl.style.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+                if (this.settings.backdrop) {
+                    this.backdropEl.style.display = `block`;
+                }
                 if (this.settings.pushElement) {
                     this.pushTransition(this.breakpoints.breaks[this.settings.initialBreak], 'unset');
                 }
@@ -1324,7 +1373,7 @@ class CupertinoPane {
     }
     isPanePresented() {
         // Check through all presented panes
-        let wrappers = Array.from(document.querySelectorAll(`.${this.wrapperClassName}.rendered`));
+        let wrappers = Array.from(document.querySelectorAll(`.cupertino-pane-wrapper.rendered`));
         if (!wrappers.length)
             return false;
         return wrappers.find((item) => item.contains(this.selector)) ? true : false;
@@ -1336,36 +1385,27 @@ class CupertinoPane {
         return bounce ? 'cubic-bezier(0.175, 0.885, 0.370, 1.120)' : this.settings.animationType;
     }
     isBackdropPresented() {
-        return document.querySelector(`.${this.wrapperClassName} .backdrop`)
+        return document.querySelector(`.cupertino-pane-wrapper .backdrop`)
             ? true : false;
     }
     renderBackdrop() {
         this.backdropEl = document.createElement('div');
-        this.backdropEl.className = 'backdrop';
-        this.addStyle(`
-      .${this.wrapperClassName} .backdrop {
-        overflow: hidden;
-        position: fixed;
-        width: 100%;
-        bottom: 0;
-        right: 0;
-        left: 0;
-        top: 0;
-        display: none;
-        z-index: 10;
-        transition: all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s;
-        background-color: rgba(0,0,0, ${this.settings.backdropOpacity});
-      }
-    `);
+        this.backdropEl.classList.add('backdrop');
+        this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+        this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
         this.wrapperEl.appendChild(this.backdropEl);
         this.backdropEl.addEventListener('click', (t) => this.settings.onBackdropTap());
     }
     /**
-     * Utility function to add CSS in multiple passes.
+     * Utility function to add minified internal CSS to head.
      * @param {string} styleString
      */
     addStyle(styleString) {
+        if (document.querySelector('#cupertino-panes-internal'))
+            return;
         const style = document.createElement('style');
+        style.id = 'cupertino-panes-internal';
+        styleString = styleString.replace(/\s\s+/g, ' ');
         style.textContent = styleString;
         document.head.prepend(style);
     }

@@ -153,6 +153,7 @@ export class Events {
    */
   public touchStartCb = (t) => this.touchStart(t);
   private touchStart(t) {
+    // Liam the best :)
     // Event emitter
     this.settings.onDragStart(t as CustomEvent);
 
