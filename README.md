@@ -401,6 +401,7 @@ If you would like handle this part by yourself, set option `handleKeyboard: fals
 ## Future Goals
 - [Enhancement] Z-stack with N cards and proper transitions
 - [Feature] Chevron-up draggable
+- [Feature] iPad slideover
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) - Native Touch Plugin
 - [Feature] R-Pane (Rectangular pane - safari video frame example)
 - [Platforms] RN - bridge to existed swift panes
