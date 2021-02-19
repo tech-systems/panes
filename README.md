@@ -401,16 +401,16 @@ If you would like handle this part by yourself, set option `handleKeyboard: fals
 ## Future Goals
 - [Enhancement] Z-stack with N cards and proper transitions
 - [Feature] Chevron-up draggable
-- [Feature] iPad slideover
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) - Native Touch Plugin
+- [Platforms] C++ QT version (low lewel programming)
 - [Feature] R-Pane (Rectangular pane - safari video frame example)
+- [Feature] iPad slideover
 - [Platforms] RN - bridge to existed swift panes
 - [Platforms] Expo wrapper + Example + Twitter
 - [Docs] (Traffic + Carbon ads) -> Docs engine <!-- Ask Vladimir first + check https://github.com/denoland/doc_website https://github.com/ionic-team/ionic-docs (Swiper, F7, Netlify, Gatsby, DO, GH pages) -->
 - [Showcase] No background - glow for view + (collaboration with arwes)
 - [Showcase] Materials (glass/metal/blur) <!-- https://codepen.io/TurkAysenur/full/ZEpxeYm + glass + metal three -->
 - [Showcase] Apple Music F7
-- [Platforms] C++ QT version
 
 ## Contributors
 We are welcome contributions of all kinds from anyone. 
