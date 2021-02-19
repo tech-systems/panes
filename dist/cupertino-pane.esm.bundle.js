@@ -1,13 +1,13 @@
 /**
- * Cupertino Pane 1.2.4
- * Multiplatform slide-over pane
+ * Cupertino Pane 1.2.5
+ * Multi-functional panes and boards for next generation progressive applications
  * https://github.com/roman-rr/cupertino-pane/
  *
  * Copyright 2019-2021 Roman Antonov (roman-rr)
  *
  * Released under the MIT License
  *
- * Released on: February 19, 2021
+ * Released on: February 20, 2021
  */
 
 /*! *****************************************************************************
@@ -692,6 +692,7 @@ class Settings {
             inverse: false,
             parentElement: null,
             followerElement: null,
+            cssClass: null,
             fitHeight: false,
             maxFitHeight: null,
             fitScreenHeight: true,
@@ -704,7 +705,6 @@ class Settings {
             animationDuration: 300,
             dragBy: null,
             bottomOffset: 0,
-            darkMode: false,
             bottomClose: false,
             fastSwipeClose: false,
             fastSwipeSensivity: 3,
@@ -867,6 +867,12 @@ class Breakpoints {
             });
             if (!this.instance.isPanePresented()) {
                 this.currentBreakpoint = this.breaks[this.settings.initialBreak];
+                // Disable overflow for top bulletin
+                if (this.settings.inverse
+                    && !this.settings.breaks.bottom.enabled
+                    && !this.settings.breaks.middle.enabled) {
+                    this.settings.topperOverflow = false;
+                }
             }
             if (this.instance.isPanePresented()) {
                 // Move to current if updated
@@ -962,7 +968,6 @@ class CupertinoPane {
         this.disableDragEvents = false;
         this.preventDismissEvent = false;
         this.preventedDismiss = false;
-        this.iconCloseColor = '#7a7a7e';
         this.rendered = false;
         this.settings = (new Settings()).instance;
         this.device = new Device();
@@ -1056,16 +1061,14 @@ class CupertinoPane {
     drawBaseElements() {
         // Parent 
         this.parentEl = this.settings.parentElement;
-        // Content user element
-        this.contentEl = this.el;
         // Wrapper
         this.wrapperEl = document.createElement('div');
         this.wrapperEl.classList.add('cupertino-pane-wrapper');
         if (this.settings.inverse) {
             this.wrapperEl.classList.add('inverse');
         }
-        if (this.el.className) {
-            this.wrapperEl.classList.add(this.el.className);
+        if (this.settings.cssClass) {
+            this.wrapperEl.className += ` ${this.settings.cssClass}`;
         }
         let internalStyles = '';
         internalStyles += `
@@ -1076,8 +1079,9 @@ class CupertinoPane {
         left: 0;
       }
     `;
-        // Panel
+        // Panel (appying transform ASAP, avoid timeouts for animate:true)
         this.paneEl = document.createElement('div');
+        this.paneEl.style.transform = `translateY(${this.screenHeightOffset}px) translateZ(0px)`;
         this.paneEl.classList.add('pane');
         internalStyles += `
       .cupertino-pane-wrapper .pane {
@@ -1089,19 +1093,21 @@ class CupertinoPane {
         right: 0px;
         margin-left: auto;
         margin-right: auto;
-        background: #ffffff;
-        box-shadow: 0 4px 16px rgba(0,0,0,.12);
+        background: var(--cupertino-pane-background, #ffffff);
+        color: var(--cupertino-pane-color, #333333);
+        box-shadow: var(--cupertino-pane-shadow, 0 4px 16px rgba(0,0,0,.12));
         will-change: transform;
         padding-top: 15px; 
-        border-radius: 20px 20px 0 0;
+        border-radius: var(--cupertino-pane-border-radius, 20px) 
+                       var(--cupertino-pane-border-radius, 20px) 
+                       0 0;
       }
       .cupertino-pane-wrapper.inverse .pane {
         padding-bottom: 15px; 
         border-radius: 0 0 20px 20px;
-      }
-      .cupertino-pane-wrapper.darkmode .pane {
-        background: #1c1c1d; 
-        color: #ffffff;
+        border-radius: 0 0
+                       var(--cupertino-pane-border-radius, 20px) 
+                       var(--cupertino-pane-border-radius, 20px);
       }
     `;
         // Draggable
@@ -1143,16 +1149,13 @@ class CupertinoPane {
       .cupertino-pane-wrapper .move {
         margin: 0 auto;
         height: 5px;
-        background: #c0c0c0;
+        background: var(--cupertino-pane-move-background, #c0c0c0);
         width: 36px;
         border-radius: 4px;
       }
-      .cupertino-pane-wrapper.darkmode .move {
-        background: #5a5a5e;
-      }
       .cupertino-pane-wrapper .draggable.over .move {
         width: 70px; 
-        background: rgba(225, 225, 225, 0.6);
+        background: var(--cupertino-pane-move-background, rgba(225, 225, 225, 0.6));
         ${Support.backdropFilter ? `
           backdrop-filter: saturate(180%) blur(20px);
           -webkit-backdrop-filter: saturate(180%) blur(20px);
@@ -1173,16 +1176,17 @@ class CupertinoPane {
         width: 26px;
         height: 26px;
         position: absolute;
-        background: #ebebeb;
+        background: var(--cupertino-pane-destroy-button-background, #ebebeb);
         right: 20px;
         z-index: 14;
         border-radius: 100%;
         top: 16px;
       }
-      .cupertino-pane-wrapper.darkmode .destroy-button {
-        background: #424246;
-      }
     `;
+        // Content user element
+        this.contentEl = this.el;
+        this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+        this.contentEl.style.overflowX = 'hidden';
         // Backdrop
         internalStyles += `
       .cupertino-pane-wrapper .backdrop {
@@ -1228,14 +1232,11 @@ class CupertinoPane {
             this.updateScreenHeights();
             this.drawBaseElements();
             yield this.setBreakpoints();
-            // Necessary Inlines
+            // Necessary Inlines with breakpoints
             this.paneEl.style.height = `${this.getPaneHeight()}px`;
             if (this.settings.inverse) {
                 this.paneEl.style.top = `-${this.breakpoints.bottomer}px`;
             }
-            this.paneEl.style.transform = `translateY(${this.screenHeightOffset}px) translateZ(0px)`;
-            this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-            this.contentEl.style.overflowX = 'hidden';
             // Show elements
             this.wrapperEl.style.display = 'block';
             this.contentEl.style.display = 'block';
@@ -1254,14 +1255,11 @@ class CupertinoPane {
             if (this.settings.pushElement) {
                 this.pushElement = document.querySelector(this.settings.pushElement);
             }
-            if (this.settings.darkMode) {
-                this.setDarkMode({ enable: true });
-            }
             if ((this.settings.buttonClose && this.settings.buttonDestroy) && !this.settings.inverse) {
                 this.paneEl.appendChild(this.destroyButtonEl);
                 this.destroyButtonEl.addEventListener('click', (t) => this.destroy({ animate: true, destroyButton: true }));
                 this.destroyButtonEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
-          <path fill="${this.iconCloseColor}" d="M278.6 256l68.2-68.2c6.2-6.2 6.2-16.4 0-22.6-6.2-6.2-16.4-6.2-22.6 0L256 233.4l-68.2-68.2c-6.2-6.2-16.4-6.2-22.6 0-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3l68.2 68.2-68.2 68.2c-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3 6.2 6.2 16.4 6.2 22.6 0l68.2-68.2 68.2 68.2c6.2 6.2 16.4 6.2 22.6 0 6.2-6.2 6.2-16.4 0-22.6L278.6 256z"/>
+          <path fill="var(--cupertino-pane-icon-close-color, #7a7a7e);" d="M278.6 256l68.2-68.2c6.2-6.2 6.2-16.4 0-22.6-6.2-6.2-16.4-6.2-22.6 0L256 233.4l-68.2-68.2c-6.2-6.2-16.4-6.2-22.6 0-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3l68.2 68.2-68.2 68.2c-3.1 3.1-4.7 7.2-4.7 11.3 0 4.1 1.6 8.2 4.7 11.3 6.2 6.2 16.4 6.2 22.6 0l68.2-68.2 68.2 68.2c6.2 6.2 16.4 6.2 22.6 0 6.2-6.2 6.2-16.4 0-22.6L278.6 256z"/>
         </svg>`;
             }
             if (this.settings.bottomClose) {
@@ -1469,16 +1467,6 @@ class CupertinoPane {
      */
     enableDrag() {
         this.disableDragEvents = false;
-    }
-    setDarkMode(conf = { enable: true }) {
-        if (conf.enable) {
-            this.wrapperEl.classList.add('darkmode');
-            this.iconCloseColor = '#a8a7ae';
-        }
-        else {
-            this.wrapperEl.classList.remove('darkmode');
-            this.iconCloseColor = '#7a7a7e';
-        }
     }
     /**
      * Public user method to reset breakpoints

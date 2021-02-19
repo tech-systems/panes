@@ -2,6 +2,34 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.2.5] - 2021-02-20
+
+### BREAKING CHANGES
+- Added `cssClass` property to settings. Pass custom class for `.cupertino-pane-wrapper` here to style later, instead of picking custom class from your element. 
+- Removed `darkmode` property and `setDarkmode()` method. Proper way you can style darkmode with variables: 
+```css
+body.dark {
+  --cupertino-pane-icon-close-color: #a8a7ae;
+  --cupertino-pane-background: #1c1c1d;
+  --cupertino-pane-color: #ffffff;
+  --cupertino-pane-shadow: 0 4px 16px rgb(0 0 0 / 12%);
+  --cupertino-pane-border-radius: 20px;
+  --cupertino-pane-move-background: #424246;
+  --cupertino-pane-destroy-button-background: #424246;
+}
+```
+
+### Extra
+- 3 Panes live environment [demo available](https://jsbin.com/xavifaf)
+
+### Features
+- CSS variables available [Readme](https://github.com/roman-rr/cupertino-pane/blob/master/CHANGELOG.md#css-variables)
+
+### Bug Fixed
+- Fixed styles for few panes in single DOM [#133](https://github.com/roman-rr/cupertino-pane/issues/133)
+- Fixed with internal styles injector in DOM. Minified styles now injected once inside `<head>` tag. 
+- Fixed backdrop with `{ animate:false }`
+
 ## [1.2.4] - 2021-01-28
 
 ### Enhancements

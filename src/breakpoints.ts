@@ -147,6 +147,14 @@ export class Breakpoints {
 
     if (!this.instance.isPanePresented()) {
       this.currentBreakpoint = this.breaks[this.settings.initialBreak];
+
+            
+      // Disable overflow for top bulletin
+      if (this.settings.inverse 
+          && !this.settings.breaks.bottom.enabled 
+          && !this.settings.breaks.middle.enabled) {
+        this.settings.topperOverflow = false;
+      }
     }
 
     if (this.instance.isPanePresented()) {
@@ -165,7 +173,7 @@ export class Breakpoints {
       // Re-calc height and top
       this.instance.paneEl.style.top = this.settings.inverse ? `-${this.bottomer}px` : `unset`;
       this.instance.paneEl.style.height = `${this.instance.getPaneHeight()}px`;
-      
+
       this.instance.scrollElementInit();
       this.instance.checkOpacityAttr(this.currentBreakpoint);
       this.instance.checkOverflowAttr(this.currentBreakpoint);

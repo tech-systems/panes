@@ -30,6 +30,16 @@
     .swiper-pagination {
       bottom: 0px !important;
     }
+
+    body.dark {
+      --cupertino-pane-icon-close-color: #a8a7ae;
+      --cupertino-pane-background: #1c1c1d;
+      --cupertino-pane-color: #ffffff;
+      --cupertino-pane-shadow: 0 4px 16px rgb(0 0 0 / 12%);
+      --cupertino-pane-border-radius: 20px;
+      --cupertino-pane-move-background: #424246;
+      --cupertino-pane-destroy-button-background: #424246;
+    }
   </style>
 </head>
 
@@ -104,11 +114,11 @@
     };
 
     let drawers = {
-      '1': new CupertinoPane('.card-1', { ...settings, onDrag: (e) => onDragFunc(1, e), onDragStart: (e) => onDragStartFunc(1, e), onDidDismiss: () => onDidDismissFunc(1) }),
-      '2': new CupertinoPane('.card-2', { ...settings, pushElement: '.cupertino-pane-wrapper.card-1', onDrag: (e) => onDragFunc(2, e), onDragStart: (e) => onDragStartFunc(2, e), onDidDismiss: () => onDidDismissFunc(2) }),
-      '3': new CupertinoPane('.card-3', { ...settings, pushElement: '.cupertino-pane-wrapper.card-2', onDrag: (e) => onDragFunc(3, e), onDragStart: (e) => onDragStartFunc(3, e), onDidDismiss: () => onDidDismissFunc(3) }),
-      '4': new CupertinoPane('.card-4', { ...settings, pushElement: '.cupertino-pane-wrapper.card-3', onDrag: (e) => onDragFunc(4, e), onDragStart: (e) => onDragStartFunc(4, e), onDidDismiss: () => onDidDismissFunc(4) }),
-      '5': new CupertinoPane('.card-5', { ...settings, pushElement: '.cupertino-pane-wrapper.card-4', onDrag: (e) => onDragFunc(5, e), onDragStart: (e) => onDragStartFunc(5, e), onDidDismiss: () => onDidDismissFunc(5) })
+      '1': new CupertinoPane('.card-1', { ...settings, cssClass: 'card-1', onDrag: (e) => onDragFunc(1, e), onDragStart: (e) => onDragStartFunc(1, e), onDidDismiss: () => onDidDismissFunc(1) }),
+      '2': new CupertinoPane('.card-2', { ...settings, cssClass: 'card-2', pushElement: '.cupertino-pane-wrapper.card-1', onDrag: (e) => onDragFunc(2, e), onDragStart: (e) => onDragStartFunc(2, e), onDidDismiss: () => onDidDismissFunc(2) }),
+      '3': new CupertinoPane('.card-3', { ...settings, cssClass: 'card-3', pushElement: '.cupertino-pane-wrapper.card-2', onDrag: (e) => onDragFunc(3, e), onDragStart: (e) => onDragStartFunc(3, e), onDidDismiss: () => onDidDismissFunc(3) }),
+      '4': new CupertinoPane('.card-4', { ...settings, cssClass: 'card-4', pushElement: '.cupertino-pane-wrapper.card-3', onDrag: (e) => onDragFunc(4, e), onDragStart: (e) => onDragStartFunc(4, e), onDidDismiss: () => onDidDismissFunc(4) }),
+      '5': new CupertinoPane('.card-5', { ...settings, cssClass: 'card-5', pushElement: '.cupertino-pane-wrapper.card-4', onDrag: (e) => onDragFunc(5, e), onDragStart: (e) => onDragStartFunc(5, e), onDidDismiss: () => onDidDismissFunc(5) })
     };
     
     // On ready

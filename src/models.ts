@@ -19,6 +19,7 @@ export interface PaneSettings {
   inverse: boolean;
   parentElement: any;
   followerElement: string;
+  cssClass: string;
   fitHeight: boolean;
   maxFitHeight: number;
   fitScreenHeight: boolean;
@@ -30,7 +31,6 @@ export interface PaneSettings {
   animationType: string;
   animationDuration: number;
   bottomOffset: number,
-  darkMode: boolean;
   bottomClose: boolean;
   fastSwipeClose: boolean;
   fastSwipeSensivity: number;

@@ -33,6 +33,7 @@ Cupertino Panes is multi-functional panes & boards with touch technologies. <br>
 * [Settings](#settings)
 * [Public Methods](#public-methods)
 * [Attributes](#attributes)
+* [CSS Variables](#css-variables)
 * [Keyboard issues](#keyboard-issues)
 * [Future Goals](#future-goals)
 * [Contributors](#contributors)
@@ -64,6 +65,7 @@ Support this project with your organization. Your logo will show up here with a 
 
 ## Demonstration
 - [Base live](https://output.jsbin.com/fuhisey)
+- [3 Panes live](https://jsbin.com/xavifaf)
 - [Z-Stack live](https://output.jsbin.com/wedegox)
 - [Draggable over live](https://jsbin.com/hamedec)
 - [Prevent dismiss live](https://output.jsbin.com/keravam)
@@ -186,6 +188,7 @@ new CupertinoPane(element); // HTMLElement
 | **inverse** | `boolean` | false | On `true` will change pane direction from `bottom-to-top` to `top-to-bottom` |
 | **parentElement** | `string` | Parent element selector | Element selector where pane will rendered |
 | **followerElement** | `string` | Follower element selector | Element with selector will following pane transitions |
+| **cssClass** | `string` | null | Additional classes to apply for wrapper to stylize different panes |
 | **fitHeight** | `boolean` | 'false' | Automatically calc and define content height as top breakpoint. Middle and bottom breakpoint will be disabled |
 | **maxFitHeight** | `number` | 'null' | Define a maximum possible automatically calculated height with `fitHeight` property |
 | **fitScreenHeight** | `boolean` | 'true' | On `true` will automatically adjust pane maximum height to screen height |
@@ -193,7 +196,6 @@ new CupertinoPane(element); // HTMLElement
 | **pushMinHeight** | `number` | Most bottom available point | Height from which 3d push effect will be started |
 | **pushYOffset** | `number` | Negative margin value to place pushed element upper |
 | **initialBreak** | `'top' \| 'middle' \| 'bottom'` | 'middle' | Initial pane position |
-| **darkMode** | `boolean` | false | Initial pane styles |
 | **backdrop** | `boolean` | false | Dimmed overlay will rendered with pane if `true` |
 | **backdropOpacity** | `number` | 0.4 | Dimmed overlay opacity value |
 | **animationType** | `string` | 'ease' | Base transition timing function |
@@ -311,11 +313,6 @@ Show/Hide backdrop method
 myPane.backdrop({show: true}); // show
 myPane.backdrop({show: false}); // hide
 ```
-### setDarkMode({enable: **boolean = false**})
-Enable dark scheme color for some elements
-```javascript
-myPane.setDarkMode({enable: true}); // enable darkmode
-```
 ### setBreakpoints(breakpoints: **PaneBreaks**)
 Method updates breakpoints configuration for rendered Pane
 ```javascript
@@ -371,6 +368,17 @@ By default using for full pane area, but in some cases good useful with header.
 </div>
 ```
 
+## CSS Variables
+| Variable | Default |
+| - | - |
+| **--cupertino-pane-background** | `#ffffff` |
+| **--cupertino-pane-color** | `#333333` |
+| **--cupertino-pane-shadow** | `#0 4px 16px rgba(0,0,0,.12)` |
+| **--cupertino-pane-border-radius** | `#20px` |
+| **--cupertino-pane-move-background** | `#c0c0c0` |
+| **--cupertino-pane-destroy-button-background** | `#ebebeb` |
+| **--cupertino-pane-icon-close-color** | `#7a7a7e` |
+
 ## Keyboard issues
 Inputs and textareas in pane may push mobile keyboard on devices, and close pane visibility. Next cases describe how to proper handle this issues.
 ### Browser/WebView
@@ -391,13 +399,12 @@ By default, we are now handle keyboard in hybrid mobile applications and push pa
 If you would like handle this part by yourself, set option `handleKeyboard: false`.
 
 ## Future Goals
-- [Bugs] Pane configuration classes + variables [#133](https://github.com/roman-rr/cupertino-pane/issues/133)
-- [Enhancement] Z-stack with N cards
+- [Enhancement] Z-stack with N cards and proper transitions
 - [Feature] Chevron-up draggable
-- [Platforms] RN - bridge to existed swift panes
-- [Platforms] Expo wrapper + Example + Twitter
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) - Native Touch Plugin
 - [Feature] R-Pane (Rectangular pane - safari video frame example)
+- [Platforms] RN - bridge to existed swift panes
+- [Platforms] Expo wrapper + Example + Twitter
 - [Docs] (Traffic + Carbon ads) -> Docs engine <!-- Ask Vladimir first + check https://github.com/denoland/doc_website https://github.com/ionic-team/ionic-docs (Swiper, F7, Netlify, Gatsby, DO, GH pages) -->
 - [Showcase] No background - glow for view + (collaboration with arwes)
 - [Showcase] Materials (glass/metal/blur) <!-- https://codepen.io/TurkAysenur/full/ZEpxeYm + glass + metal three -->
