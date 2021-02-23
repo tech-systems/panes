@@ -403,6 +403,7 @@ If you would like handle this part by yourself, set option `handleKeyboard: fals
 - [Feature] Chevron-up draggable
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) - Native Touch Plugin
 - [Platforms] C++ QT version (low lewel programming)
+- [Platforms] C# Blazor (low lewel programming)
 - [Feature] R-Pane (Rectangular pane - safari video frame example)
 - [Feature] iPad slideover
 - [Platforms] RN - bridge to existed swift panes
