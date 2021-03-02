@@ -402,6 +402,7 @@ If you would like handle this part by yourself, set option `handleKeyboard: fals
 - [Enhancement] Z-stack with N cards and proper transitions
 - [Feature] Chevron-up draggable
 - [Accurance] Draw experiment application (Normal/TimeStamp/Native) - Native Touch Plugin
+- [Showcase] Touchmove - Z-angle deviation <!-- https://dribbble.com/shots/15220605-Weather-Forecast -->
 - [Platforms] C++ QT version (low lewel programming)
 - [Platforms] C# Blazor (low lewel programming)
 - [Feature] R-Pane (Rectangular pane - safari video frame example)
