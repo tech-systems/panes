@@ -1,7 +1,7 @@
 import { Support } from './support';
 import { Device } from './device';
 import { Events } from './events';
-import { PaneSettings, PaneBreaks } from './models';
+import { PaneSettings, PaneBreaks, ZStackSettings } from './models';
 import { Settings } from './settings';
 import { Breakpoints } from './breakpoints';
 export type CupertinoSettings = Partial<PaneSettings>;
@@ -25,7 +25,6 @@ export class CupertinoPane {
   private moveEl: HTMLDivElement;
   private destroyButtonEl: HTMLDivElement;
   private followerEl: HTMLElement;
-  private pushElement: HTMLElement;
 
   private settings: CupertinoSettings = (new Settings()).instance;
   private device: Device = new Device();
@@ -281,10 +280,21 @@ export class CupertinoPane {
         this.followerEl.style.transition = `all ${this.settings.animationDuration}ms ${this.getTimingFunction(this.settings.breaks[this.currentBreak()]?.bounce)} 0s`;
       }
 
-      if (this.settings.pushElement) {
-        this.pushElement = <HTMLElement>document.querySelector(this.settings.pushElement);
-      }
-
+      // Assign multiplicators for push elements
+      if (this.settings.zStack) {
+          // Default zStacks
+        let zStackDefaults: ZStackSettings = {
+          pushElements: null,
+          minPushHeight: null,
+          cardYOffset: 0,
+          cardZScale: 0.93,
+          cardLessContrast: true,
+          stackZAngle: 160,
+        };
+        this.settings.zStack = {...zStackDefaults, ...this.settings.zStack};
+        this.setPushMultiplicators();
+      }        
+              
       if ((this.settings.buttonClose && this.settings.buttonDestroy) && !this.settings.inverse) {
         this.paneEl.appendChild(this.destroyButtonEl);
         this.destroyButtonEl.addEventListener('click', (t) => this.destroy({animate:true, destroyButton: true}));
@@ -324,8 +334,13 @@ export class CupertinoPane {
         if (this.settings.backdrop) {
           this.backdropEl.style.display = `block`;
         }
-        if (this.settings.pushElement) {
-          this.pushTransition(this.breakpoints.breaks[this.settings.initialBreak], 'unset');
+        if (this.settings.zStack) {
+          this.settings.zStack.pushElements.forEach(item => 
+            this.pushTransition(
+              document.querySelector(item), 
+              this.breakpoints.breaks[this.settings.initialBreak], 'unset'
+            )
+          );
         }
         // Emit event
         this.settings.onDidPresent();
@@ -399,7 +414,10 @@ export class CupertinoPane {
   }
 
   public checkOverflowAttr(val) {
-    if (!this.settings.topperOverflow) return;
+    if (!this.settings.topperOverflow 
+        || !this.overflowEl) {
+      return;
+    }
 
     if (!this.settings.inverse) {
       this.overflowEl.style.overflowY = (val <= this.breakpoints.topper) ? 'auto' : 'hidden';
@@ -503,6 +521,36 @@ export class CupertinoPane {
     style.textContent = styleString;
     document.head.prepend(style);
   };
+
+  // Z-Stack: Pushed elements multiplicators
+  private setPushMultiplicators(): void {
+    this.settings.zStack.pushElements.forEach((item) => {
+      let pushElement: HTMLElement = document.querySelector(item);
+      let multiplicator = this.getPushMulitplicator(pushElement);
+          multiplicator = multiplicator ? multiplicator + 1 : 1;
+      pushElement.style.setProperty('--push-multiplicator', `${multiplicator}`);
+    });
+  }
+
+  private clearPushMultiplicators(): void {
+    for (let i = 0; i < this.settings.zStack.pushElements.length; i++) {
+      let pushElement: HTMLElement = document.querySelector(
+        this.settings.zStack.pushElements[i]
+      );
+      let multiplicator = this.getPushMulitplicator(pushElement);
+          multiplicator -= 1;
+      if (multiplicator) {
+        pushElement.style.setProperty('--push-multiplicator', `${multiplicator}`);
+      } else {
+        pushElement.style.removeProperty('--push-multiplicator');
+      }
+    }
+  }
+
+  private getPushMulitplicator(el: HTMLElement): number {
+    let multiplicator: (string | number) = el.style.getPropertyValue('--push-multiplicator');
+    return parseInt(multiplicator);
+  }
   
   /**
    * Backdrop
@@ -666,6 +714,11 @@ export class CupertinoPane {
     /****** Detach Events *******/
     this.events.detachAllEvents();
 
+    // Clear pushed elements
+    if (this.settings.zStack) {
+      // this.clearPushMultiplicators();
+    }
+
     // Reset vars
     delete this.rendered;
     delete this.breakpoints.prevBreakpoint;
@@ -710,23 +763,53 @@ export class CupertinoPane {
     }
   }
 
-  private pushTransition(newPaneY: number, transition: string) {
+  private pushTransition(pushElement: HTMLElement, newPaneY: number, transition: string) {
+    let zStack = this.settings.zStack.pushElements;
+    pushElement.style.transition = transition;
     newPaneY = this.screenHeightOffset - newPaneY;
-    const topHeight = this.settings.pushMinHeight ? this.settings.pushMinHeight : this.screenHeightOffset - this.breakpoints.bottomer;
+    const topHeight = this.settings.zStack.minPushHeight 
+      ? this.settings.zStack.minPushHeight : this.screenHeightOffset - this.breakpoints.bottomer;
     const minHeight = this.screenHeightOffset - this.breakpoints.topper;
-    this.pushElement.style.transition = transition;
 
-    const setStyles = (scale, y, border, contrast) => {
-      this.pushElement.style.transform = `translateY(${y}px) scale(${scale})`;
-      this.pushElement.style.borderRadius = `${border}px`;
-      this.pushElement.style.filter = `contrast(${contrast})`;
+    // Math calculations
+    let multiplicator = this.getPushMulitplicator(pushElement);
+    let scaleNew =  Math.pow(this.settings.zStack.cardZScale, multiplicator);
+    let scaleNormal = Math.pow(this.settings.zStack.cardZScale, multiplicator - 1);
+    let pushY = 6 + this.settings.zStack.cardYOffset; // 6 is iOS style offset for z-stacks
+    let yNew = -1 * (pushY * multiplicator); 
+    let yNormal = (yNew + pushY);
+    let contrastNew = Math.pow(0.85, multiplicator);
+    let contrastNormal = Math.pow(0.85, multiplicator - 1);
+
+    // Accumulated styles from each pusher to pushed
+    const setStyles = (scale, y, contrast, border) => {
+        let exponentAngle = Math.pow(scale, this.settings.zStack.stackZAngle / 100);
+        pushElement.style.transform = `translateY(${y * (exponentAngle/scale)}px) scale(${scale})`;
+        pushElement.style.borderRadius = `${border}px`;
+        if (this.settings.zStack.cardLessContrast) {
+          pushElement.style.filter = `contrast(${contrast})`;
+        }
+
+        // When destroy transition and last item moved we reduce multiplicators
+        let lastPushed = document.querySelector(zStack[zStack.length - 1]);
+        if (!newPaneY && pushElement.className === lastPushed.className) {
+          this.clearPushMultiplicators();
+        }
     };
 
+    // Pusher cleared or pane destroyed
     if (newPaneY <= topHeight) {
-      setStyles(1, 0, 0, 1);
+      // defaults
+      setStyles(
+        scaleNormal, // scale
+        yNormal, // transformY
+        contrastNormal, // contrast
+        0 // border
+      );
       return;
     }
     
+    // Pusher drag/move
     const getXbyY = (min, max) => {
       let val = (minHeight * max - topHeight * min) * -1;
           val -= (min - max) * newPaneY;
@@ -737,10 +820,10 @@ export class CupertinoPane {
     };
 
     setStyles(
-      getXbyY(0.93, 1), 
-      getXbyY(-6 - this.settings.pushYOffset, 0), // *-1 for reverse animation
+      getXbyY(scaleNew, scaleNormal),
+      getXbyY(yNew, yNormal),
+      getXbyY(contrastNew, contrastNormal), 
       getXbyY(-10, 0) * -1,
-      getXbyY(0.85, 1)
     );
   }
 
@@ -758,9 +841,14 @@ export class CupertinoPane {
         this.followerEl.style.transform = `translateY(${params.translateY - this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
       }
 
-      // Push transition
-      if (this.settings.pushElement) {
-        this.pushTransition(this.getPanelTransformY(), 'all 0ms linear 0ms');
+      // Push transition for each element
+      if (this.settings.zStack) {
+        this.settings.zStack.pushElements.forEach(item => 
+          this.pushTransition(
+            document.querySelector(item), 
+            this.getPanelTransformY(), 'all 0ms linear 0ms'
+          )
+        );
       }
       
       return;
@@ -839,15 +927,21 @@ export class CupertinoPane {
       if (this.followerEl) {
         this.followerEl.style.transition = `transform ${this.settings.animationDuration}ms ${timingForNext} 0s`;
       }
-
+      
       // Push transition
-      if (this.settings.pushElement) {
+      if (this.settings.zStack) {
         // Reason of timeout is to hide empty space when present pane and push element
         // we should start push after pushMinHeight but for present 
-        // transition we can't calculate where pane Y is.
+        // transition we can't calculate where pane Y is.    
         setTimeout(() => {
-          this.pushTransition(params.translateY, `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`);
-        }, this.settings.pushYOffset ? 50 : 0);
+          this.settings.zStack.pushElements.forEach(item => 
+            this.pushTransition(
+              document.querySelector(item), 
+              params.translateY, 
+              `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`
+            )
+          );
+        }, (this.settings.zStack.cardYOffset && params.type === 'present') ? 50 : 0);
       }
 
       // Main transitions

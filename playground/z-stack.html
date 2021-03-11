@@ -137,6 +137,7 @@
       const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
       const screenY = t.type === 'touchmove' ? targetTouch.clientY : t.clientY;
       if (firstPoint - screenY > 50) {
+        console.log('present'); 
         activatePane(num + 1, document.getElementById(`button-${num + 1}`), true);
         firstPoint = 0;
         return;
@@ -150,6 +151,7 @@
     }
 
     async function activatePane(id, btn, animate, dismiss) {
+      console.log('activate', id);
       if ((id > 5) || (id < 1)) {
         return;
       }

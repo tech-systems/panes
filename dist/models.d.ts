@@ -8,6 +8,14 @@ export interface PaneBreaks {
     middle?: PaneBreak;
     bottom?: PaneBreak;
 }
+export interface ZStackSettings {
+    pushElements: string[];
+    minPushHeight?: number;
+    cardYOffset?: number;
+    cardZScale?: number;
+    cardLessContrast?: boolean;
+    stackZAngle?: number;
+}
 export interface TransitionStartEvent {
     translateY: {
         new: number;
@@ -22,9 +30,6 @@ export interface PaneSettings {
     fitHeight: boolean;
     maxFitHeight: number;
     fitScreenHeight: boolean;
-    pushElement: any;
-    pushMinHeight: number;
-    pushYOffset: number;
     backdrop: boolean;
     backdropOpacity: number;
     animationType: string;
@@ -51,12 +56,13 @@ export interface PaneSettings {
     touchMoveStopPropagation: boolean;
     touchAngle: number;
     breaks: PaneBreaks;
+    zStack: ZStackSettings;
     onDidDismiss: (event?: CustomEvent) => void;
     onWillDismiss: (event?: CustomEvent) => void;
     onDidPresent: (event?: CustomEvent) => void;
     onWillPresent: (event?: CustomEvent) => void;
     onDragStart: (event?: CustomEvent) => void;
-    onDrag: (event?: CustomEvent) => void;
+    onDrag: (event?: any) => void;
     onDragEnd: (event?: CustomEvent) => void;
     onBackdropTap: (event?: CustomEvent) => void;
     onTransitionStart: (event?: TransitionStartEvent) => void;

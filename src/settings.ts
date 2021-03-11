@@ -13,9 +13,6 @@ export class Settings {
       fitHeight: false,
       maxFitHeight: null,
       fitScreenHeight: true,
-      pushElement: null,
-      pushMinHeight: null,
-      pushYOffset: 0,
       backdrop: false,
       backdropOpacity: 0.4,
       animationType: 'ease',
@@ -42,6 +39,7 @@ export class Settings {
       touchMoveStopPropagation: false,
       touchAngle: null,
       breaks: {},
+      zStack: null,
       onDidDismiss: () => {},
       onWillDismiss: () => {},
       onDidPresent: () => {},
@@ -51,7 +49,7 @@ export class Settings {
       onDragEnd: () => {},
       onBackdropTap: () => {},
       onTransitionStart: () => {},
-      onTransitionEnd: () => {}
+      onTransitionEnd: () => {},
     };
   }
 }

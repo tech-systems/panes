@@ -168,19 +168,19 @@ export class Events {
     // Allow pereventDismiss by default
     this.instance.preventedDismiss = false;
 
-    const targetTouch = t.type === 'touchstart' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
-    const screenY = t.type === 'touchstart' ? targetTouch.clientY : t.clientY;
-    const screenX = t.type === 'touchstart' ? targetTouch.clientX : t.clientX;
-    if (t.type === 'mousedown') this.pointerDown = true;
+    const { clientY, clientX } = this.getEvetClientYX(t, 'touchstart');
+    this.startY = clientY;
+    this.startX = clientX;
 
-    this.startY = screenY;
-    this.startX = screenX;
+    if (t.type === 'mousedown') this.pointerDown = true;
 
     // if overflow content was scrolled
     // increase to scrolled value
-    if (this.isDragScrollabe(t.path || t.composedPath())) {
+    if (this.contentScrollTop 
+        && this.isDragScrollabe(t.path || t.composedPath())) {
       this.startY += this.contentScrollTop;  
     }
+    
     this.steps.push(this.startY);
   }
 
@@ -201,10 +201,16 @@ export class Events {
    */
   public touchMoveCb = (t) => this.touchMove(t);
   private touchMove(t) {
+    const { clientY, clientX } = this.getEvetClientYX(t, 'touchmove');
+    
     // Event emitter
-    this.settings.onDrag(t as CustomEvent);
-
-    if (this.instance.disableDragEvents) return;
+    t.delta = this.steps[0] - clientY;
+    this.settings.onDrag(t);
+    
+    if (this.instance.disableDragEvents) {
+      this.steps = [];
+      return;
+    }
     if (this.disableDragAngle) return;
     if (this.instance.preventedDismiss) return;
 
@@ -213,15 +219,10 @@ export class Events {
     }
 
     // Handle desktop/mobile events
-    const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
-    const screenY = t.type === 'touchmove' ? targetTouch.clientY : t.clientY;
-    const screenX = t.type === 'touchmove' ? targetTouch.clientX : t.clientX;
     if(t.type === 'mousemove' && !this.pointerDown) return;
     
     // Delta
-    let n = screenY;
-    let v = screenX;
-    const diffY = n - this.steps[this.steps.length - 1];
+    const diffY = clientY - this.steps[this.steps.length - 1];
     let newVal = this.instance.getPanelTransformY() + diffY;
 
     // textarea scrollbar
@@ -244,8 +245,8 @@ export class Events {
     // Only for initial gesture
     if (this.settings.touchAngle) {
       let touchAngle;
-      const diffX = v - this.startX;
-      const diffY = n - this.startY;
+      const diffX = clientX - this.startX;
+      const diffY = clientY - this.startY;
       touchAngle = (Math.atan2(Math.abs(diffY), Math.abs(diffX)) * 180) / Math.PI;
       if (diffX * diffX + diffY * diffY >= 25 
           && (90 - touchAngle > this.settings.touchAngle)
@@ -301,7 +302,7 @@ export class Events {
       let differKoef = ((-this.breakpoints.topper + this.breakpoints.topper - this.instance.getPanelTransformY()) / this.breakpoints.topper) / -8;
       newVal = this.instance.getPanelTransformY() + (diffY * (0.5 - differKoef));
       
-      let mousePointY = (t.touches[0].screenY - 220 - this.instance.screen_height) * -1;
+      let mousePointY = (clientY - 220 - this.instance.screen_height) * -1;
       if (mousePointY <= this.instance.screen_height - this.breakpoints.bottomer) {
         this.instance.preventedDismiss = true; 
         // Emit event with prevent dismiss
@@ -317,7 +318,7 @@ export class Events {
     this.instance.checkOpacityAttr(newVal);
     this.instance.checkOverflowAttr(newVal);
     this.instance.doTransition({type: 'move', translateY: newVal});
-    this.steps.push(n);
+    this.steps.push(clientY);
   }
 
   /**
@@ -326,11 +327,8 @@ export class Events {
    */
   public touchEndCb = (t) => this.touchEnd(t);
   private touchEnd(t) {
-
     if (this.instance.disableDragEvents) return;
 
-    const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
-    const screenY = t.type === 'touchmove' ? targetTouch.clientY : t.clientY;
     if (t.type === 'mouseup') this.pointerDown = false;
 
     // Determinate nearest point
@@ -343,10 +341,10 @@ export class Events {
     const fastSwipeNext = (Math.abs(diff) >= swipeNextSensivity);
     if (fastSwipeNext) {
       closest = this.instance.swipeNextPoint(diff, swipeNextSensivity, closest);
-
+      
       // Fast swipe toward bottom - close
       if (this.settings.fastSwipeClose 
-          && this.breakpoints.currentBreakpoint < closest) {        
+          && this.breakpoints.currentBreakpoint < closest) {      
         this.instance.destroy({animate:true});
         return;
       }
@@ -516,6 +514,13 @@ export class Events {
   /**
    * Private class methods
    */
+
+  private getEvetClientYX(ev, name) {
+    const targetTouch = ev.type === name && ev.targetTouches && (ev.targetTouches[0] || ev.changedTouches[0]);
+    const clientY = ev.type === name ? targetTouch.clientY : ev.clientY;
+    const clientX = ev.type === name ? targetTouch.clientX : ev.clientX;
+    return {clientY, clientX};
+  }
 
   /**
    * Fix android keyboard issue with transition 

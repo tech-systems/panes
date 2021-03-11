@@ -76,6 +76,7 @@ export declare class Events {
     /**
      * Private class methods
      */
+    private getEvetClientYX;
     /**
      * Fix android keyboard issue with transition
      * (resize window frame height on hide/show)

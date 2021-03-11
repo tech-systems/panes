@@ -19,7 +19,6 @@ export declare class CupertinoPane {
     private moveEl;
     private destroyButtonEl;
     private followerEl;
-    private pushElement;
     private settings;
     private device;
     private events;
@@ -48,6 +47,9 @@ export declare class CupertinoPane {
      * @param {string} styleString
      */
     private addStyle;
+    private setPushMultiplicators;
+    private clearPushMultiplicators;
+    private getPushMulitplicator;
     /**
      * Backdrop
      */
