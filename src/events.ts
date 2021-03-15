@@ -177,6 +177,7 @@ export class Events {
     // if overflow content was scrolled
     // increase to scrolled value
     if (this.contentScrollTop 
+        && this.willScrolled(t)
         && this.isDragScrollabe(t.path || t.composedPath())) {
       this.startY += this.contentScrollTop;  
     }

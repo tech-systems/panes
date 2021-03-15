@@ -89,7 +89,6 @@
 
   </ion-content>
   <script>
-    let firstPoint;
     let activeNum = 3;
     let maxHeight = 500;
     let swiper = document.querySelector('ion-slides');
@@ -103,23 +102,43 @@
         breaks: {
           top: { enabled: true, height: maxHeight },
           middle: { enabled: false },
-          bottom: { enabled: true, height: 0 },
+          bottom: { enabled: false },
         },
         darkMode: true,
         showDraggable: false,
         buttonClose: false,
         bottomClose: true,
-        pushMinHeight: 100,
-        pushYOffset: 15
+        zStack: {
+          cardYOffset: 16,
+          cardLessContrast: true,
+          pushElements: null,
+          minPushHeight: 100
+        }
     };
 
-    let drawers = {
-      '1': new CupertinoPane('.card-1', { ...settings, cssClass: 'card-1', onDrag: (e) => onDragFunc(1, e), onDragStart: (e) => onDragStartFunc(1, e), onDidDismiss: () => onDidDismissFunc(1) }),
-      '2': new CupertinoPane('.card-2', { ...settings, cssClass: 'card-2', pushElement: '.cupertino-pane-wrapper.card-1', onDrag: (e) => onDragFunc(2, e), onDragStart: (e) => onDragStartFunc(2, e), onDidDismiss: () => onDidDismissFunc(2) }),
-      '3': new CupertinoPane('.card-3', { ...settings, cssClass: 'card-3', pushElement: '.cupertino-pane-wrapper.card-2', onDrag: (e) => onDragFunc(3, e), onDragStart: (e) => onDragStartFunc(3, e), onDidDismiss: () => onDidDismissFunc(3) }),
-      '4': new CupertinoPane('.card-4', { ...settings, cssClass: 'card-4', pushElement: '.cupertino-pane-wrapper.card-3', onDrag: (e) => onDragFunc(4, e), onDragStart: (e) => onDragStartFunc(4, e), onDidDismiss: () => onDidDismissFunc(4) }),
-      '5': new CupertinoPane('.card-5', { ...settings, cssClass: 'card-5', pushElement: '.cupertino-pane-wrapper.card-4', onDrag: (e) => onDragFunc(5, e), onDragStart: (e) => onDragStartFunc(5, e), onDidDismiss: () => onDidDismissFunc(5) })
-    };
+    let drawers = { '1': null, '2': null, '3': null, '4': null, '5': null};
+    Object.keys(drawers).forEach((key) => {
+      key = parseInt(key);
+      let itemSettings = {
+        ...settings,
+        cssClass: `card-${key}`,
+        onDrag: (e) => onDragFunc(key, e),
+        onDragStart: (e) => onDragStartFunc(key, e),
+        onDidDismiss: () => onDidDismissFunc(key)
+      }
+
+      if (key !== 1) {
+        itemSettings.zStack = { ...itemSettings.zStack, pushElements: [`.cupertino-pane-wrapper.card-${(key - 1)}`] };
+      }
+
+      if (key === 1) {
+        itemSettings.breaks = {...settings.breaks, ...{bottom: {enabled: false}}};
+        itemSettings.bottomClose = false;
+        itemSettings.zStack = null;
+      }
+
+      drawers[key] = new CupertinoPane(`.card-${key}`, itemSettings);
+    });
     
     // On ready
     (function() {
@@ -134,13 +153,12 @@
     }
 
     async function onDragFunc(num, t) {
-      const targetTouch = t.type === 'touchmove' && t.targetTouches && (t.targetTouches[0] || t.changedTouches[0]);
-      const screenY = t.type === 'touchmove' ? targetTouch.clientY : t.clientY;
-      if (firstPoint - screenY > 50) {
-        console.log('present'); 
-        activatePane(num + 1, document.getElementById(`button-${num + 1}`), true);
-        firstPoint = 0;
+      if (num === drawers.length - 1) {
         return;
+      }
+
+      if (t.delta > 70) {
+        activatePane(num + 1, document.getElementById(`button-${num + 1}`), true);
       }
     }
 
@@ -151,11 +169,10 @@
     }
 
     async function activatePane(id, btn, animate, dismiss) {
-      console.log('activate', id);
       if ((id > 5) || (id < 1)) {
         return;
       }
-
+      
       document.querySelectorAll('ion-slide ion-button').forEach(item => item.color = 'light');
       btn.color = "medium";
       activeNum = id;

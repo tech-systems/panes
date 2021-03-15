@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: March 12, 2021
+ * Released on: March 16, 2021
  */
 
 /*! *****************************************************************************
@@ -360,6 +360,7 @@ class Events {
         // if overflow content was scrolled
         // increase to scrolled value
         if (this.contentScrollTop
+            && this.willScrolled(t)
             && this.isDragScrollabe(t.path || t.composedPath())) {
             this.startY += this.contentScrollTop;
         }
