@@ -422,7 +422,7 @@ If you would like handle this part by yourself, set option `handleKeyboard: fals
 
 ## Future Goals
 Project under regularly maintanance and bug fixes. 
-All **new features** and **new investigations** moved to open collective (Goals)[https://opencollective.com/cupertino-pane/conversations/all-goals-and-featured-packages-o60ddaqg]
+All **new features** and **new investigations** moved to open collective [Goals](https://opencollective.com/cupertino-pane/conversations/all-goals-and-featured-packages-o60ddaqg)
 
 ## Contributors
 We are welcome contributions of all kinds from anyone. 
