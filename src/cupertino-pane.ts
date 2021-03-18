@@ -289,7 +289,7 @@ export class CupertinoPane {
           minPushHeight: null,
           cardYOffset: 0,
           cardZScale: 0.93,
-          cardLessContrast: true,
+          cardContrast: 0.85,
           stackZAngle: 160,
         };
         this.settings.zStack = {...zStackDefaults, ...this.settings.zStack};
@@ -779,17 +779,15 @@ export class CupertinoPane {
     let pushY = 6 + this.settings.zStack.cardYOffset; // 6 is iOS style offset for z-stacks
     let yNew = -1 * (pushY * multiplicator); 
     let yNormal = (yNew + pushY);
-    let contrastNew = Math.pow(0.85, multiplicator);
-    let contrastNormal = Math.pow(0.85, multiplicator - 1);
+    let contrastNew = Math.pow(this.settings.zStack.cardContrast, multiplicator);
+    let contrastNormal = Math.pow(this.settings.zStack.cardContrast, multiplicator - 1);
 
     // Accumulated styles from each pusher to pushed
     const setStyles = (scale, y, contrast, border) => {
         let exponentAngle = Math.pow(scale, this.settings.zStack.stackZAngle / 100);
         pushElement.style.transform = `translateY(${y * (exponentAngle/scale)}px) scale(${scale})`;
         pushElement.style.borderRadius = `${border}px`;
-        if (this.settings.zStack.cardLessContrast) {
-          pushElement.style.filter = `contrast(${contrast})`;
-        }
+        pushElement.style.filter = `contrast(${contrast})`;
 
         // When destroy transition and last item moved we reduce multiplicators
         let lastPushed = document.querySelector(zStack[zStack.length - 1]);

@@ -2,6 +2,44 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.2.6] - 2021-03-18
+
+### BREAKING CHANGES
+- All Z-Stack and 3D Push properties was merged into `zStack` object. [Readme](https://github.com/roman-rr/cupertino-pane/blob/master/README.md#z-stack)
+
+```js
+let settings = {
+  ...
+  zStack: {
+    pushElements: string[];
+    minPushHeight?: number;
+    cardYOffset?: number;
+    cardZScale?: number;
+    cardContrast?: number;
+    stackZAngle?: number;
+  }
+}
+```
+
+### Extra 
+- [Advanced Z-stack available](https://output.jsbin.com/benidub)
+
+### Features
+- 3D Push transitions and gestures now available as cumulative options with `pushElements` property. Define array of elements which will be pushed when main element execute transitions. All styles from all elements will be accumulated together.
+```js
+let settings = {
+  ...
+  zStack: {
+    pushElements: ['.card-1', '.card-2', '.card-3']
+  }
+}
+```
+
+### Bug Fixes
+- Click to elements fixed with `.disableDrag()` method [#140](https://github.com/roman-rr/cupertino-pane/issues/140)
+- Fixed css variable `--cupertino-pane-icon-close-color` [#139](https://github.com/roman-rr/cupertino-pane/issues/139)
+- Fixed pane jump on drag with positive scroll from lower breakpoints [#135](https://github.com/roman-rr/cupertino-pane/issues/135)
+
 ## [1.2.5] - 2021-02-20
 
 ### BREAKING CHANGES
@@ -23,9 +61,9 @@ body.dark {
 - 3 Panes live environment [demo available](https://jsbin.com/xavifaf)
 
 ### Features
-- CSS variables available [Readme](https://github.com/roman-rr/cupertino-pane/blob/master/CHANGELOG.md#css-variables)
+- CSS variables available [Readme](https://github.com/roman-rr/cupertino-pane/blob/master/README.md#css-variables)
 
-### Bug Fixed
+### Bug Fixes
 - Fixed styles for few panes in single DOM [#133](https://github.com/roman-rr/cupertino-pane/issues/133)
 - Fixed with internal styles injector in DOM. Minified styles now injected once inside `<head>` tag. 
 - Fixed backdrop with `{ animate:false }`

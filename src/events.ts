@@ -157,10 +157,10 @@ export class Events {
     // Event emitter
     this.settings.onDragStart(t as CustomEvent);
 
-    if (this.instance.disableDragEvents) return;
-
-    // Allow clicks by default, disallow on move
+    // Allow clicks by default -> disallow on move (allow click with disabled drag)
     this.allowClick = true;
+
+    if (this.instance.disableDragEvents) return;
 
     // Allow touch angle by default, disallow no move with condition
     this.disableDragAngle = false;

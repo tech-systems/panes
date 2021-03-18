@@ -13,7 +13,7 @@ export interface ZStackSettings {
     minPushHeight?: number;
     cardYOffset?: number;
     cardZScale?: number;
-    cardLessContrast?: boolean;
+    cardContrast?: number;
     stackZAngle?: number;
 }
 export interface TransitionStartEvent {

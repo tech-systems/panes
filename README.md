@@ -31,6 +31,9 @@ Cupertino Panes is multi-functional panes & boards with touch technologies. <br>
 * [Supporting platforms](#supporting-platforms)
 * [Getting Started](#getting-started)
 * [Settings](#settings)
+* [Breakpoints](#breakpoints)
+* [Z-Stack](#z-stack)
+* [Callbacks](#callback)
 * [Public Methods](#public-methods)
 * [Attributes](#attributes)
 * [CSS Variables](#css-variables)
@@ -65,14 +68,15 @@ Support this project with your organization. Your logo will show up here with a 
 
 ## Demonstration
 - [Base live](https://output.jsbin.com/fuhisey)
+- [Overflow top live](https://output.jsbin.com/baguroy)
+- [Z-stack full live](https://output.jsbin.com/benidub)
+- [Z-Stack simple live](https://output.jsbin.com/daqihir)
+- [3D Push live](https://output.jsbin.com/vidaqa)
 - [3 Panes live](https://jsbin.com/xavifaf)
-- [Z-Stack live](https://output.jsbin.com/wedegox)
+- [Overflow top-middle live](https://output.jsbin.com/piwecad)
 - [Draggable over live](https://jsbin.com/hamedec)
 - [Prevent dismiss live](https://output.jsbin.com/keravam)
 - [Top-to-bottom live](https://output.jsbin.com/muhabuf)
-- [3D Push live](https://output.jsbin.com/tutegad)
-- [Overflow top live](https://output.jsbin.com/baguroy)
-- [Overflow top-middle live](https://output.jsbin.com/piwecad)
 - [Follower live](https://output.jsbin.com/xogavec)
 - [Apple Clips live](https://output.jsbin.com/luqaxud)
 - [Bulletin live](https://output.jsbin.com/maqigod)
@@ -192,9 +196,6 @@ new CupertinoPane(element); // HTMLElement
 | **fitHeight** | `boolean` | 'false' | Automatically calc and define content height as top breakpoint. Middle and bottom breakpoint will be disabled |
 | **maxFitHeight** | `number` | 'null' | Define a maximum possible automatically calculated height with `fitHeight` property |
 | **fitScreenHeight** | `boolean` | 'true' | On `true` will automatically adjust pane maximum height to screen height |
-| **pushElement** | `string` | Push element selector | DOM Element will be pushed and scaled |
-| **pushMinHeight** | `number` | Most bottom available point | Height from which 3d push effect will be started |
-| **pushYOffset** | `number` | Negative margin value to place pushed element upper |
 | **initialBreak** | `'top' \| 'middle' \| 'bottom'` | 'middle' | Initial pane position |
 | **backdrop** | `boolean` | false | Dimmed overlay will rendered with pane if `true` |
 | **backdropOpacity** | `number` | 0.4 | Dimmed overlay opacity value |
@@ -220,6 +221,7 @@ new CupertinoPane(element); // HTMLElement
 | **touchMoveStopPropagation** | `boolean` | false | If enabled, then propagation of "touchmove" will be stopped |
 | **simulateTouch** | `boolean` | true | Simulate touch events for Desktop |
 | **passiveListeners** | `boolean` | true | (Indicates that the function specified by listener will never call preventDefault()) |
+
 ### Breakpoints
 Package now supports 3 base breakpoints
 ```javascript
@@ -240,6 +242,26 @@ Bottom and middle heights normalized accross devices by default
 Default top height: `window.screen.height - (135 * 0.35)`
 
 Add property `bounce` to break and enjoy transitions in apple stocks style with `cubic-bezier(0.175, 0.885, 0.370, 1.120)`
+
+### Z-Stack
+Configuration for 3D push effects and z-stack
+```js
+let settings = {
+  ...
+  zStack: {
+    pushElements: ['.card-1', '.main-content'],
+    pushYOffset: 10
+  }
+}
+```
+| Property | Type | Default | Description |
+| - | - | - | - |
+| **pushElements** | `string[]` | null | DOM Element will be pushed and scaled |
+| **minPushHeight** | `number` | null | Height from which 3d push effect will be started |
+| **cardYOffset** | `number` | null | Margin value to place pushed elements upper |
+| **cardZScale** | `number` | 0.93 | Scale value for each pushed element |
+| **cardContrast** | `number` | 0.85 | Contrast value for each pushed element |
+| **stackZAngle** | `number` | 160 | Value from 0 to 3000 that define angle of z-stack in common. 0 - 150 positive expontial angle. 150 - 170 = 45 degree angle. 200 - 3000 negative exponential angle |
 
 ### Callbacks
 The function that executes when the event fires.
@@ -399,20 +421,8 @@ By default, we are now handle keyboard in hybrid mobile applications and push pa
 If you would like handle this part by yourself, set option `handleKeyboard: false`.
 
 ## Future Goals
-- [Enhancement] Z-stack with N cards and proper transitions
-- [Feature] Chevron-up draggable
-- [Accurance] Draw experiment application (Normal/TimeStamp/Native) - Native Touch Plugin
-- [Showcase] Touchmove - Z-angle deviation <!-- https://dribbble.com/shots/15220605-Weather-Forecast -->
-- [Platforms] C++ QT version (low lewel programming)
-- [Platforms] C# Blazor (low lewel programming)
-- [Feature] R-Pane (Rectangular pane - safari video frame example)
-- [Feature] iPad slideover
-- [Platforms] RN - bridge to existed swift panes
-- [Platforms] Expo wrapper + Example + Twitter
-- [Docs] (Traffic + Carbon ads) -> Docs engine <!-- Ask Vladimir first + check https://github.com/denoland/doc_website https://github.com/ionic-team/ionic-docs (Swiper, F7, Netlify, Gatsby, DO, GH pages) -->
-- [Showcase] No background - glow for view + (collaboration with arwes)
-- [Showcase] Materials (glass/metal/blur) <!-- https://codepen.io/TurkAysenur/full/ZEpxeYm + glass + metal three -->
-- [Showcase] Apple Music F7
+Project under regularly maintanance and bug fixes. 
+All **new features** and **new investigations** moved to open collective (Goals)[https://opencollective.com/cupertino-pane/conversations/all-goals-and-featured-packages-o60ddaqg]
 
 ## Contributors
 We are welcome contributions of all kinds from anyone. 
