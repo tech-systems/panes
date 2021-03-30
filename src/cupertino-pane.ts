@@ -31,6 +31,15 @@ export class CupertinoPane {
   private events: Events;
   private breakpoints: Breakpoints;
 
+  private zStackDefaults: ZStackSettings = {
+    pushElements: null,
+    minPushHeight: null,
+    cardYOffset: 0,
+    cardZScale: 0.93,
+    cardContrast: 0.85,
+    stackZAngle: 160,
+  };
+
   constructor(private selector: (string | HTMLElement), 
               conf: CupertinoSettings = {}) {
     // Element or selector
@@ -283,16 +292,7 @@ export class CupertinoPane {
 
       // Assign multiplicators for push elements
       if (this.settings.zStack) {
-          // Default zStacks
-        let zStackDefaults: ZStackSettings = {
-          pushElements: null,
-          minPushHeight: null,
-          cardYOffset: 0,
-          cardZScale: 0.93,
-          cardContrast: 0.85,
-          stackZAngle: 160,
-        };
-        this.settings.zStack = {...zStackDefaults, ...this.settings.zStack};
+        this.setZstackConfig(this.settings.zStack);
         this.setPushMultiplicators();
       }        
               
@@ -551,6 +551,10 @@ export class CupertinoPane {
   private getPushMulitplicator(el: HTMLElement): number {
     let multiplicator: (string | number) = el.style.getPropertyValue('--push-multiplicator');
     return parseInt(multiplicator);
+  }
+
+  public setZstackConfig(zStack: ZStackSettings): void {
+    this.settings.zStack = zStack ? {...this.zStackDefaults, ...zStack} : null;;
   }
   
   /**

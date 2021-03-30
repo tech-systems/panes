@@ -1,4 +1,4 @@
-import { PaneSettings, PaneBreaks } from './models';
+import { PaneSettings, PaneBreaks, ZStackSettings } from './models';
 export declare type CupertinoSettings = Partial<PaneSettings>;
 export declare class CupertinoPane {
     private selector;
@@ -23,6 +23,7 @@ export declare class CupertinoPane {
     private device;
     private events;
     private breakpoints;
+    private zStackDefaults;
     constructor(selector: (string | HTMLElement), conf?: CupertinoSettings);
     private drawBaseElements;
     present(conf?: {
@@ -50,6 +51,7 @@ export declare class CupertinoPane {
     private setPushMultiplicators;
     private clearPushMultiplicators;
     private getPushMulitplicator;
+    setZstackConfig(zStack: ZStackSettings): void;
     /**
      * Backdrop
      */

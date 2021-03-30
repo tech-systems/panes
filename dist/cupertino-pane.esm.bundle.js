@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.2.5
+ * Cupertino Pane 1.2.6
  * Multi-functional panes and boards for next generation progressive applications
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: March 18, 2021
+ * Released on: March 31, 2021
  */
 
 /*! *****************************************************************************
@@ -972,6 +972,14 @@ class CupertinoPane {
         this.rendered = false;
         this.settings = (new Settings()).instance;
         this.device = new Device();
+        this.zStackDefaults = {
+            pushElements: null,
+            minPushHeight: null,
+            cardYOffset: 0,
+            cardZScale: 0.93,
+            cardContrast: 0.85,
+            stackZAngle: 160,
+        };
         this.swipeNextPoint = (diff, maxDiff, closest) => {
             let brs = {};
             let settingsBreaks = {};
@@ -1256,16 +1264,7 @@ class CupertinoPane {
             }
             // Assign multiplicators for push elements
             if (this.settings.zStack) {
-                // Default zStacks
-                let zStackDefaults = {
-                    pushElements: null,
-                    minPushHeight: null,
-                    cardYOffset: 0,
-                    cardZScale: 0.93,
-                    cardContrast: 0.85,
-                    stackZAngle: 160,
-                };
-                this.settings.zStack = Object.assign(Object.assign({}, zStackDefaults), this.settings.zStack);
+                this.setZstackConfig(this.settings.zStack);
                 this.setPushMultiplicators();
             }
             if ((this.settings.buttonClose && this.settings.buttonDestroy) && !this.settings.inverse) {
@@ -1448,6 +1447,9 @@ class CupertinoPane {
     getPushMulitplicator(el) {
         let multiplicator = el.style.getPropertyValue('--push-multiplicator');
         return parseInt(multiplicator);
+    }
+    setZstackConfig(zStack) {
+        this.settings.zStack = zStack ? Object.assign(Object.assign({}, this.zStackDefaults), zStack) : null;
     }
     /**
      * Backdrop
