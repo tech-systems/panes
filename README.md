@@ -55,16 +55,7 @@ Become a financial contributor and help us sustain our community. [[Contribute](
 
 Support this project with your organization. Your logo will show up here with a link to your website. [[Contribute](https://opencollective.com/cupertino-pane/contribute)]
 
-<a href="https://opencollective.com/cupertino-pane/organization/0/website"><img src="https://opencollective.com/cupertino-pane/organization/0/avatar.svg"></a>
-<a href="https://opencollective.com/cupertino-pane/organization/1/website"><img src="https://opencollective.com/cupertino-pane/organization/1/avatar.svg"></a>
-<a href="https://opencollective.com/cupertino-pane/organization/2/website"><img src="https://opencollective.com/cupertino-pane/organization/2/avatar.svg"></a>
-<a href="https://opencollective.com/cupertino-pane/organization/3/website"><img src="https://opencollective.com/cupertino-pane/organization/3/avatar.svg"></a>
-<a href="https://opencollective.com/cupertino-pane/organization/4/website"><img src="https://opencollective.com/cupertino-pane/organization/4/avatar.svg"></a>
-<a href="https://opencollective.com/cupertino-pane/organization/5/website"><img src="https://opencollective.com/cupertino-pane/organization/5/avatar.svg"></a>
-<a href="https://opencollective.com/cupertino-pane/organization/6/website"><img src="https://opencollective.com/cupertino-pane/organization/6/avatar.svg"></a>
-<a href="https://opencollective.com/cupertino-pane/organization/7/website"><img src="https://opencollective.com/cupertino-pane/organization/7/avatar.svg"></a>
-<a href="https://opencollective.com/cupertino-pane/organization/8/website"><img src="https://opencollective.com/cupertino-pane/organization/8/avatar.svg"></a>
-<a href="https://opencollective.com/cupertino-pane/organization/9/website"><img src="https://opencollective.com/cupertino-pane/organization/9/avatar.svg"></a>
+<a href="https://opencollective.com/cupertino-pane"><img src="https://opencollective.com/cupertino-pane/organizations.svg?width=890"></a>
 
 ## Demonstration
 - [Base live](https://output.jsbin.com/fuhisey)
