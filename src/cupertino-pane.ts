@@ -242,7 +242,7 @@ export class CupertinoPane {
     }
   }
 
-  async present(conf: {animate: boolean} = {animate: false}) {
+  async present(conf: {animate: boolean} = {animate: false}): Promise<CupertinoPane> {
       if (!this.el) return;
 
       // Pane already exist and was rendered
@@ -267,7 +267,7 @@ export class CupertinoPane {
       // Necessary Inlines with breakpoints
       this.paneEl.style.height = `${this.getPaneHeight()}px`;
       if (this.settings.inverse) {
-        this.paneEl.style.top = `-${this.breakpoints.bottomer}px`;
+        this.paneEl.style.top = `-${this.breakpoints.bottomer - this.settings.bottomOffset}px`;
       }
 
       // Show elements
@@ -315,7 +315,8 @@ export class CupertinoPane {
       if (this.settings.backdrop) {
         this.renderBackdrop();
       }
-
+      this.checkOpacityAttr(this.breakpoints.currentBreakpoint);
+      
       /****** Fix android issues *******/
       if (this.device.android) {
         // Body patch prevent android pull-to-refresh
@@ -327,7 +328,7 @@ export class CupertinoPane {
 
       /****** Animation & Transition ******/
       if (conf.animate) {
-        this.doTransition({type: 'present', translateY: this.breakpoints.breaks[this.settings.initialBreak]}); 
+        await this.doTransition({type: 'present', translateY: this.breakpoints.breaks[this.settings.initialBreak]}); 
       } else {
         // No initial transitions
         this.breakpoints.prevBreakpoint = this.settings.initialBreak;
@@ -347,19 +348,20 @@ export class CupertinoPane {
         this.settings.onDidPresent();
       }
 
-      this.checkOpacityAttr(this.breakpoints.currentBreakpoint);
-
       // Some timeout to get offsetTop
       await new Promise((resolve) => setTimeout(() => resolve(true), 150));
       this.scrollElementInit();
       this.checkOverflowAttr(this.breakpoints.currentBreakpoint);
+
+      return this;
   }
 
   public getPaneHeight(): number {
     if (!this.settings.inverse) {
       return this.screen_height - this.breakpoints.topper - this.settings.bottomOffset;
     } 
-    return this.breakpoints.bottomer + this.settings.bottomOffset;
+
+    return this.breakpoints.bottomer - this.settings.bottomOffset;
   }
 
   public updateScreenHeights():void {
@@ -629,13 +631,12 @@ export class CupertinoPane {
    * Public user method to reset breakpoints
    * @param conf 
    */
-  public async setBreakpoints(conf?: PaneBreaks) {
+  public async setBreakpoints(conf?: PaneBreaks, bottomOffset?: number) {
     if (this.isPanePresented() && !conf) {
       console.warn(`Cupertino Pane: Provide any breaks configuration`);
       return;
     }
-    
-    await this.breakpoints.buildBreakpoints(conf);
+    await this.breakpoints.buildBreakpoints(conf, bottomOffset);
   }
 
   public async calcFitHeight() {
@@ -732,13 +733,13 @@ export class CupertinoPane {
     this.contentEl.style.display = 'none';
   }
 
-  public destroy(conf: {
+  public async destroy(conf: {
       animate: boolean, 
       destroyButton?: boolean
     } = {
       animate: false, 
       destroyButton: false
-    }) {
+    }): Promise<true> {
 
     if (!this.isPanePresented()) {
       console.warn(`Cupertino Pane: Present pane before call destroy()`);
@@ -760,7 +761,7 @@ export class CupertinoPane {
 
     /****** Animation & Transition ******/
     if (conf.animate) {
-      this.doTransition({type: 'destroy', translateY: this.screenHeightOffset, destroyButton: conf.destroyButton}); 
+      await this.doTransition({type: 'destroy', translateY: this.screenHeightOffset, destroyButton: conf.destroyButton}); 
     } else {
       this.destroyResets();
       // Emit event
@@ -833,140 +834,141 @@ export class CupertinoPane {
   /***********************************
    * Transitions handler
    */
-  public doTransition(params:any = {}): void {
-    // touchmove simple event
-    if (params.type === 'move') {
-      this.paneEl.style.transition = 'all 0ms linear 0ms';
-      this.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
-      // Bind for follower same transitions
-      if (this.followerEl) {
-        this.followerEl.style.transition = 'all 0ms linear 0ms';
-        this.followerEl.style.transform = `translateY(${params.translateY - this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
-      }
-
-      // Push transition for each element
-      if (this.settings.zStack) {
-        this.settings.zStack.pushElements.forEach(item => 
-          this.pushTransition(
-            document.querySelector(item), 
-            this.getPanelTransformY(), 'all 0ms linear 0ms'
-          )
-        );
-      }
-      
-      return;
-    }
-
-    // Transition end
-    const transitionEnd = () => {
-      if (params.type === 'destroy') {
-        this.destroyResets();
-      }
-      this.paneEl.style.transition = `initial`;
-      // Bind for follower same transitions
-      if (this.followerEl) {
-        this.followerEl.style.transition = `initial`;
-      }
-
-      // Backdrop 
-      if (this.settings.backdrop) {
-        if (params.type === 'destroy' || params.type === 'hide') {
-          this.backdropEl.style.transition = `initial`;
-          this.backdropEl.style.display = `none`;
+  public doTransition(params:any = {}): Promise<true> {
+    return new Promise((resolve) => {
+      // touchmove simple event
+      if (params.type === 'move') {
+        this.paneEl.style.transition = 'all 0ms linear 0ms';
+        this.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
+        // Bind for follower same transitions
+        if (this.followerEl) {
+          this.followerEl.style.transition = 'all 0ms linear 0ms';
+          this.followerEl.style.transform = `translateY(${params.translateY - this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
         }
-      }
 
-      // Emit event
-      if (params.type === 'present') {
-        this.settings.onDidPresent();  
-      }
-      if (params.type === 'destroy') {
-        this.settings.onDidDismiss({destroyButton: params.destroyButton} as any);
-      }
-      this.settings.onTransitionEnd({target: document.body.contains(this.paneEl) ? this.paneEl : null});
-
-      // Remove listener
-      this.paneEl.removeEventListener('transitionend', transitionEnd);
-    };
-
-    // MoveToBreak, Touchend, Present, Hide, Destroy events
-    if (params.type === 'breakpoint' 
-        || params.type === 'end' 
-        || params.type === 'present'
-        || params.type === 'hide'
-        || params.type === 'destroy') {
-
-      // backdrop 
-      if (this.settings.backdrop) {
-        if (this.isHidden()
-            || params.type === 'hide'
-            || params.type === 'destroy'
-            || params.type === 'present') {
-          this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
-          this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-          
-          if (params.type !== 'hide' && params.type !== 'destroy') {
-            this.backdropEl.style.display = 'block';
-            setTimeout(() => {
-              this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
-            }, 50);
-          }
-        } 
-      }
-      
-      // freemode
-      if (params.type === 'end' && this.settings.freeMode) return; 
-
-      // Get timing function && push for next 
-      // TODO: getBreakByHeight or by translateY()
-      const nextBreak = Object.entries(this.settings.breaks).find(
-        val => val[1].height === (this.screenHeightOffset - params.translateY)
-      );
-      const timingForNext = this.getTimingFunction(nextBreak && nextBreak[1]?.bounce ? true : false);
-
-      // style
-      this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${timingForNext} 0s`;
-      // Bind for follower same transitions
-      if (this.followerEl) {
-        this.followerEl.style.transition = `transform ${this.settings.animationDuration}ms ${timingForNext} 0s`;
-      }
-      
-      // Push transition
-      if (this.settings.zStack) {
-        // Reason of timeout is to hide empty space when present pane and push element
-        // we should start push after pushMinHeight but for present 
-        // transition we can't calculate where pane Y is.    
-        setTimeout(() => {
+        // Push transition for each element
+        if (this.settings.zStack) {
           this.settings.zStack.pushElements.forEach(item => 
             this.pushTransition(
               document.querySelector(item), 
-              params.translateY, 
-              `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`
+              this.getPanelTransformY(), 'all 0ms linear 0ms'
             )
           );
-        }, (this.settings.zStack.cardYOffset && params.type === 'present') ? 50 : 0);
+        }
+        
+        return resolve(true);
       }
 
-      // Main transitions
-      setTimeout(() => {
-        // Emit event
-        this.settings.onTransitionStart({translateY: {new: params.translateY}});
-        this.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
-        
+      // Transition end
+      const transitionEnd = () => {
+        if (params.type === 'destroy') {
+          this.destroyResets();
+        }
+        this.paneEl.style.transition = `initial`;
         // Bind for follower same transitions
         if (this.followerEl) {
-          this.followerEl.style.transform = `translateY(${params.translateY - this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
-        }        
-      }, params.type === 'present' ? 50 : 0); 
+          this.followerEl.style.transition = `initial`;
+        }
+
+        // Backdrop 
+        if (this.settings.backdrop) {
+          if (params.type === 'destroy' || params.type === 'hide') {
+            this.backdropEl.style.transition = `initial`;
+            this.backdropEl.style.display = `none`;
+          }
+        }
+
+        // Emit event
+        if (params.type === 'present') {
+          this.settings.onDidPresent();  
+        }
+        if (params.type === 'destroy') {
+          this.settings.onDidDismiss({destroyButton: params.destroyButton} as any);
+        }
+        this.settings.onTransitionEnd({target: document.body.contains(this.paneEl) ? this.paneEl : null});
+
+        // Remove listener
+        this.paneEl.removeEventListener('transitionend', transitionEnd);
+        return resolve(true);
+      };
+
+      // MoveToBreak, Touchend, Present, Hide, Destroy events
+      if (params.type === 'breakpoint' 
+          || params.type === 'end' 
+          || params.type === 'present'
+          || params.type === 'hide'
+          || params.type === 'destroy') {
+
+        // backdrop 
+        if (this.settings.backdrop) {
+          if (this.isHidden()
+              || params.type === 'hide'
+              || params.type === 'destroy'
+              || params.type === 'present') {
+            this.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
+            this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
+            
+            if (params.type !== 'hide' && params.type !== 'destroy') {
+              this.backdropEl.style.display = 'block';
+              setTimeout(() => {
+                this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
+              }, 50);
+            }
+          } 
+        }
+        
+        // freemode
+        if (params.type === 'end' && this.settings.freeMode) return resolve(true); 
+
+        // Get timing function && push for next 
+        const nextBreak = Object.entries(this.breakpoints.breaks).find(
+          val => val[1] === params.translateY
+        );
+        let bounce = nextBreak && this.settings.breaks[nextBreak[0]]?.bounce;
+        const timingForNext = this.getTimingFunction(bounce);
+
+        // style
+        this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${timingForNext} 0s`;
+        // Bind for follower same transitions
+        if (this.followerEl) {
+          this.followerEl.style.transition = `transform ${this.settings.animationDuration}ms ${timingForNext} 0s`;
+        }
+        
+        // Push transition
+        if (this.settings.zStack) {
+          // Reason of timeout is to hide empty space when present pane and push element
+          // we should start push after pushMinHeight but for present 
+          // transition we can't calculate where pane Y is.    
+          setTimeout(() => {
+            this.settings.zStack.pushElements.forEach(item => 
+              this.pushTransition(
+                document.querySelector(item), 
+                params.translateY, 
+                `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`
+              )
+            );
+          }, (this.settings.zStack.cardYOffset && params.type === 'present') ? 50 : 0);
+        }
+
+        // Main transitions
+        setTimeout(() => {
+          // Emit event
+          this.settings.onTransitionStart({translateY: {new: params.translateY}});
+          this.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
+          
+          // Bind for follower same transitions
+          if (this.followerEl) {
+            this.followerEl.style.transform = `translateY(${params.translateY - this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+          }        
+        }, params.type === 'present' ? 50 : 0); 
 
 
-      let getNextBreakpoint = Object.entries(this.breakpoints.breaks).find(val => val[1] === params.translateY);
-      if (getNextBreakpoint) {
-        this.breakpoints.prevBreakpoint = getNextBreakpoint[0];
+        let getNextBreakpoint = Object.entries(this.breakpoints.breaks).find(val => val[1] === params.translateY);
+        if (getNextBreakpoint) {
+          this.breakpoints.prevBreakpoint = getNextBreakpoint[0];
+        }
+        this.paneEl.addEventListener('transitionend', transitionEnd);
       }
-      this.paneEl.addEventListener('transitionend', transitionEnd);      
-      return;
-    }
+    });
   }
-
 }

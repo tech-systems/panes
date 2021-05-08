@@ -29,7 +29,8 @@ export class Breakpoints {
    * Function builder for breakpoints and heights
    * @param conf breakpoints
    */  
-  public async buildBreakpoints(conf?: PaneBreaks, lock: boolean = true) {
+  public async buildBreakpoints(conf?: PaneBreaks, bottomOffset: number = 0) {
+    this.settings.bottomOffset = bottomOffset || this.settings.bottomOffset;
     this.breaks = {
       top: this.instance.screenHeightOffset,
       middle: this.instance.screenHeightOffset,
@@ -52,9 +53,10 @@ export class Breakpoints {
 
       conf = {
         top: { enabled: true, height },
-        middle: { enabled: false},
-        bottom: { enabled: false}
+        middle: { enabled: false }
       };
+      conf.top.bounce = this.settings.breaks?.top?.bounce;
+      conf.bottom = this.settings.breaks?.bottom || { enabled: true, height: 0 };
     }
 
     ['top', 'middle', 'bottom'].forEach((val) => {
@@ -85,7 +87,7 @@ export class Breakpoints {
         }
       }
 
-      // fitHeight (bullet-in styles fir screen)
+      // fitHeight (bullet-in styles for screen)
       if (this.settings.fitHeight && val === 'top') {
         if (this.settings.breaks[val].height > this.instance.screen_height) {
           this.settings.breaks[val].height = this.instance.screen_height - (this.settings.bottomOffset * 2);
@@ -102,11 +104,11 @@ export class Breakpoints {
       if (this.settings.breaks[val]
           && this.settings.breaks[val].enabled
           && this.settings.breaks[val].height) {
-            if (!this.settings.inverse) {
-              this.breaks[val] -= this.settings.breaks[val].height;
-            } else {
-              this.breaks[val] = this.settings.breaks[val].height;
-            }
+        if (!this.settings.inverse) {
+          this.breaks[val] -= this.settings.breaks[val].height;
+        } else {
+          this.breaks[val] = this.settings.breaks[val].height + this.settings.bottomOffset;
+        }
       }
     });
 
@@ -144,11 +146,13 @@ export class Breakpoints {
     this.bottomer = this.brs.reduce((prev, curr) => {
       return (Math.abs(curr) > Math.abs(prev) ? curr : prev);
     });
+    
+    if (this.settings.inverse) {
+      this.topper = this.bottomer;
+    }
 
     if (!this.instance.isPanePresented()) {
       this.currentBreakpoint = this.breaks[this.settings.initialBreak];
-
-            
       // Disable overflow for top bulletin
       if (this.settings.inverse 
           && !this.settings.breaks.bottom.enabled 
@@ -171,7 +175,8 @@ export class Breakpoints {
       }
 
       // Re-calc height and top
-      this.instance.paneEl.style.top = this.settings.inverse ? `-${this.bottomer}px` : `unset`;
+      this.instance.paneEl.style.top = this.settings.inverse 
+        ? `-${this.bottomer - this.settings.bottomOffset}px` : `unset`;
       this.instance.paneEl.style.height = `${this.instance.getPaneHeight()}px`;
 
       this.instance.scrollElementInit();
@@ -234,8 +239,10 @@ export class Breakpoints {
     // height include margins
     let elmHeight = parseInt(document.defaultView.getComputedStyle(this.instance.el, '').getPropertyValue('height'));
     let elmMargin = parseInt(document.defaultView.getComputedStyle(this.instance.el, '').getPropertyValue('margin-top')) + parseInt(document.defaultView.getComputedStyle(this.instance.el, '').getPropertyValue('margin-bottom'));
+    let panePaddingBottom = parseInt(document.defaultView.getComputedStyle(this.instance.el.parentElement, '').getPropertyValue('padding-bottom'));
     height = elmHeight + elmMargin
-    height += this.instance.el.offsetTop;
+    height += this.instance.el.offsetTop; // From top to element
+    height += panePaddingBottom; // From element to bottom
 
     // Hide elements back
     if (!this.instance.rendered) {

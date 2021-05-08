@@ -16,7 +16,7 @@ export class Events {
   private contentScrollTop: number = 0;
   private startY: number;
   private startX: number;
-  private steps: any[] = [];  
+  private steps: {posY: number, time: number}[] = [];  
   private inputBluredbyMove: boolean = false;
   private movedByKeyboard: boolean = false;
   
@@ -182,7 +182,7 @@ export class Events {
       this.startY += this.contentScrollTop;  
     }
     
-    this.steps.push(this.startY);
+    this.steps.push({posY: this.startY, time: Date.now()});
   }
 
   /** 
@@ -202,10 +202,10 @@ export class Events {
    */
   public touchMoveCb = (t) => this.touchMove(t);
   private touchMove(t) {
-    const { clientY, clientX } = this.getEvetClientYX(t, 'touchmove');
-    
+    const { clientY, clientX, velocityY } = this.getEvetClientYX(t, 'touchmove');
+
     // Event emitter
-    t.delta = this.steps[0] - clientY;
+    t.delta = this.steps[0]?.posY - clientY;
     this.settings.onDrag(t);
     
     if (this.instance.disableDragEvents) {
@@ -223,8 +223,10 @@ export class Events {
     if(t.type === 'mousemove' && !this.pointerDown) return;
     
     // Delta
-    const diffY = clientY - this.steps[this.steps.length - 1];
-    let newVal = this.instance.getPanelTransformY() + diffY;
+    const diffY = clientY - this.steps[this.steps.length - 1].posY;
+    // Patch for 'touchmove' first start slowly events with velocity
+    let newVal = this.instance.getPanelTransformY() 
+      + ((this.steps.length < 2) ? (diffY * velocityY) : diffY);  
 
     // textarea scrollbar
     if (this.isFormElement(t.target) 
@@ -270,31 +272,54 @@ export class Events {
       }
 
       // Scrolled -> Disable drag
-      if ((newVal > this.breakpoints.topper && this.contentScrollTop > 0) 
+      if (!this.settings.inverse) {
+        if ((newVal > this.breakpoints.topper && this.contentScrollTop > 0) 
           || (newVal <= this.breakpoints.topper)) { 
+          return;
+        }
+      } 
+    }
+    
+    // Non-inverse (normal) gestures
+    if (!this.settings.inverse) {
+      // Disallow drag topper than top point
+      if (!this.settings.upperThanTop 
+          && (newVal <= this.breakpoints.topper)) {
+        this.instance.paneEl.style.transform = `translateY(${this.breakpoints.topper}px) translateZ(0px)`;
         return;
       }
-    }
 
-    // Disallow drag topper than top point
-    if (!this.settings.inverse 
-        && !this.settings.upperThanTop && (newVal <= this.breakpoints.topper)) {
-      this.instance.paneEl.style.transform = `translateY(${this.breakpoints.topper}px) translateZ(0px)`;
-      return;
-    }
+      // Allow drag topper than top point
+      if (newVal <= this.breakpoints.topper 
+          && this.settings.upperThanTop) {
+        const screenDelta = this.instance.screen_height - this.instance.screenHeightOffset;
+        const differKoef = (screenDelta - this.instance.getPanelTransformY()) / (screenDelta - this.breakpoints.topper) / 8;
+        newVal = this.instance.getPanelTransformY() + (diffY * differKoef);
+      }
 
-    // Allow drag topper than top point
-    if (newVal <= this.breakpoints.topper && this.settings.upperThanTop) {
-      const differKoef = ((-this.breakpoints.topper + this.breakpoints.topper - this.instance.getPanelTransformY()) / this.breakpoints.topper) / -8;
-      newVal = this.instance.getPanelTransformY() + (diffY * differKoef);
-    }
-
-    // Disallow drag lower then bottom 
-    if ((!this.settings.lowerThanBottom || this.settings.inverse) 
-        && (newVal >= this.breakpoints.bottomer)) {
-      this.instance.paneEl.style.transform = `translateY(${this.breakpoints.bottomer}px) translateZ(0px)`;
-      this.instance.checkOpacityAttr(newVal);
-      return;
+      // Disallow drag lower then bottom 
+      if (!this.settings.lowerThanBottom
+          && newVal >= this.breakpoints.bottomer) {
+        this.instance.paneEl.style.transform = `translateY(${this.breakpoints.bottomer}px) translateZ(0px)`;
+        this.instance.checkOpacityAttr(newVal);
+        return;
+      }
+    } else {
+      // Inverse gestures
+      // Allow drag topper than top point
+      if (newVal >= this.breakpoints.topper 
+          && this.settings.upperThanTop) {
+        const screenDelta = this.instance.screen_height - this.instance.screenHeightOffset;
+        const differKoef = (screenDelta - this.instance.getPanelTransformY()) / (screenDelta - this.breakpoints.topper) / 8;
+        newVal = this.instance.getPanelTransformY() + (diffY * differKoef);
+      }
+      
+      // Disallow drag topper than top point
+      if (!this.settings.upperThanTop 
+          && (newVal >= this.breakpoints.topper)) {
+        this.instance.paneEl.style.transform = `translateY(${this.breakpoints.topper}px) translateZ(0px)`;
+        return;
+      }
     }
 
     // Prevent Dismiss gesture
@@ -319,7 +344,7 @@ export class Events {
     this.instance.checkOpacityAttr(newVal);
     this.instance.checkOverflowAttr(newVal);
     this.instance.doTransition({type: 'move', translateY: newVal});
-    this.steps.push(clientY);
+    this.steps.push({posY: clientY, time: Date.now()});
   }
 
   /**
@@ -335,10 +360,10 @@ export class Events {
     // Determinate nearest point
     let closest = this.breakpoints.getClosestBreakY();
     // Swipe - next (if differ > 10)
-    const diff =  this.steps[this.steps.length - 1] - this.steps[this.steps.length - 2];
+    const diff =  this.steps[this.steps.length - 1]?.posY - this.steps[this.steps.length - 2]?.posY;
     // Set sensivity lower for web
     const swipeNextSensivity = window.hasOwnProperty('cordova') 
-      ? (this.settings.fastSwipeSensivity + 1) : this.settings.fastSwipeSensivity; 
+      ? (this.settings.fastSwipeSensivity + 2) : this.settings.fastSwipeSensivity; 
     const fastSwipeNext = (Math.abs(diff) >= swipeNextSensivity);
     if (fastSwipeNext) {
       closest = this.instance.swipeNextPoint(diff, swipeNextSensivity, closest);
@@ -509,7 +534,7 @@ export class Events {
   private async onWindowResize(e) {
     await new Promise((resolve) => setTimeout(() => resolve(true), 150));
     this.instance.updateScreenHeights();
-    this.breakpoints.buildBreakpoints(JSON.parse(this.breakpoints.lockedBreakpoints), false);
+    this.breakpoints.buildBreakpoints(JSON.parse(this.breakpoints.lockedBreakpoints));
   }
 
   /**
@@ -518,9 +543,12 @@ export class Events {
 
   private getEvetClientYX(ev, name) {
     const targetTouch = ev.type === name && ev.targetTouches && (ev.targetTouches[0] || ev.changedTouches[0]);
-    const clientY = ev.type === name ? targetTouch.clientY : ev.clientY;
-    const clientX = ev.type === name ? targetTouch.clientX : ev.clientX;
-    return {clientY, clientX};
+    const clientY: number = ev.type === name ? targetTouch.clientY : ev.clientY;
+    const clientX: number = ev.type === name ? targetTouch.clientX : ev.clientX;
+    const timeDiff: number = (Date.now()) - (this.steps[this.steps.length - 1]?.time || 0);
+    const distanceY: number = Math.abs(clientY - (this.steps[this.steps.length - 1]?.posY || 0));
+    const velocityY: number = distanceY / timeDiff;
+    return {clientY, clientX, velocityY};
   }
 
   /**

@@ -58,6 +58,7 @@ Support this project with your organization. Your logo will show up here with a 
 <a href="https://opencollective.com/cupertino-pane"><img src="https://opencollective.com/cupertino-pane/organizations.svg?width=890"></a>
 
 ## Demonstration
+- [Rich notifications live](https://jsbin.com/neqoxef)
 - [Base live](https://output.jsbin.com/fuhisey)
 - [Overflow top live](https://output.jsbin.com/baguroy)
 - [Z-stack full live](https://output.jsbin.com/benidub)
@@ -142,7 +143,7 @@ If you don't want to include Cupertino Pane files in your project, you may use i
         onDrag: () => console.log('Drag event')
       }
     );
-    myPane.present({animate: true});
+    myPane.present({animate: true}).then(res => {...});
   };
   </script>
 </body>
@@ -152,7 +153,7 @@ If you don't want to include Cupertino Pane files in your project, you may use i
 $(document).ready(function () {
   //initialize pane when document ready
   var myPane = new CupertinoPane('.cupertino-pane', { /* ... */ });
-  myPane.present({animate: true});
+  myPane.present({animate: true}).then(...);
 });
 ```
 ### As an ES module
@@ -162,7 +163,7 @@ import { CupertinoPane, CupertinoSettings } from 'cupertino-pane';
 
 let settings: CupertinoSettings = { /* ... */ };
 let myPane = new CupertinoPane('.cupertino-pane', settings);
-    myPane.present({animate: true});
+    await myPane.present({animate: true});
 ```
 
 ### Class creation
@@ -270,8 +271,8 @@ The function that executes when the event fires.
 | **onTransitionEnd** | `void: () => {}` | Executes when transition and animation complete |
 
 ## Public Methods
-### present({animate: **boolean = false**})
-Will render pane DOM and show pane with setted params.
+### present({animate: **boolean = false**}): Promise<CupertinoPane>
+Will render pane DOM and show pane with setted params. 
 ```javascript
 myPane.present();
 ```
@@ -290,7 +291,7 @@ Dissappear pane from screen, still keep pane in DOM.
 ```javascript
 myPane.hide();
 ```
-### destroy({animate: **boolean = false**})
+### destroy({animate: **boolean = false**}): Promise<CupertinoPane>
 Remove pane from DOM and clear styles
 ```javascript
 myPane.destroy();

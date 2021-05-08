@@ -93,11 +93,6 @@
       </ion-toolbar>
     </ion-header>
 
-      <!-- Image -->
-      <img onclick="present()" src="https://petdogowner.com/wp-content/uploads/2019/10/129357812_l.jpg" />
-      <img onclick="present()" src="https://assets.merriam-webster.com/mw/images/source-original/2016-12-02_15-49-00---27cb3bac0c4615abace2890e72cdfab6.jpg" />
-      <img onclick="present()" src="https://cdn.theatlantic.com/thumbor/pN25nhF1hatn7QpckNtABKwzmoI=/0x61:1000x624/720x405/media/old_wire/img/upload/2013/03/18/happydog/original.jpg" /> 
-
       <!-- Bulletin -->
       <ion-bulletin>
         <h1>Welcome to pet board!</h1>
@@ -105,8 +100,8 @@
           <p>
             Explore and choose a pet that you wanna play with.
           </p>
-          <ion-button expand="block" (click)="dismiss();">
-            Continue
+          <ion-button expand="block" onclick="setBreakpoints();">
+            Set bottom offset
           </ion-button>
       </ion-bulletin> <!-- End bulletin -->
 
@@ -117,12 +112,13 @@
     let height = window.getComputedStyle(elem);
     
     window.onload = function () {
-      setTimeout(() => {
+
         height = height.getPropertyValue('height');
         height = parseFloat(height);
         
         var element = document.querySelector('ion-bulletin');
         bulletin = new CupertinoPane(element, { 
+          // inverse: true,
           fitHeight: true,
           backdrop: true,
           backdropOpacity: 0.8,
@@ -134,11 +130,14 @@
           onBackdropTap: () => bulletin.destroy({animate: true})
         });
         bulletin.present({animate: true});
-      }, 200);
     }
 
     function present() {
       setTimeout(() => bulletin.present({animate: true}));
+    }
+
+    function setBreakpoints() {
+      bulletin.setBreakpoints({}, 150);
     }
   </script>
 </body>

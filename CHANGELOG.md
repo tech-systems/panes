@@ -2,6 +2,21 @@
 # Change Log
 All notable changes to this project will be documented in this file.
 
+## [1.2.7] - 2021-05-08
+
+### Extra 
+- [Rich notifications live](https://jsbin.com/neqoxef)
+
+### Features
+- Functions `.present()` and `.destroy()` enhanced to using Promise like functins. [#144](https://github.com/roman-rr/cupertino-pane/issues/144)
+```js
+    await myPane.present({animate: true});
+    myPane.destroy({animate: true}).then(...);
+```
+
+### Bug Fixes 
+- Fixed slow drag gesture with velocity when first `touchmove` not firing
+
 ## [1.2.6] - 2021-03-18
 
 ### BREAKING CHANGES

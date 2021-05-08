@@ -28,7 +28,7 @@ export declare class CupertinoPane {
     private drawBaseElements;
     present(conf?: {
         animate: boolean;
-    }): Promise<void>;
+    }): Promise<CupertinoPane>;
     getPaneHeight(): number;
     updateScreenHeights(): void;
     scrollElementInit(): void;
@@ -78,7 +78,7 @@ export declare class CupertinoPane {
      * Public user method to reset breakpoints
      * @param conf
      */
-    setBreakpoints(conf?: PaneBreaks): Promise<void>;
+    setBreakpoints(conf?: PaneBreaks, bottomOffset?: number): Promise<void>;
     calcFitHeight(): Promise<any>;
     moveToBreak(val: string): any;
     moveToHeight(val: number): any;
@@ -89,10 +89,10 @@ export declare class CupertinoPane {
     destroy(conf?: {
         animate: boolean;
         destroyButton?: boolean;
-    }): any;
+    }): Promise<true>;
     private pushTransition;
     /***********************************
      * Transitions handler
      */
-    doTransition(params?: any): void;
+    doTransition(params?: any): Promise<true>;
 }
