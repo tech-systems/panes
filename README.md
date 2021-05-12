@@ -76,10 +76,9 @@ Support this project with your organization. Your logo will show up here with a 
 - [Backdrop drag-opacity live](https://output.jsbin.com/riwahab)
 
 <div style="display:flex;flex-wrap:wrap;">
-  <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/maps.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="200px">
-  <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/bulletin.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="200px">
-  <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/overflow.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="200px">
-  <img src="https://github.com/roman-rr/cupertino-pane/blob/master/docs/images/starbucks.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="200px">
+  <img src="docs/images/notifications.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="200px">
+  <img src="docs/images/z-stack.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="200px">
+  <img src="docs/images/overflow.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="200px">
 </div>
 
 ## Supporting platforms
