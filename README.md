@@ -198,7 +198,7 @@ new CupertinoPane(element); // HTMLElement
 | **freeMode** | `boolean` | false | On `true` will remove automatical magnetic effects to near breakpoint |
 | **lowerThanBottom** | `boolean` | true | By default allow user to drag pane lower than bottom position. On `false` will automatically place pane to bottom position on lower than bottom attemption |
 | **upperThanTop** | `boolean` | false | Allow user to drag pane upper than maximum top position. Useful with bulletin style without overflow-y |
-| **touchAngle** | `number` | null | Allowable angle (in degrees) to trigger touch move |
+| **touchAngle** | `number` | 45 | Allowable angle (in degrees) to trigger drag gestures |
 | **buttonDestroy** | `boolean` | true | Determinate whetever close button will render or not |
 | **bottomOffset** | `number` | 0 | Margin bottom for pane from screen bottom point |
 | **topperOverflow** | `boolean` | true | Ability to scroll content inside pane if topper point reached |
