@@ -37,7 +37,7 @@ export class Settings {
       simulateTouch: true,
       passiveListeners: true,
       touchMoveStopPropagation: false,
-      touchAngle: null,
+      touchAngle: 45,
       breaks: {},
       zStack: null,
       onDidDismiss: () => {},
