@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: May 8, 2021
+ * Released on: July 22, 2021
  */
  
  
@@ -194,7 +194,7 @@ class Events {
         this.contentScrollTop = 0;
         this.steps = [];
         this.inputBluredbyMove = false;
-        this.movedByKeyboard = false;
+        this.keyboardVisible = false;
         this.touchEvents = (() => {
             const touch = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
             let desktop = ['mousedown', 'mousemove', 'mouseup'];
@@ -248,7 +248,12 @@ class Events {
          * Close Cordova Keyboard event
          * @param e
          */
-        this.onKeyboardHideCb = (e) => this.onKeyboardHide(e);
+        this.onKeyboardWillHideCb = (e) => this.onKeyboardWillHide(e);
+        /**
+         * Close Cordova Keyboard event
+         * @param e
+         */
+        this.onKeyboardDidHideCb = (e) => this.onKeyboardDidHide(e);
         /**
          * Window resize event
          * @param e
@@ -269,7 +274,8 @@ class Events {
         // Handle keyboard events for cordova
         if (this.settings.handleKeyboard && this.device.cordova) {
             window.addEventListener('keyboardWillShow', this.onKeyboardShowCb);
-            window.addEventListener('keyboardWillHide', this.onKeyboardHideCb);
+            window.addEventListener('keyboardWillHide', this.onKeyboardWillHideCb);
+            window.addEventListener('keyboardDidHide', this.onKeyboardDidHideCb);
         }
         // Fix Android issue with resize if not handle
         if (!this.settings.handleKeyboard
@@ -302,7 +308,8 @@ class Events {
         // Handle keyboard events for cordova
         if (this.settings.handleKeyboard && this.device.cordova) {
             window.removeEventListener('keyboardWillShow', this.onKeyboardShowCb);
-            window.removeEventListener('keyboardWillHide', this.onKeyboardHideCb);
+            window.removeEventListener('keyboardWillHide', this.onKeyboardWillHideCb);
+            window.removeEventListener('keyboardDidHide', this.onKeyboardDidHideCb);
         }
         // Orientation change + window resize
         window.removeEventListener('resize', this.onWindowResizeCb);
@@ -595,7 +602,7 @@ class Events {
         if (this.device.android) {
             setTimeout(() => this.fixAndroidResize(), 20);
         }
-        this.movedByKeyboard = true;
+        this.keyboardVisible = true;
         this.breakpoints.prevBreakpoint = Object.entries(this.breakpoints.breaks).find(val => val[1] === this.instance.getPanelTransformY())[0];
         let newHeight = this.settings.breaks[this.instance.currentBreak()].height + e.keyboardHeight;
         // Landscape case
@@ -611,16 +618,10 @@ class Events {
         if (newHeight - 50 >= this.settings.breaks[this.instance.currentBreak()].height) {
             this.instance.moveToHeight(newHeight);
         }
-        // Remove offset because on new height no offsets needs
-        // Timeout await for keyboard presented
-        setTimeout(() => {
-            this.instance.setOverflowHeight(e.keyboardHeight - this.settings.topperOverflowOffset);
-            this.instance.overflowEl.scrollTop = document.activeElement.offsetTop;
-        }, 300);
     }
-    onKeyboardHide(e) {
+    onKeyboardWillHide(e) {
         // Move back
-        if (!this.movedByKeyboard) {
+        if (!this.keyboardVisible) {
             return;
         }
         // pane not visible on viewport
@@ -630,8 +631,6 @@ class Events {
         if (this.device.android) {
             this.fixAndroidResize();
         }
-        this.movedByKeyboard = false;
-        this.instance.setOverflowHeight();
         if (this.inputBluredbyMove) {
             this.inputBluredbyMove = false;
             return;
@@ -640,8 +639,15 @@ class Events {
             this.instance.moveToBreak(this.breakpoints.prevBreakpoint);
         }
     }
+    onKeyboardDidHide(e) {
+        this.keyboardVisible = false;
+    }
     onWindowResize(e) {
         return __awaiter(this, void 0, void 0, function* () {
+            // Doesn't re-build if callback from keyboard
+            if (this.keyboardVisible) {
+                return;
+            }
             yield new Promise((resolve) => setTimeout(() => resolve(true), 150));
             this.instance.updateScreenHeights();
             this.breakpoints.buildBreakpoints(JSON.parse(this.breakpoints.lockedBreakpoints));
@@ -760,7 +766,7 @@ class Settings {
             simulateTouch: true,
             passiveListeners: true,
             touchMoveStopPropagation: false,
-            touchAngle: null,
+            touchAngle: 45,
             breaks: {},
             zStack: null,
             onDidDismiss: () => { },

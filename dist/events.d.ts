@@ -18,7 +18,7 @@ export declare class Events {
     private startX;
     private steps;
     private inputBluredbyMove;
-    private movedByKeyboard;
+    private keyboardVisible;
     constructor(instance: CupertinoPane, settings: CupertinoSettings, device: Device, breakpoints: Breakpoints);
     attachAllEvents(): void;
     detachAllEvents(): void;
@@ -65,8 +65,14 @@ export declare class Events {
      * Close Cordova Keyboard event
      * @param e
      */
-    onKeyboardHideCb: (e: any) => void;
-    private onKeyboardHide;
+    onKeyboardWillHideCb: (e: any) => void;
+    private onKeyboardWillHide;
+    /**
+     * Close Cordova Keyboard event
+     * @param e
+     */
+    onKeyboardDidHideCb: (e: any) => void;
+    private onKeyboardDidHide;
     /**
      * Window resize event
      * @param e

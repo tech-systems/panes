@@ -18,7 +18,7 @@ export class Events {
   private startX: number;
   private steps: {posY: number, time: number}[] = [];  
   private inputBluredbyMove: boolean = false;
-  private movedByKeyboard: boolean = false;
+  private keyboardVisible: boolean = false;
   
   
   constructor(private instance: CupertinoPane, 
@@ -40,7 +40,8 @@ export class Events {
     // Handle keyboard events for cordova
     if (this.settings.handleKeyboard && this.device.cordova) {
       window.addEventListener('keyboardWillShow', this.onKeyboardShowCb);
-      window.addEventListener('keyboardWillHide', this.onKeyboardHideCb);
+      window.addEventListener('keyboardWillHide', this.onKeyboardWillHideCb);
+      window.addEventListener('keyboardDidHide', this.onKeyboardDidHideCb);
     }
 
     // Fix Android issue with resize if not handle
@@ -75,7 +76,8 @@ export class Events {
     // Handle keyboard events for cordova
     if (this.settings.handleKeyboard && this.device.cordova) {
       window.removeEventListener('keyboardWillShow', this.onKeyboardShowCb);
-      window.removeEventListener('keyboardWillHide', this.onKeyboardHideCb);
+      window.removeEventListener('keyboardWillHide', this.onKeyboardWillHideCb);
+      window.removeEventListener('keyboardDidHide', this.onKeyboardDidHideCb);
     }
 
     // Orientation change + window resize
@@ -464,7 +466,7 @@ export class Events {
       setTimeout(() => this.fixAndroidResize(), 20);
     }
 
-    this.movedByKeyboard = true;
+    this.keyboardVisible = true;
     this.breakpoints.prevBreakpoint = Object.entries(this.breakpoints.breaks).find(val => val[1] === this.instance.getPanelTransformY())[0];
     let newHeight = this.settings.breaks[this.instance.currentBreak()].height + e.keyboardHeight;
     
@@ -482,24 +484,17 @@ export class Events {
     // Move pane up if new position more than 50px
     if (newHeight - 50 >= this.settings.breaks[this.instance.currentBreak()].height) {
       this.instance.moveToHeight(newHeight);
-    } 
-
-    // Remove offset because on new height no offsets needs
-    // Timeout await for keyboard presented
-    setTimeout(() => {
-      this.instance.setOverflowHeight(e.keyboardHeight - this.settings.topperOverflowOffset);
-      this.instance.overflowEl.scrollTop = (<any>document.activeElement).offsetTop;
-    }, 300);
+    }
   }
 
   /**
    * Close Cordova Keyboard event
    * @param e
    */
-  public onKeyboardHideCb = (e) => this.onKeyboardHide(e);
-  private onKeyboardHide(e) {
+  public onKeyboardWillHideCb = (e) => this.onKeyboardWillHide(e);
+  private onKeyboardWillHide(e) {
     // Move back
-    if (!this.movedByKeyboard) {
+    if (!this.keyboardVisible) {
       return;
     }
 
@@ -512,10 +507,6 @@ export class Events {
       this.fixAndroidResize();
     }    
 
-    this.movedByKeyboard = false;
-
-    this.instance.setOverflowHeight();
-
     if (this.inputBluredbyMove) {
       this.inputBluredbyMove = false;
       return;
@@ -527,11 +518,25 @@ export class Events {
   }
 
   /**
+   * Close Cordova Keyboard event
+   * @param e
+   */
+  public onKeyboardDidHideCb = (e) => this.onKeyboardDidHide(e);
+  private onKeyboardDidHide(e) {
+    this.keyboardVisible = false;
+  }
+
+  /**
    * Window resize event
    * @param e
    */
   public onWindowResizeCb = (e) => this.onWindowResize(e);
   private async onWindowResize(e) {
+    // Doesn't re-build if callback from keyboard
+    if (this.keyboardVisible) {
+      return;
+    }
+
     await new Promise((resolve) => setTimeout(() => resolve(true), 150));
     this.instance.updateScreenHeights();
     this.breakpoints.buildBreakpoints(JSON.parse(this.breakpoints.lockedBreakpoints));
