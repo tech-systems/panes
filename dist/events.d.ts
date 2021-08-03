@@ -75,6 +75,7 @@ export declare class Events {
     private onKeyboardDidHide;
     /**
      * Window resize event
+     * TODO: Prevent android unlock events
      * @param e
      */
     onWindowResizeCb: (e: any) => Promise<void>;

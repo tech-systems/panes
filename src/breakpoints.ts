@@ -164,7 +164,9 @@ export class Breakpoints {
     if (this.instance.isPanePresented()) {
       // Move to current if updated
       if (this.settings.breaks[this.prevBreakpoint]?.enabled) {
-        this.instance.moveToBreak(this.prevBreakpoint);
+        if (!this.instance.isHidden()) {
+          this.instance.moveToBreak(this.prevBreakpoint);
+        }
       }
 
       // Move to any if removed

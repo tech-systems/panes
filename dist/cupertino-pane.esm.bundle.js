@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: July 22, 2021
+ * Released on: August 3, 2021
  */
 
 /*! *****************************************************************************
@@ -250,6 +250,7 @@ class Events {
         this.onKeyboardDidHideCb = (e) => this.onKeyboardDidHide(e);
         /**
          * Window resize event
+         * TODO: Prevent android unlock events
          * @param e
          */
         this.onWindowResizeCb = (e) => this.onWindowResize(e);
@@ -920,7 +921,9 @@ class Breakpoints {
             if (this.instance.isPanePresented()) {
                 // Move to current if updated
                 if ((_d = this.settings.breaks[this.prevBreakpoint]) === null || _d === void 0 ? void 0 : _d.enabled) {
-                    this.instance.moveToBreak(this.prevBreakpoint);
+                    if (!this.instance.isHidden()) {
+                        this.instance.moveToBreak(this.prevBreakpoint);
+                    }
                 }
                 // Move to any if removed
                 if (!((_e = this.settings.breaks[this.prevBreakpoint]) === null || _e === void 0 ? void 0 : _e.enabled)) {

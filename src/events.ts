@@ -528,6 +528,7 @@ export class Events {
 
   /**
    * Window resize event
+   * TODO: Prevent android unlock events
    * @param e
    */
   public onWindowResizeCb = (e) => this.onWindowResize(e);
