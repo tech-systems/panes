@@ -5,13 +5,7 @@ const gopen = require('gulp-open');
 const fs = require('fs');
 const path = require('path');
 const del = require('del');
-
 const buildJs = require('./build-js.js');
-
-// Clean 
-gulp.task('clean', (cb) => {
-  return del('dist/**', {force:true});
-});
 
 // js bundle
 gulp.task('js', (cb) => {
@@ -41,7 +35,7 @@ gulp.task('prod-source-sourcemap-fix-paths', (cb) => {
   if (cb) cb();
 });
 
-gulp.task('build', gulp.series(['clean', 'js', 'prod-source-sourcemap-fix-paths']));
+gulp.task('build', gulp.series(['js', 'prod-source-sourcemap-fix-paths']));
 
 gulp.task('watch', () => {
   gulp.watch('./src/**/**/*.ts', gulp.series('js'));

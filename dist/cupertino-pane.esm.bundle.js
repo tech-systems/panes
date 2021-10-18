@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: August 3, 2021
+ * Released on: October 19, 2021
  */
 
 /*! *****************************************************************************
@@ -668,7 +668,7 @@ class Events {
     fixAndroidResize() {
         if (!this.instance.paneEl)
             return;
-        const ionApp = document.querySelector('ion-app');
+        document.querySelector('ion-app');
         window.requestAnimationFrame(() => {
             this.instance.wrapperEl.style.width = '100%';
             this.instance.paneEl.style.position = 'absolute';
