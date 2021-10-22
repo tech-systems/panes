@@ -19,12 +19,12 @@ npm install
 ```
 ### 3. Test with Playground
 ```sh
-gulp server
+npm run serve
 ```
 ### 4. Changes & Build
 ```sh
 # Make bundles 
-gulp build
+npm run build
 ```
 This will output the files into the dist directory.
 ### 5. Push changes
