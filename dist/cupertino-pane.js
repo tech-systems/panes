@@ -7,16 +7,14 @@
  *
  * Released under the MIT License
  *
- * Released on: October 19, 2021
+ * Released on: October 22, 2021
  */
- 
- 
- if (!exports) var exports = {"__esModule": true};
+
 (function (global, factory) {
-    typeof exports === 'object' && typeof module !== 'undefined' ? factory(exports) :
-    typeof define === 'function' && define.amd ? define(['exports'], factory) :
-    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, factory(global["Cupertino Pane"] = {}));
-})(this, (function (exports) { 'use strict';
+    typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
+    typeof define === 'function' && define.amd ? define(factory) :
+    (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.CupertinoPane = factory());
+})(this, (function () { 'use strict';
 
     /*! *****************************************************************************
     Copyright (c) Microsoft Corporation.
@@ -1852,9 +1850,7 @@
         }
     }
 
-    exports.CupertinoPane = CupertinoPane;
-
-    Object.defineProperty(exports, '__esModule', { value: true });
+    return CupertinoPane;
 
 }));
 //# sourceMappingURL=cupertino-pane.js.map

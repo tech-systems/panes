@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: October 19, 2021
+ * Released on: October 22, 2021
  */
 
 /*! *****************************************************************************
@@ -1845,4 +1845,3 @@ class CupertinoPane {
 }
 
 export { CupertinoPane };
-//# sourceMappingURL=cupertino-pane.esm.bundle.js.map

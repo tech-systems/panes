@@ -5,34 +5,55 @@ const fs = require('fs-extra');
 const rollup = require('rollup');
 const Terser = require('terser');
 const typescript = require('rollup-plugin-typescript2');
-const banner = require('./banner.js');
-const env = process.env.NODE_ENV || 'development';
+const replace = require('@rollup/plugin-replace');
+const elapsed = require('elapsed-time-logger');
+const chalk = require('chalk');
 
-function umd(cb) {
+const banner = require('./banner.js');
+const env = process.env.NODE_ENV;
+
+async function buildEntry(format) {
+  const bundleName = 'CupertinoPane';
+  const isUMD = format === 'umd';
+  const isESM = format === 'esm';
+  const isProd = env === 'production';
+  const isDev = env === 'development';
+  const sourcemap = isProd && isUMD;
+  let filename = 'cupertino-pane';
+  const outputDir = 'dist';
+  if (isESM) filename += `.esm`;
+
+  // Bundle
   rollup.rollup({
-    input: './src/cupertino-pane.ts',
-    plugins: [typescript({clean: true})],
+    input: './src/index.ts',
+    plugins: [
+      replace({
+        delimiters: ['', ''],
+        preventAssignment: true,
+        '//EXPORT': isUMD ? `export default ${bundleName};` : `export { ${bundleName} }`
+      }),
+      typescript({
+        cacheRoot: process.cwd() + `/.rpt2_cache/${filename}`,
+      })
+    ],
   }).then((bundle) => bundle.write({
-    format: 'umd',
-    name: 'Cupertino Pane',
+    name: bundleName,
+    format, banner, sourcemap, 
     strict: true,
-    sourcemap: true,
-    exports: 'named',
-    sourcemapFile: `./dist/cupertino-pane.js.map`,
-    banner: `${banner} \n \n if (!exports) var exports = {\"__esModule\": true};`,
-    file: `./dist/cupertino-pane.js`,
+    exports: isUMD ? 'default' : 'named',
+    sourcemapFile: `./${outputDir}/${filename}.js.map`,
+    file: `./${outputDir}/${filename}.js`,
   })).then(async(bundle) => {
-    if (env === 'development') {
-      if (cb) cb();
+    if (!isProd || !isUMD) {
       return;
-    }
-  
+    };
+
     const result = bundle.output[0];
     const { code, map } = await Terser.minify(result.code, {
       sourceMap: {
-        content: env === 'development' ? result.map : undefined,
-        filename: env === 'development' ? undefined : 'cupertino-pane.min.js',
-        url: 'cupertino-pane.min.js.map',
+        content: sourcemap ? result.map : undefined,
+        filename: sourcemap ? `${filename}.min.js` : undefined,
+        url: `${filename}.min.js.map`,
       },
       output: {
         preamble: banner,
@@ -41,51 +62,22 @@ function umd(cb) {
       console.error(`Terser failed on file ${filename}: ${err.toString()}`);
     });
 
-    await fs.writeFile(`./dist/cupertino-pane.min.js`, code);
-    await fs.writeFile(`./dist/cupertino-pane.min.js.map`, map);
-
-    cb();
+    await fs.writeFile(`./${outputDir}/${filename}.min.js`, code);
+    await fs.writeFile(`./${outputDir}/${filename}.min.js.map`, map);
   }).catch((err) => {
-    if (cb) cb();
-    console.error(err.toString());
+    console.error('Rollup error:', err.stack);
   });
 }
 
-function es(cb) {
-  // Bundle
-  rollup.rollup({
-    input: './src/cupertino-pane.ts',
-    plugins: [typescript({clean: true})],
-  }).then((bundle) => bundle.write({
-    format: 'esm',
-    name: 'Cupertino Pane',
-    strict: true,
-    sourcemap: true,
-    sourcemapFile: `./dist/cupertino-pane.esm.bundle.js.map`,
-    banner,
-    file: `./dist/cupertino-pane.esm.bundle.js`,
-  })).then(() => {
-    if (cb) cb();
-  }).catch((err) => {
-    if (cb) cb();
-    console.error(err.toString());
-  });
-}
-
-function build(cb) {
-  const expectCbs = env === 'development' ? 1 : 2;
-  let cbs = 0;
-
-  if (env !== 'development') {
-    umd(() => {
-      cbs += 1;
-      if (cbs === expectCbs) cb();
-    });
-  }
-
-  es(() => {
-    cbs += 1;
-    if (cbs === expectCbs) cb();
+async function build() {
+  elapsed.start('bundles');
+  return Promise.all(
+    [
+      buildEntry('umd'), 
+      buildEntry('esm')
+    ]
+  ).then(() => {
+    elapsed.end('bundles', chalk.green('\nRollup bundles build completed!'));
   });
 }
 

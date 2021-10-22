@@ -7,16 +7,18 @@
   "repository": "roman-rr/cupertino-pane",
   "license": "MIT",
   "main": "dist/cupertino-pane.min.js",
-  "module": "dist/cupertino-pane.esm.bundle.js",
+  "module": "dist/cupertino-pane.esm.js",
   "types": "dist/cupertino-pane.d.ts",
   "scripts": {
-    "build": "npm run clean && NODE_ENV=production gulp build",
-    "serve": "npm run clean && NODE_ENV=development gulp build && gulp server",
-    "tslint": "tslint src/**/*.ts",
-    "clean": "rm -rf ./dist"
+    "build": "rimraf dist && NODE_ENV=production gulp build",
+    "serve": "rimraf dist && NODE_ENV=development gulp build && gulp server",
+    "tslint": "tslint src/**/*.ts"
   },
   "devDependencies": {
+    "@rollup/plugin-replace": "^3.0.0",
+    "chalk": "^4.1.2",
     "del": "^5.1.0",
+    "elapsed-time-logger": "^1.1.7",
     "fs-extra": "^10.0.0",
     "glob": "^7.1.6",
     "gulp": "4.0.2",
