@@ -5,6 +5,7 @@
     "outDir": "./dist/",
     "sourceMap": false,
     "declaration": true,
+    "declarationDir": "./dist/types",
     "module": "es2020",
     "target": "es2015",
     "moduleResolution": "node",

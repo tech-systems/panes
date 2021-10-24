@@ -24,28 +24,33 @@ async function buildEntry(format) {
   if (isESM) filename += `.esm`;
 
   // Bundle
-  rollup.rollup({
-    input: './src/index.ts',
-    plugins: [
-      replace({
-        delimiters: ['', ''],
-        preventAssignment: true,
-        '//EXPORT': isUMD ? `export default ${bundleName};` : `export { ${bundleName} }`
-      }),
-      typescript({
-        cacheRoot: process.cwd() + `/.rpt2_cache/${filename}`,
-      })
-    ],
-  }).then((bundle) => bundle.write({
-    name: bundleName,
-    format, banner, sourcemap, 
-    strict: true,
-    exports: isUMD ? 'default' : 'named',
-    sourcemapFile: `./${outputDir}/${filename}.js.map`,
-    file: `./${outputDir}/${filename}.js`,
-  })).then(async(bundle) => {
-    if (!isProd || !isUMD) {
-      return;
+  new Promise(async(resolve, reject) => {
+    let bundle = await rollup.rollup({
+      input: './src/index.ts',
+      plugins: [
+        replace({
+          delimiters: ['', ''],
+          preventAssignment: true,
+          '//EXPORT': isUMD ? `export default ${bundleName};` : `export { ${bundleName} }`
+        }),
+        typescript({
+          useTsconfigDeclarationDir: true,
+          cacheRoot: process.cwd() + `/.rpt2_cache/${filename}`,
+        })
+      ],
+    });
+
+    bundle = await bundle.write({
+      name: bundleName,
+      format, banner, sourcemap, 
+      strict: true,
+      exports: isUMD ? 'default' : 'named',
+      sourcemapFile: `./${outputDir}/${filename}.js.map`,
+      file: `./${outputDir}/${filename}.js`,
+    });
+    
+    if (isDev) {
+      return resolve();
     };
 
     const result = bundle.output[0];
@@ -60,12 +65,13 @@ async function buildEntry(format) {
       },
     }).catch((err) => {
       console.error(`Terser failed on file ${filename}: ${err.toString()}`);
+      return reject();
     });
 
     await fs.writeFile(`./${outputDir}/${filename}.min.js`, code);
     await fs.writeFile(`./${outputDir}/${filename}.min.js.map`, map);
-  }).catch((err) => {
-    console.error('Rollup error:', err.stack);
+
+    return resolve();
   });
 }
 

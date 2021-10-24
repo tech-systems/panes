@@ -419,6 +419,7 @@ All **new features** and **new investigations** moved to open collective [Goals]
 ## Contributors
 We are welcome contributions of all kinds from anyone. 
 Please review the [contributing](https://github.com/roman-rr/cupertino-pane/blob/master/CONTRIBUTING.md) guideline.
+
 Commit Message Format [angular commit format](https://github.com/angular/angular/blob/master/CONTRIBUTING.md#-commit-message-format)
 
 ## License

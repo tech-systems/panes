@@ -4,6 +4,11 @@ import { Events } from './events';
 import { PaneSettings, PaneBreaks, ZStackSettings } from './models';
 import { Settings } from './settings';
 import { Breakpoints } from './breakpoints';
+
+/**
+ * Typings: If here lot's of exported types/interfaces,
+ * collect to public-api.d.ts with rollup-plugin-dts.
+ */
 export type CupertinoSettings = Partial<PaneSettings>;
 
 export class CupertinoPane {  

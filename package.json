@@ -7,13 +7,13 @@
   "repository": "roman-rr/cupertino-pane",
   "license": "MIT",
   "main": "dist/cupertino-pane.min.js",
-  "module": "dist/cupertino-pane.esm.js",
-  "types": "dist/cupertino-pane.d.ts",
+  "module": "dist/cupertino-pane.esm.min.js",
+  "types": "dist/types/cupertino-pane.d.ts",
   "scripts": {
     "build": "rimraf dist && NODE_ENV=production gulp build",
     "serve": "rimraf dist && NODE_ENV=development gulp build && gulp server",
     "tslint": "tslint src/**/*.ts",
-    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -u -s"
+    "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
   },
   "devDependencies": {
     "@rollup/plugin-replace": "^3.0.0",
@@ -30,7 +30,7 @@
     "terser": "5.9.0",
     "tslib": "^1.10.0",
     "tslint": "^5.20.1",
-    "typescript": "^3.4.5"
+    "typescript": "^4.4.4"
   },
   "bugs": {
     "url": "https://github.com/roman-rr/cupertino-pane/issues"
