@@ -8,7 +8,7 @@
   "license": "MIT",
   "main": "dist/cupertino-pane.min.js",
   "module": "dist/cupertino-pane.esm.min.js",
-  "types": "dist/types/cupertino-pane.d.ts",
+  "types": "dist/types/index.d.ts",
   "scripts": {
     "build": "rimraf dist && NODE_ENV=production gulp build",
     "serve": "rimraf dist && NODE_ENV=development gulp build && gulp server",
@@ -26,6 +26,7 @@
     "gulp-connect": "5.7.0",
     "gulp-open": "3.0.1",
     "rollup": "2.58.0",
+    "rollup-plugin-dts": "^4.0.0",
     "rollup-plugin-typescript2": "0.30.0",
     "terser": "5.9.0",
     "tslib": "^1.10.0",

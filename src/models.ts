@@ -70,3 +70,5 @@ export interface PaneSettings {
   onTransitionStart: (event?: TransitionStartEvent) => void,
   onTransitionEnd: (event?: any) => void
 }
+
+export type CupertinoSettings = Partial<PaneSettings>;

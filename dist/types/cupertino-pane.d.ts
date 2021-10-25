@@ -1,9 +1,4 @@
-import { PaneSettings, PaneBreaks, ZStackSettings } from './models';
-/**
- * Typings: If here lot's of exported types/interfaces,
- * create facede gateway for public-api.
- */
-export declare type CupertinoSettings = Partial<PaneSettings>;
+import { CupertinoSettings, PaneBreaks, ZStackSettings } from './models';
 export declare class CupertinoPane {
     private selector;
     disableDragEvents: boolean;

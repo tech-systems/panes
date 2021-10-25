@@ -48,7 +48,22 @@ async function buildEntry(format) {
       sourcemapFile: `./${outputDir}/${filename}.js.map`,
       file: `./${outputDir}/${filename}.js`,
     });
-    
+
+    // Build types only once
+    if (isESM) {
+      let typings = await rollup.rollup({
+        input: './src/public-api.ts',
+        plugins: [
+          require("rollup-plugin-dts").default()
+        ]
+      });
+  
+      typings = await typings.write({
+        file: `${outputDir}/types/index.d.ts`, 
+        format: "es"
+      });
+    }
+
     if (isDev) {
       return resolve();
     };

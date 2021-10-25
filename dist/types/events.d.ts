@@ -1,4 +1,5 @@
-import { CupertinoPane, CupertinoSettings } from './cupertino-pane';
+import { CupertinoPane } from './cupertino-pane';
+import { CupertinoSettings } from './models';
 import { Device } from './device';
 import { Breakpoints } from './breakpoints';
 /**

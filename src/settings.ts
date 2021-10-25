@@ -1,4 +1,4 @@
-import { CupertinoSettings } from './cupertino-pane';
+import { CupertinoSettings } from './models';
 
 export class Settings {
 

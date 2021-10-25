@@ -1,4 +1,4 @@
-import { CupertinoSettings } from './cupertino-pane';
+import { CupertinoSettings } from './models';
 export declare class Settings {
     instance: CupertinoSettings;
     constructor();
