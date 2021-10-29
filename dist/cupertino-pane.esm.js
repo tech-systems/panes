@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: October 26, 2021
+ * Released on: October 29, 2021
  */
 
 /*! *****************************************************************************
@@ -349,7 +349,6 @@ class Events {
         }
     }
     touchStart(t) {
-        // Liam the best :)
         // Event emitter
         this.settings.onDragStart(t);
         // Allow clicks by default -> disallow on move (allow click with disabled drag)
@@ -385,6 +384,8 @@ class Events {
         // Event emitter
         t.delta = ((_a = this.steps[0]) === null || _a === void 0 ? void 0 : _a.posY) - clientY;
         this.settings.onDrag(t);
+        // Disallow accidentaly clicks while slide gestures
+        this.allowClick = false;
         if (this.instance.disableDragEvents) {
             this.steps = [];
             return;
@@ -404,6 +405,10 @@ class Events {
         // Patch for 'touchmove' first start slowly events with velocity
         let newVal = this.instance.getPanelTransformY()
             + ((this.steps.length < 2) ? (diffY * velocityY) : diffY);
+        // No Y changes
+        if (!Math.abs(diffY)) {
+            return;
+        }
         // textarea scrollbar
         if (this.isFormElement(t.target)
             && this.isElementScrollable(t.target)) {
@@ -503,8 +508,6 @@ class Events {
                 return;
             }
         }
-        // Disallow accidentaly clicks while slide gestures
-        this.allowClick = false;
         this.instance.checkOpacityAttr(newVal);
         this.instance.checkOverflowAttr(newVal);
         this.instance.doTransition({ type: 'move', translateY: newVal });
@@ -544,8 +547,9 @@ class Events {
         this.breakpoints.currentBreakpoint = closest;
         // Event emitter
         this.settings.onDragEnd(t);
-        // tap event
-        if (isNaN(diff) || blurTapEvent) {
+        // touchend with allowClick === tapped event (no move triggered)
+        // skip next functions
+        if (this.allowClick || blurTapEvent) {
             return;
         }
         this.instance.checkOpacityAttr(this.breakpoints.currentBreakpoint);

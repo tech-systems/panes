@@ -156,7 +156,7 @@ export class Events {
    */
   public touchStartCb = (t) => this.touchStart(t);
   private touchStart(t) {
-    // Liam the best :)
+
     // Event emitter
     this.settings.onDragStart(t as CustomEvent);
 
@@ -210,6 +210,9 @@ export class Events {
     // Event emitter
     t.delta = this.steps[0]?.posY - clientY;
     this.settings.onDrag(t);
+
+    // Disallow accidentaly clicks while slide gestures
+    this.allowClick = false;
     
     if (this.instance.disableDragEvents) {
       this.steps = [];
@@ -230,6 +233,11 @@ export class Events {
     // Patch for 'touchmove' first start slowly events with velocity
     let newVal = this.instance.getPanelTransformY() 
       + ((this.steps.length < 2) ? (diffY * velocityY) : diffY);  
+
+    // No Y changes
+    if (!Math.abs(diffY)) {
+      return;
+    }
 
     // textarea scrollbar
     if (this.isFormElement(t.target) 
@@ -341,9 +349,6 @@ export class Events {
       }
     }
 
-    // Disallow accidentaly clicks while slide gestures
-    this.allowClick = false;
-
     this.instance.checkOpacityAttr(newVal);
     this.instance.checkOverflowAttr(newVal);
     this.instance.doTransition({type: 'move', translateY: newVal});
@@ -363,7 +368,7 @@ export class Events {
     // Determinate nearest point
     let closest = this.breakpoints.getClosestBreakY();
     // Swipe - next (if differ > 10)
-    const diff =  this.steps[this.steps.length - 1]?.posY - this.steps[this.steps.length - 2]?.posY;
+    const diff = this.steps[this.steps.length - 1]?.posY - this.steps[this.steps.length - 2]?.posY;
     // Set sensivity lower for web
     const swipeNextSensivity = window.hasOwnProperty('cordova') 
       ? (this.settings.fastSwipeSensivity + 2) : this.settings.fastSwipeSensivity; 
@@ -394,8 +399,9 @@ export class Events {
     // Event emitter
     this.settings.onDragEnd(t as CustomEvent);
 
-    // tap event
-    if (isNaN(diff) || blurTapEvent) {
+    // touchend with allowClick === tapped event (no move triggered)
+    // skip next functions
+    if (this.allowClick || blurTapEvent) {
       return;
     }
 
