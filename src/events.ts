@@ -20,6 +20,7 @@ export class Events {
   private steps: {posY: number, time: number}[] = [];  
   private inputBluredbyMove: boolean = false;
   private keyboardVisible: boolean = false;
+  private isScrolling: boolean = false;
   
   
   constructor(private instance: CupertinoPane, 
@@ -36,6 +37,11 @@ export class Events {
         const el = document.querySelector(selector);
         if (el) this.eventListeners('addEventListener', el);
       });
+    }
+
+    // scroll events for overflowEl
+    if (this.settings.topperOverflow) {
+      this.instance.overflowEl.addEventListener('scroll', this.onScrollCb);
     }
 
     // Handle keyboard events for cordova
@@ -72,6 +78,11 @@ export class Events {
         const el = document.querySelector(selector);
         if (el) this.eventListeners('removeEventListener', el);
       });
+    }
+
+    // scroll events for overflowEl
+    if (this.settings.topperOverflow) {
+      this.instance.overflowEl.removeEventListener('scroll', this.onScrollCb);
     }
 
     // Handle keyboard events for cordova
@@ -168,6 +179,9 @@ export class Events {
     // Allow touch angle by default, disallow no move with condition
     this.disableDragAngle = false;
 
+    // Not scrolling event by default -> on scroll will true
+    this.isScrolling = false;
+
     // Allow pereventDismiss by default
     this.instance.preventedDismiss = false;
 
@@ -179,9 +193,7 @@ export class Events {
 
     // if overflow content was scrolled
     // increase to scrolled value
-    if (this.contentScrollTop 
-        && this.willScrolled(t)
-        && this.isDragScrollabe(t.path || t.composedPath())) {
+    if (this.contentScrollTop && this.willScrolled(t)) {
       this.startY += this.contentScrollTop;  
     }
     
@@ -227,7 +239,7 @@ export class Events {
 
     // Handle desktop/mobile events
     if(t.type === 'mousemove' && !this.pointerDown) return;
-    
+
     // Delta
     const diffY = clientY - this.steps[this.steps.length - 1].posY;
     // Patch for 'touchmove' first start slowly events with velocity
@@ -256,8 +268,10 @@ export class Events {
     }
 
     // Touch angle
-    // Only for initial gesture
-    if (this.settings.touchAngle) {
+    // Only for initial gesture with 1 touchstart step
+    // Only not for scrolling events (scrolling already checked for angle)
+    if (this.settings.touchAngle 
+        && !this.isScrolling) {
       let touchAngle;
       const diffX = clientX - this.startX;
       const diffY = clientY - this.startY;
@@ -271,24 +285,16 @@ export class Events {
     }
 
     // Not allow move panel with positive overflow scroll
-    if (this.isDragScrollabe(t.path || t.composedPath()) 
-          && this.instance.overflowEl.style.overflowY === 'auto') {
-      this.instance.overflowEl.addEventListener('scroll', (s: any) => {
-        this.contentScrollTop = s.target.scrollTop;
-      });
-
+    if (this.instance.overflowEl.style.overflowY === 'auto') {
       if (this.settings.inverse && this.willScrolled(t)) {
         this.contentScrollTop = 0;
         return;
       }
 
       // Scrolled -> Disable drag
-      if (!this.settings.inverse) {
-        if ((newVal > this.breakpoints.topper && this.contentScrollTop > 0) 
-          || (newVal <= this.breakpoints.topper)) { 
-          return;
-        }
-      } 
+      if (!this.settings.inverse && this.contentScrollTop > 0) {
+        return;
+      }
     }
     
     // Non-inverse (normal) gestures
@@ -420,6 +426,16 @@ export class Events {
     }
 
     this.instance.doTransition({type: 'end', translateY: closest});
+  }
+
+  /**
+   * Click Event
+   * @param t 
+   */
+  public onScrollCb = (t) => this.onScroll(t);
+  private async onScroll(t) {
+    this.isScrolling = true;
+    this.contentScrollTop = t.target.scrollTop;
   }
 
   /**
@@ -582,17 +598,9 @@ export class Events {
     });
   }
 
-  /** 
-   * Check if drag event fired by scrollable element
-   */
-  private isDragScrollabe(path):boolean {
-    return !!path.find(item => item === this.instance.overflowEl);
-  }
-
   private willScrolled(t): boolean {
     if (!(this.isElementScrollable(this.instance.overflowEl)
-        && this.instance.overflowEl.style.overflow !== 'hidden'
-        && this.isDragScrollabe(t.path || t.composedPath()))) {
+        && this.instance.overflowEl.style.overflow !== 'hidden')) {
       return false;
     }
     return true;

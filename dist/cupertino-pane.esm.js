@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: October 29, 2021
+ * Released on: November 5, 2021
  */
 
 /*! *****************************************************************************
@@ -189,6 +189,7 @@ class Events {
         this.steps = [];
         this.inputBluredbyMove = false;
         this.keyboardVisible = false;
+        this.isScrolling = false;
         this.touchEvents = (() => {
             const touch = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
             let desktop = ['mousedown', 'mousemove', 'mouseup'];
@@ -232,6 +233,11 @@ class Events {
          * Click Event
          * @param t
          */
+        this.onScrollCb = (t) => this.onScroll(t);
+        /**
+         * Click Event
+         * @param t
+         */
         this.onClickCb = (t) => this.onClick(t);
         /**
          * Open Cordova Keyboard event
@@ -266,6 +272,10 @@ class Events {
                     this.eventListeners('addEventListener', el);
             });
         }
+        // scroll events for overflowEl
+        if (this.settings.topperOverflow) {
+            this.instance.overflowEl.addEventListener('scroll', this.onScrollCb);
+        }
         // Handle keyboard events for cordova
         if (this.settings.handleKeyboard && this.device.cordova) {
             window.addEventListener('keyboardWillShow', this.onKeyboardShowCb);
@@ -299,6 +309,10 @@ class Events {
                 if (el)
                     this.eventListeners('removeEventListener', el);
             });
+        }
+        // scroll events for overflowEl
+        if (this.settings.topperOverflow) {
+            this.instance.overflowEl.removeEventListener('scroll', this.onScrollCb);
         }
         // Handle keyboard events for cordova
         if (this.settings.handleKeyboard && this.device.cordova) {
@@ -357,6 +371,8 @@ class Events {
             return;
         // Allow touch angle by default, disallow no move with condition
         this.disableDragAngle = false;
+        // Not scrolling event by default -> on scroll will true
+        this.isScrolling = false;
         // Allow pereventDismiss by default
         this.instance.preventedDismiss = false;
         const { clientY, clientX } = this.getEvetClientYX(t, 'touchstart');
@@ -366,9 +382,7 @@ class Events {
             this.pointerDown = true;
         // if overflow content was scrolled
         // increase to scrolled value
-        if (this.contentScrollTop
-            && this.willScrolled(t)
-            && this.isDragScrollabe(t.path || t.composedPath())) {
+        if (this.contentScrollTop && this.willScrolled(t)) {
             this.startY += this.contentScrollTop;
         }
         this.steps.push({ posY: this.startY, time: Date.now() });
@@ -424,8 +438,10 @@ class Events {
             }
         }
         // Touch angle
-        // Only for initial gesture
-        if (this.settings.touchAngle) {
+        // Only for initial gesture with 1 touchstart step
+        // Only not for scrolling events (scrolling already checked for angle)
+        if (this.settings.touchAngle
+            && !this.isScrolling) {
             let touchAngle;
             const diffX = clientX - this.startX;
             const diffY = clientY - this.startY;
@@ -438,21 +454,14 @@ class Events {
             }
         }
         // Not allow move panel with positive overflow scroll
-        if (this.isDragScrollabe(t.path || t.composedPath())
-            && this.instance.overflowEl.style.overflowY === 'auto') {
-            this.instance.overflowEl.addEventListener('scroll', (s) => {
-                this.contentScrollTop = s.target.scrollTop;
-            });
+        if (this.instance.overflowEl.style.overflowY === 'auto') {
             if (this.settings.inverse && this.willScrolled(t)) {
                 this.contentScrollTop = 0;
                 return;
             }
             // Scrolled -> Disable drag
-            if (!this.settings.inverse) {
-                if ((newVal > this.breakpoints.topper && this.contentScrollTop > 0)
-                    || (newVal <= this.breakpoints.topper)) {
-                    return;
-                }
+            if (!this.settings.inverse && this.contentScrollTop > 0) {
+                return;
             }
         }
         // Non-inverse (normal) gestures
@@ -564,6 +573,12 @@ class Events {
             this.settings.onTransitionEnd({ target: this.instance.paneEl });
         }
         this.instance.doTransition({ type: 'end', translateY: closest });
+    }
+    onScroll(t) {
+        return __awaiter(this, void 0, void 0, function* () {
+            this.isScrolling = true;
+            this.contentScrollTop = t.target.scrollTop;
+        });
     }
     onClick(t) {
         // Prevent accidental unwanted clicks events during swiping
@@ -682,16 +697,9 @@ class Events {
             });
         });
     }
-    /**
-     * Check if drag event fired by scrollable element
-     */
-    isDragScrollabe(path) {
-        return !!path.find(item => item === this.instance.overflowEl);
-    }
     willScrolled(t) {
         if (!(this.isElementScrollable(this.instance.overflowEl)
-            && this.instance.overflowEl.style.overflow !== 'hidden'
-            && this.isDragScrollabe(t.path || t.composedPath()))) {
+            && this.instance.overflowEl.style.overflow !== 'hidden')) {
             return false;
         }
         return true;
@@ -1341,8 +1349,6 @@ class CupertinoPane {
                 // Body patch prevent android pull-to-refresh
                 document.body.style['overscrollBehaviorY'] = 'none';
             }
-            /****** Attach Events *******/
-            this.events.attachAllEvents();
             /****** Animation & Transition ******/
             if (conf.animate) {
                 yield this.doTransition({ type: 'present', translateY: this.breakpoints.breaks[this.settings.initialBreak] });
@@ -1364,6 +1370,8 @@ class CupertinoPane {
             yield new Promise((resolve) => setTimeout(() => resolve(true), 150));
             this.scrollElementInit();
             this.checkOverflowAttr(this.breakpoints.currentBreakpoint);
+            /****** Attach Events *******/
+            this.events.attachAllEvents();
             return this;
         });
     }

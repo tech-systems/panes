@@ -20,6 +20,7 @@ export declare class Events {
     private steps;
     private inputBluredbyMove;
     private keyboardVisible;
+    private isScrolling;
     constructor(instance: CupertinoPane, settings: CupertinoSettings, device: Device, breakpoints: Breakpoints);
     attachAllEvents(): void;
     detachAllEvents(): void;
@@ -50,6 +51,12 @@ export declare class Events {
      */
     touchEndCb: (t: any) => void;
     private touchEnd;
+    /**
+     * Click Event
+     * @param t
+     */
+    onScrollCb: (t: any) => Promise<void>;
+    private onScroll;
     /**
      * Click Event
      * @param t
@@ -90,10 +97,6 @@ export declare class Events {
      * (resize window frame height on hide/show)
      */
     private fixAndroidResize;
-    /**
-     * Check if drag event fired by scrollable element
-     */
-    private isDragScrollabe;
     private willScrolled;
     private isPaneDescendant;
     private isFormElement;

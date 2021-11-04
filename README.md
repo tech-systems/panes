@@ -1,5 +1,6 @@
 <p align="center">
-     <img alt="Cupertino Panes is multi-functional panes & boards with touch technologies" src="docs/logo/logo-1-mini.jpg" width="600" />
+     <!-- <img alt="Cupertino Panes is multi-functional panes & boards with touch technologies" src="docs/logo/logo-1-mini.jpg" width="600" /> -->
+     <img alt="Cupertino Panes is multi-functional panes & boards with touch technologies" src="docs/logo/logo-2-mini.png" width="600" />
 </p>
 
 # Cupertino Panes

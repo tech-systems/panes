@@ -322,9 +322,6 @@ export class CupertinoPane {
         document.body.style['overscrollBehaviorY'] = 'none';  
       }      
 
-      /****** Attach Events *******/
-      this.events.attachAllEvents();
-
       /****** Animation & Transition ******/
       if (conf.animate) {
         await this.doTransition({type: 'present', translateY: this.breakpoints.breaks[this.settings.initialBreak]}); 
@@ -351,6 +348,9 @@ export class CupertinoPane {
       await new Promise((resolve) => setTimeout(() => resolve(true), 150));
       this.scrollElementInit();
       this.checkOverflowAttr(this.breakpoints.currentBreakpoint);
+
+      /****** Attach Events *******/
+      this.events.attachAllEvents();
 
       return this;
   }
