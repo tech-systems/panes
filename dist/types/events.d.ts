@@ -91,6 +91,12 @@ export declare class Events {
     /**
      * Private class methods
      */
+    /**
+     * Topper Than Top
+     * Lower Than Bottom
+     * Otherwise don't changes
+     */
+    private handleTopperLowerPositions;
     private getEvetClientYX;
     /**
      * Fix android keyboard issue with transition
