@@ -39,7 +39,7 @@ export declare class CupertinoPane {
     /**
      * Private Utils methods
      */
-    private getTimingFunction;
+    private buildTransitionValue;
     private isBackdropPresented;
     private renderBackdrop;
     /**

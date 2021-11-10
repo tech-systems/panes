@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: November 9, 2021
+ * Released on: November 11, 2021
  */
 
 (function (global, factory) {
@@ -432,10 +432,19 @@
                 return;
             }
             let newVal = this.instance.getPanelTransformY() + diffY;
-            // Patch for 'touchmove' first event 
-            // when start slowly events with small velocity
-            if (this.steps.length < 2 && velocityY < 1) {
-                newVal = this.instance.getPanelTransformY() + (diffY * velocityY);
+            // First event after touchmove only
+            if (this.steps.length < 2) {
+                // Patch for 'touchmove' first event 
+                // when start slowly events with small velocity
+                if (velocityY < 1) {
+                    newVal = this.instance.getPanelTransformY() + (diffY * velocityY);
+                }
+                // Move while transition patch next transitions
+                let computedTranslateY = new WebKitCSSMatrix(window.getComputedStyle(this.instance.paneEl).transform).m42;
+                let transitionYDiff = computedTranslateY - this.instance.getPanelTransformY();
+                if (Math.abs(transitionYDiff)) {
+                    newVal += transitionYDiff;
+                }
             }
             // Detect if input was blured
             // TODO: Check that blured from pane child instance
@@ -1341,7 +1350,7 @@
                     this.followerEl = document.querySelector(this.settings.followerElement);
                     this.followerEl.style.willChange = 'transform, border-radius';
                     this.followerEl.style.transform = `translateY(0px) translateZ(0px)`;
-                    this.followerEl.style.transition = `all ${this.settings.animationDuration}ms ${this.getTimingFunction((_a = this.settings.breaks[this.currentBreak()]) === null || _a === void 0 ? void 0 : _a.bounce)} 0s`;
+                    this.followerEl.style.transition = this.buildTransitionValue((_a = this.settings.breaks[this.currentBreak()]) === null || _a === void 0 ? void 0 : _a.bounce);
                 }
                 // Assign multiplicators for push elements
                 if (this.settings.zStack) {
@@ -1475,8 +1484,11 @@
         /**
          * Private Utils methods
          */
-        getTimingFunction(bounce) {
-            return bounce ? 'cubic-bezier(0.175, 0.885, 0.370, 1.120)' : this.settings.animationType;
+        buildTransitionValue(bounce) {
+            if (bounce) {
+                return `all 300ms cubic-bezier(.155,1.105,.295,1.12)`;
+            }
+            return `all ${this.settings.animationDuration}ms ${this.settings.animationType}`;
         }
         isBackdropPresented() {
             return document.querySelector(`.cupertino-pane-wrapper .backdrop`)
@@ -1841,12 +1853,11 @@
                     // Get timing function && push for next 
                     const nextBreak = Object.entries(this.breakpoints.breaks).find(val => val[1] === params.translateY);
                     let bounce = nextBreak && ((_a = this.settings.breaks[nextBreak[0]]) === null || _a === void 0 ? void 0 : _a.bounce);
-                    const timingForNext = this.getTimingFunction(bounce);
                     // style
-                    this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${timingForNext} 0s`;
+                    this.paneEl.style.transition = this.buildTransitionValue(bounce);
                     // Bind for follower same transitions
                     if (this.followerEl) {
-                        this.followerEl.style.transition = `transform ${this.settings.animationDuration}ms ${timingForNext} 0s`;
+                        this.followerEl.style.transition = this.buildTransitionValue(bounce);
                     }
                     // Push transition
                     if (this.settings.zStack) {

@@ -286,7 +286,7 @@ export class CupertinoPane {
         );
         this.followerEl.style.willChange = 'transform, border-radius';
         this.followerEl.style.transform = `translateY(0px) translateZ(0px)`;
-        this.followerEl.style.transition = `all ${this.settings.animationDuration}ms ${this.getTimingFunction(this.settings.breaks[this.currentBreak()]?.bounce)} 0s`;
+        this.followerEl.style.transition = this.buildTransitionValue(this.settings.breaks[this.currentBreak()]?.bounce);
       }
 
       // Assign multiplicators for push elements
@@ -493,8 +493,12 @@ export class CupertinoPane {
   /**
    * Private Utils methods
    */  
-  private getTimingFunction(bounce) {
-    return bounce ? 'cubic-bezier(0.175, 0.885, 0.370, 1.120)' : this.settings.animationType;
+  private buildTransitionValue(bounce: boolean): string {
+    if (bounce) {
+      return `all 300ms cubic-bezier(.155,1.105,.295,1.12)`;
+    }
+
+    return `all ${this.settings.animationDuration}ms ${this.settings.animationType}`;
   }
 
   private isBackdropPresented() {
@@ -924,13 +928,12 @@ export class CupertinoPane {
           val => val[1] === params.translateY
         );
         let bounce = nextBreak && this.settings.breaks[nextBreak[0]]?.bounce;
-        const timingForNext = this.getTimingFunction(bounce);
 
         // style
-        this.paneEl.style.transition = `transform ${this.settings.animationDuration}ms ${timingForNext} 0s`;
+        this.paneEl.style.transition = this.buildTransitionValue(bounce);
         // Bind for follower same transitions
         if (this.followerEl) {
-          this.followerEl.style.transition = `transform ${this.settings.animationDuration}ms ${timingForNext} 0s`;
+          this.followerEl.style.transition = this.buildTransitionValue(bounce);
         }
         
         // Push transition

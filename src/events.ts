@@ -255,10 +255,22 @@ export class Events {
     
     let newVal = this.instance.getPanelTransformY() + diffY;
     
-    // Patch for 'touchmove' first event 
-    // when start slowly events with small velocity
-    if (this.steps.length < 2 && velocityY < 1) {
-      newVal = this.instance.getPanelTransformY() + (diffY * velocityY);
+    // First event after touchmove only
+    if (this.steps.length < 2) {
+      // Patch for 'touchmove' first event 
+      // when start slowly events with small velocity
+      if (velocityY < 1) {
+        newVal = this.instance.getPanelTransformY() + (diffY * velocityY);
+      }
+
+      // Move while transition patch next transitions
+      let computedTranslateY = new WebKitCSSMatrix(
+        window.getComputedStyle(this.instance.paneEl).transform
+      ).m42;
+      let transitionYDiff = computedTranslateY - this.instance.getPanelTransformY();
+      if (Math.abs(transitionYDiff)) {
+        newVal += transitionYDiff;
+      }
     }
 
     // Detect if input was blured
