@@ -48,7 +48,6 @@ export class Events {
     if (this.settings.handleKeyboard && this.device.cordova) {
       window.addEventListener('keyboardWillShow', this.onKeyboardShowCb);
       window.addEventListener('keyboardWillHide', this.onKeyboardWillHideCb);
-      window.addEventListener('keyboardDidHide', this.onKeyboardDidHideCb);
     }
 
     // Fix Android issue with resize if not handle
@@ -89,7 +88,6 @@ export class Events {
     if (this.settings.handleKeyboard && this.device.cordova) {
       window.removeEventListener('keyboardWillShow', this.onKeyboardShowCb);
       window.removeEventListener('keyboardWillHide', this.onKeyboardWillHideCb);
-      window.removeEventListener('keyboardDidHide', this.onKeyboardDidHideCb);
     }
 
     // Orientation change + window resize
@@ -474,7 +472,6 @@ export class Events {
       setTimeout(() => this.fixAndroidResize(), 20);
     }
 
-    this.keyboardVisible = true;
     this.breakpoints.prevBreakpoint = Object.entries(this.breakpoints.breaks).find(val => val[1] === this.instance.getPanelTransformY())[0];
     let newHeight = this.settings.breaks[this.instance.currentBreak()].height + e.keyboardHeight;
     
@@ -501,11 +498,6 @@ export class Events {
    */
   public onKeyboardWillHideCb = (e) => this.onKeyboardWillHide(e);
   private onKeyboardWillHide(e) {
-    // Move back
-    if (!this.keyboardVisible) {
-      return;
-    }
-
     // pane not visible on viewport
     if (!this.isOnViewport()) {
       return;
@@ -526,23 +518,15 @@ export class Events {
   }
 
   /**
-   * Close Cordova Keyboard event
-   * @param e
-   */
-  public onKeyboardDidHideCb = (e) => this.onKeyboardDidHide(e);
-  private onKeyboardDidHide(e) {
-    this.keyboardVisible = false;
-  }
-
-  /**
    * Window resize event
    * TODO: Prevent android unlock events
    * @param e
    */
   public onWindowResizeCb = (e) => this.onWindowResize(e);
   private async onWindowResize(e) {
-    // Doesn't re-build if callback from keyboard
-    if (this.keyboardVisible) {
+    // If form element active - recognize here as Keyboard event
+    // TODO: if window screen not changed condition also (desktop input focus + resize)
+    if (this.isFormElement(document.activeElement)) {
       return;
     }
 

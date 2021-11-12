@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: November 11, 2021
+ * Released on: November 12, 2021
  */
 
 (function (global, factory) {
@@ -256,11 +256,6 @@
              */
             this.onKeyboardWillHideCb = (e) => this.onKeyboardWillHide(e);
             /**
-             * Close Cordova Keyboard event
-             * @param e
-             */
-            this.onKeyboardDidHideCb = (e) => this.onKeyboardDidHide(e);
-            /**
              * Window resize event
              * TODO: Prevent android unlock events
              * @param e
@@ -286,7 +281,6 @@
             if (this.settings.handleKeyboard && this.device.cordova) {
                 window.addEventListener('keyboardWillShow', this.onKeyboardShowCb);
                 window.addEventListener('keyboardWillHide', this.onKeyboardWillHideCb);
-                window.addEventListener('keyboardDidHide', this.onKeyboardDidHideCb);
             }
             // Fix Android issue with resize if not handle
             if (!this.settings.handleKeyboard
@@ -324,7 +318,6 @@
             if (this.settings.handleKeyboard && this.device.cordova) {
                 window.removeEventListener('keyboardWillShow', this.onKeyboardShowCb);
                 window.removeEventListener('keyboardWillHide', this.onKeyboardWillHideCb);
-                window.removeEventListener('keyboardDidHide', this.onKeyboardDidHideCb);
             }
             // Orientation change + window resize
             window.removeEventListener('resize', this.onWindowResizeCb);
@@ -604,7 +597,6 @@
             if (this.device.android) {
                 setTimeout(() => this.fixAndroidResize(), 20);
             }
-            this.keyboardVisible = true;
             this.breakpoints.prevBreakpoint = Object.entries(this.breakpoints.breaks).find(val => val[1] === this.instance.getPanelTransformY())[0];
             let newHeight = this.settings.breaks[this.instance.currentBreak()].height + e.keyboardHeight;
             // Landscape case
@@ -622,10 +614,6 @@
             }
         }
         onKeyboardWillHide(e) {
-            // Move back
-            if (!this.keyboardVisible) {
-                return;
-            }
             // pane not visible on viewport
             if (!this.isOnViewport()) {
                 return;
@@ -641,13 +629,11 @@
                 this.instance.moveToBreak(this.breakpoints.prevBreakpoint);
             }
         }
-        onKeyboardDidHide(e) {
-            this.keyboardVisible = false;
-        }
         onWindowResize(e) {
             return __awaiter(this, void 0, void 0, function* () {
-                // Doesn't re-build if callback from keyboard
-                if (this.keyboardVisible) {
+                // If form element active - recognize here as Keyboard event
+                // TODO: if window screen not changed condition also (desktop input focus + resize)
+                if (this.isFormElement(document.activeElement)) {
                     return;
                 }
                 yield new Promise((resolve) => setTimeout(() => resolve(true), 150));

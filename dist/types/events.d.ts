@@ -76,12 +76,6 @@ export declare class Events {
     onKeyboardWillHideCb: (e: any) => void;
     private onKeyboardWillHide;
     /**
-     * Close Cordova Keyboard event
-     * @param e
-     */
-    onKeyboardDidHideCb: (e: any) => void;
-    private onKeyboardDidHide;
-    /**
      * Window resize event
      * TODO: Prevent android unlock events
      * @param e
