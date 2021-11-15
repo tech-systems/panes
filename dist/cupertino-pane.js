@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: November 12, 2021
+ * Released on: November 15, 2021
  */
 
 (function (global, factory) {
@@ -586,6 +586,7 @@
             }
         }
         onKeyboardShow(e) {
+            this.keyboardVisible = true;
             // focud element not inside pane
             if (!this.isPaneDescendant(document.activeElement)) {
                 return;
@@ -631,9 +632,14 @@
         }
         onWindowResize(e) {
             return __awaiter(this, void 0, void 0, function* () {
-                // If form element active - recognize here as Keyboard event
-                // TODO: if window screen not changed condition also (desktop input focus + resize)
+                // We should separate keyboard and resize events
+                // If form element active - recognize here as KeyboardWillShow
                 if (this.isFormElement(document.activeElement)) {
+                    return;
+                }
+                if (!this.isFormElement(document.activeElement)
+                    && this.keyboardVisible) {
+                    this.keyboardVisible = false;
                     return;
                 }
                 yield new Promise((resolve) => setTimeout(() => resolve(true), 150));
@@ -955,9 +961,11 @@
                     }
                     // Move to any if removed
                     if (!((_e = this.settings.breaks[this.prevBreakpoint]) === null || _e === void 0 ? void 0 : _e.enabled)) {
-                        let nextY = this.instance.swipeNextPoint(1, 1, this.getClosestBreakY());
-                        const nextBreak = Object.entries(this.breaks).find(val => val[1] === nextY);
-                        this.instance.moveToBreak(nextBreak[0]);
+                        if (!this.instance.isHidden()) {
+                            let nextY = this.instance.swipeNextPoint(1, 1, this.getClosestBreakY());
+                            const nextBreak = Object.entries(this.breaks).find(val => val[1] === nextY);
+                            this.instance.moveToBreak(nextBreak[0]);
+                        }
                     }
                     // Re-calc height and top
                     this.instance.paneEl.style.top = this.settings.inverse

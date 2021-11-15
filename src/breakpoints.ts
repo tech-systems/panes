@@ -171,9 +171,11 @@ export class Breakpoints {
 
       // Move to any if removed
       if (!this.settings.breaks[this.prevBreakpoint]?.enabled) {
-        let nextY = this.instance.swipeNextPoint(1, 1, this.getClosestBreakY());
-        const nextBreak = Object.entries(this.breaks).find(val => val[1] === nextY);
-        this.instance.moveToBreak(nextBreak[0]);
+        if (!this.instance.isHidden()) {
+          let nextY = this.instance.swipeNextPoint(1, 1, this.getClosestBreakY());
+          const nextBreak = Object.entries(this.breaks).find(val => val[1] === nextY);
+          this.instance.moveToBreak(nextBreak[0]);
+        }
       }
 
       // Re-calc height and top

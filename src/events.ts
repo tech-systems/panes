@@ -458,6 +458,8 @@ export class Events {
    */
   public onKeyboardShowCb = (e) => this.onKeyboardShow(e);
   private onKeyboardShow(e) {
+    this.keyboardVisible = true;
+
     // focud element not inside pane
     if (!this.isPaneDescendant(document.activeElement)) {
       return;
@@ -524,9 +526,14 @@ export class Events {
    */
   public onWindowResizeCb = (e) => this.onWindowResize(e);
   private async onWindowResize(e) {
-    // If form element active - recognize here as Keyboard event
-    // TODO: if window screen not changed condition also (desktop input focus + resize)
+    // We should separate keyboard and resize events
+    // If form element active - recognize here as KeyboardWillShow
     if (this.isFormElement(document.activeElement)) {
+      return;
+    }
+    if (!this.isFormElement(document.activeElement) 
+        && this.keyboardVisible) {
+      this.keyboardVisible = false;
       return;
     }
 
