@@ -1,7 +1,7 @@
 import { CupertinoPane } from './cupertino-pane';
 import { PaneBreaks, CupertinoSettings } from './models';
 /**
- * Breakpoints builde
+ * Breakpoints builder
  */
 export declare class Breakpoints {
     private instance;

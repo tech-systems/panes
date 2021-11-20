@@ -2,7 +2,7 @@ import { CupertinoPane } from './cupertino-pane';
 import { PaneBreaks, CupertinoSettings } from './models';
 
 /**
- * Breakpoints builde
+ * Breakpoints builder
  */
 
 export class Breakpoints {

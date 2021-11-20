@@ -3,6 +3,7 @@ import { CupertinoSettings } from './models';
 import { Device } from './device';
 import { Support } from './support';
 import { Breakpoints } from './breakpoints';
+import { Transitions } from './transitions';
 
 /**
  * Touch start, Touch move, Touch end,
@@ -24,9 +25,10 @@ export class Events {
   
   
   constructor(private instance: CupertinoPane, 
-              private settings: CupertinoSettings, 
+              private settings: CupertinoSettings,
               private device: Device,
-              private breakpoints: Breakpoints) {
+              private breakpoints: Breakpoints,
+              private transitions: Transitions) {
   }
 
   public attachAllEvents() {
@@ -340,7 +342,7 @@ export class Events {
 
     this.instance.checkOpacityAttr(newVal);
     this.instance.checkOverflowAttr(newVal);
-    this.instance.doTransition({type: 'move', translateY: newVal});
+    this.transitions.doTransition({type: 'move', translateY: newVal});
     this.steps.push({posY: clientY, time: Date.now()});
   }
 
@@ -408,7 +410,7 @@ export class Events {
       this.settings.onTransitionEnd({target: this.instance.paneEl});
     }
 
-    this.instance.doTransition({type: 'end', translateY: closest});
+    this.transitions.doTransition({type: 'end', translateY: closest});
   }
 
   /**

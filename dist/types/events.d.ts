@@ -2,6 +2,7 @@ import { CupertinoPane } from './cupertino-pane';
 import { CupertinoSettings } from './models';
 import { Device } from './device';
 import { Breakpoints } from './breakpoints';
+import { Transitions } from './transitions';
 /**
  * Touch start, Touch move, Touch end,
  * Click, Keyboard show, Keyboard hide
@@ -11,6 +12,7 @@ export declare class Events {
     private settings;
     private device;
     private breakpoints;
+    private transitions;
     private allowClick;
     private disableDragAngle;
     private pointerDown;
@@ -21,7 +23,7 @@ export declare class Events {
     private inputBluredbyMove;
     private keyboardVisible;
     private isScrolling;
-    constructor(instance: CupertinoPane, settings: CupertinoSettings, device: Device, breakpoints: Breakpoints);
+    constructor(instance: CupertinoPane, settings: CupertinoSettings, device: Device, breakpoints: Breakpoints, transitions: Transitions);
     attachAllEvents(): void;
     detachAllEvents(): void;
     resetEvents(): void;

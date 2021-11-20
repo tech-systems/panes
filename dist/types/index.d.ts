@@ -85,15 +85,16 @@ declare class CupertinoPane {
     contentEl: HTMLElement;
     parentEl: HTMLElement;
     backdropEl: HTMLDivElement;
+    followerEl: HTMLElement;
     private draggableEl;
     private moveEl;
     private destroyButtonEl;
-    private followerEl;
     private settings;
     private device;
     private events;
     private breakpoints;
-    private zStackDefaults;
+    private transitions;
+    private zStack;
     constructor(selector: (string | HTMLElement), conf?: CupertinoSettings);
     private drawBaseElements;
     present(conf?: {
@@ -107,10 +108,6 @@ declare class CupertinoPane {
     checkOverflowAttr(val: any): void;
     isPanePresented(): boolean;
     swipeNextPoint: (diff: any, maxDiff: any, closest: any) => any;
-    /**
-     * Private Utils methods
-     */
-    private buildTransitionValue;
     private isBackdropPresented;
     private renderBackdrop;
     /**
@@ -118,10 +115,6 @@ declare class CupertinoPane {
      * @param {string} styleString
      */
     private addStyle;
-    private setPushMultiplicators;
-    private clearPushMultiplicators;
-    private getPushMulitplicator;
-    setZstackConfig(zStack: ZStackSettings): void;
     /**
      * Backdrop
      */
@@ -155,16 +148,11 @@ declare class CupertinoPane {
     hide(): any;
     isHidden(): (boolean | null);
     currentBreak(): (string | null);
-    private destroyResets;
     destroy(conf?: {
         animate: boolean;
         destroyButton?: boolean;
     }): Promise<true>;
-    private pushTransition;
-    /***********************************
-     * Transitions handler
-     */
-    doTransition(params?: any): Promise<true>;
+    destroyResets(): void;
 }
 
 export { CupertinoPane, CupertinoSettings };
