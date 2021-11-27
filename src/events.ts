@@ -313,8 +313,11 @@ export class Events {
       }
     }
 
-    // topper/lower
-    let forceNewVal = this.handleTopperLowerPositions(newVal, diffY);
+    // Topper-top/Lower-bottom recognizers
+    let forceNewVal = this.handleTopperLowerPositions({
+        clientX, clientY, 
+        newVal, diffY
+    });
     if (forceNewVal) {
       newVal = forceNewVal;
     }
@@ -553,26 +556,31 @@ export class Events {
    * Lower Than Bottom
    * Otherwise don't changes
    */
-   private handleTopperLowerPositions(newVal:number, diffY: number):number {
+   private handleTopperLowerPositions(coords: {
+     clientX: number, clientY: number, 
+     newVal:number, diffY: number, 
+  }):number {
     // Non-inverse (normal) gestures
     if (!this.settings.inverse) {
       // Disallow drag topper than top point
       if (!this.settings.upperThanTop 
-          && (newVal <= this.breakpoints.topper)) {
+          && (coords.newVal <= this.breakpoints.topper)) {
         return this.breakpoints.topper;
       }
 
-      // Allow drag topper than top point
-      if (newVal <= this.breakpoints.topper 
-          && this.settings.upperThanTop) {
+      /**
+       * Allow drag topper than top point
+       */
+      if (this.settings.upperThanTop 
+        && (coords.newVal <= this.breakpoints.topper)) {
         const screenDelta = this.instance.screen_height - this.instance.screenHeightOffset;
         const differKoef = (screenDelta - this.instance.getPanelTransformY()) / (screenDelta - this.breakpoints.topper) / 8;
-        return this.instance.getPanelTransformY() + (diffY * differKoef);
+        return this.instance.getPanelTransformY() + (coords.diffY * differKoef);
       }
 
       // Disallow drag lower then bottom 
       if (!this.settings.lowerThanBottom
-          && newVal >= this.breakpoints.bottomer) {
+          && coords.newVal >= this.breakpoints.bottomer) {
         return this.breakpoints.bottomer;
       }
     } 
@@ -580,16 +588,16 @@ export class Events {
     if (this.settings.inverse) {
       // Inverse gestures
       // Allow drag topper than top point
-      if (newVal >= this.breakpoints.topper 
+      if (coords.newVal >= this.breakpoints.topper 
           && this.settings.upperThanTop) {
         const screenDelta = this.instance.screen_height - this.instance.screenHeightOffset;
         const differKoef = (screenDelta - this.instance.getPanelTransformY()) / (screenDelta - this.breakpoints.topper) / 8;
-        return this.instance.getPanelTransformY() + (diffY * differKoef);
+        return this.instance.getPanelTransformY() + (coords.diffY * differKoef);
       }
       
       // Disallow drag topper than top point
       if (!this.settings.upperThanTop 
-          && (newVal >= this.breakpoints.topper)) {
+          && (coords.newVal >= this.breakpoints.topper)) {
         return this.breakpoints.topper;
       }
     }
@@ -632,6 +640,9 @@ export class Events {
   }
 
   private isPaneDescendant(el): boolean {
+    if (!el) {
+      return false;
+    }
     let node = el.parentNode;
     while (node != null) {
         if (node == this.instance.paneEl) {

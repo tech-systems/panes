@@ -165,11 +165,14 @@ export class Breakpoints {
       // Move to current if updated
       if (this.settings.breaks[this.prevBreakpoint]?.enabled) {
         if (!this.instance.isHidden()) {
-          this.instance.moveToBreak(this.prevBreakpoint);
+          // Move to any if removed
+          this.instance.moveToBreak(
+            this.prevBreakpoint, 
+            this.settings.inverse && 'move'
+          );
         }
       }
 
-      // Move to any if removed
       if (!this.settings.breaks[this.prevBreakpoint]?.enabled) {
         if (!this.instance.isHidden()) {
           let nextY = this.instance.swipeNextPoint(1, 1, this.getClosestBreakY());
@@ -178,11 +181,12 @@ export class Breakpoints {
         }
       }
 
-      // Re-calc height and top
+      // Re-calc top
       this.instance.paneEl.style.top = this.settings.inverse 
         ? `-${this.bottomer - this.settings.bottomOffset}px` : `unset`;
+      // Re-calc height 
+      // TODO: with transition
       this.instance.paneEl.style.height = `${this.instance.getPaneHeight()}px`;
-
       this.instance.scrollElementInit();
       this.instance.checkOpacityAttr(this.currentBreakpoint);
       this.instance.checkOverflowAttr(this.currentBreakpoint);

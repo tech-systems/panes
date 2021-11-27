@@ -19,7 +19,6 @@ export declare class ZStack {
      */
     pushTransition(pushElement: HTMLElement, newPaneY: number, transition: string): void;
     setPushMultiplicators(): void;
-    setZstackConfig(zStack: ZStackSettings): void;
     /**
      * Private class methods
      */

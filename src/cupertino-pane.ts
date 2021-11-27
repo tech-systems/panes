@@ -292,7 +292,7 @@ export class CupertinoPane {
 
       // Assign multiplicators for push elements
       if (this.settings.zStack) {
-        this.zStack.setZstackConfig(this.settings.zStack);
+        this.setZstackConfig(this.settings.zStack);
         this.zStack.setPushMultiplicators();
       }
 
@@ -565,6 +565,11 @@ export class CupertinoPane {
    * Public user methods
    */
 
+  public setZstackConfig(zStack: ZStackSettings): void {
+    // Allow user to reset config
+    this.settings.zStack = zStack ? {...this.zStack.zStackDefaults, ...zStack} : null;
+  }
+
   /**
    * Prevent dismiss event
    */
@@ -612,7 +617,7 @@ export class CupertinoPane {
     await this.breakpoints.buildBreakpoints(this.breakpoints.lockedBreakpoints);
   }
 
-  public moveToBreak(val: string) {
+  public async moveToBreak(val: string, type: string = 'breakpoint'): Promise<true> {
     if (!this.isPanePresented()) {
       console.warn(`Cupertino Pane: Present pane before call moveToBreak()`);
       return null;
@@ -625,8 +630,9 @@ export class CupertinoPane {
 
     this.checkOpacityAttr(this.breakpoints.breaks[val]);
     this.checkOverflowAttr(this.breakpoints.breaks[val]);
-    this.transitions.doTransition({type: 'breakpoint', translateY: this.breakpoints.breaks[val]});
+    await this.transitions.doTransition({type, translateY: this.breakpoints.breaks[val]});
     this.breakpoints.currentBreakpoint = this.breakpoints.breaks[val];
+    return Promise.resolve(true);
   }
 
   public moveToHeight(val: number) {

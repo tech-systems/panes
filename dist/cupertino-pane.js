@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: November 21, 2021
+ * Released on: November 28, 2021
  */
 
 (function (global, factory) {
@@ -476,8 +476,11 @@
                     return;
                 }
             }
-            // topper/lower
-            let forceNewVal = this.handleTopperLowerPositions(newVal, diffY);
+            // Topper-top/Lower-bottom recognizers
+            let forceNewVal = this.handleTopperLowerPositions({
+                clientX, clientY,
+                newVal, diffY
+            });
             if (forceNewVal) {
                 newVal = forceNewVal;
             }
@@ -656,39 +659,41 @@
          * Lower Than Bottom
          * Otherwise don't changes
          */
-        handleTopperLowerPositions(newVal, diffY) {
+        handleTopperLowerPositions(coords) {
             // Non-inverse (normal) gestures
             if (!this.settings.inverse) {
                 // Disallow drag topper than top point
                 if (!this.settings.upperThanTop
-                    && (newVal <= this.breakpoints.topper)) {
+                    && (coords.newVal <= this.breakpoints.topper)) {
                     return this.breakpoints.topper;
                 }
-                // Allow drag topper than top point
-                if (newVal <= this.breakpoints.topper
-                    && this.settings.upperThanTop) {
+                /**
+                 * Allow drag topper than top point
+                 */
+                if (this.settings.upperThanTop
+                    && (coords.newVal <= this.breakpoints.topper)) {
                     const screenDelta = this.instance.screen_height - this.instance.screenHeightOffset;
                     const differKoef = (screenDelta - this.instance.getPanelTransformY()) / (screenDelta - this.breakpoints.topper) / 8;
-                    return this.instance.getPanelTransformY() + (diffY * differKoef);
+                    return this.instance.getPanelTransformY() + (coords.diffY * differKoef);
                 }
                 // Disallow drag lower then bottom 
                 if (!this.settings.lowerThanBottom
-                    && newVal >= this.breakpoints.bottomer) {
+                    && coords.newVal >= this.breakpoints.bottomer) {
                     return this.breakpoints.bottomer;
                 }
             }
             if (this.settings.inverse) {
                 // Inverse gestures
                 // Allow drag topper than top point
-                if (newVal >= this.breakpoints.topper
+                if (coords.newVal >= this.breakpoints.topper
                     && this.settings.upperThanTop) {
                     const screenDelta = this.instance.screen_height - this.instance.screenHeightOffset;
                     const differKoef = (screenDelta - this.instance.getPanelTransformY()) / (screenDelta - this.breakpoints.topper) / 8;
-                    return this.instance.getPanelTransformY() + (diffY * differKoef);
+                    return this.instance.getPanelTransformY() + (coords.diffY * differKoef);
                 }
                 // Disallow drag topper than top point
                 if (!this.settings.upperThanTop
-                    && (newVal >= this.breakpoints.topper)) {
+                    && (coords.newVal >= this.breakpoints.topper)) {
                     return this.breakpoints.topper;
                 }
             }
@@ -728,6 +733,9 @@
             return true;
         }
         isPaneDescendant(el) {
+            if (!el) {
+                return false;
+            }
             let node = el.parentNode;
             while (node != null) {
                 if (node == this.instance.paneEl) {
@@ -957,10 +965,10 @@
                     // Move to current if updated
                     if ((_d = this.settings.breaks[this.prevBreakpoint]) === null || _d === void 0 ? void 0 : _d.enabled) {
                         if (!this.instance.isHidden()) {
-                            this.instance.moveToBreak(this.prevBreakpoint);
+                            // Move to any if removed
+                            this.instance.moveToBreak(this.prevBreakpoint, this.settings.inverse && 'move');
                         }
                     }
-                    // Move to any if removed
                     if (!((_e = this.settings.breaks[this.prevBreakpoint]) === null || _e === void 0 ? void 0 : _e.enabled)) {
                         if (!this.instance.isHidden()) {
                             let nextY = this.instance.swipeNextPoint(1, 1, this.getClosestBreakY());
@@ -968,9 +976,11 @@
                             this.instance.moveToBreak(nextBreak[0]);
                         }
                     }
-                    // Re-calc height and top
+                    // Re-calc top
                     this.instance.paneEl.style.top = this.settings.inverse
                         ? `-${this.bottomer - this.settings.bottomOffset}px` : `unset`;
+                    // Re-calc height 
+                    // TODO: with transition
                     this.instance.paneEl.style.height = `${this.instance.getPaneHeight()}px`;
                     this.instance.scrollElementInit();
                     this.instance.checkOpacityAttr(this.currentBreakpoint);
@@ -1261,9 +1271,6 @@
                 multiplicator = multiplicator ? multiplicator + 1 : 1;
                 pushElement.style.setProperty('--push-multiplicator', `${multiplicator}`);
             });
-        }
-        setZstackConfig(zStack) {
-            this.settings.zStack = zStack ? Object.assign(Object.assign({}, this.zStackDefaults), zStack) : null;
         }
         /**
          * Private class methods
@@ -1586,7 +1593,7 @@
                 }
                 // Assign multiplicators for push elements
                 if (this.settings.zStack) {
-                    this.zStack.setZstackConfig(this.settings.zStack);
+                    this.setZstackConfig(this.settings.zStack);
                     this.zStack.setPushMultiplicators();
                 }
                 if ((this.settings.buttonClose && this.settings.buttonDestroy) && !this.settings.inverse) {
@@ -1781,6 +1788,10 @@
         /************************************
          * Public user methods
          */
+        setZstackConfig(zStack) {
+            // Allow user to reset config
+            this.settings.zStack = zStack ? Object.assign(Object.assign({}, this.zStack.zStackDefaults), zStack) : null;
+        }
         /**
          * Prevent dismiss event
          */
@@ -1825,19 +1836,22 @@
                 yield this.breakpoints.buildBreakpoints(this.breakpoints.lockedBreakpoints);
             });
         }
-        moveToBreak(val) {
-            if (!this.isPanePresented()) {
-                console.warn(`Cupertino Pane: Present pane before call moveToBreak()`);
-                return null;
-            }
-            if (!this.settings.breaks[val].enabled) {
-                console.warn('Cupertino Pane: %s breakpoint disabled', val);
-                return;
-            }
-            this.checkOpacityAttr(this.breakpoints.breaks[val]);
-            this.checkOverflowAttr(this.breakpoints.breaks[val]);
-            this.transitions.doTransition({ type: 'breakpoint', translateY: this.breakpoints.breaks[val] });
-            this.breakpoints.currentBreakpoint = this.breakpoints.breaks[val];
+        moveToBreak(val, type = 'breakpoint') {
+            return __awaiter(this, void 0, void 0, function* () {
+                if (!this.isPanePresented()) {
+                    console.warn(`Cupertino Pane: Present pane before call moveToBreak()`);
+                    return null;
+                }
+                if (!this.settings.breaks[val].enabled) {
+                    console.warn('Cupertino Pane: %s breakpoint disabled', val);
+                    return;
+                }
+                this.checkOpacityAttr(this.breakpoints.breaks[val]);
+                this.checkOverflowAttr(this.breakpoints.breaks[val]);
+                yield this.transitions.doTransition({ type, translateY: this.breakpoints.breaks[val] });
+                this.breakpoints.currentBreakpoint = this.breakpoints.breaks[val];
+                return Promise.resolve(true);
+            });
         }
         moveToHeight(val) {
             if (!this.isPanePresented()) {

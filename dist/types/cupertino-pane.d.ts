@@ -1,4 +1,4 @@
-import { CupertinoSettings, PaneBreaks } from './models';
+import { CupertinoSettings, PaneBreaks, ZStackSettings } from './models';
 export declare class CupertinoPane {
     private selector;
     disableDragEvents: boolean;
@@ -54,6 +54,7 @@ export declare class CupertinoPane {
     /************************************
      * Public user methods
      */
+    setZstackConfig(zStack: ZStackSettings): void;
     /**
      * Prevent dismiss event
      */
@@ -72,7 +73,7 @@ export declare class CupertinoPane {
      */
     setBreakpoints(conf?: PaneBreaks, bottomOffset?: number): Promise<void>;
     calcFitHeight(): Promise<any>;
-    moveToBreak(val: string): any;
+    moveToBreak(val: string, type?: string): Promise<true>;
     moveToHeight(val: number): any;
     hide(): any;
     isHidden(): (boolean | null);

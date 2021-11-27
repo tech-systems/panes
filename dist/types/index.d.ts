@@ -125,6 +125,7 @@ declare class CupertinoPane {
     /************************************
      * Public user methods
      */
+    setZstackConfig(zStack: ZStackSettings): void;
     /**
      * Prevent dismiss event
      */
@@ -143,7 +144,7 @@ declare class CupertinoPane {
      */
     setBreakpoints(conf?: PaneBreaks, bottomOffset?: number): Promise<void>;
     calcFitHeight(): Promise<any>;
-    moveToBreak(val: string): any;
+    moveToBreak(val: string, type?: string): Promise<true>;
     moveToHeight(val: number): any;
     hide(): any;
     isHidden(): (boolean | null);

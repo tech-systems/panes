@@ -101,10 +101,6 @@ export class ZStack {
     });
   }
 
-  public setZstackConfig(zStack: ZStackSettings): void {
-    this.settings.zStack = zStack ? {...this.zStackDefaults, ...zStack} : null;;
-  }
-
   /**
    * Private class methods
    */
