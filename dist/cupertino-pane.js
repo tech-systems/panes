@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: November 28, 2021
+ * Released on: December 6, 2021
  */
 
 (function (global, factory) {
@@ -658,6 +658,7 @@
          * Topper Than Top
          * Lower Than Bottom
          * Otherwise don't changes
+         * TODO: Merge same entry functions
          */
         handleTopperLowerPositions(coords) {
             // Non-inverse (normal) gestures
@@ -671,7 +672,15 @@
                  * Allow drag topper than top point
                  */
                 if (this.settings.upperThanTop
-                    && (coords.newVal <= this.breakpoints.topper)) {
+                    && ((coords.newVal <= this.breakpoints.topper)
+                        || this.startPointOverTop)) {
+                    // check that finger reach same position before enable normal swipe mode
+                    if (!this.startPointOverTop) {
+                        this.startPointOverTop = coords.clientY;
+                    }
+                    if (this.startPointOverTop < coords.clientY) {
+                        delete this.startPointOverTop;
+                    }
                     const screenDelta = this.instance.screen_height - this.instance.screenHeightOffset;
                     const differKoef = (screenDelta - this.instance.getPanelTransformY()) / (screenDelta - this.breakpoints.topper) / 8;
                     return this.instance.getPanelTransformY() + (coords.diffY * differKoef);
@@ -685,8 +694,16 @@
             if (this.settings.inverse) {
                 // Inverse gestures
                 // Allow drag topper than top point
-                if (coords.newVal >= this.breakpoints.topper
-                    && this.settings.upperThanTop) {
+                if (this.settings.upperThanTop
+                    && ((coords.newVal >= this.breakpoints.topper)
+                        || this.startPointOverTop)) {
+                    // check that finger reach same position before enable normal swipe mode
+                    if (!this.startPointOverTop) {
+                        this.startPointOverTop = coords.clientY;
+                    }
+                    if (this.startPointOverTop > coords.clientY) {
+                        delete this.startPointOverTop;
+                    }
                     const screenDelta = this.instance.screen_height - this.instance.screenHeightOffset;
                     const differKoef = (screenDelta - this.instance.getPanelTransformY()) / (screenDelta - this.breakpoints.topper) / 8;
                     return this.instance.getPanelTransformY() + (coords.diffY * differKoef);

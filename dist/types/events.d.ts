@@ -23,6 +23,7 @@ export declare class Events {
     private inputBluredbyMove;
     private keyboardVisible;
     private isScrolling;
+    private startPointOverTop;
     constructor(instance: CupertinoPane, settings: CupertinoSettings, device: Device, breakpoints: Breakpoints, transitions: Transitions);
     attachAllEvents(): void;
     detachAllEvents(): void;
@@ -91,6 +92,7 @@ export declare class Events {
      * Topper Than Top
      * Lower Than Bottom
      * Otherwise don't changes
+     * TODO: Merge same entry functions
      */
     private handleTopperLowerPositions;
     private getEvetClientYX;
