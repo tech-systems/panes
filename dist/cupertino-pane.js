@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.2.7
+ * Cupertino Pane 1.2.8
  * Multi-functional panes and boards for next generation progressive applications
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -1959,3 +1959,4 @@
     return CupertinoPane;
 
 }));
+//# sourceMappingURL=cupertino-pane.js.map
