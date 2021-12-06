@@ -1,5 +1,35 @@
-# Change Log
-All notable changes to this project will be documented in this file.
+## [1.2.8](https://github.com/roman-rr/cupertino-pane/compare/1.1.57...1.2.8) (2021-12-06)
+
+
+### Bug Fixes
+
+* **draggable:** reduced zIndex to prevent overlapping ([#169](https://github.com/roman-rr/cupertino-pane/issues/169)) ([6196a4e](https://github.com/roman-rr/cupertino-pane/commit/6196a4e03edf76dd05bfe66eca9e12541510f304))
+* **events:** android fast drag was interpreted as tap event ([#154](https://github.com/roman-rr/cupertino-pane/issues/154)) ([ac7093e](https://github.com/roman-rr/cupertino-pane/commit/ac7093e18d3b9e207efb9ac3e1493e5a998560ff))
+* **events:** fixed unexpected jumps on fast drag ([1b0d082](https://github.com/roman-rr/cupertino-pane/commit/1b0d0829f19cd29f1c0be6e620a93aaf148c15d0))
+* **events:** prevent hidden pane to be visible on keyboard ([#112](https://github.com/roman-rr/cupertino-pane/issues/112)) ([bf34a24](https://github.com/roman-rr/cupertino-pane/commit/bf34a24980bf890d13c37e176b3c294f6da80c30))
+* **events:** touchmove position while transition ([7c367a3](https://github.com/roman-rr/cupertino-pane/commit/7c367a38f12e682aa974c32e67ad624dcccf54eb))
+* **inverse:** `calcFitHeight` for inverse pane cause animation swing ([91359a0](https://github.com/roman-rr/cupertino-pane/commit/91359a0837867b97c29ad47639e3ba65fb780a60))
+* **keyboard:** detach resize from keyboard events ([#112](https://github.com/roman-rr/cupertino-pane/issues/112)) ([5d574d7](https://github.com/roman-rr/cupertino-pane/commit/5d574d728f8cdfabdfd87a7c0180937e8e24f7f2))
+* **events:** unlock mode show hidden pane on Android [#159](https://github.com/roman-rr/cupertino-pane/issues/159)
+* **keyboard:** fixed keyboard for fitHeight panes - [#155](https://github.com/roman-rr/cupertino-pane/issues/155)
+
+### Refactor
+
+* **core:** add classes for transitions and z-stack
+
+### Enhancements
+
+* **gestures:** `topperThanTop` gesture smooth on backward
+* **gestures:** scroll events remastered for smooth entry scrolls
+* **core:** implemented proper UMD and EMS bundle system
+* **ci:** async build and face typings with public-api
+* **events:** default `touchAngle` is 45
+
+### Features
+
+* **destroy:** allow to destroy without DOM element ([#163](https://github.com/roman-rr/cupertino-pane/issues/163)) ([44a0d18](https://github.com/roman-rr/cupertino-pane/commit/44a0d18f487c229fb0d53a515d53c65af3a736c3))
+* **docs:** commits standards and changelogs
+
 
 ## [1.2.7] - 2021-05-08
 
