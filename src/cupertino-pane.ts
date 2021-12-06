@@ -239,7 +239,10 @@ export class CupertinoPane {
   }
 
   async present(conf: {animate: boolean} = {animate: false}): Promise<CupertinoPane> {
-      if (!this.el) return;
+      if (!this.el || !document.body.contains(this.el)) {
+        console.warn('Cupertino Pane: specified DOM element must be attached to the DOM');
+        return;
+      }
 
       // Pane already exist and was rendered
       if (this.isPanePresented() && this.rendered) {
@@ -429,6 +432,7 @@ export class CupertinoPane {
     }
   }
 
+  // TODO: replace with body.contains()
   public isPanePresented():boolean {
     // Check through all presented panes
     let wrappers = Array.from(document.querySelectorAll(`.cupertino-pane-wrapper.rendered`));
@@ -686,7 +690,9 @@ export class CupertinoPane {
       destroyButton: false
     }): Promise<true> {
 
-    if (!this.isPanePresented()) {
+    // Experimentally allow to destroy, even if not currently in DOM,
+    // instead of this.isPanePresented() check with rendered (#163 issue)
+    if (!this.rendered) {
       console.warn(`Cupertino Pane: Present pane before call destroy()`);
       return null;
     }

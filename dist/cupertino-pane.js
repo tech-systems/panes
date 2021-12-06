@@ -1567,8 +1567,10 @@
         present(conf = { animate: false }) {
             var _a;
             return __awaiter(this, void 0, void 0, function* () {
-                if (!this.el)
+                if (!this.el || !document.body.contains(this.el)) {
+                    console.warn('Cupertino Pane: specified DOM element must be attached to the DOM');
                     return;
+                }
                 // Pane already exist and was rendered
                 if (this.isPanePresented() && this.rendered) {
                     this.moveToBreak(this.settings.initialBreak);
@@ -1730,6 +1732,7 @@
                 this.overflowEl.style.overflowY = (val >= this.breakpoints.bottomer) ? 'auto' : 'hidden';
             }
         }
+        // TODO: replace with body.contains()
         isPanePresented() {
             // Check through all presented panes
             let wrappers = Array.from(document.querySelectorAll(`.cupertino-pane-wrapper.rendered`));
@@ -1910,7 +1913,9 @@
             destroyButton: false
         }) {
             return __awaiter(this, void 0, void 0, function* () {
-                if (!this.isPanePresented()) {
+                // Experimentally allow to destroy, even if not currently in DOM,
+                // instead of this.isPanePresented() check with rendered (#163 issue)
+                if (!this.rendered) {
                     console.warn(`Cupertino Pane: Present pane before call destroy()`);
                     return null;
                 }
