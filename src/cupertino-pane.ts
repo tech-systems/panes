@@ -143,7 +143,7 @@ export class CupertinoPane {
         margin-left: auto;
         margin-right: auto;
         height: 30px;
-        z-index: 12;
+        z-index: -1;
         top: 0;
         bottom: initial;
       }

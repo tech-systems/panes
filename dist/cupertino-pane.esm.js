@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: December 6, 2021
+ * Released on: December 7, 2021
  */
 
 /*! *****************************************************************************
@@ -1470,7 +1470,7 @@ class CupertinoPane {
         margin-left: auto;
         margin-right: auto;
         height: 30px;
-        z-index: 12;
+        z-index: -1;
         top: 0;
         bottom: initial;
       }
