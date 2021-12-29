@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: December 7, 2021
+ * Released on: December 30, 2021
  */
 
 /*! *****************************************************************************
@@ -852,7 +852,7 @@ class Breakpoints {
      * Function builder for breakpoints and heights
      * @param conf breakpoints
      */
-    buildBreakpoints(conf, bottomOffset = 0) {
+    buildBreakpoints(conf, bottomOffset = 0, animated = true) {
         var _a, _b, _c, _d, _e;
         return __awaiter(this, void 0, void 0, function* () {
             this.settings.bottomOffset = bottomOffset || this.settings.bottomOffset;
@@ -977,7 +977,7 @@ class Breakpoints {
                 if ((_d = this.settings.breaks[this.prevBreakpoint]) === null || _d === void 0 ? void 0 : _d.enabled) {
                     if (!this.instance.isHidden()) {
                         // Move to any if removed
-                        this.instance.moveToBreak(this.prevBreakpoint, this.settings.inverse && 'move');
+                        this.instance.moveToBreak(this.prevBreakpoint, animated ? 'breakpoint' : 'move');
                     }
                 }
                 if (!((_e = this.settings.breaks[this.prevBreakpoint]) === null || _e === void 0 ? void 0 : _e.enabled)) {
@@ -1837,7 +1837,7 @@ class CupertinoPane {
             yield this.breakpoints.buildBreakpoints(conf, bottomOffset);
         });
     }
-    calcFitHeight() {
+    calcFitHeight(animated = true) {
         return __awaiter(this, void 0, void 0, function* () {
             // Allow user to call method asap, dont check with this.isPanePresented()
             if (!this.wrapperEl || !this.el) {
@@ -1847,7 +1847,7 @@ class CupertinoPane {
                 console.warn(`Cupertino Pane: calcFitHeight() already in process`);
                 return null;
             }
-            yield this.breakpoints.buildBreakpoints(this.breakpoints.lockedBreakpoints);
+            yield this.breakpoints.buildBreakpoints(this.breakpoints.lockedBreakpoints, null, animated);
         });
     }
     moveToBreak(val, type = 'breakpoint') {

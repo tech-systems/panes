@@ -72,7 +72,7 @@ export declare class CupertinoPane {
      * @param conf
      */
     setBreakpoints(conf?: PaneBreaks, bottomOffset?: number): Promise<void>;
-    calcFitHeight(): Promise<any>;
+    calcFitHeight(animated?: boolean): Promise<any>;
     moveToBreak(val: string, type?: string): Promise<true>;
     moveToHeight(val: number): any;
     hide(): any;

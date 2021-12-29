@@ -20,7 +20,7 @@ export declare class Breakpoints {
      * Function builder for breakpoints and heights
      * @param conf breakpoints
      */
-    buildBreakpoints(conf?: PaneBreaks, bottomOffset?: number): Promise<void>;
+    buildBreakpoints(conf?: PaneBreaks, bottomOffset?: number, animated?: boolean): Promise<void>;
     getCurrentBreakName(): (string | null);
     /**
      * Private class methods

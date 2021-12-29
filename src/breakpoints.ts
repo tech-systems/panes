@@ -29,7 +29,7 @@ export class Breakpoints {
    * Function builder for breakpoints and heights
    * @param conf breakpoints
    */  
-  public async buildBreakpoints(conf?: PaneBreaks, bottomOffset: number = 0) {
+  public async buildBreakpoints(conf?: PaneBreaks, bottomOffset: number = 0, animated: boolean = true) {
     this.settings.bottomOffset = bottomOffset || this.settings.bottomOffset;
     this.breaks = {
       top: this.instance.screenHeightOffset,
@@ -167,8 +167,8 @@ export class Breakpoints {
         if (!this.instance.isHidden()) {
           // Move to any if removed
           this.instance.moveToBreak(
-            this.prevBreakpoint, 
-            this.settings.inverse && 'move'
+            this.prevBreakpoint,
+            animated ? 'breakpoint' : 'move'
           );
         }
       }

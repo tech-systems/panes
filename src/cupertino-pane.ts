@@ -607,7 +607,7 @@ export class CupertinoPane {
     await this.breakpoints.buildBreakpoints(conf, bottomOffset);
   }
 
-  public async calcFitHeight() {
+  public async calcFitHeight(animated: boolean = true) {
     // Allow user to call method asap, dont check with this.isPanePresented()
     if (!this.wrapperEl || !this.el) {
       return null;
@@ -618,7 +618,7 @@ export class CupertinoPane {
       return null;
     }
 
-    await this.breakpoints.buildBreakpoints(this.breakpoints.lockedBreakpoints);
+    await this.breakpoints.buildBreakpoints(this.breakpoints.lockedBreakpoints, null, animated);
   }
 
   public async moveToBreak(val: string, type: string = 'breakpoint'): Promise<true> {
