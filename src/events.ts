@@ -319,7 +319,8 @@ export class Events {
         clientX, clientY, 
         newVal, diffY
     });
-    if (forceNewVal) {
+
+    if (!isNaN(forceNewVal)) {
       newVal = forceNewVal;
     }
 

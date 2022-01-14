@@ -1,13 +1,13 @@
 /**
- * Cupertino Pane 1.2.8
+ * Cupertino Pane 1.2.81
  * Multi-functional panes and boards for next generation progressive applications
  * https://github.com/roman-rr/cupertino-pane/
  *
- * Copyright 2019-2021 Roman Antonov (roman-rr)
+ * Copyright 2019-2022 Roman Antonov (roman-rr)
  *
  * Released under the MIT License
  *
- * Released on: December 30, 2021
+ * Released on: January 15, 2022
  */
 
 /*! *****************************************************************************
@@ -475,7 +475,7 @@ class Events {
             clientX, clientY,
             newVal, diffY
         });
-        if (forceNewVal) {
+        if (!isNaN(forceNewVal)) {
             newVal = forceNewVal;
         }
         // No changes Y
