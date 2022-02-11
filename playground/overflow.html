@@ -37,7 +37,7 @@
     
             <ion-item>
               <ion-avatar slot="start">
-                <img src="https://github.com/ionic-team/ionic-docs/blob/master/src/demos/api/list/avatar-finn.png?raw=true">
+                <img src="https://ionicframework.com/docs/demos/api/avatar/avatar.svg">
               </ion-avatar>
               <ion-label>
                 <h2>Finn</h2>
@@ -48,7 +48,7 @@
     
             <ion-item>
               <ion-avatar slot="start">
-                <img src="https://github.com/ionic-team/ionic-docs/blob/master/src/demos/api/list/avatar-han.png?raw=true">
+                <img src="https://ionicframework.com/docs/demos/api/avatar/avatar.svg">
               </ion-avatar>
               <ion-label>
                 <h2>Han</h2>
@@ -59,7 +59,7 @@
     
             <ion-item>
               <ion-avatar slot="start">
-                <img src="https://github.com/ionic-team/ionic-docs/blob/master/src/demos/api/list/avatar-rey.png?raw=true">
+                <img src="https://ionicframework.com/docs/demos/api/avatar/avatar.svg">
               </ion-avatar>
               <ion-label>
                 <h2>Rey</h2>
@@ -70,7 +70,7 @@
     
             <ion-item>
               <ion-avatar slot="start">
-                <img src="https://github.com/ionic-team/ionic-docs/blob/master/src/demos/api/list/avatar-luke.png?raw=true">
+                <img src="https://ionicframework.com/docs/demos/api/avatar/avatar.svg">
               </ion-avatar>
               <ion-label>
                 <h2>Luke</h2>
@@ -87,7 +87,7 @@
     
             <ion-item>
               <ion-avatar slot="start">
-                <img src="https://github.com/ionic-team/ionic-docs/blob/master/src/demos/api/list/avatar-poe.png?raw=true">
+                <img src="https://ionicframework.com/docs/demos/api/avatar/avatar.svg">
               </ion-avatar>
               <ion-label>
                 <h2>Poe</h2>
@@ -98,7 +98,7 @@
     
             <ion-item>
               <ion-avatar slot="start">
-                <img src="https://github.com/ionic-team/ionic-docs/blob/master/src/demos/api/list/avatar-ben.png?raw=true">
+                <img src="https://ionicframework.com/docs/demos/api/avatar/avatar.svg">
               </ion-avatar>
               <ion-label>
                 <h2>Ben</h2>
@@ -109,7 +109,7 @@
     
             <ion-item>
               <ion-avatar slot="start">
-                <img src="https://github.com/ionic-team/ionic-docs/blob/master/src/demos/api/list/avatar-leia.png?raw=true">
+                <img src="https://ionicframework.com/docs/demos/api/avatar/avatar.svg">
               </ion-avatar>
               <ion-label>
                 <h2>Leia</h2>
@@ -120,7 +120,7 @@
     
             <ion-item>
               <ion-avatar slot="start">
-                <img src="https://github.com/ionic-team/ionic-docs/blob/master/src/demos/api/list/avatar-yoda.png?raw=true">
+                <img src="https://ionicframework.com/docs/demos/api/avatar/avatar.svg">
               </ion-avatar>
               <ion-label>
                 <h2>Yoda</h2>
@@ -163,7 +163,6 @@
         // freeMode: true,
         // onBackdropTap: () => hideDrawer()
     });
-    setTimeout(() => drawer.present({animate: true}));
 
     async function presentDrawer() {
       drawer.present({animate: true});
@@ -208,6 +207,10 @@
     async function moveToHeight() {
       drawer.moveToHeight(575);
     };
+
+    window.addEventListener('load', function() {
+      presentDrawer();
+    })
   </script>
 </body>
 

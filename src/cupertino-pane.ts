@@ -650,7 +650,7 @@ export class CupertinoPane {
     this.transitions.doTransition({type: 'breakpoint', translateY });    
   }
 
-  public hide() {
+  public async hide() {
     if (!this.isPanePresented()) {
       console.warn(`Cupertino Pane: Present pane before call hide()`);
       return null;
@@ -661,7 +661,7 @@ export class CupertinoPane {
       return null;
     }
 
-    this.transitions.doTransition({type: 'hide', translateY: this.screenHeightOffset});
+    await this.transitions.doTransition({type: 'hide', translateY: this.screenHeightOffset});
   }
 
   public isHidden(): (boolean|null) {
@@ -670,7 +670,7 @@ export class CupertinoPane {
       return null;
     }
     
-    return this.paneEl.style.transform === `translateY(${this.screenHeightOffset}px) translateZ(0px)`;
+    return this.transitions.isPaneHidden;
   }
 
   public currentBreak(): (string|null) {

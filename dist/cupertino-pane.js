@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.2.81
+ * Cupertino Pane 1.2.82
  * Multi-functional panes and boards for next generation progressive applications
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: January 15, 2022
+ * Released on: February 11, 2022
  */
 
 (function (global, factory) {
@@ -1079,12 +1079,23 @@
      * Transitions class
      * Z-Push transitions class
      */
+    // TODO: review MoveEnd can be replaced with breakpoint
+    var CupertinoTransition;
+    (function (CupertinoTransition) {
+        CupertinoTransition["Present"] = "present";
+        CupertinoTransition["Destroy"] = "destroy";
+        CupertinoTransition["Move"] = "move";
+        CupertinoTransition["Breakpoint"] = "breakpoint";
+        CupertinoTransition["Hide"] = "hide";
+        CupertinoTransition["TouchEnd"] = "end";
+    })(CupertinoTransition || (CupertinoTransition = {}));
     class Transitions {
         constructor(instance, settings, breakpoints, zStack) {
             this.instance = instance;
             this.settings = settings;
             this.breakpoints = breakpoints;
             this.zStack = zStack;
+            this.isPaneHidden = false;
         }
         /***********************************
         * Transitions handler
@@ -1093,7 +1104,7 @@
             return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
                 var _a;
                 // touchmove simple event
-                if (params.type === 'move') {
+                if (params.type === CupertinoTransition.Move) {
                     this.instance.paneEl.style.transition = 'all 0ms linear 0ms';
                     this.instance.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
                     // Bind for follower same transitions
@@ -1109,7 +1120,7 @@
                 }
                 // Transition end
                 const transitionEnd = () => {
-                    if (params.type === 'destroy') {
+                    if (params.type === CupertinoTransition.Destroy) {
                         this.instance.destroyResets();
                     }
                     this.instance.paneEl.style.transition = `initial`;
@@ -1119,16 +1130,25 @@
                     }
                     // Backdrop 
                     if (this.settings.backdrop) {
-                        if (params.type === 'destroy' || params.type === 'hide') {
+                        if (params.type === CupertinoTransition.Destroy
+                            || params.type === CupertinoTransition.Hide) {
                             this.instance.backdropEl.style.transition = `initial`;
                             this.instance.backdropEl.style.display = `none`;
                         }
                     }
+                    // isHidden
+                    if (params.type === CupertinoTransition.Hide) {
+                        this.isPaneHidden = true;
+                    }
+                    if (params.type === CupertinoTransition.Breakpoint
+                        || params.type === CupertinoTransition.TouchEnd) {
+                        this.isPaneHidden = false;
+                    }
                     // Emit event
-                    if (params.type === 'present') {
+                    if (params.type === CupertinoTransition.Present) {
                         this.settings.onDidPresent();
                     }
-                    if (params.type === 'destroy') {
+                    if (params.type === CupertinoTransition.Destroy) {
                         this.settings.onDidDismiss({ destroyButton: params.destroyButton });
                     }
                     this.settings.onTransitionEnd({ target: document.body.contains(this.instance.paneEl) ? this.instance.paneEl : null });
@@ -1137,20 +1157,21 @@
                     return resolve(true);
                 };
                 // MoveToBreak, Touchend, Present, Hide, Destroy events
-                if (params.type === 'breakpoint'
-                    || params.type === 'end'
-                    || params.type === 'present'
-                    || params.type === 'hide'
-                    || params.type === 'destroy') {
+                if (params.type === CupertinoTransition.Breakpoint
+                    || params.type === CupertinoTransition.TouchEnd
+                    || params.type === CupertinoTransition.Present
+                    || params.type === CupertinoTransition.Hide
+                    || params.type === CupertinoTransition.Destroy) {
                     // backdrop 
                     if (this.settings.backdrop) {
                         if (this.instance.isHidden()
-                            || params.type === 'hide'
-                            || params.type === 'destroy'
-                            || params.type === 'present') {
+                            || params.type === CupertinoTransition.Hide
+                            || params.type === CupertinoTransition.Destroy
+                            || params.type === CupertinoTransition.Present) {
                             this.instance.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
                             this.instance.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-                            if (params.type !== 'hide' && params.type !== 'destroy') {
+                            if (params.type !== CupertinoTransition.Hide
+                                && params.type !== CupertinoTransition.Destroy) {
                                 this.instance.backdropEl.style.display = 'block';
                                 setTimeout(() => {
                                     this.instance.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
@@ -1159,7 +1180,7 @@
                         }
                     }
                     // freemode
-                    if (params.type === 'end' && this.settings.freeMode)
+                    if (params.type === CupertinoTransition.TouchEnd && this.settings.freeMode)
                         return resolve(true);
                     // Get timing function && push for next 
                     const nextBreak = Object.entries(this.breakpoints.breaks).find(val => val[1] === params.translateY);
@@ -1178,7 +1199,7 @@
                         // TODO: already can. change timeout to current pane position on transition
                         setTimeout(() => {
                             this.settings.zStack.pushElements.forEach(item => this.zStack.pushTransition(document.querySelector(item), params.translateY, `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`));
-                        }, (this.settings.zStack.cardYOffset && params.type === 'present') ? 100 : 0);
+                        }, (this.settings.zStack.cardYOffset && params.type === CupertinoTransition.Present) ? 100 : 0);
                     }
                     // Main transitions
                     // Emit event
@@ -1883,22 +1904,24 @@
             this.transitions.doTransition({ type: 'breakpoint', translateY });
         }
         hide() {
-            if (!this.isPanePresented()) {
-                console.warn(`Cupertino Pane: Present pane before call hide()`);
-                return null;
-            }
-            if (this.isHidden()) {
-                console.warn(`Cupertino Pane: Pane already hidden`);
-                return null;
-            }
-            this.transitions.doTransition({ type: 'hide', translateY: this.screenHeightOffset });
+            return __awaiter(this, void 0, void 0, function* () {
+                if (!this.isPanePresented()) {
+                    console.warn(`Cupertino Pane: Present pane before call hide()`);
+                    return null;
+                }
+                if (this.isHidden()) {
+                    console.warn(`Cupertino Pane: Pane already hidden`);
+                    return null;
+                }
+                yield this.transitions.doTransition({ type: 'hide', translateY: this.screenHeightOffset });
+            });
         }
         isHidden() {
             if (!this.isPanePresented()) {
                 console.warn(`Cupertino Pane: Present pane before call isHidden()`);
                 return null;
             }
-            return this.paneEl.style.transform === `translateY(${this.screenHeightOffset}px) translateZ(0px)`;
+            return this.transitions.isPaneHidden;
         }
         currentBreak() {
             if (!this.isPanePresented()) {

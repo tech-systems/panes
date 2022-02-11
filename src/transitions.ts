@@ -8,9 +8,19 @@ import { ZStack } from './z-stack';
  * Z-Push transitions class
  */
 
+// TODO: review MoveEnd can be replaced with breakpoint
+enum CupertinoTransition {
+  Present = 'present',
+  Destroy = 'destroy',
+  Move = 'move',
+  Breakpoint = 'breakpoint',
+  Hide = 'hide',
+  TouchEnd = 'end'
+}
+
 export class Transitions {
 
-
+  public isPaneHidden: boolean = false;
   constructor(private instance: CupertinoPane,
               private settings: CupertinoSettings,
               private breakpoints: Breakpoints,
@@ -23,7 +33,7 @@ export class Transitions {
   public doTransition(params:any = {}): Promise<true> {
     return new Promise(async (resolve) => {
       // touchmove simple event
-      if (params.type === 'move') {
+      if (params.type === CupertinoTransition.Move) {
         this.instance.paneEl.style.transition = 'all 0ms linear 0ms';
         this.instance.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
         // Bind for follower same transitions
@@ -47,7 +57,7 @@ export class Transitions {
 
       // Transition end
       const transitionEnd = () => {
-        if (params.type === 'destroy') {
+        if (params.type === CupertinoTransition.Destroy) {
           this.instance.destroyResets();
         }
         this.instance.paneEl.style.transition = `initial`;
@@ -58,17 +68,27 @@ export class Transitions {
 
         // Backdrop 
         if (this.settings.backdrop) {
-          if (params.type === 'destroy' || params.type === 'hide') {
+          if (params.type === CupertinoTransition.Destroy 
+              || params.type === CupertinoTransition.Hide) {
             this.instance.backdropEl.style.transition = `initial`;
             this.instance.backdropEl.style.display = `none`;
           }
         }
 
+        // isHidden
+        if (params.type === CupertinoTransition.Hide) {
+          this.isPaneHidden = true;
+        }
+        if (params.type === CupertinoTransition.Breakpoint 
+            || params.type === CupertinoTransition.TouchEnd) {
+          this.isPaneHidden = false;
+        }
+
         // Emit event
-        if (params.type === 'present') {
+        if (params.type === CupertinoTransition.Present) {
           this.settings.onDidPresent();  
         }
-        if (params.type === 'destroy') {
+        if (params.type === CupertinoTransition.Destroy) {
           this.settings.onDidDismiss({destroyButton: params.destroyButton} as any);
         }
         this.settings.onTransitionEnd({target: document.body.contains(this.instance.paneEl) ? this.instance.paneEl : null});
@@ -79,22 +99,23 @@ export class Transitions {
       };
 
       // MoveToBreak, Touchend, Present, Hide, Destroy events
-      if (params.type === 'breakpoint' 
-          || params.type === 'end' 
-          || params.type === 'present'
-          || params.type === 'hide'
-          || params.type === 'destroy') {
+      if (params.type === CupertinoTransition.Breakpoint
+          || params.type === CupertinoTransition.TouchEnd
+          || params.type === CupertinoTransition.Present
+          || params.type === CupertinoTransition.Hide
+          || params.type === CupertinoTransition.Destroy) {
 
         // backdrop 
         if (this.settings.backdrop) {
           if (this.instance.isHidden()
-              || params.type === 'hide'
-              || params.type === 'destroy'
-              || params.type === 'present') {
+              || params.type === CupertinoTransition.Hide
+              || params.type === CupertinoTransition.Destroy
+              || params.type === CupertinoTransition.Present) {
             this.instance.backdropEl.style.backgroundColor = 'rgba(0,0,0,.0)';
             this.instance.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
             
-            if (params.type !== 'hide' && params.type !== 'destroy') {
+            if (params.type !== CupertinoTransition.Hide 
+                && params.type !== CupertinoTransition.Destroy) {
               this.instance.backdropEl.style.display = 'block';
               setTimeout(() => {
                 this.instance.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
@@ -104,7 +125,7 @@ export class Transitions {
         }
         
         // freemode
-        if (params.type === 'end' && this.settings.freeMode) return resolve(true); 
+        if (params.type === CupertinoTransition.TouchEnd && this.settings.freeMode) return resolve(true); 
 
         // Get timing function && push for next 
         const nextBreak = Object.entries(this.breakpoints.breaks).find(
@@ -133,7 +154,7 @@ export class Transitions {
                 `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`
               )
             );
-          }, (this.settings.zStack.cardYOffset && params.type === 'present') ? 100 : 0);
+          }, (this.settings.zStack.cardYOffset && params.type === CupertinoTransition.Present) ? 100 : 0);
         }
 
         // Main transitions

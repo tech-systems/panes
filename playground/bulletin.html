@@ -110,35 +110,34 @@
     let bulletin;
     let elem = document.querySelector('ion-bulletin');
     let height = window.getComputedStyle(elem);
+    height = height.getPropertyValue('height');
+    height = parseFloat(height);
     
-    window.onload = function () {
-
-        height = height.getPropertyValue('height');
-        height = parseFloat(height);
-        
-        var element = document.querySelector('ion-bulletin');
-        bulletin = new CupertinoPane(element, { 
-          // inverse: true,
-          fitHeight: true,
-          backdrop: true,
-          backdropOpacity: 0.8,
-          bottomClose: true,
-          buttonClose: false,
-          showDraggable: false,
-          upperThanTop: true,
-          bottomOffset: 8,
-          onBackdropTap: () => bulletin.destroy({animate: true})
-        });
-        bulletin.present({animate: true});
-    }
+    var element = document.querySelector('ion-bulletin');
+    bulletin = new CupertinoPane(element, { 
+      // inverse: true,
+      fitHeight: true,
+      backdrop: true,
+      backdropOpacity: 0.8,
+      bottomClose: true,
+      buttonClose: false,
+      showDraggable: false,
+      upperThanTop: true,
+      bottomOffset: 8,
+      onBackdropTap: () => bulletin.destroy({animate: true})
+    });
 
     function present() {
-      setTimeout(() => bulletin.present({animate: true}));
+      bulletin.present({animate: true});
     }
 
     function setBreakpoints() {
       bulletin.setBreakpoints({}, 150);
     }
+
+    window.addEventListener('load', function() {
+      present();
+    })
   </script>
 </body>
 

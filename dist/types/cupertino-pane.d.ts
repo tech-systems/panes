@@ -75,7 +75,7 @@ export declare class CupertinoPane {
     calcFitHeight(animated?: boolean): Promise<any>;
     moveToBreak(val: string, type?: string): Promise<true>;
     moveToHeight(val: number): any;
-    hide(): any;
+    hide(): Promise<any>;
     isHidden(): (boolean | null);
     currentBreak(): (string | null);
     destroy(conf?: {

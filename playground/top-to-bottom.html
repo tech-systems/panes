@@ -30,6 +30,9 @@
         <ion-button expand="block" color="danger" onclick="presentDrawer()">Present Drawer</ion-button>
         <ion-button expand="block" color="danger" onclick="destroyDrawer()">Destroy Drawer</ion-button>
 
+        <ion-button expand="block" onclick="hideDrawer()">Hide Drawer</ion-button>
+        <ion-button expand="block" onclick="isHiddenDrawer()">Drawer is hidden</ion-button>
+
         <ion-button expand="block" onclick="setBreakpoints()">Set breakpoints</ion-button>
       </div>
   </ion-content>
@@ -61,9 +64,9 @@
     var drawer = new CupertinoPane(element, { 
         inverse: true,
         breaks: {
-          top: { enabled: true, height: screen.height * 0.65, bounce: false },
-          middle: { enabled: true, height: 300, bounce: true },
-          bottom: { enabled: true, height: screen.height * 0.1, bounce: true },
+          top: { enabled: true, height: screen.height * 0.65 },
+          middle: { enabled: true, height: 300 },
+          bottom: { enabled: true, height: screen.height * 0.1 },
         },
         // clickBottomOpen: false,
         // lowerThanBottom: false,
@@ -78,7 +81,6 @@
         // freeMode: true,
         // onBackdropTap: () => hideDrawer()
     });
-    setTimeout(() => drawer.present({animate: true}));
 
     async function presentDrawer() {
       drawer.present({animate: true});
@@ -86,6 +88,14 @@
 
     async function destroyDrawer() {
       drawer.destroy({animate: true});
+    };
+
+    async function hideDrawer() {
+      drawer.hide();
+    };
+
+    async function isHiddenDrawer() {
+        console.log(await drawer.isHidden());
     };
     
     async function setBreakpoints() {
@@ -99,6 +109,10 @@
         bottom: { enabled: true, height: 35 },
       })
     };
+
+    window.addEventListener('load', function() {
+      presentDrawer();
+    })
   </script>
 </body>
 

@@ -53,7 +53,6 @@
         top: { enabled: false }
       }
     });
-    setTimeout(() => drawer.present({animate: true}));
 
     async function presentDrawer() {
       drawer.present({animate: true});
@@ -89,6 +88,10 @@
         middle: { enabled: true, height: 400 }
       });
     };
+
+    window.addEventListener('load', function() {
+      presentDrawer();
+    })
   </script>
 </body>
 
