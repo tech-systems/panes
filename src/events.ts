@@ -53,18 +53,17 @@ export class Events {
       window.addEventListener('keyboardWillHide', this.onKeyboardWillHideCb);
     }
 
-    // Fix Android issue with resize if not handle
-    if (!this.settings.handleKeyboard 
-        && this.device.cordova
+    // Fix Android issue with ion-page scroll on keyboard
+    if (this.device.cordova
+        && this.device.ionic
         && this.device.android) {
-      window.addEventListener('keyboardWillHide', () => {
-        this.instance.parentEl.scrollTop = 0;
-        if (this.instance.parentEl.parentElement) {
-          this.instance.parentEl.parentElement.scrollTop = 0;
-          if (this.instance.parentEl.parentElement.parentElement) {
-            this.instance.parentEl.parentElement.parentElement.scrollTop = 0;
+      let ionPages = document.querySelectorAll('.ion-page');
+      ionPages.forEach((el: any) => {
+        el.addEventListener('scroll', (e) => {
+          if (el.scrollTop) {
+            el.scrollTo({top: 0});
           }
-        }
+        });
       });
     }
 
@@ -446,6 +445,10 @@ export class Events {
 
     // Click to bottom - open middle
     if (this.settings.clickBottomOpen) {
+      if (this.isFormElement(document.activeElement)) {
+        return;
+      }
+      
       if (this.breakpoints.breaks['bottom'] === this.instance.getPanelTransformY()) {
           let closest;
           if (this.settings.breaks['top'].enabled) {
@@ -465,7 +468,6 @@ export class Events {
    */
   public onKeyboardShowCb = (e) => this.onKeyboardShow(e);
   private onKeyboardShow(e) {
-    this.keyboardVisible = true;
 
     // focud element not inside pane
     if (!this.isPaneDescendant(document.activeElement)) {
@@ -477,26 +479,26 @@ export class Events {
       return;
     }
 
-    if (this.device.android) {
-      setTimeout(() => this.fixAndroidResize(), 20);
-    }
+    this.keyboardVisible = true;
+
+    // if (this.device.android) {
+    //   setTimeout(() => this.fixAndroidResize(), 20);
+    // }
 
     this.breakpoints.prevBreakpoint = Object.entries(this.breakpoints.breaks).find(val => val[1] === this.instance.getPanelTransformY())[0];
-    let newHeight = this.settings.breaks[this.instance.currentBreak()].height + e.keyboardHeight;
+    const currentHeight = this.settings.breaks[this.instance.currentBreak()].height;
+    const inputEl = document.activeElement.getBoundingClientRect();
+    const spaceBelow = this.instance.screen_height - inputEl.bottom;
     
-    // Landscape case
-    let isLandscape = window.matchMedia('(orientation: landscape)').matches;
-    if (isLandscape) {
-      newHeight = this.instance.screen_height;
-    }
 
-    // higher than screen + offsets
-    if (newHeight > this.instance.screen_height - 80) {
-      newHeight = this.instance.screen_height - 80;
+    // Android cordova offset is higher
+    let offset = 80;
+    if (this.device.cordova 
+        && this.device.android) {
+      offset = 150;
     }
-
-    // Move pane up if new position more than 50px
-    if (newHeight - 50 >= this.settings.breaks[this.instance.currentBreak()].height) {
+    if (e.keyboardHeight > spaceBelow - offset) {
+      const newHeight = currentHeight + e.keyboardHeight - spaceBelow + offset;
       this.instance.moveToHeight(newHeight);
     }
   }
@@ -512,9 +514,9 @@ export class Events {
       return;
     }
 
-    if (this.device.android) {
-      this.fixAndroidResize();
-    }    
+    // if (this.device.android) {
+    //   this.fixAndroidResize();
+    // }    
 
     if (this.inputBluredbyMove) {
       this.inputBluredbyMove = false;
@@ -528,19 +530,26 @@ export class Events {
 
   /**
    * Window resize event
-   * TODO: Prevent android unlock events
    * @param e
    */
   public onWindowResizeCb = (e) => this.onWindowResize(e);
   private async onWindowResize(e) {
     // We should separate keyboard and resize events
-    // If form element active - recognize here as KeyboardWillShow
-    if (this.isFormElement(document.activeElement)) {
-      return;
-    }
-    if (!this.isFormElement(document.activeElement) 
-        && this.keyboardVisible) {
-      this.keyboardVisible = false;
+    if (this.isKeyboardEvent()) {
+      // Cordova & PWA iOS
+      if (this.device.cordova 
+          || this.device.ios) {
+        return;
+      }
+      
+      // PWA Android: we still handle keyboard with resize if input is active
+      const keyboardHeight = this.instance.screen_height - window.innerHeight;
+      if (this.isFormElement(document.activeElement)) {
+        this.onKeyboardShow({keyboardHeight});
+      } else {
+        this.onKeyboardWillHide({});
+      }
+
       return;
     }
 
@@ -552,6 +561,25 @@ export class Events {
   /**
    * Private class methods
    */
+
+
+  /**
+   * Determinate if event is keyboard not resize
+   * If form element active - recognize here as KeyboardWillShow
+   */
+  private isKeyboardEvent() {
+    if (this.isFormElement(document.activeElement)) {
+      return true;
+    }
+
+    if (!this.isFormElement(document.activeElement) 
+        && this.keyboardVisible) {
+      this.keyboardVisible = false;
+      return true;
+    }
+
+    return false;
+  }
 
   /**
    * Topper Than Top
@@ -635,20 +663,21 @@ export class Events {
   /**
    * Fix android keyboard issue with transition 
    * (resize window frame height on hide/show)
+   * UNDER CONSIDERATION: Please let me know if any issues without that patch
    */
-  private fixAndroidResize() {
-    if (!this.instance.paneEl) return;
-    const ionApp:any = document.querySelector('ion-app');
+  // private fixAndroidResize() {
+  //   if (!this.instance.paneEl) return;
+  //   const ionApp:any = document.querySelector('ion-app');
 
-    window.requestAnimationFrame(() => {
-      this.instance.wrapperEl.style.width = '100%';
-      this.instance.paneEl.style.position = 'absolute';
-      window.requestAnimationFrame(() => {
-        this.instance.wrapperEl.style.width = 'unset';
-        this.instance.paneEl.style.position = 'fixed';
-      });
-    });
-  }
+  //   window.requestAnimationFrame(() => {
+  //     this.instance.wrapperEl.style.width = '100%';
+  //     this.instance.paneEl.style.position = 'absolute';
+  //     window.requestAnimationFrame(() => {
+  //       this.instance.wrapperEl.style.width = 'unset';
+  //       this.instance.paneEl.style.position = 'fixed';
+  //     });
+  //   });
+  // }
 
   private willScrolled(t): boolean {
     if (!(this.isElementScrollable(this.instance.overflowEl)

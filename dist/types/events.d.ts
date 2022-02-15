@@ -68,6 +68,11 @@ export declare class Events {
     private onClick;
     /**
      * Open Cordova Keyboard event
+     * Handling keyboard process
+     * Cordova iOS - with onKeyboard events
+     * Cordova Android - with onKeyboard events
+     * PWA iOS - automatically by browser
+     * PWA Android - with resize events
      * @param e
      */
     onKeyboardShowCb: (e: any) => void;
@@ -80,7 +85,6 @@ export declare class Events {
     private onKeyboardWillHide;
     /**
      * Window resize event
-     * TODO: Prevent android unlock events
      * @param e
      */
     onWindowResizeCb: (e: any) => Promise<void>;
@@ -88,6 +92,11 @@ export declare class Events {
     /**
      * Private class methods
      */
+    /**
+     * Determinate if event is keyboard not resize
+     * If form element active - recognize here as KeyboardWillShow
+     */
+    private isKeyboardEvent;
     /**
      * Topper Than Top
      * Lower Than Bottom
@@ -99,8 +108,8 @@ export declare class Events {
     /**
      * Fix android keyboard issue with transition
      * (resize window frame height on hide/show)
+     * UNDER CONSIDERATION: Please let me know if any issues without that patch
      */
-    private fixAndroidResize;
     private willScrolled;
     private isPaneDescendant;
     private isFormElement;

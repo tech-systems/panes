@@ -395,23 +395,12 @@ By default using for full pane area, but in some cases good useful with header.
 | **--cupertino-pane-icon-close-color** | `#7a7a7e` |
 
 ## Keyboard issues
-Inputs and textareas in pane may push mobile keyboard on devices, and close pane visibility. Next cases describe how to proper handle this issues.
-### Browser/WebView
-User's must use input focus/blur callback's to handle keyboard. Example: 
-```html
-<input onfocus="keyboardOpen()" onblur="keyboardClose()" />
-```
-```javascript
-function keyboardOpen () {
-  pane.moveToBreak('top'); // or moveToHeight(current + keyboardHeight);
-}
-function keyboardClose () {
-  pane.moveToBreak('middle'); // or moveToHeight(current - keyboardHeight);
-}
-```
-### Cordova/Phonegap/Capacitor
-By default, we are now handle keyboard in hybrid mobile applications and push pane to exact keyboard height. 
+By default, we are now handle keyboard in all type of applications. 
 If you would like handle this part by yourself, set option `handleKeyboard: false`.
+
+- Safari WebKit (browser) will handle inputs and keyboard automatically. 
+- Chrome WebView (browser) are handled in our end with resize events. 
+- Cordova WkWebView/WebView are handled in our end with keyboard events.
 
 ## Future Goals
 Project under regularly maintanance and bug fixes. 
