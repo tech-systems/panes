@@ -85,12 +85,6 @@ export class Transitions {
         }
 
         // Emit event
-        if (params.type === CupertinoTransition.Present) {
-          this.settings.onDidPresent();  
-        }
-        if (params.type === CupertinoTransition.Destroy) {
-          this.settings.onDidDismiss({destroyButton: params.destroyButton} as any);
-        }
         this.settings.onTransitionEnd({target: document.body.contains(this.instance.paneEl) ? this.instance.paneEl : null});
 
         // Remove listener

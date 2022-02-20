@@ -279,6 +279,10 @@ export class CupertinoPane {
       this.wrapperEl.classList.add('rendered');
       this.rendered = true;
       
+      // set overflow element
+      this.scrollElementInit();
+      this.checkOverflowAttr(this.breakpoints.currentBreakpoint);
+
       if (this.settings.followerElement) {
         if (!<HTMLElement>document.querySelector(this.settings.followerElement)) {
           console.warn('Cupertino Pane: wrong follower element selector specified', this.settings.followerElement);
@@ -344,17 +348,13 @@ export class CupertinoPane {
             )
           );
         }
-        // Emit event
-        this.settings.onDidPresent();
       }
-
-      // Some timeout to get offsetTop
-      await new Promise((resolve) => setTimeout(() => resolve(true), 150));
-      this.scrollElementInit();
-      this.checkOverflowAttr(this.breakpoints.currentBreakpoint);
 
       /****** Attach Events *******/
       this.events.attachAllEvents();
+
+      // Emit event
+      this.settings.onDidPresent();
 
       return this;
   }
@@ -715,9 +715,10 @@ export class CupertinoPane {
       await this.transitions.doTransition({type: 'destroy', translateY: this.screenHeightOffset, destroyButton: conf.destroyButton}); 
     } else {
       this.destroyResets();
-      // Emit event
-      this.settings.onDidDismiss({destroyButton: conf.destroyButton} as any);
     }
+
+    // Emit event
+    this.settings.onDidDismiss({destroyButton: conf.destroyButton} as any);
   }
 
   public destroyResets(): void {

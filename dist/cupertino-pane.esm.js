@@ -1197,12 +1197,6 @@ class Transitions {
                     this.isPaneHidden = false;
                 }
                 // Emit event
-                if (params.type === CupertinoTransition.Present) {
-                    this.settings.onDidPresent();
-                }
-                if (params.type === CupertinoTransition.Destroy) {
-                    this.settings.onDidDismiss({ destroyButton: params.destroyButton });
-                }
                 this.settings.onTransitionEnd({ target: document.body.contains(this.instance.paneEl) ? this.instance.paneEl : null });
                 // Remove listener
                 this.instance.paneEl.removeEventListener('transitionend', transitionEnd);
@@ -1673,6 +1667,9 @@ class CupertinoPane {
             this.contentEl.style.display = 'block';
             this.wrapperEl.classList.add('rendered');
             this.rendered = true;
+            // set overflow element
+            this.scrollElementInit();
+            this.checkOverflowAttr(this.breakpoints.currentBreakpoint);
             if (this.settings.followerElement) {
                 if (!document.querySelector(this.settings.followerElement)) {
                     console.warn('Cupertino Pane: wrong follower element selector specified', this.settings.followerElement);
@@ -1724,15 +1721,11 @@ class CupertinoPane {
                 if (this.settings.zStack) {
                     this.settings.zStack.pushElements.forEach(item => this.zStack.pushTransition(document.querySelector(item), this.breakpoints.breaks[this.settings.initialBreak], 'unset'));
                 }
-                // Emit event
-                this.settings.onDidPresent();
             }
-            // Some timeout to get offsetTop
-            yield new Promise((resolve) => setTimeout(() => resolve(true), 150));
-            this.scrollElementInit();
-            this.checkOverflowAttr(this.breakpoints.currentBreakpoint);
             /****** Attach Events *******/
             this.events.attachAllEvents();
+            // Emit event
+            this.settings.onDidPresent();
             return this;
         });
     }
@@ -2013,9 +2006,9 @@ class CupertinoPane {
             }
             else {
                 this.destroyResets();
-                // Emit event
-                this.settings.onDidDismiss({ destroyButton: conf.destroyButton });
             }
+            // Emit event
+            this.settings.onDidDismiss({ destroyButton: conf.destroyButton });
         });
     }
     destroyResets() {
