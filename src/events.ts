@@ -19,11 +19,16 @@ export class Events {
   private startY: number;
   private startX: number;
   private steps: {posY: number, time: number}[] = [];  
-  private inputBluredbyMove: boolean = false;
-  private keyboardVisible: boolean = false;
   private isScrolling: boolean = false;
   private startPointOverTop: number;
   
+  // Keyboard help vars
+  private keyboardVisible: boolean = false;
+  private inputBluredbyMove: boolean = false;
+  private inputBottomOffset: number = 0;
+  private previousInputBottomOffset: number = 0;
+  private prevNewHeight: number = 0;
+  private prevFocusedElement: Element;
   
   constructor(private instance: CupertinoPane, 
               private settings: CupertinoSettings,
@@ -53,10 +58,8 @@ export class Events {
       window.addEventListener('keyboardWillHide', this.onKeyboardWillHideCb);
     }
 
-    // Fix Android issue with ion-page scroll on keyboard
-    if (this.device.cordova
-        && this.device.ionic
-        && this.device.android) {
+    // Fix Ionic-Android issue with ion-page scroll on keyboard
+    if (this.device.ionic && this.device.android) {
       let ionPages = document.querySelectorAll('.ion-page');
       ionPages.forEach((el: any) => {
         el.addEventListener('scroll', (e) => {
@@ -167,7 +170,6 @@ export class Events {
    */
   public touchStartCb = (t) => this.touchStart(t);
   private touchStart(t) {
-
     // Event emitter
     this.settings.onDragStart(t as CustomEvent);
 
@@ -382,14 +384,12 @@ export class Events {
     // blur tap event
     let blurTapEvent = false;
     if ((this.isFormElement(document.activeElement))
-      && !(this.isFormElement(t.target))
-      && this.steps.length === 2
-      ) {
+          && !(this.isFormElement(t.target))
+          && this.steps.length === 2) {
         blurTapEvent = true;
     }
 
     this.steps = [];
-    this.breakpoints.currentBreakpoint = closest;
 
     // Event emitter
     this.settings.onDragEnd(t as CustomEvent);
@@ -414,6 +414,7 @@ export class Events {
       this.settings.onTransitionEnd({target: this.instance.paneEl});
     }
 
+    this.breakpoints.currentBreakpoint = closest;
     this.transitions.doTransition({type: 'end', translateY: closest});
   }
 
@@ -443,6 +444,17 @@ export class Events {
       return;
     }
 
+    // Android Multiple Re-focus on PWA
+    // with resize keyboard handler
+    if (!this.device.cordova
+        && this.device.android
+        && this.isFormElement(t.target)) {
+      this.onKeyboardShow({
+        keyboardHeight: this.instance.screen_height - window.innerHeight
+      });
+      return;
+    }
+    
     // Click to bottom - open middle
     if (this.settings.clickBottomOpen) {
       if (this.isFormElement(document.activeElement)) {
@@ -467,7 +479,7 @@ export class Events {
    * @param e
    */
   public onKeyboardShowCb = (e) => this.onKeyboardShow(e);
-  private onKeyboardShow(e) {
+  private async onKeyboardShow(e) {
 
     // focud element not inside pane
     if (!this.isPaneDescendant(document.activeElement)) {
@@ -481,25 +493,38 @@ export class Events {
 
     this.keyboardVisible = true;
 
-    // if (this.device.android) {
-    //   setTimeout(() => this.fixAndroidResize(), 20);
-    // }
+    // calculate distances
+    const currentHeight = this.settings.breaks[this.breakpoints.prevBreakpoint].height;
+    const inputEl = document.activeElement;
+    const inputElBottomBound = inputEl.getBoundingClientRect().bottom;
+    const inputSpaceBelow = this.instance.screen_height - inputElBottomBound - this.inputBottomOffset;
+    const offset = this.device.cordova && this.device.android ? 150 : 100;
+    let spaceBelowOffset = 0;
+    let newHeight = currentHeight + (e.keyboardHeight - inputSpaceBelow);
 
-    this.breakpoints.prevBreakpoint = Object.entries(this.breakpoints.breaks).find(val => val[1] === this.instance.getPanelTransformY())[0];
-    const currentHeight = this.settings.breaks[this.instance.currentBreak()].height;
-    const inputEl = document.activeElement.getBoundingClientRect();
-    const spaceBelow = this.instance.screen_height - inputEl.bottom;
-    
-
-    // Android cordova offset is higher
-    let offset = 80;
-    if (this.device.cordova 
-        && this.device.android) {
-      offset = 150;
+    // Multiple event fired with opened keyboard
+    if (this.prevNewHeight) {
+      spaceBelowOffset = this.previousInputBottomOffset - inputElBottomBound;
+      newHeight = this.prevNewHeight;
     }
-    if (e.keyboardHeight > spaceBelow - offset) {
-      const newHeight = currentHeight + e.keyboardHeight - spaceBelow + offset;
-      this.instance.moveToHeight(newHeight);
+
+    // Re-focus input dublicate events
+    if (inputEl.isEqualNode(this.prevFocusedElement)) {
+      return;
+    }
+
+    // Keyboard will overlaps input
+    if (e.keyboardHeight > inputSpaceBelow) {
+      this.prevNewHeight = newHeight - spaceBelowOffset;
+      this.prevFocusedElement = document.activeElement;
+      await this.instance.moveToHeight(newHeight - spaceBelowOffset + offset);
+
+      // Determinate device offset for presented keyboard
+      const newInputBottomOffset = inputEl.getBoundingClientRect().bottom;
+      this.previousInputBottomOffset = newInputBottomOffset;
+      if (!this.inputBottomOffset) {
+        this.inputBottomOffset = inputElBottomBound - newInputBottomOffset;
+      }
     }
   }
 
@@ -514,18 +539,29 @@ export class Events {
       return;
     }
 
-    // if (this.device.android) {
-    //   this.fixAndroidResize();
-    // }    
+    this.keyboardVisible = false;
+    
+    // Clear
+    this.inputBottomOffset = 0;
+    this.previousInputBottomOffset = 0;
+    this.prevNewHeight = 0;
+    delete this.prevFocusedElement;
 
     if (this.inputBluredbyMove) {
       this.inputBluredbyMove = false;
       return;
-    } 
-
-    if (!this.instance.isHidden()) {
-      this.instance.moveToBreak(this.breakpoints.prevBreakpoint);
     }
+
+    if (this.instance.isHidden()) {
+      return;
+    }
+
+    // Position doesn't changed
+    if (this.instance.getPanelTransformY() === this.breakpoints.breaks[this.breakpoints.prevBreakpoint]) {
+      return;
+    }
+
+    this.instance.moveToBreak(this.breakpoints.prevBreakpoint);
   }
 
   /**
@@ -543,9 +579,10 @@ export class Events {
       }
       
       // PWA Android: we still handle keyboard with resize if input is active
-      const keyboardHeight = this.instance.screen_height - window.innerHeight;
       if (this.isFormElement(document.activeElement)) {
-        this.onKeyboardShow({keyboardHeight});
+        this.onKeyboardShow({
+          keyboardHeight: this.instance.screen_height - window.innerHeight
+        });
       } else {
         this.onKeyboardWillHide({});
       }

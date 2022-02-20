@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: February 16, 2022
+ * Released on: February 21, 2022
  */
 
 (function (global, factory) {
@@ -194,9 +194,13 @@
             this.pointerDown = false;
             this.contentScrollTop = 0;
             this.steps = [];
-            this.inputBluredbyMove = false;
-            this.keyboardVisible = false;
             this.isScrolling = false;
+            // Keyboard help vars
+            this.keyboardVisible = false;
+            this.inputBluredbyMove = false;
+            this.inputBottomOffset = 0;
+            this.previousInputBottomOffset = 0;
+            this.prevNewHeight = 0;
             this.touchEvents = (() => {
                 const touch = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
                 let desktop = ['mousedown', 'mousemove', 'mouseup'];
@@ -248,11 +252,6 @@
             this.onClickCb = (t) => this.onClick(t);
             /**
              * Open Cordova Keyboard event
-             * Handling keyboard process
-             * Cordova iOS - with onKeyboard events
-             * Cordova Android - with onKeyboard events
-             * PWA iOS - automatically by browser
-             * PWA Android - with resize events
              * @param e
              */
             this.onKeyboardShowCb = (e) => this.onKeyboardShow(e);
@@ -287,10 +286,8 @@
                 window.addEventListener('keyboardWillShow', this.onKeyboardShowCb);
                 window.addEventListener('keyboardWillHide', this.onKeyboardWillHideCb);
             }
-            // Fix Android issue with ion-page scroll on keyboard
-            if (this.device.cordova
-                && this.device.ionic
-                && this.device.android) {
+            // Fix Ionic-Android issue with ion-page scroll on keyboard
+            if (this.device.ionic && this.device.android) {
                 let ionPages = document.querySelectorAll('.ion-page');
                 ionPages.forEach((el) => {
                     el.addEventListener('scroll', (e) => {
@@ -541,7 +538,6 @@
                 blurTapEvent = true;
             }
             this.steps = [];
-            this.breakpoints.currentBreakpoint = closest;
             // Event emitter
             this.settings.onDragEnd(t);
             // touchend with allowClick === tapped event (no move triggered)
@@ -560,6 +556,7 @@
             if (this.instance.getPanelTransformY() === closest) {
                 this.settings.onTransitionEnd({ target: this.instance.paneEl });
             }
+            this.breakpoints.currentBreakpoint = closest;
             this.transitions.doTransition({ type: 'end', translateY: closest });
         }
         onScroll(t) {
@@ -576,6 +573,16 @@
                     t.stopPropagation();
                     t.stopImmediatePropagation();
                 }
+                return;
+            }
+            // Android Multiple Re-focus on PWA
+            // with resize keyboard handler
+            if (!this.device.cordova
+                && this.device.android
+                && this.isFormElement(t.target)) {
+                this.onKeyboardShow({
+                    keyboardHeight: this.instance.screen_height - window.innerHeight
+                });
                 return;
             }
             // Click to bottom - open middle
@@ -596,48 +603,70 @@
             }
         }
         onKeyboardShow(e) {
-            // focud element not inside pane
-            if (!this.isPaneDescendant(document.activeElement)) {
-                return;
-            }
-            // pane not visible on viewport
-            if (!this.isOnViewport()) {
-                return;
-            }
-            this.keyboardVisible = true;
-            // if (this.device.android) {
-            //   setTimeout(() => this.fixAndroidResize(), 20);
-            // }
-            this.breakpoints.prevBreakpoint = Object.entries(this.breakpoints.breaks).find(val => val[1] === this.instance.getPanelTransformY())[0];
-            const currentHeight = this.settings.breaks[this.instance.currentBreak()].height;
-            const inputEl = document.activeElement.getBoundingClientRect();
-            const spaceBelow = this.instance.screen_height - inputEl.bottom;
-            // Android cordova offset is higher
-            let offset = 80;
-            if (this.device.cordova
-                && this.device.android) {
-                offset = 150;
-            }
-            if (e.keyboardHeight > spaceBelow - offset) {
-                const newHeight = currentHeight + e.keyboardHeight - spaceBelow + offset;
-                this.instance.moveToHeight(newHeight);
-            }
+            return __awaiter(this, void 0, void 0, function* () {
+                // focud element not inside pane
+                if (!this.isPaneDescendant(document.activeElement)) {
+                    return;
+                }
+                // pane not visible on viewport
+                if (!this.isOnViewport()) {
+                    return;
+                }
+                this.keyboardVisible = true;
+                // calculate distances
+                const currentHeight = this.settings.breaks[this.breakpoints.prevBreakpoint].height;
+                const inputEl = document.activeElement;
+                const inputElBottomBound = inputEl.getBoundingClientRect().bottom;
+                const inputSpaceBelow = this.instance.screen_height - inputElBottomBound - this.inputBottomOffset;
+                const offset = this.device.cordova && this.device.android ? 150 : 100;
+                let spaceBelowOffset = 0;
+                let newHeight = currentHeight + (e.keyboardHeight - inputSpaceBelow);
+                // Multiple event fired with opened keyboard
+                if (this.prevNewHeight) {
+                    spaceBelowOffset = this.previousInputBottomOffset - inputElBottomBound;
+                    newHeight = this.prevNewHeight;
+                }
+                // Re-focus input dublicate events
+                if (inputEl.isEqualNode(this.prevFocusedElement)) {
+                    return;
+                }
+                // Keyboard will overlaps input
+                if (e.keyboardHeight > inputSpaceBelow) {
+                    this.prevNewHeight = newHeight - spaceBelowOffset;
+                    this.prevFocusedElement = document.activeElement;
+                    yield this.instance.moveToHeight(newHeight - spaceBelowOffset + offset);
+                    // Determinate device offset for presented keyboard
+                    const newInputBottomOffset = inputEl.getBoundingClientRect().bottom;
+                    this.previousInputBottomOffset = newInputBottomOffset;
+                    if (!this.inputBottomOffset) {
+                        this.inputBottomOffset = inputElBottomBound - newInputBottomOffset;
+                    }
+                }
+            });
         }
         onKeyboardWillHide(e) {
             // pane not visible on viewport
             if (!this.isOnViewport()) {
                 return;
             }
-            // if (this.device.android) {
-            //   this.fixAndroidResize();
-            // }    
+            this.keyboardVisible = false;
+            // Clear
+            this.inputBottomOffset = 0;
+            this.previousInputBottomOffset = 0;
+            this.prevNewHeight = 0;
+            delete this.prevFocusedElement;
             if (this.inputBluredbyMove) {
                 this.inputBluredbyMove = false;
                 return;
             }
-            if (!this.instance.isHidden()) {
-                this.instance.moveToBreak(this.breakpoints.prevBreakpoint);
+            if (this.instance.isHidden()) {
+                return;
             }
+            // Position doesn't changed
+            if (this.instance.getPanelTransformY() === this.breakpoints.breaks[this.breakpoints.prevBreakpoint]) {
+                return;
+            }
+            this.instance.moveToBreak(this.breakpoints.prevBreakpoint);
         }
         onWindowResize(e) {
             return __awaiter(this, void 0, void 0, function* () {
@@ -649,9 +678,10 @@
                         return;
                     }
                     // PWA Android: we still handle keyboard with resize if input is active
-                    const keyboardHeight = this.instance.screen_height - window.innerHeight;
                     if (this.isFormElement(document.activeElement)) {
-                        this.onKeyboardShow({ keyboardHeight });
+                        this.onKeyboardShow({
+                            keyboardHeight: this.instance.screen_height - window.innerHeight
+                        });
                     }
                     else {
                         this.onKeyboardWillHide({});
@@ -1032,6 +1062,7 @@
                 }
             });
         }
+        // TODO: Replace currentBreakpoint with prevBreakpoint if possible
         getCurrentBreakName() {
             if (this.breaks['top'] === this.currentBreakpoint)
                 return 'top';
@@ -1922,13 +1953,15 @@
             });
         }
         moveToHeight(val) {
-            if (!this.isPanePresented()) {
-                console.warn(`Cupertino Pane: Present pane before call moveToHeight()`);
-                return null;
-            }
-            let translateY = this.screenHeightOffset ? this.screen_height - val : val;
-            this.checkOpacityAttr(translateY);
-            this.transitions.doTransition({ type: 'breakpoint', translateY });
+            return __awaiter(this, void 0, void 0, function* () {
+                if (!this.isPanePresented()) {
+                    console.warn(`Cupertino Pane: Present pane before call moveToHeight()`);
+                    return null;
+                }
+                let translateY = this.screenHeightOffset ? this.screen_height - val : val;
+                this.checkOpacityAttr(translateY);
+                yield this.transitions.doTransition({ type: 'breakpoint', translateY });
+            });
         }
         hide() {
             return __awaiter(this, void 0, void 0, function* () {

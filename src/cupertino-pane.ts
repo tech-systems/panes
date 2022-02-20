@@ -639,7 +639,7 @@ export class CupertinoPane {
     return Promise.resolve(true);
   }
 
-  public moveToHeight(val: number) {
+  public async moveToHeight(val: number): Promise<any> {
     if (!this.isPanePresented()) {
       console.warn(`Cupertino Pane: Present pane before call moveToHeight()`);
       return null;
@@ -647,7 +647,7 @@ export class CupertinoPane {
 
     let translateY = this.screenHeightOffset ? this.screen_height - val : val; 
     this.checkOpacityAttr(translateY);
-    this.transitions.doTransition({type: 'breakpoint', translateY });    
+    await this.transitions.doTransition({type: 'breakpoint', translateY });    
   }
 
   public async hide() {

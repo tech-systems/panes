@@ -20,10 +20,14 @@ export declare class Events {
     private startY;
     private startX;
     private steps;
-    private inputBluredbyMove;
-    private keyboardVisible;
     private isScrolling;
     private startPointOverTop;
+    private keyboardVisible;
+    private inputBluredbyMove;
+    private inputBottomOffset;
+    private previousInputBottomOffset;
+    private prevNewHeight;
+    private prevFocusedElement;
     constructor(instance: CupertinoPane, settings: CupertinoSettings, device: Device, breakpoints: Breakpoints, transitions: Transitions);
     attachAllEvents(): void;
     detachAllEvents(): void;
@@ -68,14 +72,9 @@ export declare class Events {
     private onClick;
     /**
      * Open Cordova Keyboard event
-     * Handling keyboard process
-     * Cordova iOS - with onKeyboard events
-     * Cordova Android - with onKeyboard events
-     * PWA iOS - automatically by browser
-     * PWA Android - with resize events
      * @param e
      */
-    onKeyboardShowCb: (e: any) => void;
+    onKeyboardShowCb: (e: any) => Promise<void>;
     private onKeyboardShow;
     /**
      * Close Cordova Keyboard event

@@ -145,7 +145,7 @@ declare class CupertinoPane {
     setBreakpoints(conf?: PaneBreaks, bottomOffset?: number): Promise<void>;
     calcFitHeight(animated?: boolean): Promise<any>;
     moveToBreak(val: string, type?: string): Promise<true>;
-    moveToHeight(val: number): any;
+    moveToHeight(val: number): Promise<any>;
     hide(): Promise<any>;
     isHidden(): (boolean | null);
     currentBreak(): (string | null);

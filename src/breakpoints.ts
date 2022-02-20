@@ -193,6 +193,7 @@ export class Breakpoints {
     }
   }
 
+  // TODO: Replace currentBreakpoint with prevBreakpoint if possible
   public getCurrentBreakName(): (string|null) {
     if (this.breaks['top'] === this.currentBreakpoint) return 'top';
     if (this.breaks['middle'] === this.currentBreakpoint) return 'middle';
