@@ -221,6 +221,12 @@ export class Events {
   private touchMove(t) {
     const { clientY, clientX, velocityY } = this.getEvetClientYX(t, 'touchmove');
 
+    // sometimes touchstart is not called 
+    // when touchmove is began before initialization
+    if (!this.steps.length) {
+      this.steps.push({posY: clientY, time: Date.now()});
+    }
+
     // Event emitter
     t.delta = this.steps[0]?.posY - clientY;
     this.settings.onDrag(t);

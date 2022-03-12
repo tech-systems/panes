@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: February 21, 2022
+ * Released on: March 13, 2022
  */
 
 /*! *****************************************************************************
@@ -389,6 +389,11 @@ class Events {
     touchMove(t) {
         var _a;
         const { clientY, clientX, velocityY } = this.getEvetClientYX(t, 'touchmove');
+        // sometimes touchstart is not called 
+        // when touchmove is began before initialization
+        if (!this.steps.length) {
+            this.steps.push({ posY: clientY, time: Date.now() });
+        }
         // Event emitter
         t.delta = ((_a = this.steps[0]) === null || _a === void 0 ? void 0 : _a.posY) - clientY;
         this.settings.onDrag(t);
