@@ -406,11 +406,12 @@ export class Events {
       return;
     }
 
-    this.instance.checkOpacityAttr(this.breakpoints.currentBreakpoint);
-    this.instance.checkOverflowAttr(this.breakpoints.currentBreakpoint);
+    this.instance.checkOpacityAttr(closest);
+    this.instance.checkOverflowAttr(closest);
 
     // Bottom closable
-    if (this.settings.bottomClose && closest === this.breakpoints.breaks['bottom']) {
+    if (this.settings.bottomClose 
+        && closest === this.breakpoints.breaks['bottom']) {
       this.instance.destroy({animate:true});
       return;
     }

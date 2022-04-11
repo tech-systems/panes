@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: March 13, 2022
+ * Released on: April 12, 2022
  */
 
 /*! *****************************************************************************
@@ -544,10 +544,11 @@ class Events {
         if (this.allowClick || blurTapEvent) {
             return;
         }
-        this.instance.checkOpacityAttr(this.breakpoints.currentBreakpoint);
-        this.instance.checkOverflowAttr(this.breakpoints.currentBreakpoint);
+        this.instance.checkOpacityAttr(closest);
+        this.instance.checkOverflowAttr(closest);
         // Bottom closable
-        if (this.settings.bottomClose && closest === this.breakpoints.breaks['bottom']) {
+        if (this.settings.bottomClose
+            && closest === this.breakpoints.breaks['bottom']) {
             this.instance.destroy({ animate: true });
             return;
         }
@@ -1789,6 +1790,7 @@ class CupertinoPane {
         attrElements.forEach((item) => {
             item.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
             item.style.opacity = (val >= this.breakpoints.breaks['bottom']) ? '0' : '1';
+            console.log(`set hide-on-bottom opacity to ${(val >= this.breakpoints.breaks['bottom']) ? '0' : '1'}`);
         });
     }
     checkOverflowAttr(val) {
