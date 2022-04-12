@@ -18,6 +18,7 @@
   "devDependencies": {
     "@rollup/plugin-replace": "^3.0.0",
     "chalk": "^4.1.2",
+    "rimraf": "^3.0.2",
     "del": "^5.1.0",
     "elapsed-time-logger": "^1.1.7",
     "fs-extra": "^10.0.0",
@@ -57,8 +58,5 @@
     "mobile",
     "cordova",
     "plugin"
-  ],
-  "dependencies": {
-    "rimraf": "^3.0.2"
-  }
+  ]
 }
