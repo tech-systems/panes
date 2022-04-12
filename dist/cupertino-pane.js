@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: April 12, 2022
+ * Released on: April 13, 2022
  */
 
 (function (global, factory) {
@@ -1796,7 +1796,6 @@
             attrElements.forEach((item) => {
                 item.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
                 item.style.opacity = (val >= this.breakpoints.breaks['bottom']) ? '0' : '1';
-                console.log(`set hide-on-bottom opacity to ${(val >= this.breakpoints.breaks['bottom']) ? '0' : '1'}`);
             });
         }
         checkOverflowAttr(val) {

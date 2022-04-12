@@ -57,5 +57,8 @@
     "mobile",
     "cordova",
     "plugin"
-  ]
+  ],
+  "dependencies": {
+    "rimraf": "^3.0.2"
+  }
 }
