@@ -261,6 +261,9 @@ export class Events {
       return;
     }
     
+
+    // Has changes in position 
+    this.instance.setGrabCursor(true, true);
     let newVal = this.instance.getPanelTransformY() + diffY;
     
     // First event after touchmove only
@@ -408,6 +411,7 @@ export class Events {
 
     this.instance.checkOpacityAttr(closest);
     this.instance.checkOverflowAttr(closest);
+    this.instance.setGrabCursor(true, false);
 
     // Bottom closable
     if (this.settings.bottomClose 
@@ -771,5 +775,4 @@ export class Events {
 
     return true;
   }
-
 }

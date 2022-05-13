@@ -131,6 +131,10 @@ declare class CupertinoPane {
      */
     preventDismiss(val?: boolean): void;
     /**
+     * GrabCursor for desktop
+     */
+    setGrabCursor(enable: boolean, moving?: boolean): void;
+    /**
      * Disable pane drag events
      */
     disableDrag(): void;

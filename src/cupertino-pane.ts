@@ -118,6 +118,7 @@ export class CupertinoPane {
         border-radius: var(--cupertino-pane-border-radius, 20px) 
                        var(--cupertino-pane-border-radius, 20px) 
                        0 0;
+        -webkit-user-select: none;
       }
       .cupertino-pane-wrapper.inverse .pane {
         padding-bottom: 15px; 
@@ -125,6 +126,9 @@ export class CupertinoPane {
         border-radius: 0 0
                        var(--cupertino-pane-border-radius, 20px) 
                        var(--cupertino-pane-border-radius, 20px);
+      }
+      .cupertino-pane-wrapper .pane img {
+        -webkit-user-drag: none;
       }
     `;
 
@@ -283,6 +287,7 @@ export class CupertinoPane {
       this.scrollElementInit();
       this.checkOverflowAttr(this.breakpoints.currentBreakpoint);
 
+      // follower element
       if (this.settings.followerElement) {
         if (!<HTMLElement>document.querySelector(this.settings.followerElement)) {
           console.warn('Cupertino Pane: wrong follower element selector specified', this.settings.followerElement);
@@ -303,6 +308,7 @@ export class CupertinoPane {
         this.zStack.setPushMultiplicators();
       }
 
+      // Button destroy
       if ((this.settings.buttonClose && this.settings.buttonDestroy) && !this.settings.inverse) {
         this.paneEl.appendChild(this.destroyButtonEl);
         this.destroyButtonEl.addEventListener('click', (t) => this.destroy({animate:true, destroyButton: true}));
@@ -322,6 +328,7 @@ export class CupertinoPane {
       if (this.settings.backdrop) {
         this.renderBackdrop();
       }
+      this.setGrabCursor(true);
       this.checkOpacityAttr(this.breakpoints.currentBreakpoint);
       
       /****** Fix android issues *******/
@@ -582,10 +589,21 @@ export class CupertinoPane {
   }
 
   /**
+   * GrabCursor for desktop
+   */
+  public setGrabCursor(enable: boolean, moving?: boolean) {
+    if (!this.device.desktop) {
+      return;
+    }
+    this.paneEl.style.cursor = enable ? (moving ? 'grabbing' : 'grab'): '';
+  }
+
+  /**
    * Disable pane drag events
    */
   public disableDrag(): void {
     this.disableDragEvents = true;
+    this.setGrabCursor(false);
   }
 
   /**
@@ -593,6 +611,7 @@ export class CupertinoPane {
    */  
   public enableDrag(): void {
     this.disableDragEvents = false;
+    this.setGrabCursor(true);
   }
 
   /**

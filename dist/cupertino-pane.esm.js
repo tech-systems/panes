@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: April 13, 2022
+ * Released on: May 13, 2022
  */
 
 /*! *****************************************************************************
@@ -424,6 +424,8 @@ class Events {
         if (!Math.abs(diffY)) {
             return;
         }
+        // Has changes in position 
+        this.instance.setGrabCursor(true, true);
         let newVal = this.instance.getPanelTransformY() + diffY;
         // First event after touchmove only
         if (this.steps.length < 2) {
@@ -546,6 +548,7 @@ class Events {
         }
         this.instance.checkOpacityAttr(closest);
         this.instance.checkOverflowAttr(closest);
+        this.instance.setGrabCursor(true, false);
         // Bottom closable
         if (this.settings.bottomClose
             && closest === this.breakpoints.breaks['bottom']) {
@@ -1525,6 +1528,7 @@ class CupertinoPane {
         border-radius: var(--cupertino-pane-border-radius, 20px) 
                        var(--cupertino-pane-border-radius, 20px) 
                        0 0;
+        -webkit-user-select: none;
       }
       .cupertino-pane-wrapper.inverse .pane {
         padding-bottom: 15px; 
@@ -1532,6 +1536,9 @@ class CupertinoPane {
         border-radius: 0 0
                        var(--cupertino-pane-border-radius, 20px) 
                        var(--cupertino-pane-border-radius, 20px);
+      }
+      .cupertino-pane-wrapper .pane img {
+        -webkit-user-drag: none;
       }
     `;
         // Draggable
@@ -1676,6 +1683,7 @@ class CupertinoPane {
             // set overflow element
             this.scrollElementInit();
             this.checkOverflowAttr(this.breakpoints.currentBreakpoint);
+            // follower element
             if (this.settings.followerElement) {
                 if (!document.querySelector(this.settings.followerElement)) {
                     console.warn('Cupertino Pane: wrong follower element selector specified', this.settings.followerElement);
@@ -1691,6 +1699,7 @@ class CupertinoPane {
                 this.setZstackConfig(this.settings.zStack);
                 this.zStack.setPushMultiplicators();
             }
+            // Button destroy
             if ((this.settings.buttonClose && this.settings.buttonDestroy) && !this.settings.inverse) {
                 this.paneEl.appendChild(this.destroyButtonEl);
                 this.destroyButtonEl.addEventListener('click', (t) => this.destroy({ animate: true, destroyButton: true }));
@@ -1707,6 +1716,7 @@ class CupertinoPane {
             if (this.settings.backdrop) {
                 this.renderBackdrop();
             }
+            this.setGrabCursor(true);
             this.checkOpacityAttr(this.breakpoints.currentBreakpoint);
             /****** Fix android issues *******/
             if (this.device.android) {
@@ -1891,16 +1901,27 @@ class CupertinoPane {
         this.preventDismissEvent = val;
     }
     /**
+     * GrabCursor for desktop
+     */
+    setGrabCursor(enable, moving) {
+        if (!this.device.desktop) {
+            return;
+        }
+        this.paneEl.style.cursor = enable ? (moving ? 'grabbing' : 'grab') : '';
+    }
+    /**
      * Disable pane drag events
      */
     disableDrag() {
         this.disableDragEvents = true;
+        this.setGrabCursor(false);
     }
     /**
      * Enable pane drag events
      */
     enableDrag() {
         this.disableDragEvents = false;
+        this.setGrabCursor(true);
     }
     /**
      * Public user method to reset breakpoints
