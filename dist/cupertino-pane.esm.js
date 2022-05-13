@@ -185,7 +185,7 @@ class Events {
         this.transitions = transitions;
         this.allowClick = true;
         this.disableDragAngle = false;
-        this.pointerDown = false;
+        this.mouseDown = false;
         this.contentScrollTop = 0;
         this.steps = [];
         this.isScrolling = false;
@@ -197,7 +197,7 @@ class Events {
         this.prevNewHeight = 0;
         this.touchEvents = (() => {
             const touch = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
-            let desktop = ['mousedown', 'mousemove', 'mouseup'];
+            let desktop = ['mousedown', 'mousemove', 'mouseup', 'mouseleave'];
             if (Support.pointerEvents) {
                 desktop = ['pointerdown', 'pointermove', 'pointerup'];
             }
@@ -205,12 +205,13 @@ class Events {
                 start: touch[0],
                 move: touch[1],
                 end: touch[2],
-                cancel: touch[3],
+                cancel: touch[3]
             };
             const touchEventsDesktop = {
                 start: desktop[0],
                 move: desktop[1],
                 end: desktop[2],
+                leave: desktop[3],
             };
             return Support.touch || !this.settings.simulateTouch ? touchEventsTouch : touchEventsDesktop;
         })();
@@ -346,6 +347,7 @@ class Events {
             if ((this.settings.simulateTouch && !this.device.ios && !this.device.android) || (this.settings.simulateTouch && !Support.touch && this.device.ios)) {
                 el[type]('mousedown', this.touchStartCb, false);
                 el[type]('mousemove', this.touchMoveCb, false);
+                el[type]('mouseleave', this.touchEndCb, false);
                 el[type]('mouseup', this.touchEndCb, false);
                 // Backdrop propagation fix
                 (_c = this.instance.backdropEl) === null || _c === void 0 ? void 0 : _c[type]('mousemove', this.touchMoveBackdropCb, false);
@@ -373,7 +375,7 @@ class Events {
         this.startY = clientY;
         this.startX = clientX;
         if (t.type === 'mousedown')
-            this.pointerDown = true;
+            this.mouseDown = true;
         // if overflow content was scrolled
         // increase to scrolled value
         if (this.contentScrollTop && this.willScrolled(t)) {
@@ -415,8 +417,8 @@ class Events {
         if (this.settings.touchMoveStopPropagation) {
             t.stopPropagation();
         }
-        // Handle desktop/mobile events
-        if (t.type === 'mousemove' && !this.pointerDown)
+        // Deskop: check that touchStart() was initiated
+        if (t.type === 'mousemove' && !this.mouseDown)
             return;
         // Delta
         const diffY = clientY - this.steps[this.steps.length - 1].posY;
@@ -512,8 +514,9 @@ class Events {
         var _a, _b;
         if (this.instance.disableDragEvents)
             return;
-        if (t.type === 'mouseup')
-            this.pointerDown = false;
+        // Desktop fixes
+        if (t.type === 'mouseup' || t.type === 'mouseleave')
+            this.mouseDown = false;
         // Determinate nearest point
         let closest = this.breakpoints.getClosestBreakY();
         // Swipe - next (if differ > 10)

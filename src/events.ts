@@ -14,7 +14,7 @@ export class Events {
 
   private allowClick: boolean = true;
   private disableDragAngle: boolean = false;
-  private pointerDown: boolean = false;
+  private mouseDown: boolean = false;
   private contentScrollTop: number = 0;
   private startY: number;
   private startX: number;
@@ -106,7 +106,7 @@ export class Events {
 
   private touchEvents = (() => {
     const touch = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
-    let desktop = ['mousedown', 'mousemove', 'mouseup'];
+    let desktop = ['mousedown', 'mousemove', 'mouseup', 'mouseleave'];
     if (Support.pointerEvents) {
       desktop = ['pointerdown', 'pointermove', 'pointerup'];
     }
@@ -114,12 +114,13 @@ export class Events {
       start: touch[0],
       move: touch[1],
       end: touch[2],
-      cancel: touch[3],
+      cancel: touch[3]
     };
     const touchEventsDesktop = {
       start: desktop[0],
       move: desktop[1],
       end: desktop[2],
+      leave: desktop[3],
     };
     return Support.touch || !this.settings.simulateTouch ? touchEventsTouch : touchEventsDesktop;
   })();
@@ -151,6 +152,7 @@ export class Events {
       if ((this.settings.simulateTouch && !this.device.ios && !this.device.android) || (this.settings.simulateTouch && !Support.touch && this.device.ios)) {
         el[type]('mousedown', this.touchStartCb, false);
         el[type]('mousemove', this.touchMoveCb, false);
+        el[type]('mouseleave', this.touchEndCb, false);
         el[type]('mouseup', this.touchEndCb, false);
         
         // Backdrop propagation fix
@@ -191,7 +193,7 @@ export class Events {
     this.startY = clientY;
     this.startX = clientX;
 
-    if (t.type === 'mousedown') this.pointerDown = true;
+    if (t.type === 'mousedown') this.mouseDown = true;
 
     // if overflow content was scrolled
     // increase to scrolled value
@@ -251,8 +253,8 @@ export class Events {
       t.stopPropagation();
     }
 
-    // Handle desktop/mobile events
-    if(t.type === 'mousemove' && !this.pointerDown) return;
+    // Deskop: check that touchStart() was initiated
+    if(t.type === 'mousemove' && !this.mouseDown) return;
 
     // Delta
     const diffY = clientY - this.steps[this.steps.length - 1].posY;
@@ -369,7 +371,8 @@ export class Events {
   private touchEnd(t) {
     if (this.instance.disableDragEvents) return;
 
-    if (t.type === 'mouseup') this.pointerDown = false;
+    // Desktop fixes
+    if (t.type === 'mouseup' || t.type === 'mouseleave') this.mouseDown = false;
 
     // Determinate nearest point
     let closest = this.breakpoints.getClosestBreakY();

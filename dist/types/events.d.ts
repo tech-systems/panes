@@ -15,7 +15,7 @@ export declare class Events {
     private transitions;
     private allowClick;
     private disableDragAngle;
-    private pointerDown;
+    private mouseDown;
     private contentScrollTop;
     private startY;
     private startX;
