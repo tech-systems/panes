@@ -541,7 +541,9 @@ class Events {
             && this.steps.length === 2) {
             blurTapEvent = true;
         }
+        // Clear
         this.steps = [];
+        delete this.startPointOverTop;
         // Event emitter
         this.settings.onDragEnd(t);
         // touchend with allowClick === tapped event (no move triggered)
@@ -748,7 +750,7 @@ class Events {
                 const differKoef = (screenDelta - this.instance.getPanelTransformY()) / (screenDelta - this.breakpoints.topper) / 8;
                 return this.instance.getPanelTransformY() + (coords.diffY * differKoef);
             }
-            // Disallow drag lower then bottom 
+            // Disallow drag lower then bottom
             if (!this.settings.lowerThanBottom
                 && coords.newVal >= this.breakpoints.bottomer) {
                 return this.breakpoints.bottomer;

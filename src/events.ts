@@ -401,7 +401,9 @@ export class Events {
         blurTapEvent = true;
     }
 
+    // Clear
     this.steps = [];
+    delete this.startPointOverTop;
 
     // Event emitter
     this.settings.onDragEnd(t as CustomEvent);
@@ -668,7 +670,7 @@ export class Events {
         return this.instance.getPanelTransformY() + (coords.diffY * differKoef);
       }
 
-      // Disallow drag lower then bottom 
+      // Disallow drag lower then bottom
       if (!this.settings.lowerThanBottom
           && coords.newVal >= this.breakpoints.bottomer) {
         return this.breakpoints.bottomer;

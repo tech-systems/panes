@@ -19,7 +19,7 @@
      
 Cupertino Panes is multi-functional panes & boards with touch technologies. <br>
 
-* **Small.** 5kb (minified and gzipped). No dependencies.
+* **Small.** 12kb (minified and gzipped). No dependencies.
 * **Accelerated.** Hardware accelerated transitions and amazing native behavior.
 * **Progressive.** Useful for mobile/web/hybrid applications.
 
