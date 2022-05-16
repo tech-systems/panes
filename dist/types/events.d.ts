@@ -103,7 +103,7 @@ export declare class Events {
      * TODO: Merge same entry functions
      */
     private handleTopperLowerPositions;
-    private getEvetClientYX;
+    private getEventClientYX;
     /**
      * Fix android keyboard issue with transition
      * (resize window frame height on hide/show)

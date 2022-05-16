@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: May 13, 2022
+ * Released on: May 17, 2022
  */
 
 (function (global, factory) {
@@ -377,7 +377,7 @@
             this.isScrolling = false;
             // Allow pereventDismiss by default
             this.instance.preventedDismiss = false;
-            const { clientY, clientX } = this.getEvetClientYX(t, 'touchstart');
+            const { clientY, clientX } = this.getEventClientYX(t, 'touchstart');
             this.startY = clientY;
             this.startX = clientX;
             if (t.type === 'mousedown')
@@ -396,7 +396,10 @@
         }
         touchMove(t) {
             var _a;
-            const { clientY, clientX, velocityY } = this.getEvetClientYX(t, 'touchmove');
+            const { clientY, clientX, velocityY } = this.getEventClientYX(t, 'touchmove');
+            // Deskop: check that touchStart() was initiated
+            if (t.type === 'mousemove' && !this.mouseDown)
+                return;
             // sometimes touchstart is not called 
             // when touchmove is began before initialization
             if (!this.steps.length) {
@@ -404,7 +407,6 @@
             }
             // Event emitter
             t.delta = ((_a = this.steps[0]) === null || _a === void 0 ? void 0 : _a.posY) - clientY;
-            this.settings.onDrag(t);
             // Disallow accidentaly clicks while slide gestures
             this.allowClick = false;
             // textarea scrollbar
@@ -423,15 +425,14 @@
             if (this.settings.touchMoveStopPropagation) {
                 t.stopPropagation();
             }
-            // Deskop: check that touchStart() was initiated
-            if (t.type === 'mousemove' && !this.mouseDown)
-                return;
             // Delta
             const diffY = clientY - this.steps[this.steps.length - 1].posY;
             // No Y changes
             if (!Math.abs(diffY)) {
                 return;
             }
+            // Emit event
+            this.settings.onDrag(t);
             // Has changes in position 
             this.instance.setGrabCursor(true, true);
             let newVal = this.instance.getPanelTransformY() + diffY;
@@ -786,7 +787,7 @@
                 }
             }
         }
-        getEvetClientYX(ev, name) {
+        getEventClientYX(ev, name) {
             var _a, _b;
             const targetTouch = ev.type === name && ev.targetTouches && (ev.targetTouches[0] || ev.changedTouches[0]);
             const clientY = ev.type === name ? targetTouch.clientY : ev.clientY;

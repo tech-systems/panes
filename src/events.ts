@@ -189,7 +189,7 @@ export class Events {
     // Allow pereventDismiss by default
     this.instance.preventedDismiss = false;
 
-    const { clientY, clientX } = this.getEvetClientYX(t, 'touchstart');
+    const { clientY, clientX } = this.getEventClientYX(t, 'touchstart');
     this.startY = clientY;
     this.startX = clientX;
 
@@ -221,7 +221,10 @@ export class Events {
    */
   public touchMoveCb = (t) => this.touchMove(t);
   private touchMove(t) {
-    const { clientY, clientX, velocityY } = this.getEvetClientYX(t, 'touchmove');
+    const { clientY, clientX, velocityY } = this.getEventClientYX(t, 'touchmove');
+
+    // Deskop: check that touchStart() was initiated
+    if(t.type === 'mousemove' && !this.mouseDown) return;
 
     // sometimes touchstart is not called 
     // when touchmove is began before initialization
@@ -231,7 +234,6 @@ export class Events {
 
     // Event emitter
     t.delta = this.steps[0]?.posY - clientY;
-    this.settings.onDrag(t);
 
     // Disallow accidentaly clicks while slide gestures
     this.allowClick = false;
@@ -253,16 +255,15 @@ export class Events {
       t.stopPropagation();
     }
 
-    // Deskop: check that touchStart() was initiated
-    if(t.type === 'mousemove' && !this.mouseDown) return;
-
     // Delta
     const diffY = clientY - this.steps[this.steps.length - 1].posY;
     // No Y changes
     if (!Math.abs(diffY)) {
       return;
     }
-    
+
+    // Emit event
+    this.settings.onDrag(t);
 
     // Has changes in position 
     this.instance.setGrabCursor(true, true);
@@ -703,7 +704,7 @@ export class Events {
     }
   }
 
-  private getEvetClientYX(ev, name) {
+  private getEventClientYX(ev, name) {
     const targetTouch = ev.type === name && ev.targetTouches && (ev.targetTouches[0] || ev.changedTouches[0]);
     const clientY: number = ev.type === name ? targetTouch.clientY : ev.clientY;
     const clientX: number = ev.type === name ? targetTouch.clientX : ev.clientX;
