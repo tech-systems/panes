@@ -124,7 +124,9 @@
       showDraggable: false,
       upperThanTop: true,
       bottomOffset: 8,
-      onBackdropTap: () => bulletin.destroy({animate: true})
+      events: {
+        onBackdropTap: () => bulletin.destroy({animate: true})
+      }
     });
 
     function present() {

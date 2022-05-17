@@ -360,7 +360,7 @@ class Events {
     }
     touchStart(t) {
         // Event emitter
-        this.settings.onDragStart(t);
+        this.instance.emit('onDragStart', t);
         // Allow clicks by default -> disallow on move (allow click with disabled drag)
         this.allowClick = true;
         if (this.instance.disableDragEvents)
@@ -426,7 +426,7 @@ class Events {
             return;
         }
         // Emit event
-        this.settings.onDrag(t);
+        this.instance.emit('onDrag', t);
         // Has changes in position 
         this.instance.setGrabCursor(true, true);
         let newVal = this.instance.getPanelTransformY() + diffY;
@@ -501,7 +501,7 @@ class Events {
             if (mousePointY <= this.instance.screen_height - this.breakpoints.bottomer) {
                 this.instance.preventedDismiss = true;
                 // Emit event with prevent dismiss
-                this.settings.onWillDismiss({ prevented: true });
+                this.instance.emit('onWillDismiss', { prevented: true });
                 this.instance.moveToBreak(this.breakpoints.prevBreakpoint);
                 return;
             }
@@ -546,7 +546,7 @@ class Events {
         this.steps = [];
         delete this.startPointOverTop;
         // Event emitter
-        this.settings.onDragEnd(t);
+        this.instance.emit('onDragEnd', t);
         // touchend with allowClick === tapped event (no move triggered)
         // skip next functions
         if (this.allowClick || blurTapEvent) {
@@ -563,7 +563,7 @@ class Events {
         }
         // Simulationiusly emit event when touchend exact with next position (top)
         if (this.instance.getPanelTransformY() === closest) {
-            this.settings.onTransitionEnd({ target: this.instance.paneEl });
+            this.instance.emit('onTransitionEnd', { target: this.instance.paneEl });
         }
         this.breakpoints.currentBreakpoint = closest;
         this.transitions.doTransition({ type: 'end', translateY: closest });
@@ -890,16 +890,7 @@ class Settings {
             touchAngle: 45,
             breaks: {},
             zStack: null,
-            onDidDismiss: () => { },
-            onWillDismiss: () => { },
-            onDidPresent: () => { },
-            onWillPresent: () => { },
-            onDragStart: () => { },
-            onDrag: () => { },
-            onDragEnd: () => { },
-            onBackdropTap: () => { },
-            onTransitionStart: () => { },
-            onTransitionEnd: () => { },
+            events: null
         };
     }
 }
@@ -1212,7 +1203,7 @@ class Transitions {
                     this.isPaneHidden = false;
                 }
                 // Emit event
-                this.settings.onTransitionEnd({ target: document.body.contains(this.instance.paneEl) ? this.instance.paneEl : null });
+                this.instance.emit('onTransitionEnd', { target: document.body.contains(this.instance.paneEl) ? this.instance.paneEl : null });
                 // Remove listener
                 this.instance.paneEl.removeEventListener('transitionend', transitionEnd);
                 return resolve(true);
@@ -1264,7 +1255,7 @@ class Transitions {
                 }
                 // Main transitions
                 // Emit event
-                this.settings.onTransitionStart({ translateY: { new: params.translateY } });
+                this.instance.emit('onTransitionStart', { translateY: { new: params.translateY } });
                 this.instance.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
                 // Bind for follower same transitions
                 if (this.instance.followerEl) {
@@ -1393,6 +1384,38 @@ class ZStack {
     }
 }
 
+// Add listeners
+function on(events, handler, priority) {
+    if (!this.eventsListeners) {
+        return;
+    }
+    if (typeof handler !== 'function') {
+        return;
+    }
+    const method = priority ? 'unshift' : 'push';
+    events.split(' ').forEach((event) => {
+        if (!this.eventsListeners[event]) {
+            this.eventsListeners[event] = [];
+        }
+        this.eventsListeners[event][method](handler);
+    });
+}
+// Emit events
+function emit(...args) {
+    if (!this.eventsListeners) {
+        return;
+    }
+    let events = args[0];
+    let data = args.slice(1, args.length);
+    const eventsArray = Array.isArray(events) ? events : events.split(' ');
+    eventsArray.forEach((event) => {
+        var _a;
+        if ((_a = this.eventsListeners) === null || _a === void 0 ? void 0 : _a[event]) {
+            this.eventsListeners[event].forEach((eventHandler) => eventHandler.apply(this, data));
+        }
+    });
+}
+
 class CupertinoPane {
     constructor(selector, conf = {}) {
         this.selector = selector;
@@ -1402,6 +1425,10 @@ class CupertinoPane {
         this.rendered = false;
         this.settings = (new Settings()).instance;
         this.device = new Device();
+        // Events emitter
+        this.eventsListeners = {};
+        this.on = on;
+        this.emit = emit;
         this.swipeNextPoint = (diff, maxDiff, closest) => {
             let brs = {};
             let settingsBreaks = {};
@@ -1485,6 +1512,10 @@ class CupertinoPane {
         }
         else {
             this.settings.parentElement = this.el.parentElement;
+        }
+        // Events listeners
+        if (this.settings.events) {
+            Object.keys(this.settings.events).forEach(name => this.on(name, this.settings.events[name]));
         }
         this.breakpoints = new Breakpoints(this, this.settings);
         this.zStack = new ZStack(this, this.settings, this.breakpoints);
@@ -1668,7 +1699,7 @@ class CupertinoPane {
                 return;
             }
             // Emit event
-            this.settings.onWillPresent();
+            this.emit('onWillPresent');
             this.updateScreenHeights();
             this.drawBaseElements();
             yield this.setBreakpoints();
@@ -1747,7 +1778,7 @@ class CupertinoPane {
             /****** Attach Events *******/
             this.events.attachAllEvents();
             // Emit event
-            this.settings.onDidPresent();
+            this.emit('onDidPresent');
             return this;
         });
     }
@@ -1838,7 +1869,7 @@ class CupertinoPane {
         this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
         this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
         this.wrapperEl.appendChild(this.backdropEl);
-        this.backdropEl.addEventListener('click', (t) => this.settings.onBackdropTap());
+        this.backdropEl.addEventListener('click', () => this.emit('onBackdropTap'));
     }
     /**
      * Utility function to add minified internal CSS to head.
@@ -2026,13 +2057,13 @@ class CupertinoPane {
             if (this.preventDismissEvent) {
                 // Emit event with prevent dismiss if not already sent from drag event
                 if (!this.preventedDismiss) {
-                    this.settings.onWillDismiss({ prevented: true });
+                    this.emit('onWillDismiss', { prevented: true });
                     this.moveToBreak(this.breakpoints.prevBreakpoint);
                 }
                 return;
             }
             // Emit event
-            this.settings.onWillDismiss();
+            this.emit('onWillDismiss');
             /****** Animation & Transition ******/
             if (conf.animate) {
                 yield this.transitions.doTransition({ type: 'destroy', translateY: this.screenHeightOffset, destroyButton: conf.destroyButton });
@@ -2041,7 +2072,7 @@ class CupertinoPane {
                 this.destroyResets();
             }
             // Emit event
-            this.settings.onDidDismiss({ destroyButton: conf.destroyButton });
+            this.emit('onDidDismiss', { destroyButton: conf.destroyButton });
         });
     }
     destroyResets() {

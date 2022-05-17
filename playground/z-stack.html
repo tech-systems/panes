@@ -122,9 +122,11 @@
       let itemSettings = {
         ...settings,
         cssClass: `card-${key}`,
-        onDrag: (e) => onDragFunc(key, e),
-        onDragStart: (e) => onDragStartFunc(key, e),
-        onDidDismiss: () => onDidDismissFunc(key)
+        events: {
+          onDrag: (e) => onDragFunc(key, e),
+          onDragStart: (e) => onDragStartFunc(key, e),
+          onDidDismiss: (e) => onDidDismissFunc(key)
+        }
       }
 
       if (key !== 1) {

@@ -40,16 +40,7 @@ export class Settings {
       touchAngle: 45,
       breaks: {},
       zStack: null,
-      onDidDismiss: () => {},
-      onWillDismiss: () => {},
-      onDidPresent: () => {},
-      onWillPresent: () => {},
-      onDragStart: () => {},
-      onDrag: () => {},
-      onDragEnd: () => {},
-      onBackdropTap: () => {},
-      onTransitionStart: () => {},
-      onTransitionEnd: () => {},
+      events: null
     };
   }
 }

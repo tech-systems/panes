@@ -34,7 +34,7 @@ Cupertino Panes is multi-functional panes & boards with touch technologies. <br>
 * [Settings](#settings)
 * [Breakpoints](#breakpoints)
 * [Z-Stack](#z-stack)
-* [Callbacks](#callback)
+* [Events](#events)
 * [Public Methods](#public-methods)
 * [Attributes](#attributes)
 * [CSS Variables](#css-variables)
@@ -141,7 +141,9 @@ If you don't want to include Cupertino Pane files in your project, you may use i
             middle: { enabled: true, height: 300, bounce: true },
             bottom: { enabled: true, height: 80 },
         },
-        onDrag: () => console.log('Drag event')
+        events: {
+          onDrag: () => console.log('Drag event')
+        }
       }
     );
     myPane.present({animate: true}).then(res => {...});
@@ -256,8 +258,26 @@ let settings = {
 | **cardContrast** | `number` | 0.85 | Contrast value for each pushed element |
 | **stackZAngle** | `number` | 160 | Value from 0 to 3000 that define angle of z-stack in common. 0 - 150 positive expontial angle. 150 - 170 = 45 degree angle. 200 - 3000 negative exponential angle |
 
-### Callbacks
-The function that executes when the event fires.
+### Events
+The function that executes when the event fires. Events can be assigned in two ways: 
+1. Using `events` parameter on initialization:
+```js
+let settings = {
+  ...
+  events: {
+    onWillPresent: (ev) => {
+      console.log('Will present callback', ev);
+    }
+  }
+}
+```
+2. Using on method after initialization.
+```js
+const pane = new CupertinoPane('.cupertino-pane', { /* ... */ });
+pane.on('onBackdropTap', (ev) => {
+  console.log('Backdrop tapped', ev);
+});
+```
 | Name | Type | Description |
 | ---- | ---- | ----------- |
 | **onDidDismiss** | `void: () => {}` | Call after pane will dissapeared |
@@ -346,9 +366,11 @@ Use this method to prevent dismiss events. Use `onWillDismiss()` callback to lis
 ```javascript
 const settings = {
   ...
-  onWillDismiss: (e) => {
-    if (e) {
-      console.log(e.prevented);
+  events: {
+    onWillDismiss: (e) => {
+      if (e) {
+        console.log(e.prevented);
+      }
     }
   }
 }

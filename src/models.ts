@@ -23,6 +23,19 @@ export interface TransitionStartEvent {
   translateY: { new: number};
 }
 
+export interface CupertinoEvents {
+  onDidDismiss?: (event?: CustomEvent) => void;
+  onWillDismiss?: (event?: CustomEvent) => void;
+  onDidPresent?: (event?: CustomEvent) => void;
+  onWillPresent?: (event?: CustomEvent) => void;
+  onDragStart?: (event?: CustomEvent) => void;
+  onDrag?: (event?: any) => void;
+  onDragEnd?: (event?: CustomEvent) => void;
+  onBackdropTap?: (event?: CustomEvent) => void;
+  onTransitionStart?: (event?: TransitionStartEvent) => void;
+  onTransitionEnd?: (event?: any) => void;
+}
+
 export interface PaneSettings {
   initialBreak: ('top' | 'middle' | 'bottom');
   inverse: boolean;
@@ -59,16 +72,7 @@ export interface PaneSettings {
   touchAngle: number;
   breaks: PaneBreaks;
   zStack: ZStackSettings; // todo; remove question mark 
-  onDidDismiss: (event?: CustomEvent) => void,
-  onWillDismiss: (event?: CustomEvent) => void,
-  onDidPresent: (event?: CustomEvent) => void,
-  onWillPresent: (event?: CustomEvent) => void,
-  onDragStart: (event?: CustomEvent) => void,
-  onDrag: (event?: any) => void,
-  onDragEnd: (event?: CustomEvent) => void,
-  onBackdropTap: (event?: CustomEvent) => void,
-  onTransitionStart: (event?: TransitionStartEvent) => void,
-  onTransitionEnd: (event?: any) => void
+  events: CupertinoEvents;
 }
 
 export type CupertinoSettings = Partial<PaneSettings>;

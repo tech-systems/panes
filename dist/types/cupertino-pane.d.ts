@@ -24,6 +24,9 @@ export declare class CupertinoPane {
     private breakpoints;
     private transitions;
     private zStack;
+    eventsListeners: {};
+    on: Function;
+    emit: Function;
     constructor(selector: (string | HTMLElement), conf?: CupertinoSettings);
     private drawBaseElements;
     present(conf?: {

@@ -85,7 +85,7 @@ export class Transitions {
         }
 
         // Emit event
-        this.settings.onTransitionEnd({target: document.body.contains(this.instance.paneEl) ? this.instance.paneEl : null});
+        this.instance.emit('onTransitionEnd', {target: document.body.contains(this.instance.paneEl) ? this.instance.paneEl : null});
 
         // Remove listener
         this.instance.paneEl.removeEventListener('transitionend', transitionEnd);
@@ -153,7 +153,7 @@ export class Transitions {
 
         // Main transitions
         // Emit event
-        this.settings.onTransitionStart({translateY: {new: params.translateY}});
+        this.instance.emit('onTransitionStart', {translateY: {new: params.translateY}});
         this.instance.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
         // Bind for follower same transitions
         if (this.instance.followerEl) {

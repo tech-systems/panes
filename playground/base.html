@@ -98,11 +98,18 @@
         // fastSwipeClose: true,
         // topperOverflowOffset: 110
         // followerElement: 'ion-fab',
-        // onDragEnd: () => console.log('On drag end event'),
-        onTransitionEnd: (e) => console.log('Transition end', e),
-        onBackdropTap: () => hideBackdrop()
+        events: {
+          onDragEnd: () => console.log('On drag end event'),
+          onTransitionEnd: (e) => console.log('Transition end', e),
+          onBackdropTap: () => hideBackdrop(),
+          onDidPresent: () => {
+            drawer.on('onDrag', () => {
+              console.log('DRAGGING');
+            })
+          }
+          // onBackdropTap: () => hideDrawer()
+        }
         // freeMode: true,
-        // onBackdropTap: () => hideDrawer()
     });
     setTimeout(() => drawer.present({animate: true}));
 

@@ -75,11 +75,13 @@
         // backdrop: true,
         // topperOverflowOffset: 110
         // followerElement: 'ion-fab',
-        // onDrag: () => console.log('Drag event'),
-        // onTransitionEnd: (e) => console.log('Transition end', e),
-        onBackdropTap: () => hideBackdrop()
+        events: {
+          // onDrag: () => console.log('Drag event'),
+          onTransitionEnd: (e) => console.log('Transition end', e),
+          onBackdropTap: () => hideBackdrop(),
+          onBackdropTap: () => hideDrawer(),
+        }
         // freeMode: true,
-        // onBackdropTap: () => hideDrawer()
     });
 
     async function presentDrawer() {

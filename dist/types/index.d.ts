@@ -21,6 +21,18 @@ interface TransitionStartEvent {
         new: number;
     };
 }
+interface CupertinoEvents {
+    onDidDismiss?: (event?: CustomEvent) => void;
+    onWillDismiss?: (event?: CustomEvent) => void;
+    onDidPresent?: (event?: CustomEvent) => void;
+    onWillPresent?: (event?: CustomEvent) => void;
+    onDragStart?: (event?: CustomEvent) => void;
+    onDrag?: (event?: any) => void;
+    onDragEnd?: (event?: CustomEvent) => void;
+    onBackdropTap?: (event?: CustomEvent) => void;
+    onTransitionStart?: (event?: TransitionStartEvent) => void;
+    onTransitionEnd?: (event?: any) => void;
+}
 interface PaneSettings {
     initialBreak: ('top' | 'middle' | 'bottom');
     inverse: boolean;
@@ -57,16 +69,7 @@ interface PaneSettings {
     touchAngle: number;
     breaks: PaneBreaks;
     zStack: ZStackSettings;
-    onDidDismiss: (event?: CustomEvent) => void;
-    onWillDismiss: (event?: CustomEvent) => void;
-    onDidPresent: (event?: CustomEvent) => void;
-    onWillPresent: (event?: CustomEvent) => void;
-    onDragStart: (event?: CustomEvent) => void;
-    onDrag: (event?: any) => void;
-    onDragEnd: (event?: CustomEvent) => void;
-    onBackdropTap: (event?: CustomEvent) => void;
-    onTransitionStart: (event?: TransitionStartEvent) => void;
-    onTransitionEnd: (event?: any) => void;
+    events: CupertinoEvents;
 }
 declare type CupertinoSettings = Partial<PaneSettings>;
 
@@ -95,6 +98,9 @@ declare class CupertinoPane {
     private breakpoints;
     private transitions;
     private zStack;
+    eventsListeners: {};
+    on: Function;
+    emit: Function;
     constructor(selector: (string | HTMLElement), conf?: CupertinoSettings);
     private drawBaseElements;
     present(conf?: {

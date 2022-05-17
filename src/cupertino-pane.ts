@@ -6,6 +6,7 @@ import { Settings } from './settings';
 import { Breakpoints } from './breakpoints';
 import { Transitions } from './transitions';
 import { ZStack } from './z-stack';
+import { on, emit } from './events-emitter';
 
 export class CupertinoPane {  
   public disableDragEvents: boolean = false;
@@ -33,6 +34,11 @@ export class CupertinoPane {
   private breakpoints: Breakpoints;
   private transitions: Transitions;
   private zStack: ZStack;
+
+  // Events emitter
+  public eventsListeners: {} = {};
+  public on: Function = on;
+  public emit: Function = emit;
 
   constructor(private selector: (string | HTMLElement), 
               conf: CupertinoSettings = {}) {
@@ -65,6 +71,13 @@ export class CupertinoPane {
       );
     } else {
       this.settings.parentElement = this.el.parentElement;
+    }
+
+    // Events listeners
+    if (this.settings.events) {
+      Object.keys(this.settings.events).forEach(
+        name => this.on(name, this.settings.events[name])
+      );
     }
 
     this.breakpoints = new Breakpoints(this, this.settings);
@@ -261,7 +274,7 @@ export class CupertinoPane {
       }
 
       // Emit event
-      this.settings.onWillPresent();
+      this.emit('onWillPresent');
       
       this.updateScreenHeights();
       this.drawBaseElements();
@@ -361,7 +374,7 @@ export class CupertinoPane {
       this.events.attachAllEvents();
 
       // Emit event
-      this.settings.onDidPresent();
+      this.emit('onDidPresent');
 
       return this;
   }
@@ -513,7 +526,7 @@ export class CupertinoPane {
     this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
     this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
     this.wrapperEl.appendChild(this.backdropEl);
-    this.backdropEl.addEventListener('click', (t) => this.settings.onBackdropTap());
+    this.backdropEl.addEventListener('click', () => this.emit('onBackdropTap'));
   }
 
   /**
@@ -720,14 +733,14 @@ export class CupertinoPane {
     if (this.preventDismissEvent) {
       // Emit event with prevent dismiss if not already sent from drag event
       if (!this.preventedDismiss) {
-        this.settings.onWillDismiss({prevented: true} as any);
+        this.emit('onWillDismiss', {prevented: true} as any);
         this.moveToBreak(this.breakpoints.prevBreakpoint);
       }
       return;
     }
 
     // Emit event
-    this.settings.onWillDismiss();
+    this.emit('onWillDismiss');
 
     /****** Animation & Transition ******/
     if (conf.animate) {
@@ -737,7 +750,7 @@ export class CupertinoPane {
     }
 
     // Emit event
-    this.settings.onDidDismiss({destroyButton: conf.destroyButton} as any);
+    this.emit('onDidDismiss', {destroyButton: conf.destroyButton} as any);
   }
 
   public destroyResets(): void {

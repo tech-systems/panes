@@ -173,7 +173,7 @@ export class Events {
   public touchStartCb = (t) => this.touchStart(t);
   private touchStart(t) {
     // Event emitter
-    this.settings.onDragStart(t as CustomEvent);
+    this.instance.emit('onDragStart', (t as CustomEvent));
 
     // Allow clicks by default -> disallow on move (allow click with disabled drag)
     this.allowClick = true;
@@ -263,7 +263,7 @@ export class Events {
     }
 
     // Emit event
-    this.settings.onDrag(t);
+    this.instance.emit('onDrag', t);
 
     // Has changes in position 
     this.instance.setGrabCursor(true, true);
@@ -352,7 +352,7 @@ export class Events {
       if (mousePointY <= this.instance.screen_height - this.breakpoints.bottomer) {
         this.instance.preventedDismiss = true; 
         // Emit event with prevent dismiss
-        this.settings.onWillDismiss({prevented: true} as any);
+        this.instance.emit('onWillDismiss', {prevented: true} as any);
         this.instance.moveToBreak(this.breakpoints.prevBreakpoint);
         return;
       }
@@ -407,7 +407,7 @@ export class Events {
     delete this.startPointOverTop;
 
     // Event emitter
-    this.settings.onDragEnd(t as CustomEvent);
+    this.instance.emit('onDragEnd', (t as CustomEvent));
 
     // touchend with allowClick === tapped event (no move triggered)
     // skip next functions
@@ -428,7 +428,7 @@ export class Events {
     
     // Simulationiusly emit event when touchend exact with next position (top)
     if (this.instance.getPanelTransformY() === closest) {
-      this.settings.onTransitionEnd({target: this.instance.paneEl});
+      this.instance.emit('onTransitionEnd', {target: this.instance.paneEl});
     }
 
     this.breakpoints.currentBreakpoint = closest;
