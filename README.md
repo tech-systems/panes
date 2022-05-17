@@ -20,6 +20,7 @@
 Cupertino Panes is multi-functional panes & boards with touch technologies. <br>
 
 * **Small.** 12kb (minified and gzipped). No dependencies.
+* **Modularized.** Add extra features to your panes and create own modules.
 * **Accelerated.** Hardware accelerated transitions and amazing native behavior.
 * **Progressive.** Useful for mobile/web/hybrid applications.
 
@@ -296,6 +297,11 @@ pane.on('onBackdropTap', (ev) => {
 Will render pane DOM and show pane with setted params. 
 ```javascript
 myPane.present();
+```
+### on({events: **string**, handler: **Function**}): Promise<CupertinoPane>
+Will assign a function to be executed when the event will be fired.
+```javascript
+myPane.on('onDidPresent', () => console.log('Presented!'));
 ```
 ### moveToBreak('top' | 'middle' | 'bottom')
 Will change pane position with animation to selected breakpoint.

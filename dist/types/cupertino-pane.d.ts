@@ -1,4 +1,7 @@
-import { CupertinoSettings, PaneBreaks, ZStackSettings } from './models';
+import { Events } from './events';
+import { CupertinoSettings, PaneBreaks } from './models';
+import { Breakpoints } from './breakpoints';
+import { Transitions } from './transitions';
 export declare class CupertinoPane {
     private selector;
     disableDragEvents: boolean;
@@ -13,17 +16,15 @@ export declare class CupertinoPane {
     el: HTMLElement;
     contentEl: HTMLElement;
     parentEl: HTMLElement;
-    backdropEl: HTMLDivElement;
-    followerEl: HTMLElement;
     private draggableEl;
     private moveEl;
     private destroyButtonEl;
-    private settings;
+    settings: CupertinoSettings;
     private device;
-    private events;
-    private breakpoints;
-    private transitions;
-    private zStack;
+    events: Events;
+    breakpoints: Breakpoints;
+    transitions: Transitions;
+    private modules;
     eventsListeners: {};
     on: Function;
     emit: Function;
@@ -40,24 +41,15 @@ export declare class CupertinoPane {
     checkOverflowAttr(val: any): void;
     isPanePresented(): boolean;
     swipeNextPoint: (diff: any, maxDiff: any, closest: any) => any;
-    private isBackdropPresented;
-    private renderBackdrop;
     /**
      * Utility function to add minified internal CSS to head.
      * @param {string} styleString
      */
-    private addStyle;
-    /**
-     * Backdrop
-     */
-    backdrop(conf?: {
-        show: boolean;
-    }): any;
-    getPanelTransformY(): number;
+    addStyle(styleString: any): void;
     /************************************
      * Public user methods
      */
-    setZstackConfig(zStack: ZStackSettings): void;
+    getPanelTransformY(): number;
     /**
      * Prevent dismiss event
      */
@@ -79,7 +71,6 @@ export declare class CupertinoPane {
      * @param conf
      */
     setBreakpoints(conf?: PaneBreaks, bottomOffset?: number): Promise<void>;
-    calcFitHeight(animated?: boolean): Promise<any>;
     moveToBreak(val: string, type?: string): Promise<true>;
     moveToHeight(val: number): Promise<any>;
     hide(): Promise<any>;

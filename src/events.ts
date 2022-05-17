@@ -12,6 +12,11 @@ import { Transitions } from './transitions';
 
 export class Events {
 
+  public touchEvents: {
+    start: string, move: string, 
+    end: string, cancel: string
+  };
+
   private allowClick: boolean = true;
   private disableDragAngle: boolean = false;
   private mouseDown: boolean = false;
@@ -35,6 +40,24 @@ export class Events {
               private device: Device,
               private breakpoints: Breakpoints,
               private transitions: Transitions) {
+    this.touchEvents = this.getTouchEvents();
+  }
+  
+  private getTouchEvents(): {
+    start: string, move: string, 
+    end: string, cancel: string
+  } {
+    const touch = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
+    let desktop = ['mousedown', 'mousemove', 'mouseup', 'mouseleave'];
+    const touchEventsTouch = {
+      start: touch[0], move: touch[1],
+      end: touch[2], cancel: touch[3]
+    };
+    const touchEventsDesktop = {
+      start: desktop[0], move: desktop[1],
+      end: desktop[2], cancel: desktop[3],
+    };
+    return Support.touch || !this.settings.simulateTouch ? touchEventsTouch : touchEventsDesktop;
   }
 
   public attachAllEvents() {
@@ -104,60 +127,23 @@ export class Events {
     this.attachAllEvents();
   }
 
-  private touchEvents = (() => {
-    const touch = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
-    let desktop = ['mousedown', 'mousemove', 'mouseup', 'mouseleave'];
-    if (Support.pointerEvents) {
-      desktop = ['pointerdown', 'pointermove', 'pointerup'];
-    }
-    const touchEventsTouch = {
-      start: touch[0],
-      move: touch[1],
-      end: touch[2],
-      cancel: touch[3]
-    };
-    const touchEventsDesktop = {
-      start: desktop[0],
-      move: desktop[1],
-      end: desktop[2],
-      leave: desktop[3],
-    };
-    return Support.touch || !this.settings.simulateTouch ? touchEventsTouch : touchEventsDesktop;
-  })();
-
+  /**
+   * Core DOM elements event listeners
+   * @param type 
+   * @param el 
+   */
   private eventListeners(type: 'addEventListener' | 'removeEventListener', el: Element) {
-    // Touch Events
-    if (!Support.touch && Support.pointerEvents) {
+    if (Support.touch) {
+      const passiveListener = this.touchEvents.start === 'touchstart' && Support.passiveListener && this.settings.passiveListeners ? { passive: true, capture: false } : false;
+      el[type](this.touchEvents.start, this.touchStartCb, passiveListener);
+      el[type](this.touchEvents.move, this.touchMoveCb, Support.passiveListener ? { passive: false, capture: false } : false);
+      el[type](this.touchEvents.end, this.touchEndCb, passiveListener);
+      el[type](this.touchEvents.cancel, this.touchEndCb, passiveListener);        
+    } else {
       el[type](this.touchEvents.start, this.touchStartCb, false);
       el[type](this.touchEvents.move, this.touchMoveCb, false);
       el[type](this.touchEvents.end, this.touchEndCb, false);
-      
-      // Backdrop propagation fix
-      this.instance.backdropEl?.[type](this.touchEvents.move, this.touchMoveBackdropCb, false);
-    } else {
-
-      if (Support.touch) {
-        const passiveListener = this.touchEvents.start === 'touchstart' && Support.passiveListener && this.settings.passiveListeners ? { passive: true, capture: false } : false;
-        el[type](this.touchEvents.start, this.touchStartCb, passiveListener);
-        el[type](this.touchEvents.move, this.touchMoveCb, Support.passiveListener ? { passive: false, capture: false } : false);
-        el[type](this.touchEvents.end, this.touchEndCb, passiveListener);
-        
-        // Backdrop propagation fix
-        this.instance.backdropEl?.[type](this.touchEvents.move, this.touchMoveBackdropCb, Support.passiveListener ? { passive: false, capture: false } : false);
-        if (this.touchEvents['cancel']) {
-          el[type](this.touchEvents['cancel'], this.touchEndCb, passiveListener);
-        }
-      }
-
-      if ((this.settings.simulateTouch && !this.device.ios && !this.device.android) || (this.settings.simulateTouch && !Support.touch && this.device.ios)) {
-        el[type]('mousedown', this.touchStartCb, false);
-        el[type]('mousemove', this.touchMoveCb, false);
-        el[type]('mouseleave', this.touchEndCb, false);
-        el[type]('mouseup', this.touchEndCb, false);
-        
-        // Backdrop propagation fix
-        this.instance.backdropEl?.[type]('mousemove', this.touchMoveBackdropCb, false);
-      }
+      el[type](this.touchEvents.cancel, this.touchEndCb, false);
     }
 
     // Prevent accidental unwanted clicks events during swiping
@@ -202,17 +188,6 @@ export class Events {
     }
     
     this.steps.push({posY: this.startY, time: Date.now()});
-  }
-
-  /** 
-   * Touch Move Event
-   * @param t 
-   */
-  public touchMoveBackdropCb = (t) => this.touchMoveBackdrop(t);
-  private touchMoveBackdrop(t) {
-    if (this.settings.touchMoveStopPropagation) {
-      t.stopPropagation();
-    }
   }
 
   /** 
@@ -373,6 +348,7 @@ export class Events {
     if (this.instance.disableDragEvents) return;
 
     // Desktop fixes
+    if (t.type === 'mouseleave' && !this.mouseDown) return;
     if (t.type === 'mouseup' || t.type === 'mouseleave') this.mouseDown = false;
 
     // Determinate nearest point

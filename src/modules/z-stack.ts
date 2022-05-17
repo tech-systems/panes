@@ -1,12 +1,12 @@
-import { CupertinoPane } from './cupertino-pane';
-import { CupertinoSettings, ZStackSettings } from './models';
-import { Breakpoints } from './breakpoints';
+import { CupertinoPane } from '../cupertino-pane';
+import { CupertinoSettings, ZStackSettings } from '../models';
+import { Breakpoints } from '../breakpoints';
 
 /**
- * Z-Stack functions and transitions
+ * Z-Stack Module
  */
 
-export class ZStack {
+export class ZStackModule {
 
   public zStackDefaults: ZStackSettings = {
     pushElements: null,
@@ -17,9 +17,59 @@ export class ZStack {
     stackZAngle: 160,
   };
 
-  constructor(private instance: CupertinoPane, 
-              private settings: CupertinoSettings,
-              private breakpoints: Breakpoints) {
+  private settings: CupertinoSettings;
+  private breakpoints: Breakpoints;
+  constructor(private instance: CupertinoPane) {
+    this.breakpoints = this.instance.breakpoints;
+    this.settings = this.instance.settings;
+
+    // Assign multiplicators for push elements
+    this.instance.on('rendered', () => {
+      this.setZstackConfig(this.settings.zStack);
+      this.setPushMultiplicators();
+    });
+
+    // Set initial position without animation on present
+    this.instance.on('beforePresentTransition', (ev) => {
+      if (!ev.animate) {
+        this.settings.zStack.pushElements.forEach(item => 
+          this.pushTransition(
+            document.querySelector(item), 
+            this.breakpoints.breaks[this.settings.initialBreak], 'unset'
+          )
+        );
+      }
+    });
+    
+    // Move/Drag push transition for each element
+    this.instance.on('onMoveTransitionStart', () => {
+      this.settings.zStack.pushElements.forEach(item => 
+        this.pushTransition(
+          document.querySelector(item), 
+          this.instance.getPanelTransformY(), 'all 0ms linear 0ms'
+        )
+      );
+    });
+
+    // Main transition for pushed elements
+    this.instance.on('onTransitionStart', (ev) => {
+      this.settings.zStack.pushElements.forEach(item => 
+        this.pushTransition(
+          document.querySelector(item), 
+          ev.translateY.new, 
+          `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`
+        )
+      );
+    });
+
+  }
+
+  /**
+   * Change z-stack configuration on the way
+   */
+  public setZstackConfig(zStack: ZStackSettings): void {
+    // Allow user to reset config
+    this.settings.zStack = zStack ? {...this.zStackDefaults, ...zStack} : null;
   }
 
   /**

@@ -1,15 +1,18 @@
-import { CupertinoPane } from './cupertino-pane';
-import { CupertinoSettings, ZStackSettings } from './models';
-import { Breakpoints } from './breakpoints';
+import { CupertinoPane } from '../cupertino-pane';
+import { ZStackSettings } from '../models';
 /**
- * Z-Stack functions and transitions
+ * Z-Stack Module
  */
-export declare class ZStack {
+export declare class ZStackModule {
     private instance;
+    zStackDefaults: ZStackSettings;
     private settings;
     private breakpoints;
-    zStackDefaults: ZStackSettings;
-    constructor(instance: CupertinoPane, settings: CupertinoSettings, breakpoints: Breakpoints);
+    constructor(instance: CupertinoPane);
+    /**
+     * Change z-stack configuration on the way
+     */
+    setZstackConfig(zStack: ZStackSettings): void;
     /**
      * Z-Stack push transitions
      * @param pushElement - element be pushed

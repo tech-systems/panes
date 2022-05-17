@@ -33,8 +33,4 @@ export class Support {
   public static get gestures() {
     return 'ongesturestart' in window;
   }
-
-  public static get pointerEvents() {
-    return !!window['PointerEvent'] && ('maxTouchPoints' in window.navigator) && window.navigator.maxTouchPoints > 0
-  }
 }

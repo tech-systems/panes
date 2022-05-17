@@ -13,6 +13,12 @@ export declare class Events {
     private device;
     private breakpoints;
     private transitions;
+    touchEvents: {
+        start: string;
+        move: string;
+        end: string;
+        cancel: string;
+    };
     private allowClick;
     private disableDragAngle;
     private mouseDown;
@@ -29,10 +35,15 @@ export declare class Events {
     private prevNewHeight;
     private prevFocusedElement;
     constructor(instance: CupertinoPane, settings: CupertinoSettings, device: Device, breakpoints: Breakpoints, transitions: Transitions);
+    private getTouchEvents;
     attachAllEvents(): void;
     detachAllEvents(): void;
     resetEvents(): void;
-    private touchEvents;
+    /**
+     * Core DOM elements event listeners
+     * @param type
+     * @param el
+     */
     private eventListeners;
     /**
      * Touch Start Event
@@ -40,12 +51,6 @@ export declare class Events {
      */
     touchStartCb: (t: any) => void;
     private touchStart;
-    /**
-     * Touch Move Event
-     * @param t
-     */
-    touchMoveBackdropCb: (t: any) => void;
-    private touchMoveBackdrop;
     /**
      * Touch Move Event
      * @param t

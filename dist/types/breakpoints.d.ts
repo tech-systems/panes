@@ -12,8 +12,9 @@ export declare class Breakpoints {
     lockedBreakpoints: any;
     currentBreakpoint: number;
     prevBreakpoint: string;
-    calcHeightInProcess: boolean;
     brs: number[];
+    beforeBuildBreakpoints: () => any;
+    conf: PaneBreaks;
     private defaultBreaksConf;
     constructor(instance: CupertinoPane, settings: CupertinoSettings);
     /**
@@ -22,9 +23,5 @@ export declare class Breakpoints {
      */
     buildBreakpoints(conf?: PaneBreaks, bottomOffset?: number, animated?: boolean): Promise<void>;
     getCurrentBreakName(): (string | null);
-    /**
-     * Private class methods
-     */
-    private getPaneFitHeight;
     getClosestBreakY(): number;
 }
