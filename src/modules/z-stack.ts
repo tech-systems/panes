@@ -23,6 +23,10 @@ export class ZStackModule {
     this.breakpoints = this.instance.breakpoints;
     this.settings = this.instance.settings;
 
+    if (!this.settings.zStack) {
+      return;
+    }
+
     // Assign multiplicators for push elements
     this.instance.on('rendered', () => {
       this.setZstackConfig(this.settings.zStack);

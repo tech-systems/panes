@@ -4,12 +4,21 @@ const connect = require('gulp-connect');
 const gopen = require('gulp-open');
 const fs = require('fs');
 const path = require('path');
-const del = require('del');
-const buildJs = require('./build-js.js');
+const env = process.env.NODE_ENV;
+
+const buildBundle = require('./build-bundle.js');
+const buildCore = require('./build-core.js');
+const buildModules = require('./build-modules.js');
 
 // js bundle
 gulp.task('js', (cb) => {
-  buildJs(cb);
+  buildBundle(cb);
+
+  if (env === 'production') {
+    buildCore(cb);
+    buildModules(cb);
+  }
+
   return gulp
     .src('./src/**/*.ts')
     .pipe(connect.reload());

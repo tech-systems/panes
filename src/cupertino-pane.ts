@@ -6,12 +6,7 @@ import { Settings } from './settings';
 import { Breakpoints } from './breakpoints';
 import { Transitions } from './transitions';
 import { on, emit } from './events-emitter';
-
-// Modules
-import { ZStackModule } from './modules/z-stack';
-import { FollowerModule } from './modules/follower';
-import { BackdropModule } from './modules/backdrop';
-import { FitHeightModule } from './modules/fit-height';
+import * as Modules from './modules';
 
 export class CupertinoPane {  
   public disableDragEvents: boolean = false;
@@ -36,7 +31,7 @@ export class CupertinoPane {
   public events: Events;
   public breakpoints: Breakpoints;
   public transitions: Transitions;
-  private modules: any[] = [];
+  public modules: {} = {};
 
   // Events emitter
   public eventsListeners: {} = {};
@@ -83,30 +78,19 @@ export class CupertinoPane {
       );
     }
 
+    // Core classes
     this.breakpoints = new Breakpoints(this, this.settings);
     this.transitions = new Transitions(this, this.settings, this.breakpoints);
     this.events = new Events(this, this.settings, this.device, this.breakpoints, this.transitions);
 
-
-    ////////////////////////////
-    // Modules
-    if (this.settings.zStack) {
-      this.modules.push({zStack: new ZStackModule(this)});
-    }
-
-    if (this.settings.followerElement) {
-      this.modules.push({follower: new FollowerModule(this)});
-    }
-
-    if (this.settings.fitHeight) {
-      this.modules.push({fitHeight: new FitHeightModule(this)});
-    }
-    
-    this.modules.push({backdrop: new BackdropModule(this)});
+    // Install modules
+    let allModules = Object.keys(Modules).map((key) => Modules[key]);
+    let modules = this.settings.modules || allModules;
+    modules.forEach((module) => this.modules[this.getModuleRef(module.name)] = new module(this));
   }
 
   private drawBaseElements() {
-    // Parent 
+    // Parent
     this.parentEl = this.settings.parentElement;
     
     // Wrapper
@@ -504,6 +488,10 @@ export class CupertinoPane {
       style.textContent += styleString;
     }
   };
+
+  private getModuleRef(className): string {
+    return (className.charAt(0).toLowerCase() + className.slice(1)).replace('Module','');
+  }
 
   /************************************
    * Public user methods

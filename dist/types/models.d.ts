@@ -70,5 +70,6 @@ export interface PaneSettings {
     breaks: PaneBreaks;
     zStack: ZStackSettings;
     events: CupertinoEvents;
+    modules: any[];
 }
 export declare type CupertinoSettings = Partial<PaneSettings>;

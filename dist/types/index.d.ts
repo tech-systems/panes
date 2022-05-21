@@ -70,6 +70,7 @@ interface PaneSettings {
     breaks: PaneBreaks;
     zStack: ZStackSettings;
     events: CupertinoEvents;
+    modules: any[];
 }
 declare type CupertinoSettings = Partial<PaneSettings>;
 
@@ -278,7 +279,7 @@ declare class CupertinoPane {
     events: Events;
     breakpoints: Breakpoints;
     transitions: Transitions;
-    private modules;
+    modules: {};
     eventsListeners: {};
     on: Function;
     emit: Function;
@@ -300,6 +301,7 @@ declare class CupertinoPane {
      * @param {string} styleString
      */
     addStyle(styleString: any): void;
+    private getModuleRef;
     /************************************
      * Public user methods
      */

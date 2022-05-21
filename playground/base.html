@@ -93,7 +93,7 @@
         // lowerThanBottom: false,
         draggableOver: true,
         // dragByCursor: false,
-        // backdrop: true,
+        backdrop: true,
         // bottomClose: true,
         // fastSwipeClose: true,
         // topperOverflowOffset: 110
@@ -103,13 +103,14 @@
           onTransitionEnd: (e) => console.log('Transition end', e),
           onBackdropTap: () => hideBackdrop(),
           onDidPresent: () => {
-            drawer.on('onDrag', () => {
-              console.log('DRAGGING');
-            })
+            // drawer.on('onDrag', () => {
+            //   console.log('Drag');
+            // });
           }
           // onBackdropTap: () => hideDrawer()
-        }
+        },
         // freeMode: true,
+
     });
     setTimeout(() => drawer.present({animate: true}));
 

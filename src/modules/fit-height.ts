@@ -17,6 +17,10 @@ export class FitHeightModule {
     this.breakpoints = this.instance.breakpoints;
     this.settings = this.instance.settings;
 
+    if (!this.settings.fitHeight) {
+      return;
+    }
+
     // bind to primary instance
     this.instance['calcFitHeight'] = async(animated) => this.calcFitHeight(animated);
 

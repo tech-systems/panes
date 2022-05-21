@@ -73,6 +73,7 @@ export interface PaneSettings {
   breaks: PaneBreaks;
   zStack: ZStackSettings; // todo; remove question mark 
   events: CupertinoEvents;
+  modules: any[];
 }
 
 export type CupertinoSettings = Partial<PaneSettings>;

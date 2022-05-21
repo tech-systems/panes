@@ -40,7 +40,8 @@ export class Settings {
       touchAngle: 45,
       breaks: {},
       zStack: null,
-      events: null
+      events: null,
+      modules: null
     };
   }
 }

@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: May 18, 2022
+ * Released on: May 21, 2022
  */
 
 (function (global, factory) {
@@ -16,7 +16,7 @@
     (global = typeof globalThis !== 'undefined' ? globalThis : global || self, global.CupertinoPane = factory());
 })(this, (function () { 'use strict';
 
-    /*! *****************************************************************************
+    /******************************************************************************
     Copyright (c) Microsoft Corporation.
 
     Permission to use, copy, modify, and/or distribute this software for any
@@ -867,7 +867,8 @@
                 touchAngle: 45,
                 breaks: {},
                 zStack: null,
-                events: null
+                events: null,
+                modules: null
             };
         }
     }
@@ -1162,6 +1163,9 @@
             };
             this.breakpoints = this.instance.breakpoints;
             this.settings = this.instance.settings;
+            if (!this.settings.zStack) {
+                return;
+            }
             // Assign multiplicators for push elements
             this.instance.on('rendered', () => {
                 this.setZstackConfig(this.settings.zStack);
@@ -1287,6 +1291,9 @@
             this.breakpoints = this.instance.breakpoints;
             this.transitions = this.instance.transitions;
             this.settings = this.instance.settings;
+            if (!this.settings.followerElement) {
+                return;
+            }
             // Set follower initial transitions
             this.instance.on('rendered', () => {
                 var _a;
@@ -1328,6 +1335,9 @@
             this.touchMoveBackdropCb = (t) => this.touchMoveBackdrop(t);
             this.settings = this.instance.settings;
             this.events = this.instance.events;
+            if (!this.settings.backdrop) {
+                return;
+            }
             // bind to primary instance
             this.instance['backdrop'] = (conf) => this.backdrop(conf);
             this.instance.on('rendered', () => {
@@ -1373,6 +1383,9 @@
                 }
             });
             this.instance.on('onTransitionEnd', (ev) => {
+                if (!this.backdropEl) {
+                    return;
+                }
                 if (ev.type === CupertinoTransition.Destroy
                     || ev.type === CupertinoTransition.Hide) {
                     this.backdropEl.style.transition = `initial`;
@@ -1463,6 +1476,9 @@
             this.calcHeightInProcess = false;
             this.breakpoints = this.instance.breakpoints;
             this.settings = this.instance.settings;
+            if (!this.settings.fitHeight) {
+                return;
+            }
             // bind to primary instance
             this.instance['calcFitHeight'] = (animated) => __awaiter(this, void 0, void 0, function* () { return this.calcFitHeight(animated); });
             // Pass our code into function buildBreakpoints()
@@ -1587,6 +1603,7 @@
         }
     }
 
+    const Modules = { ZStackModule: ZStackModule, FollowerModule: FollowerModule, BackdropModule: BackdropModule, FitHeightModule: FitHeightModule };
     class CupertinoPane {
         constructor(selector, conf = {}) {
             this.selector = selector;
@@ -1596,7 +1613,7 @@
             this.rendered = false;
             this.settings = (new Settings()).instance;
             this.device = new Device();
-            this.modules = [];
+            this.modules = {};
             // Events emitter
             this.eventsListeners = {};
             this.on = on;
@@ -1689,24 +1706,17 @@
             if (this.settings.events) {
                 Object.keys(this.settings.events).forEach(name => this.on(name, this.settings.events[name]));
             }
+            // Core classes
             this.breakpoints = new Breakpoints(this, this.settings);
             this.transitions = new Transitions(this, this.settings, this.breakpoints);
             this.events = new Events(this, this.settings, this.device, this.breakpoints, this.transitions);
-            ////////////////////////////
-            // Modules
-            if (this.settings.zStack) {
-                this.modules.push({ zStack: new ZStackModule(this) });
-            }
-            if (this.settings.followerElement) {
-                this.modules.push({ follower: new FollowerModule(this) });
-            }
-            if (this.settings.fitHeight) {
-                this.modules.push({ fitHeight: new FitHeightModule(this) });
-            }
-            this.modules.push({ backdrop: new BackdropModule(this) });
+            // Install modules
+            let allModules = Object.keys(Modules).map((key) => Modules[key]);
+            let modules = this.settings.modules || allModules;
+            modules.forEach((module) => this.modules[this.getModuleRef(module.name)] = new module(this));
         }
         drawBaseElements() {
-            // Parent 
+            // Parent
             this.parentEl = this.settings.parentElement;
             // Wrapper
             this.wrapperEl = document.createElement('div');
@@ -2022,6 +2032,9 @@
             }
         }
         ;
+        getModuleRef(className) {
+            return (className.charAt(0).toLowerCase() + className.slice(1)).replace('Module', '');
+        }
         /************************************
          * Public user methods
          */

@@ -1,6 +1,5 @@
 /* eslint import/no-extraneous-dependencies: ["error", {"devDependencies": true}] */
 /* eslint no-console: "off" */
-
 const fs = require('fs-extra');
 const rollup = require('rollup');
 const Terser = require('terser');
@@ -12,7 +11,7 @@ const chalk = require('chalk');
 const banner = require('./banner.js');
 const env = process.env.NODE_ENV;
 
-async function buildEntry(format) {
+async function buildEntry(format, includeModules) {
   const bundleName = 'CupertinoPane';
   const isUMD = format === 'umd';
   const isESM = format === 'esm';
@@ -31,7 +30,11 @@ async function buildEntry(format) {
         replace({
           delimiters: ['', ''],
           preventAssignment: true,
-          '//EXPORT': isUMD ? `export default ${bundleName};` : `export { ${bundleName} }`
+          '//EXPORT': isUMD ? `export default ${bundleName};` : `export { ${bundleName} }`,
+          // Include modules
+          'import * as Modules from \'./modules\';': `${includeModules.map(
+            module => `import {${module}} from './modules';`
+          ).join('\n')}\nconst Modules = {${includeModules.map(item => `${item}:${item}`).join(', ')}};`
         }),
         typescript({
           useTsconfigDeclarationDir: true,
@@ -92,13 +95,34 @@ async function buildEntry(format) {
 
 async function build() {
   elapsed.start('bundles');
+
+  // Get all modules
+  let indexTs = await fs.readFileSync('./src/modules/index.ts', {encoding: 'utf-8'});
+  let allModules = indexTs.replaceAll(/\r?\n|\r/g, '').replaceAll(/\s/g,'');
+  allModules = allModules.substring(
+    allModules.indexOf("export{") + 7, 
+    allModules.lastIndexOf("};")
+  ).split(',')
+  
+  // Prepare modules to exclude
+  let includeModules = process.argv.find(item => item.includes('--modules='));
+  if (includeModules) {
+    // Includes Modules
+    includeModules = includeModules.replace('--modules=', '').replaceAll(/\s/g,'').split(',');
+    includeModules = includeModules.filter(item => allModules.includes(item));
+  } else {
+    includeModules = allModules;
+  }
+
+  console.log(chalk.yellow(`Modules includes to bundle: ${includeModules.join(', ')}`));
+
   return Promise.all(
     [
-      buildEntry('umd'), 
-      buildEntry('esm')
+      buildEntry('umd', includeModules), 
+      buildEntry('esm', includeModules)
     ]
   ).then(() => {
-    elapsed.end('bundles', chalk.green('\nRollup bundles build completed!'));
+    elapsed.end('bundles', chalk.green('Rollup bundles build completed!'));
   });
 }
 

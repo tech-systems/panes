@@ -19,6 +19,10 @@ export class FollowerModule {
     this.transitions = this.instance.transitions;
     this.settings = this.instance.settings;
 
+    if (!this.settings.followerElement) {
+      return;
+    }
+
     // Set follower initial transitions
     this.instance.on('rendered', () => {
       if (!<HTMLElement>document.querySelector(this.settings.followerElement)) {

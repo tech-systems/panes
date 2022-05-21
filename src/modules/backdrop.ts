@@ -17,6 +17,10 @@ export class BackdropModule {
   constructor(private instance: CupertinoPane) {
     this.settings = this.instance.settings;
     this.events = this.instance.events;
+    
+    if (!this.settings.backdrop) {
+      return;
+    }
 
     // bind to primary instance
     this.instance['backdrop'] = (conf) => this.backdrop(conf);
@@ -70,6 +74,10 @@ export class BackdropModule {
     });
 
     this.instance.on('onTransitionEnd', (ev) => {
+      if (!this.backdropEl) {
+        return;
+      }
+
       if (ev.type === CupertinoTransition.Destroy 
           || ev.type === CupertinoTransition.Hide) {
         this.backdropEl.style.transition = `initial`;
