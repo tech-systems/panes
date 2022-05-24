@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: May 21, 2022
+ * Released on: May 24, 2022
  */
 
 /******************************************************************************
@@ -497,14 +497,11 @@ class Events {
         const swipeNextSensivity = window.hasOwnProperty('cordova')
             ? (this.settings.fastSwipeSensivity + 2) : this.settings.fastSwipeSensivity;
         const fastSwipeNext = (Math.abs(diff) >= swipeNextSensivity);
+        let fastSwipeClose;
         if (fastSwipeNext) {
             closest = this.instance.swipeNextPoint(diff, swipeNextSensivity, closest);
-            // Fast swipe toward bottom - close
-            if (this.settings.fastSwipeClose
-                && this.breakpoints.currentBreakpoint < closest) {
-                this.instance.destroy({ animate: true });
-                return;
-            }
+            fastSwipeClose = this.settings.fastSwipeClose
+                && this.breakpoints.currentBreakpoint < closest;
         }
         // blur tap event
         let blurTapEvent = false;
@@ -521,6 +518,11 @@ class Events {
         // touchend with allowClick === tapped event (no move triggered)
         // skip next functions
         if (this.allowClick || blurTapEvent) {
+            return;
+        }
+        // Fast swipe toward bottom - close
+        if (fastSwipeClose) {
+            this.instance.destroy({ animate: true });
             return;
         }
         this.instance.checkOpacityAttr(closest);
