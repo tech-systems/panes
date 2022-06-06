@@ -96,11 +96,10 @@ export class CupertinoPane {
     // Wrapper
     this.wrapperEl = document.createElement('div');
     this.wrapperEl.classList.add('cupertino-pane-wrapper');
-    if (this.settings.inverse) {
-      this.wrapperEl.classList.add('inverse');
-    }
     if (this.settings.cssClass) {
-      this.wrapperEl.className += ` ${this.settings.cssClass}`;
+      this.settings.cssClass.split(' ')
+        .filter(item => !!item)
+        .forEach(item => this.wrapperEl.classList.add(item));
     };
     let internalStyles: string = '';
     internalStyles += `
@@ -136,13 +135,6 @@ export class CupertinoPane {
                        0 0;
         -webkit-user-select: none;
       }
-      .cupertino-pane-wrapper.inverse .pane {
-        padding-bottom: 15px; 
-        border-radius: 0 0 20px 20px;
-        border-radius: 0 0
-                       var(--cupertino-pane-border-radius, 20px) 
-                       var(--cupertino-pane-border-radius, 20px);
-      }
       .cupertino-pane-wrapper .pane img {
         -webkit-user-drag: none;
       }
@@ -171,14 +163,6 @@ export class CupertinoPane {
         top: -30px;
         padding: 15px;
       }
-      .cupertino-pane-wrapper.inverse .draggable {
-        bottom: 0;
-        top: initial;
-      }
-      .cupertino-pane-wrapper.inverse .draggable.over {
-        bottom: -30px;
-        top: initial;
-      }
     `;
 
     // Move
@@ -199,12 +183,6 @@ export class CupertinoPane {
           backdrop-filter: saturate(180%) blur(20px);
           -webkit-backdrop-filter: saturate(180%) blur(20px);
         ` : ``}
-      }
-      .cupertino-pane-wrapper.inverse .move {
-        margin-top: 15px;
-      }
-      .cupertino-pane-wrapper.inverse .draggable.over .move {
-        margin-top: -5px;
       }
     `;
     
@@ -241,6 +219,9 @@ export class CupertinoPane {
       this.paneEl.appendChild(this.draggableEl);
       this.draggableEl.appendChild(this.moveEl);
     }
+
+    // System event
+    this.emit('DOMElementsReady');
   }
 
   async present(conf: {animate: boolean} = {animate: false}): Promise<CupertinoPane> {
@@ -270,9 +251,6 @@ export class CupertinoPane {
 
       // Necessary Inlines with breakpoints
       this.paneEl.style.height = `${this.getPaneHeight()}px`;
-      if (this.settings.inverse) {
-        this.paneEl.style.top = `-${this.breakpoints.bottomer - this.settings.bottomOffset}px`;
-      }
 
       // Show elements
       // For some reason need timeout after show wrapper to make 
@@ -292,7 +270,8 @@ export class CupertinoPane {
       this.emit('rendered');
 
       // Button destroy
-      if ((this.settings.buttonClose && this.settings.buttonDestroy) && !this.settings.inverse) {
+      // TODO: Merge to one config
+      if (this.settings.buttonDestroy) {
         this.paneEl.appendChild(this.destroyButtonEl);
         this.destroyButtonEl.addEventListener('click', (t) => this.destroy({animate:true, destroyButton: true}));
         this.destroyButtonEl.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
@@ -337,21 +316,12 @@ export class CupertinoPane {
   }
 
   public getPaneHeight(): number {
-    if (!this.settings.inverse) {
-      return this.screen_height - this.breakpoints.topper - this.settings.bottomOffset;
-    } 
-
-    return this.breakpoints.bottomer - this.settings.bottomOffset;
+    return this.screen_height - this.breakpoints.topper - this.settings.bottomOffset;
   }
 
   public updateScreenHeights():void {
-    if (this.settings.inverse) {
-      this.screen_height = window.innerHeight;
-      this.screenHeightOffset = 0;
-    } else {
-      this.screen_height = window.innerHeight;
-      this.screenHeightOffset = window.innerHeight;
-    }
+    this.screen_height = window.innerHeight;
+    this.screenHeightOffset = window.innerHeight;
   }
 
   public scrollElementInit() {
@@ -373,23 +343,15 @@ export class CupertinoPane {
   }
 
   public setOverflowHeight(offset = 0) {
-    if (!this.settings.inverse) {
-      this.overflowEl.style.height = `${this.getPaneHeight()
-        - this.settings.topperOverflowOffset
-        - this.overflowEl.offsetTop
-        - offset}px`;
-    } else {
-      this.overflowEl.style.height = `${this.getPaneHeight()
-        - 30
-        - this.settings.topperOverflowOffset
-        - this.overflowEl.offsetTop}px`;
-    }
+    this.overflowEl.style.height = `${this.getPaneHeight()
+      - this.settings.topperOverflowOffset
+      - this.overflowEl.offsetTop
+      - offset}px`;
   }
 
   public checkOpacityAttr(val) {
     let attrElements = this.el.querySelectorAll('[hide-on-bottom]');
     if (!attrElements.length) return;
-    if (this.settings.inverse) return;
     attrElements.forEach((item) => {
       (<HTMLElement>item).style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
       (<HTMLElement>item).style.opacity = (val >= this.breakpoints.breaks['bottom']) ? '0' : '1';
@@ -402,11 +364,7 @@ export class CupertinoPane {
       return;
     }
 
-    if (!this.settings.inverse) {
-      this.overflowEl.style.overflowY = (val <= this.breakpoints.topper) ? 'auto' : 'hidden';
-    } else {
-      this.overflowEl.style.overflowY = (val >= this.breakpoints.bottomer) ? 'auto' : 'hidden';
-    }
+    this.overflowEl.style.overflowY = (val <= this.breakpoints.topper) ? 'auto' : 'hidden';
   }
 
   // TODO: replace with body.contains()
@@ -417,21 +375,15 @@ export class CupertinoPane {
     return wrappers.find((item) => item.contains(<HTMLElement>this.selector)) ? true: false;
   }
 
-  public swipeNextPoint = (diff, maxDiff, closest) => {
-    let brs = {};
-    let settingsBreaks = {};
+  private prepareBreaksSwipeNextPoint(): {brs: {}, settingsBreaks: {}} {
+    return {
+      brs: {...this.breakpoints.breaks}, 
+      settingsBreaks: {...this.settings.breaks}
+    };
+  }
 
-    if (this.settings.inverse) {
-      brs['top'] = this.breakpoints.breaks['bottom'];
-      brs['middle'] = this.breakpoints.breaks['middle'];
-      brs['bottom'] = this.breakpoints.breaks['top'];
-      settingsBreaks['top'] = {...this.settings.breaks['bottom']};
-      settingsBreaks['middle'] = {...this.settings.breaks['middle']};
-      settingsBreaks['bottom'] = {...this.settings.breaks['top']};
-    } else {
-      brs = {...this.breakpoints.breaks}
-      settingsBreaks = {...this.settings.breaks};
-    }
+  public swipeNextPoint = (diff, maxDiff, closest) => {
+    let { brs, settingsBreaks }  = this.prepareBreaksSwipeNextPoint();
 
     if (this.breakpoints.currentBreakpoint === brs['top']) {
         if (diff > maxDiff) {

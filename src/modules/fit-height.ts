@@ -24,6 +24,11 @@ export class FitHeightModule {
     // bind to primary instance
     this.instance['calcFitHeight'] = async(animated) => this.calcFitHeight(animated);
 
+    // Class to wrapper
+    this.instance.on('DOMElementsReady', () => {
+      this.instance.wrapperEl.classList.add('fit-height');
+    });
+    
     // Pass our code into function buildBreakpoints()
     this.instance.on('onWillPresent', () => {
       this.breakpoints.beforeBuildBreakpoints = () => this.beforeBuildBreakpoints();
@@ -58,7 +63,7 @@ export class FitHeightModule {
           }
         }
       }
-    })
+    }, true);
   }
 
   private async beforeBuildBreakpoints(): Promise<void> {

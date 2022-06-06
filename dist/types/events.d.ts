@@ -22,12 +22,12 @@ export declare class Events {
     private allowClick;
     private disableDragAngle;
     private mouseDown;
-    private contentScrollTop;
+    contentScrollTop: number;
     private startY;
     private startX;
     private steps;
-    private isScrolling;
-    private startPointOverTop;
+    isScrolling: boolean;
+    startPointOverTop: number;
     private keyboardVisible;
     private inputBluredbyMove;
     private inputBottomOffset;
@@ -105,18 +105,13 @@ export declare class Events {
      * Topper Than Top
      * Lower Than Bottom
      * Otherwise don't changes
-     * TODO: Merge same entry functions
      */
     private handleTopperLowerPositions;
     private getEventClientYX;
-    /**
-     * Fix android keyboard issue with transition
-     * (resize window frame height on hide/show)
-     * UNDER CONSIDERATION: Please let me know if any issues without that patch
-     */
-    private willScrolled;
+    scrollPreventDrag(t: any): boolean;
+    willScrolled(): boolean;
     private isPaneDescendant;
     private isFormElement;
-    private isElementScrollable;
+    isElementScrollable(el: any): boolean;
     private isOnViewport;
 }

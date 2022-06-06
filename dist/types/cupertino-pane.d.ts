@@ -40,6 +40,7 @@ export declare class CupertinoPane {
     checkOpacityAttr(val: any): void;
     checkOverflowAttr(val: any): void;
     isPanePresented(): boolean;
+    private prepareBreaksSwipeNextPoint;
     swipeNextPoint: (diff: any, maxDiff: any, closest: any) => any;
     /**
      * Utility function to add minified internal CSS to head.

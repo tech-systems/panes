@@ -20,12 +20,12 @@ export class Events {
   private allowClick: boolean = true;
   private disableDragAngle: boolean = false;
   private mouseDown: boolean = false;
-  private contentScrollTop: number = 0;
+  public contentScrollTop: number = 0;
   private startY: number;
   private startX: number;
   private steps: {posY: number, time: number}[] = [];  
-  private isScrolling: boolean = false;
-  private startPointOverTop: number;
+  public isScrolling: boolean = false;
+  public startPointOverTop: number;
   
   // Keyboard help vars
   private keyboardVisible: boolean = false;
@@ -183,7 +183,7 @@ export class Events {
 
     // if overflow content was scrolled
     // increase to scrolled value
-    if (this.contentScrollTop && this.willScrolled(t)) {
+    if (this.contentScrollTop && this.willScrolled()) {
       this.startY += this.contentScrollTop;  
     }
     
@@ -290,16 +290,10 @@ export class Events {
     }
 
     // Not allow move panel with positive overflow scroll
-    if (this.instance.overflowEl.style.overflowY === 'auto') {
-      if (this.settings.inverse && this.willScrolled(t)) {
-        this.contentScrollTop = 0;
-        return;
-      }
-
-      // Scrolled -> Disable drag
-      if (!this.settings.inverse && this.contentScrollTop > 0) {
-        return;
-      }
+    // Scroll handler
+    if (this.instance.overflowEl.style.overflowY === 'auto' 
+      && this.scrollPreventDrag(t)) {
+      return;
     }
 
     // Topper-top/Lower-bottom recognizers
@@ -617,68 +611,39 @@ export class Events {
    * Topper Than Top
    * Lower Than Bottom
    * Otherwise don't changes
-   * TODO: Merge same entry functions 
    */
    private handleTopperLowerPositions(coords: {
      clientX: number, clientY: number, 
      newVal:number, diffY: number, 
   }):number {
-    // Non-inverse (normal) gestures
-    if (!this.settings.inverse) {
-      // Disallow drag topper than top point
-      if (!this.settings.upperThanTop 
-          && (coords.newVal <= this.breakpoints.topper)) {
-        return this.breakpoints.topper;
-      }
+    // Disallow drag topper than top point
+    if (!this.settings.upperThanTop 
+        && (coords.newVal <= this.breakpoints.topper)) {
+      return this.breakpoints.topper;
+    }
 
-      /**
-       * Allow drag topper than top point
-       */
-      if (this.settings.upperThanTop 
-          && ((coords.newVal <= this.breakpoints.topper) 
-          || this.startPointOverTop)) {
-        // check that finger reach same position before enable normal swipe mode
-        if (!this.startPointOverTop) {
-          this.startPointOverTop = coords.clientY;
-        }
-        if (this.startPointOverTop < coords.clientY) {
-          delete this.startPointOverTop;
-        }
-        const screenDelta = this.instance.screen_height - this.instance.screenHeightOffset;
-        const differKoef = (screenDelta - this.instance.getPanelTransformY()) / (screenDelta - this.breakpoints.topper) / 8;  
-        return this.instance.getPanelTransformY() + (coords.diffY * differKoef);
+    /**
+     * Allow drag topper than top point
+     */
+    if (this.settings.upperThanTop 
+        && ((coords.newVal <= this.breakpoints.topper) 
+        || this.startPointOverTop)) {
+      // check that finger reach same position before enable normal swipe mode
+      if (!this.startPointOverTop) {
+        this.startPointOverTop = coords.clientY;
       }
+      if (this.startPointOverTop < coords.clientY) {
+        delete this.startPointOverTop;
+      }
+      const screenDelta = this.instance.screen_height - this.instance.screenHeightOffset;
+      const differKoef = (screenDelta - this.instance.getPanelTransformY()) / (screenDelta - this.breakpoints.topper) / 8;  
+      return this.instance.getPanelTransformY() + (coords.diffY * differKoef);
+    }
 
-      // Disallow drag lower then bottom
-      if (!this.settings.lowerThanBottom
-          && coords.newVal >= this.breakpoints.bottomer) {
-        return this.breakpoints.bottomer;
-      }
-    } 
-    
-    if (this.settings.inverse) {
-      // Inverse gestures
-      // Allow drag topper than top point
-      if (this.settings.upperThanTop
-          && ((coords.newVal >= this.breakpoints.topper) 
-          || this.startPointOverTop)) {
-        // check that finger reach same position before enable normal swipe mode
-        if (!this.startPointOverTop) {
-          this.startPointOverTop = coords.clientY;
-        }
-        if (this.startPointOverTop > coords.clientY) {
-          delete this.startPointOverTop;
-        }
-        const screenDelta = this.instance.screen_height - this.instance.screenHeightOffset;
-        const differKoef = (screenDelta - this.instance.getPanelTransformY()) / (screenDelta - this.breakpoints.topper) / 8;
-        return this.instance.getPanelTransformY() + (coords.diffY * differKoef);
-      }
-      
-      // Disallow drag topper than top point
-      if (!this.settings.upperThanTop 
-          && (coords.newVal >= this.breakpoints.topper)) {
-        return this.breakpoints.topper;
-      }
+    // Disallow drag lower then bottom
+    if (!this.settings.lowerThanBottom
+        && coords.newVal >= this.breakpoints.bottomer) {
+      return this.breakpoints.bottomer;
     }
   }
 
@@ -692,26 +657,15 @@ export class Events {
     return {clientY, clientX, velocityY};
   }
 
-  /**
-   * Fix android keyboard issue with transition 
-   * (resize window frame height on hide/show)
-   * UNDER CONSIDERATION: Please let me know if any issues without that patch
-   */
-  // private fixAndroidResize() {
-  //   if (!this.instance.paneEl) return;
-  //   const ionApp:any = document.querySelector('ion-app');
+  public scrollPreventDrag(t): boolean {
+    let prevention: boolean = false;
+    if (this.contentScrollTop > 0) {
+      prevention = true;
+    }
+    return prevention;
+  }
 
-  //   window.requestAnimationFrame(() => {
-  //     this.instance.wrapperEl.style.width = '100%';
-  //     this.instance.paneEl.style.position = 'absolute';
-  //     window.requestAnimationFrame(() => {
-  //       this.instance.wrapperEl.style.width = 'unset';
-  //       this.instance.paneEl.style.position = 'fixed';
-  //     });
-  //   });
-  // }
-
-  private willScrolled(t): boolean {
+  public willScrolled(): boolean {
     if (!(this.isElementScrollable(this.instance.overflowEl)
         && this.instance.overflowEl.style.overflow !== 'hidden')) {
       return false;
@@ -746,7 +700,7 @@ export class Events {
     return false;
   }
 
-  private isElementScrollable(el):boolean {
+  public isElementScrollable(el):boolean {
     return el.scrollHeight > el.clientHeight ? true : false;
   }
 

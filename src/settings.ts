@@ -24,7 +24,6 @@ export class Settings {
       fastSwipeSensivity: 3,
       freeMode: false,
       buttonDestroy: true,
-      buttonClose: true,
       topperOverflow: true,
       topperOverflowOffset: 0,
       lowerThanBottom: true,

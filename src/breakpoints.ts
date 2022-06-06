@@ -33,20 +33,11 @@ export class Breakpoints {
   public async buildBreakpoints(conf?: PaneBreaks, bottomOffset: number = 0, animated: boolean = true) {
     this.conf = conf;
     this.settings.bottomOffset = bottomOffset || this.settings.bottomOffset;
-    this.breaks = {
-      top: this.instance.screenHeightOffset,
-      middle: this.instance.screenHeightOffset,
-      bottom: this.instance.screenHeightOffset
-    };
 
     // Async hook for modules injections
     await this.beforeBuildBreakpoints();
 
     ['top', 'middle', 'bottom'].forEach((val) => {
-      // bottom offset for bulletins
-      
-      this.breaks[val] -= this.settings.bottomOffset;
-
       // Set default if no exist
       if (!this.settings.breaks[val]) {
         this.settings.breaks[val] = this.defaultBreaksConf[val];
@@ -60,15 +51,11 @@ export class Breakpoints {
       // System event
       this.instance.emit('beforeBreakHeightApplied', {break: val});
 
-      // Assign heights as translateY values
-      if (this.settings.breaks[val]
-          && this.settings.breaks[val].enabled
-          && this.settings.breaks[val].height) {
-        if (!this.settings.inverse) {
-          this.breaks[val] -= this.settings.breaks[val].height;
-        } else {
-          this.breaks[val] = this.settings.breaks[val].height + this.settings.bottomOffset;
-        }
+      // Apply initial breaks
+      if (this.settings.breaks[val]?.enabled) {
+        this.breaks[val] = this.breaks[val] || this.instance.screenHeightOffset;
+        this.breaks[val] -= this.settings.bottomOffset;
+        this.breaks[val] -= this.settings.breaks[val].height;
       }
     });
 
@@ -91,6 +78,7 @@ export class Breakpoints {
     }
 
     // Prepare breakpoint numbers array
+    // TODO: this.brs to this.breaks.map()
     this.brs = [];
     ['top', 'middle', 'bottom'].forEach((val) => {
       if (this.settings.breaks[val].enabled) {
@@ -106,19 +94,9 @@ export class Breakpoints {
     this.bottomer = this.brs.reduce((prev, curr) => {
       return (Math.abs(curr) > Math.abs(prev) ? curr : prev);
     });
-    
-    if (this.settings.inverse) {
-      this.topper = this.bottomer;
-    }
 
     if (!this.instance.isPanePresented()) {
       this.currentBreakpoint = this.breaks[this.settings.initialBreak];
-      // Disable overflow for top bulletin
-      if (this.settings.inverse 
-          && !this.settings.breaks.bottom.enabled 
-          && !this.settings.breaks.middle.enabled) {
-        this.settings.topperOverflow = false;
-      }
     }
 
     if (this.instance.isPanePresented()) {
@@ -141,16 +119,15 @@ export class Breakpoints {
         }
       }
 
-      // Re-calc top
-      this.instance.paneEl.style.top = this.settings.inverse 
-        ? `-${this.bottomer - this.settings.bottomOffset}px` : `unset`;
       // Re-calc height 
-      // TODO: with transition
       this.instance.paneEl.style.height = `${this.instance.getPaneHeight()}px`;
       this.instance.scrollElementInit();
       this.instance.checkOpacityAttr(this.currentBreakpoint);
       this.instance.checkOverflowAttr(this.currentBreakpoint);
     }
+
+    // System event
+    this.instance.emit('buildBreakpointsCompleted');
   }
 
   // TODO: Replace currentBreakpoint with prevBreakpoint if possible
