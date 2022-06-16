@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: June 6, 2022
+ * Released on: June 16, 2022
  */
 
 (function (global, factory) {
@@ -855,6 +855,7 @@
         buildBreakpoints(conf, bottomOffset = 0, animated = true) {
             var _a, _b;
             return __awaiter(this, void 0, void 0, function* () {
+                this.breaks = {};
                 this.conf = conf;
                 this.settings.bottomOffset = bottomOffset || this.settings.bottomOffset;
                 // Async hook for modules injections

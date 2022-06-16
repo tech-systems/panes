@@ -31,6 +31,7 @@ export class Breakpoints {
    * @param conf breakpoints
    */  
   public async buildBreakpoints(conf?: PaneBreaks, bottomOffset: number = 0, animated: boolean = true) {
+    this.breaks = {};
     this.conf = conf;
     this.settings.bottomOffset = bottomOffset || this.settings.bottomOffset;
 
