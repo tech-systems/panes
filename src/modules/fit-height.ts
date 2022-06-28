@@ -124,15 +124,15 @@ export class FitHeightModule {
       // Bulletins with image height we get after image render
       promises = Array.from(images).map(
         (image) => new Promise((resolve) => {
+          image.onload = () => resolve(true);
+          image.onerror = () => resolve(true);
           // Already rendered
           if (image.complete && image.naturalHeight) {
-            resolve(true)
-          } else {
-            image.onload = () => resolve(true)
+            resolve(true);
           }
         })
       );
-    } 
+    }
 
     // resized timeouts - 0, render - 150
     promises.push(
