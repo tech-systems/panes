@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.2.82
+ * Cupertino Pane 1.2.91
  * Multi-functional panes and boards for next generation progressive applications
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: June 16, 2022
+ * Released on: June 30, 2022
  */
 
 (function (global, factory) {
@@ -1512,12 +1512,11 @@
                 if (images.length) {
                     // Bulletins with image height we get after image render
                     promises = Array.from(images).map((image) => new Promise((resolve) => {
+                        image.onload = () => resolve(true);
+                        image.onerror = () => resolve(true);
                         // Already rendered
                         if (image.complete && image.naturalHeight) {
                             resolve(true);
-                        }
-                        else {
-                            image.onload = () => resolve(true);
                         }
                     }));
                 }
@@ -2017,6 +2016,7 @@
                 this.overflowEl = attrElements[0];
                 this.overflowEl.style.overflowX = 'hidden';
             }
+            this.overflowEl.style.overscrollBehavior = 'none';
             if (this.settings.topperOverflow) {
                 if (this.settings.upperThanTop) {
                     console.warn('Cupertino Pane: "upperThanTop" allowed for disabled "topperOverflow"');
@@ -2236,4 +2236,3 @@
     return CupertinoPane;
 
 }));
-//# sourceMappingURL=cupertino-pane.js.map
