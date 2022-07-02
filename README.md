@@ -79,10 +79,10 @@ Support this project with your organization. Your logo will show up here with a 
 - [Backdrop drag-opacity live](https://output.jsbin.com/riwahab)
 
 <div style="display:flex;flex-wrap:wrap;">
-  <img src="docs/images/bulletin.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="200px">
-  <img src="docs/images/overflow.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="200px">
-  <img src="docs/images/notifications.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="200px">
-  <img src="docs/images/z-stack.gif?raw=true" alt="Cupertino Pane - Roman Antonov" width="200px">
+  <img style="width: 200px;" src="docs/images/bulletin.gif?raw=true" alt="Cupertino Pane - Roman Antonov" >
+  <img style="width: 200px;" src="docs/images/overflow.gif?raw=true" alt="Cupertino Pane - Roman Antonov" >
+  <img style="width: 200px;" src="docs/images/notifications.gif?raw=true" alt="Cupertino Pane - Roman Antonov" >
+  <img style="width: 200px;" src="docs/images/z-stack.gif?raw=true" alt="Cupertino Pane - Roman Antonov" >
 </div>
 
 ## Supporting platforms
@@ -183,6 +183,9 @@ new CupertinoPane(element); // HTMLElement
 ```
 
 ## Modules
+
+> Available modules:   ZStackModule, FollowerModule, BackdropModule, FitHeightModule, InverseModule, HorizontalModule
+
 Modular architecture of the project helps us to keep small size of bundles, also huge scalability features are possible. 
 
 We are welcome to creators — feel free to make your own modules!
@@ -225,6 +228,8 @@ As output you will have your `umd` and `esm` builds in `dist` folder.
 ### Common configuration
 | Property | Type | Default | Description |
 | - | - | - | - |
+| **horizontal** | `boolean` | false | Drag by horizontal axis will be possible on `true` and left right screen edge will automatically recognized as horizontal breakpoints |
+| **horizontalOffset** | `number` | 'null' | Margin left and right for screen edges used with horizontal gestures |
 | **inverse** | `boolean` | false | On `true` will change pane direction from `bottom-to-top` to `top-to-bottom` |
 | **parentElement** | `string` | Parent element selector | Element selector where pane will rendered |
 | **followerElement** | `string` | Follower element selector | Element with selector will following pane transitions |

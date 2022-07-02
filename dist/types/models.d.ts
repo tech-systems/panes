@@ -35,6 +35,8 @@ export interface CupertinoEvents {
 }
 export interface PaneSettings {
     initialBreak: ('top' | 'middle' | 'bottom');
+    horizontal: boolean;
+    horizontalOffset: number;
     inverse: boolean;
     parentElement: any;
     followerElement: string;

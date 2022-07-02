@@ -23,10 +23,15 @@ export class Events {
   public contentScrollTop: number = 0;
   private startY: number;
   private startX: number;
-  private steps: {posY: number, time: number}[] = [];  
+  private steps: {
+    posY: number, 
+    posX?: number, 
+    time: number
+  }[] = [];  
   public isScrolling: boolean = false;
   public startPointOverTop: number;
-  
+  public swipeNextSensivity: number;
+
   // Keyboard help vars
   private keyboardVisible: boolean = false;
   private inputBluredbyMove: boolean = false;
@@ -41,6 +46,10 @@ export class Events {
               private breakpoints: Breakpoints,
               private transitions: Transitions) {
     this.touchEvents = this.getTouchEvents();
+
+    // Set sensivity lower for web
+    this.swipeNextSensivity = window.hasOwnProperty('cordova') 
+      ? (this.settings.fastSwipeSensivity + 2) : this.settings.fastSwipeSensivity;
   }
   
   private getTouchEvents(): {
@@ -187,7 +196,7 @@ export class Events {
       this.startY += this.contentScrollTop;  
     }
     
-    this.steps.push({posY: this.startY, time: Date.now()});
+    this.steps.push({posY: this.startY, posX: this.startX, time: Date.now()});
   }
 
   /** 
@@ -204,7 +213,7 @@ export class Events {
     // sometimes touchstart is not called 
     // when touchmove is began before initialization
     if (!this.steps.length) {
-      this.steps.push({posY: clientY, time: Date.now()});
+      this.steps.push({posY: clientY, posX: clientX, time: Date.now()});
     }
 
     // Event emitter
@@ -232,8 +241,11 @@ export class Events {
 
     // Delta
     const diffY = clientY - this.steps[this.steps.length - 1].posY;
-    // No Y changes
-    if (!Math.abs(diffY)) {
+    const diffX = clientX - this.steps[this.steps.length - 1].posX;
+
+    // No Y/X changes
+    if (!Math.abs(diffY) 
+        && !Math.abs(diffX)) {
       return;
     }
 
@@ -243,6 +255,7 @@ export class Events {
     // Has changes in position 
     this.instance.setGrabCursor(true, true);
     let newVal = this.instance.getPanelTransformY() + diffY;
+    let newValX = this.instance.getPanelTransformX() + diffX;
     
     // First event after touchmove only
     if (this.steps.length < 2) {
@@ -306,8 +319,9 @@ export class Events {
       newVal = forceNewVal;
     }
 
-    // No changes Y
-    if (this.instance.getPanelTransformY() === newVal) {
+    // No changes Y/X
+    if (this.instance.getPanelTransformY() === newVal 
+        && this.instance.getPanelTransformX() === newValX ) {
       return;
     }
 
@@ -329,8 +343,8 @@ export class Events {
 
     this.instance.checkOpacityAttr(newVal);
     this.instance.checkOverflowAttr(newVal);
-    this.transitions.doTransition({type: 'move', translateY: newVal});
-    this.steps.push({posY: clientY, time: Date.now()});
+    this.transitions.doTransition({type: 'move', translateY: newVal, translateX: newValX});
+    this.steps.push({posY: clientY, posX: clientX, time: Date.now()});
   }
 
   /**
@@ -347,15 +361,15 @@ export class Events {
 
     // Determinate nearest point
     let closest = this.breakpoints.getClosestBreakY();
+
     // Swipe - next (if differ > 10)
-    const diff = this.steps[this.steps.length - 1]?.posY - this.steps[this.steps.length - 2]?.posY;
-    // Set sensivity lower for web
-    const swipeNextSensivity = window.hasOwnProperty('cordova') 
-      ? (this.settings.fastSwipeSensivity + 2) : this.settings.fastSwipeSensivity; 
-    const fastSwipeNext = (Math.abs(diff) >= swipeNextSensivity);
     let fastSwipeClose;
-    if (fastSwipeNext) {
-      closest = this.instance.swipeNextPoint(diff, swipeNextSensivity, closest);      
+    if (this.fastSwipeNext('Y')) {
+      closest = this.instance.swipeNextPoint(
+        this.steps[this.steps.length - 1]?.posY - this.steps[this.steps.length - 2]?.posY, //diff
+        this.swipeNextSensivity, 
+        closest
+      );
       fastSwipeClose = this.settings.fastSwipeClose
         && this.breakpoints.currentBreakpoint < closest;
     }
@@ -368,12 +382,12 @@ export class Events {
         blurTapEvent = true;
     }
 
+    // Event emitter
+    this.instance.emit('onDragEnd', (t as CustomEvent));
+
     // Clear
     this.steps = [];
     delete this.startPointOverTop;
-
-    // Event emitter
-    this.instance.emit('onDragEnd', (t as CustomEvent));
 
     // touchend with allowClick === tapped event (no move triggered)
     // skip next functions
@@ -584,10 +598,14 @@ export class Events {
     this.breakpoints.buildBreakpoints(JSON.parse(this.breakpoints.lockedBreakpoints));
   }
 
+  public fastSwipeNext(axis: 'Y' | 'X'): boolean {
+    const diff = this.steps[this.steps.length - 1]?.['pos' + axis] - this.steps[this.steps.length - 2]?.['pos' + axis];
+    return (Math.abs(diff) >= this.swipeNextSensivity);
+  }
+
   /**
    * Private class methods
    */
-
 
   /**
    * Determinate if event is keyboard not resize

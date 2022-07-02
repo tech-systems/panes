@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.2.91
+ * Cupertino Pane 1.2.92
  * Multi-functional panes and boards for next generation progressive applications
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: June 30, 2022
+ * Released on: July 3, 2022
  */
 
 /******************************************************************************
@@ -233,6 +233,9 @@ class Events {
          */
         this.onWindowResizeCb = (e) => this.onWindowResize(e);
         this.touchEvents = this.getTouchEvents();
+        // Set sensivity lower for web
+        this.swipeNextSensivity = window.hasOwnProperty('cordova')
+            ? (this.settings.fastSwipeSensivity + 2) : this.settings.fastSwipeSensivity;
     }
     getTouchEvents() {
         const touch = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
@@ -355,7 +358,7 @@ class Events {
         if (this.contentScrollTop && this.willScrolled()) {
             this.startY += this.contentScrollTop;
         }
-        this.steps.push({ posY: this.startY, time: Date.now() });
+        this.steps.push({ posY: this.startY, posX: this.startX, time: Date.now() });
     }
     touchMove(t) {
         var _a;
@@ -366,7 +369,7 @@ class Events {
         // sometimes touchstart is not called 
         // when touchmove is began before initialization
         if (!this.steps.length) {
-            this.steps.push({ posY: clientY, time: Date.now() });
+            this.steps.push({ posY: clientY, posX: clientX, time: Date.now() });
         }
         // Event emitter
         t.delta = ((_a = this.steps[0]) === null || _a === void 0 ? void 0 : _a.posY) - clientY;
@@ -390,8 +393,10 @@ class Events {
         }
         // Delta
         const diffY = clientY - this.steps[this.steps.length - 1].posY;
-        // No Y changes
-        if (!Math.abs(diffY)) {
+        const diffX = clientX - this.steps[this.steps.length - 1].posX;
+        // No Y/X changes
+        if (!Math.abs(diffY)
+            && !Math.abs(diffX)) {
             return;
         }
         // Emit event
@@ -399,6 +404,7 @@ class Events {
         // Has changes in position 
         this.instance.setGrabCursor(true, true);
         let newVal = this.instance.getPanelTransformY() + diffY;
+        let newValX = this.instance.getPanelTransformX() + diffX;
         // First event after touchmove only
         if (this.steps.length < 2) {
             // Patch for 'touchmove' first event 
@@ -452,8 +458,9 @@ class Events {
         if (!isNaN(forceNewVal)) {
             newVal = forceNewVal;
         }
-        // No changes Y
-        if (this.instance.getPanelTransformY() === newVal) {
+        // No changes Y/X
+        if (this.instance.getPanelTransformY() === newVal
+            && this.instance.getPanelTransformX() === newValX) {
             return;
         }
         // Prevent Dismiss gesture
@@ -472,8 +479,8 @@ class Events {
         }
         this.instance.checkOpacityAttr(newVal);
         this.instance.checkOverflowAttr(newVal);
-        this.transitions.doTransition({ type: 'move', translateY: newVal });
-        this.steps.push({ posY: clientY, time: Date.now() });
+        this.transitions.doTransition({ type: 'move', translateY: newVal, translateX: newValX });
+        this.steps.push({ posY: clientY, posX: clientX, time: Date.now() });
     }
     touchEnd(t) {
         var _a, _b;
@@ -487,14 +494,10 @@ class Events {
         // Determinate nearest point
         let closest = this.breakpoints.getClosestBreakY();
         // Swipe - next (if differ > 10)
-        const diff = ((_a = this.steps[this.steps.length - 1]) === null || _a === void 0 ? void 0 : _a.posY) - ((_b = this.steps[this.steps.length - 2]) === null || _b === void 0 ? void 0 : _b.posY);
-        // Set sensivity lower for web
-        const swipeNextSensivity = window.hasOwnProperty('cordova')
-            ? (this.settings.fastSwipeSensivity + 2) : this.settings.fastSwipeSensivity;
-        const fastSwipeNext = (Math.abs(diff) >= swipeNextSensivity);
         let fastSwipeClose;
-        if (fastSwipeNext) {
-            closest = this.instance.swipeNextPoint(diff, swipeNextSensivity, closest);
+        if (this.fastSwipeNext('Y')) {
+            closest = this.instance.swipeNextPoint(((_a = this.steps[this.steps.length - 1]) === null || _a === void 0 ? void 0 : _a.posY) - ((_b = this.steps[this.steps.length - 2]) === null || _b === void 0 ? void 0 : _b.posY), //diff
+            this.swipeNextSensivity, closest);
             fastSwipeClose = this.settings.fastSwipeClose
                 && this.breakpoints.currentBreakpoint < closest;
         }
@@ -505,11 +508,11 @@ class Events {
             && this.steps.length === 2) {
             blurTapEvent = true;
         }
+        // Event emitter
+        this.instance.emit('onDragEnd', t);
         // Clear
         this.steps = [];
         delete this.startPointOverTop;
-        // Event emitter
-        this.instance.emit('onDragEnd', t);
         // touchend with allowClick === tapped event (no move triggered)
         // skip next functions
         if (this.allowClick || blurTapEvent) {
@@ -670,6 +673,11 @@ class Events {
             this.breakpoints.buildBreakpoints(JSON.parse(this.breakpoints.lockedBreakpoints));
         });
     }
+    fastSwipeNext(axis) {
+        var _a, _b;
+        const diff = ((_a = this.steps[this.steps.length - 1]) === null || _a === void 0 ? void 0 : _a['pos' + axis]) - ((_b = this.steps[this.steps.length - 2]) === null || _b === void 0 ? void 0 : _b['pos' + axis]);
+        return (Math.abs(diff) >= this.swipeNextSensivity);
+    }
     /**
      * Private class methods
      */
@@ -787,6 +795,8 @@ class Settings {
     constructor() {
         this.instance = {
             initialBreak: 'middle',
+            horizontal: false,
+            horizontalOffset: null,
             inverse: false,
             parentElement: null,
             followerElement: null,
@@ -982,7 +992,7 @@ class Transitions {
                 // System event
                 this.instance.emit('onMoveTransitionStart', { translateY: params.translateY });
                 this.instance.paneEl.style.transition = 'all 0ms linear 0ms';
-                this.instance.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
+                this.setPaneElTransform(params);
                 return resolve(true);
             }
             // Transition end
@@ -1030,7 +1040,7 @@ class Transitions {
                     transition: this.instance.paneEl.style.transition
                 });
                 // Move pane
-                this.instance.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
+                this.setPaneElTransform(params);
                 // set prev breakpoint for service needs
                 let getNextBreakpoint = Object.entries(this.breakpoints.breaks).find(val => val[1] === params.translateY);
                 if (getNextBreakpoint) {
@@ -1039,6 +1049,9 @@ class Transitions {
                 this.instance.paneEl.addEventListener('transitionend', transitionEnd);
             }
         }));
+    }
+    setPaneElTransform(params) {
+        this.instance.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
     }
     buildTransitionValue(bounce) {
         if (bounce) {
@@ -1695,7 +1708,70 @@ class InverseModule {
     }
 }
 
-const Modules = { ZStackModule: ZStackModule, FollowerModule: FollowerModule, BackdropModule: BackdropModule, FitHeightModule: FitHeightModule, InverseModule: InverseModule };
+/**
+ * Horizontal module
+ */
+class HorizontalModule {
+    constructor(instance) {
+        this.instance = instance;
+        this.settings = this.instance.settings;
+        this.transitions = this.instance.transitions;
+        this.events = this.instance.events;
+        if (!this.settings.horizontal) {
+            return;
+        }
+        this.settings.touchAngle = null;
+        // re-bind functions
+        this.transitions['setPaneElTransform'] = (params) => this.setPaneElTransform(params);
+        // Calculate horizontal breakpoints on left-right edges
+        // On present or window resized when transformX = 0
+        this.instance.on('onTransitionEnd', (ev) => {
+            if ((ev.type === 'breakpoint' || ev.type === 'present')
+                && !this.instance.getPanelTransformX()) {
+                this.calcHorizontalBreaks();
+            }
+        });
+        this.instance.on('onDragEnd', (ev) => {
+            this.fastSwipeNext = this.events.fastSwipeNext('X');
+        });
+    }
+    calcHorizontalBreaks() {
+        this.defaultRect = {
+            width: this.instance.paneEl.getBoundingClientRect().width,
+            left: this.instance.paneEl.getBoundingClientRect().left,
+            right: this.instance.paneEl.getBoundingClientRect().right
+        };
+        this.horizontalBreaks = [
+            -this.defaultRect.left + this.settings.horizontalOffset,
+            window.innerWidth - this.defaultRect.left - this.defaultRect.width - this.settings.horizontalOffset
+        ];
+    }
+    setPaneElTransform(params) {
+        let closest = params.translateX;
+        if (params.type === 'end') {
+            closest = this.getClosestBreakX();
+            if (this.fastSwipeNext) {
+                if (this.currentBreakpoint === 'left'
+                    && this.instance.getPanelTransformX() > this.horizontalBreaks[0]) {
+                    closest = this.horizontalBreaks[1];
+                }
+                if (this.currentBreakpoint === 'right'
+                    && this.instance.getPanelTransformX() < this.horizontalBreaks[1]) {
+                    closest = this.horizontalBreaks[0];
+                }
+            }
+            this.currentBreakpoint = closest === this.horizontalBreaks[0] ? 'left' : 'right';
+        }
+        this.instance.paneEl.style.transform = `translateX(${closest || 0}px) translateY(${params.translateY}px) translateZ(0px)`;
+    }
+    getClosestBreakX() {
+        return this.horizontalBreaks.reduce((prev, curr) => {
+            return (Math.abs(curr - this.instance.getPanelTransformX()) < Math.abs(prev - this.instance.getPanelTransformX()) ? curr : prev);
+        });
+    }
+}
+
+const Modules = { ZStackModule: ZStackModule, FollowerModule: FollowerModule, BackdropModule: BackdropModule, FitHeightModule: FitHeightModule, InverseModule: InverseModule, HorizontalModule: HorizontalModule };
 class CupertinoPane {
     constructor(selector, conf = {}) {
         this.selector = selector;
@@ -2078,10 +2154,15 @@ class CupertinoPane {
     /************************************
      * Public user methods
      */
-    // TODO: static method
     getPanelTransformY() {
         const translateYRegex = /\.*translateY\((.*)px\)/i;
         return parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
+    }
+    // TODO: merge to 1 function above
+    getPanelTransformX() {
+        const translateYRegex = /\.*translateX\((.*)px\)/i;
+        let translateExec = translateYRegex.exec(this.paneEl.style.transform);
+        return translateExec ? parseFloat(translateExec[1]) : 0;
     }
     /**
      * Prevent dismiss event

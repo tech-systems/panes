@@ -23,5 +23,6 @@ export declare class Transitions {
     * Transitions handler
     */
     doTransition(params?: any): Promise<true>;
+    private setPaneElTransform;
     buildTransitionValue(bounce: boolean): string;
 }

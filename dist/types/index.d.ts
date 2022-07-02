@@ -35,6 +35,8 @@ interface CupertinoEvents {
 }
 interface PaneSettings {
     initialBreak: ('top' | 'middle' | 'bottom');
+    horizontal: boolean;
+    horizontalOffset: number;
     inverse: boolean;
     parentElement: any;
     followerElement: string;
@@ -135,6 +137,7 @@ declare class Transitions {
     * Transitions handler
     */
     doTransition(params?: any): Promise<true>;
+    private setPaneElTransform;
     buildTransitionValue(bounce: boolean): string;
 }
 
@@ -163,6 +166,7 @@ declare class Events {
     private steps;
     isScrolling: boolean;
     startPointOverTop: number;
+    swipeNextSensivity: number;
     private keyboardVisible;
     private inputBluredbyMove;
     private inputBottomOffset;
@@ -228,6 +232,7 @@ declare class Events {
      */
     onWindowResizeCb: (e: any) => Promise<void>;
     private onWindowResize;
+    fastSwipeNext(axis: 'Y' | 'X'): boolean;
     /**
      * Private class methods
      */
@@ -301,6 +306,7 @@ declare class CupertinoPane {
      * Public user methods
      */
     getPanelTransformY(): number;
+    getPanelTransformX(): number;
     /**
      * Prevent dismiss event
      */

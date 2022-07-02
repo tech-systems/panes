@@ -28,6 +28,7 @@ export declare class Events {
     private steps;
     isScrolling: boolean;
     startPointOverTop: number;
+    swipeNextSensivity: number;
     private keyboardVisible;
     private inputBluredbyMove;
     private inputBottomOffset;
@@ -93,6 +94,7 @@ export declare class Events {
      */
     onWindowResizeCb: (e: any) => Promise<void>;
     private onWindowResize;
+    fastSwipeNext(axis: 'Y' | 'X'): boolean;
     /**
      * Private class methods
      */

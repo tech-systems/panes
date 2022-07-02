@@ -6,6 +6,8 @@ export class Settings {
   constructor() {
     this.instance = {
       initialBreak: 'middle',
+      horizontal: false,
+      horizontalOffset: null,
       inverse: false,
       parentElement: null,
       followerElement: null,

@@ -35,7 +35,7 @@ export class Transitions {
         // System event
         this.instance.emit('onMoveTransitionStart', {translateY: params.translateY});
         this.instance.paneEl.style.transition = 'all 0ms linear 0ms';
-        this.instance.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
+        this.setPaneElTransform(params);
         return resolve(true);
       }
 
@@ -94,7 +94,7 @@ export class Transitions {
         });
 
         // Move pane
-        this.instance.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
+        this.setPaneElTransform(params);
         
         // set prev breakpoint for service needs
         let getNextBreakpoint = Object.entries(this.breakpoints.breaks).find(val => val[1] === params.translateY);
@@ -105,6 +105,10 @@ export class Transitions {
         this.instance.paneEl.addEventListener('transitionend', transitionEnd);
       }
     });
+  }
+
+  private setPaneElTransform(params) {
+    this.instance.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
   }
 
   public buildTransitionValue(bounce: boolean): string {

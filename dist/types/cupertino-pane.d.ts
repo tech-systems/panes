@@ -52,6 +52,7 @@ export declare class CupertinoPane {
      * Public user methods
      */
     getPanelTransformY(): number;
+    getPanelTransformX(): number;
     /**
      * Prevent dismiss event
      */

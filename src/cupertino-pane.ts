@@ -450,11 +450,19 @@ export class CupertinoPane {
    * Public user methods
    */
 
-  // TODO: static method
+
   public getPanelTransformY():number {
     const translateYRegex = /\.*translateY\((.*)px\)/i;
     return parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
   }
+
+  // TODO: merge to 1 function above
+  public getPanelTransformX():number {
+    const translateYRegex = /\.*translateX\((.*)px\)/i;
+    let translateExec = translateYRegex.exec(this.paneEl.style.transform);
+    return translateExec ? parseFloat(translateExec[1]) : 0;
+  }
+
 
   /**
    * Prevent dismiss event
