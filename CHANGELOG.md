@@ -1,3 +1,45 @@
+# [1.3.0](https://github.com/roman-rr/cupertino-pane/compare/1.1.57...1.3.0) (2022-07-04)
+
+### Extra 
+- [Picture-In-Picture live](https://output.jsbin.com/dubixep)
+
+### BREAKING CHANGES
+
+* **core:** Events emitter and callbacks assignments ([64788d0](https://github.com/roman-rr/cupertino-pane/commit/64788d06db5dd50b5808ea098efff72156a3d50c))
+
+Callback enhanced and required simple updates.
+All callbacks has been moved under `events` key in settings dictionary.
+Callbacks now can be assigned with `on()` method.
+
+### Features
+
+* **core:** fully modularized ([#174](https://github.com/roman-rr/cupertino-pane/issues/174)) ([63b0cbb](https://github.com/roman-rr/cupertino-pane/commit/63b0cbbbfb209d5745026d3d9e5038bd15d09bdc))
+* **core:** modularized ([#174](https://github.com/roman-rr/cupertino-pane/issues/174)) ([07f9d74](https://github.com/roman-rr/cupertino-pane/commit/07f9d74cac5f71fd1bee10fa49a9b2b8280054f1))
+* **modules:** Horizontal module ([#164](https://github.com/roman-rr/cupertino-pane/issues/164)) ([176e327](https://github.com/roman-rr/cupertino-pane/commit/176e3277a568e7b2e9055b5802720151c160877a))
+* **modules:** Inverse module ([2436337](https://github.com/roman-rr/cupertino-pane/commit/2436337a7517c372e849909474335bd198f0b251))
+* **api:** calcFitHeight method with animated in params ([2327f3b](https://github.com/roman-rr/cupertino-pane/commit/2327f3be03ab740f09f907a7e7fdbbae83fcbf77))
+
+### Enhancements
+
+* **core:** remastered `isHidden()` and `hide()` methods
+* **events:** keyboard hero ([#175](https://github.com/roman-rr/cupertino-pane/issues/175))
+* **events:** keyboard hero v2 ([#175](https://github.com/roman-rr/cupertino-pane/issues/175))([#176](https://github.com/roman-rr/cupertino-pane/issues/176))
+* **desktop:** text no-selectable, img no-draggable, grab cursor
+* **gesture:** topperThanTop reducer cleared
+
+### Bug Fixes
+
+* **break:** buildBreakpoint() clear on begin ([#181](https://github.com/roman-rr/cupertino-pane/issues/181)) ([e245bca](https://github.com/roman-rr/cupertino-pane/commit/e245bca29ea3fdbae7b1e2eb6d2b6b53611e47fc))
+* **core:** events attached before didPresent callback ([#170](https://github.com/roman-rr/cupertino-pane/issues/170)) ([5b49dc3](https://github.com/roman-rr/cupertino-pane/commit/5b49dc37dbc33a67093d473053872975dc816ba6))
+* **desktop:** handle mouseleave events ([8c6c81f](https://github.com/roman-rr/cupertino-pane/commit/8c6c81f16814f4b1b954e0cf56c646c375c4a17a))
+* **events:**  disable drag upperThanTop for full height top breakpoint ([#171](https://github.com/roman-rr/cupertino-pane/issues/171)) ([d048dbd](https://github.com/roman-rr/cupertino-pane/commit/d048dbd13c780ceda19abde6292e7dd466e6d0ad))
+* **events:** clear steps after fastSwipeClose ([#180](https://github.com/roman-rr/cupertino-pane/issues/180)) ([3558cf2](https://github.com/roman-rr/cupertino-pane/commit/3558cf2fe717945fe57a01ea44cbdcebfbc1a79d))
+* **events:** drag events emitted with position changes ([#179](https://github.com/roman-rr/cupertino-pane/issues/179)) ([c1aa175](https://github.com/roman-rr/cupertino-pane/commit/c1aa175d82e4721abafe426384b357e5b10b5fbf))
+* **events:** hide-on-bottom attribute by recent position on touchend ([4804af8](https://github.com/roman-rr/cupertino-pane/commit/4804af8b6fa1ce46278f124f7977c3d170ceb5b6))
+* **events:** overscroll-behavior fix safari scroll bounce ([c9c6a69](https://github.com/roman-rr/cupertino-pane/commit/c9c6a695f9487eabdff8a829f0ba6726def8d86b))
+* **events:** skipped touchstart event ([#177](https://github.com/roman-rr/cupertino-pane/issues/177)) ([4a878f0](https://github.com/roman-rr/cupertino-pane/commit/4a878f0199136d4ae7bbb9ecfce4bf786c547ea2))
+
+
 ## [1.2.8](https://github.com/roman-rr/cupertino-pane/compare/1.1.57...1.2.8) (2021-12-06)
 
 
