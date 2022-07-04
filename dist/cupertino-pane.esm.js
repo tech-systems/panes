@@ -1,13 +1,13 @@
 /**
- * Cupertino Pane 1.2.92
- * Multi-functional panes and boards for next generation progressive applications
+ * Cupertino Pane 1.3.0
+ * New generation interfaces for web3 progressive applications
  * https://github.com/roman-rr/cupertino-pane/
  *
  * Copyright 2019-2022 Roman Antonov (roman-rr)
  *
  * Released under the MIT License
  *
- * Released on: July 3, 2022
+ * Released on: July 5, 2022
  */
 
 /******************************************************************************

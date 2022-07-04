@@ -61,13 +61,13 @@ Support this project with your organization. Your logo will show up here with a 
 <a href="https://opencollective.com/cupertino-pane"><img src="https://opencollective.com/cupertino-pane/organizations.svg?width=890"></a>
 
 ## Demonstration
+- [Picture-in-Picture live](https://output.jsbin.com/dubixep)
 - [Rich notifications live](https://jsbin.com/neqoxef)
 - [Base live](https://output.jsbin.com/fuhisey)
 - [Overflow top live](https://output.jsbin.com/baguroy)
 - [Z-stack full live](https://output.jsbin.com/benidub)
 - [Z-Stack simple live](https://output.jsbin.com/daqihir)
 - [3D Push live](https://output.jsbin.com/vidaqa)
-- [3 Panes live](https://jsbin.com/xavifaf)
 - [Overflow top-middle live](https://output.jsbin.com/piwecad)
 - [Draggable over live](https://jsbin.com/hamedec)
 - [Prevent dismiss live](https://output.jsbin.com/keravam)
