@@ -32,6 +32,11 @@ export declare class CupertinoPane {
     private drawBaseElements;
     present(conf?: {
         animate: boolean;
+        transition?: {
+            duration?: number;
+            from?: {};
+            to?: {};
+        };
     }): Promise<CupertinoPane>;
     getPaneHeight(): number;
     updateScreenHeights(): void;
@@ -82,6 +87,11 @@ export declare class CupertinoPane {
     destroy(conf?: {
         animate: boolean;
         destroyButton?: boolean;
+        transition?: {
+            duration?: number;
+            from?: {};
+            to?: {};
+        };
     }): Promise<true>;
     destroyResets(): void;
 }

@@ -138,7 +138,7 @@ declare class Transitions {
     */
     doTransition(params?: any): Promise<true>;
     private setPaneElTransform;
-    buildTransitionValue(bounce: boolean): string;
+    buildTransitionValue(bounce: boolean, duration?: number): string;
 }
 
 /**
@@ -286,6 +286,11 @@ declare class CupertinoPane {
     private drawBaseElements;
     present(conf?: {
         animate: boolean;
+        transition?: {
+            duration?: number;
+            from?: {};
+            to?: {};
+        };
     }): Promise<CupertinoPane>;
     getPaneHeight(): number;
     updateScreenHeights(): void;
@@ -336,6 +341,11 @@ declare class CupertinoPane {
     destroy(conf?: {
         animate: boolean;
         destroyButton?: boolean;
+        transition?: {
+            duration?: number;
+            from?: {};
+            to?: {};
+        };
     }): Promise<true>;
     destroyResets(): void;
 }

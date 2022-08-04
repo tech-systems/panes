@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: July 5, 2022
+ * Released on: August 5, 2022
  */
 
 /******************************************************************************
@@ -986,7 +986,7 @@ class Transitions {
     */
     doTransition(params = {}) {
         return new Promise((resolve) => __awaiter(this, void 0, void 0, function* () {
-            var _a;
+            var _a, _b;
             // touchmove simple event
             if (params.type === CupertinoTransition.Move) {
                 // System event
@@ -1024,14 +1024,21 @@ class Transitions {
                 || params.type === CupertinoTransition.Present
                 || params.type === CupertinoTransition.Hide
                 || params.type === CupertinoTransition.Destroy) {
+                // Allow custom transitions for present/destroy
+                let subTransition = ((_a = params.conf) === null || _a === void 0 ? void 0 : _a.transition) || {};
                 // freemode
                 if (params.type === CupertinoTransition.TouchEnd && this.settings.freeMode)
                     return resolve(true);
                 // Get timing function && push for next 
                 const nextBreak = Object.entries(this.breakpoints.breaks).find(val => val[1] === params.translateY);
-                let bounce = nextBreak && ((_a = this.settings.breaks[nextBreak[0]]) === null || _a === void 0 ? void 0 : _a.bounce);
+                let bounce = nextBreak && ((_b = this.settings.breaks[nextBreak[0]]) === null || _b === void 0 ? void 0 : _b.bounce);
+                // From: Allow custom transitions for present/destroy
+                Object.assign(this.instance.paneEl.style, subTransition.from);
+                // Request frame to be sure styles applied
+                yield new Promise(resolve => requestAnimationFrame(resolve));
                 // transition style
-                this.instance.paneEl.style.transition = this.buildTransitionValue(bounce);
+                let buildedTransition = this.buildTransitionValue(bounce, subTransition.duration);
+                this.instance.paneEl.style.setProperty('transition', buildedTransition);
                 // Main transitions
                 // Emit event
                 this.instance.emit('onTransitionStart', {
@@ -1041,6 +1048,8 @@ class Transitions {
                 });
                 // Move pane
                 this.setPaneElTransform(params);
+                // To: Allow custom transitions for present/destroy
+                Object.assign(this.instance.paneEl.style, subTransition.to);
                 // set prev breakpoint for service needs
                 let getNextBreakpoint = Object.entries(this.breakpoints.breaks).find(val => val[1] === params.translateY);
                 if (getNextBreakpoint) {
@@ -1053,11 +1062,11 @@ class Transitions {
     setPaneElTransform(params) {
         this.instance.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
     }
-    buildTransitionValue(bounce) {
+    buildTransitionValue(bounce, duration) {
         if (bounce) {
             return `all 300ms cubic-bezier(.155,1.105,.295,1.12)`;
         }
-        return `all ${this.settings.animationDuration}ms ${this.settings.animationType}`;
+        return `all ${duration || this.settings.animationDuration}ms ${this.settings.animationType}`;
     }
 }
 
@@ -2057,7 +2066,10 @@ class CupertinoPane {
             // System event
             this.emit('beforePresentTransition', { animate: conf.animate });
             if (conf.animate) {
-                yield this.transitions.doTransition({ type: 'present', translateY: this.breakpoints.breaks[this.settings.initialBreak] });
+                yield this.transitions.doTransition({
+                    type: 'present', conf,
+                    translateY: this.breakpoints.breaks[this.settings.initialBreak]
+                });
             }
             else {
                 this.breakpoints.prevBreakpoint = this.settings.initialBreak;
@@ -2286,7 +2298,11 @@ class CupertinoPane {
             this.emit('onWillDismiss');
             /****** Animation & Transition ******/
             if (conf.animate) {
-                yield this.transitions.doTransition({ type: 'destroy', translateY: this.screenHeightOffset, destroyButton: conf.destroyButton });
+                yield this.transitions.doTransition({
+                    type: 'destroy', conf,
+                    translateY: this.screenHeightOffset,
+                    destroyButton: conf.destroyButton
+                });
             }
             else {
                 this.destroyResets();

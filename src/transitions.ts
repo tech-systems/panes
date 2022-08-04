@@ -73,6 +73,9 @@ export class Transitions {
           || params.type === CupertinoTransition.Hide
           || params.type === CupertinoTransition.Destroy) {
         
+        // Allow custom transitions for present/destroy
+        let subTransition = params.conf?.transition || {};
+
         // freemode
         if (params.type === CupertinoTransition.TouchEnd && this.settings.freeMode) return resolve(true); 
 
@@ -82,9 +85,16 @@ export class Transitions {
         );
         let bounce = nextBreak && this.settings.breaks[nextBreak[0]]?.bounce;
 
-        // transition style
-        this.instance.paneEl.style.transition = this.buildTransitionValue(bounce);
+        // From: Allow custom transitions for present/destroy
+        Object.assign(this.instance.paneEl.style, subTransition.from);
+
+        // Request frame to be sure styles applied
+        await new Promise(resolve => requestAnimationFrame(resolve));
         
+        // transition style
+        let buildedTransition = this.buildTransitionValue(bounce, subTransition.duration);
+        this.instance.paneEl.style.setProperty('transition', buildedTransition);
+
         // Main transitions
         // Emit event
         this.instance.emit('onTransitionStart', {
@@ -92,10 +102,13 @@ export class Transitions {
           translateY: {new: params.translateY}, 
           transition: this.instance.paneEl.style.transition
         });
-
+        
         // Move pane
         this.setPaneElTransform(params);
         
+        // To: Allow custom transitions for present/destroy
+        Object.assign(this.instance.paneEl.style, subTransition.to);
+
         // set prev breakpoint for service needs
         let getNextBreakpoint = Object.entries(this.breakpoints.breaks).find(val => val[1] === params.translateY);
         if (getNextBreakpoint) {
@@ -111,12 +124,12 @@ export class Transitions {
     this.instance.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
   }
 
-  public buildTransitionValue(bounce: boolean): string {
+  public buildTransitionValue(bounce: boolean, duration?: number): string {
     if (bounce) {
       return `all 300ms cubic-bezier(.155,1.105,.295,1.12)`;
     }
 
-    return `all ${this.settings.animationDuration}ms ${this.settings.animationType}`;
+    return `all ${duration || this.settings.animationDuration}ms ${this.settings.animationType}`;
   }
 
 

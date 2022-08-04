@@ -224,7 +224,11 @@ export class CupertinoPane {
     this.emit('DOMElementsReady');
   }
 
-  async present(conf: {animate: boolean} = {animate: false}): Promise<CupertinoPane> {
+  async present(conf: {
+      animate: boolean, 
+      transition?: { duration?: number, from?: {}, to?: {}} 
+    } = { animate: false }
+  ): Promise<CupertinoPane> {
       if (!this.el || !document.body.contains(this.el)) {
         console.warn('Cupertino Pane: specified DOM element must be attached to the DOM');
         return;
@@ -300,7 +304,10 @@ export class CupertinoPane {
       this.emit('beforePresentTransition', {animate: conf.animate});
       
       if (conf.animate) {
-        await this.transitions.doTransition({type: 'present', translateY: this.breakpoints.breaks[this.settings.initialBreak]});
+        await this.transitions.doTransition({
+          type: 'present', conf,
+          translateY: this.breakpoints.breaks[this.settings.initialBreak]
+        });
       } else {
         this.breakpoints.prevBreakpoint = this.settings.initialBreak;
         this.paneEl.style.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
@@ -572,7 +579,8 @@ export class CupertinoPane {
 
   public async destroy(conf: {
       animate: boolean, 
-      destroyButton?: boolean
+      destroyButton?: boolean,
+      transition?: { duration?: number, from?: {}, to?: {}}
     } = {
       animate: false, 
       destroyButton: false
@@ -600,7 +608,11 @@ export class CupertinoPane {
 
     /****** Animation & Transition ******/
     if (conf.animate) {
-      await this.transitions.doTransition({type: 'destroy', translateY: this.screenHeightOffset, destroyButton: conf.destroyButton}); 
+      await this.transitions.doTransition({
+        type: 'destroy', conf,
+        translateY: this.screenHeightOffset, 
+        destroyButton: conf.destroyButton
+      }); 
     } else {
       this.destroyResets();
     }
