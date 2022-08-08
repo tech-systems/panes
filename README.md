@@ -61,6 +61,7 @@ Support this project with your organization. Your logo will show up here with a 
 <a href="https://opencollective.com/cupertino-pane"><img src="https://opencollective.com/cupertino-pane/organizations.svg?width=890"></a>
 
 ## Demonstration
+- [Synthwave live](https://output.jsbin.com/garijar)
 - [Picture-in-Picture live](https://output.jsbin.com/dubixep)
 - [Rich notifications live](https://jsbin.com/neqoxef)
 - [Base live](https://output.jsbin.com/fuhisey)
@@ -79,11 +80,13 @@ Support this project with your organization. Your logo will show up here with a 
 - [Backdrop drag-opacity live](https://output.jsbin.com/riwahab)
 
 <div style="display:flex;flex-wrap:wrap;">
+  <img style="width: 200px;" width="200" src="docs/images/custom-transitions.gif?raw=true" alt="Cupertino Pane - Roman Antonov" >
   <img style="width: 200px;" width="200" src="docs/images/picture-in-picture.gif?raw=true" alt="Cupertino Pane - Roman Antonov" >
   <img style="width: 200px;" width="200" src="docs/images/notifications.gif?raw=true" alt="Cupertino Pane - Roman Antonov" >
   <img style="width: 200px;" width="200" src="docs/images/z-stack.gif?raw=true" alt="Cupertino Pane - Roman Antonov" >
   <img style="width: 200px;" width="200" src="docs/images/overflow.gif?raw=true" alt="Cupertino Pane - Roman Antonov" >
   <img style="width: 200px;" width="200" src="docs/images/bulletin.gif?raw=true" alt="Cupertino Pane - Roman Antonov" >
+
 </div>
 
 ## Supporting platforms
