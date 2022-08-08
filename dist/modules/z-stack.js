@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.3.0
+ * Cupertino Pane 1.3.01
  * New generation interfaces for web3 progressive applications
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: August 5, 2022
+ * Released on: August 8, 2022
  */
 
 class ZStackModule{constructor(t){this.instance=t,this.zStackDefaults={pushElements:null,minPushHeight:null,cardYOffset:0,cardZScale:.93,cardContrast:.85,stackZAngle:160},this.breakpoints=this.instance.breakpoints,this.settings=this.instance.settings,this.settings.zStack&&(this.instance.on("rendered",(()=>{this.setZstackConfig(this.settings.zStack),this.setPushMultiplicators()})),this.instance.on("beforePresentTransition",(t=>{t.animate||this.settings.zStack.pushElements.forEach((t=>this.pushTransition(document.querySelector(t),this.breakpoints.breaks[this.settings.initialBreak],"unset")))})),this.instance.on("onMoveTransitionStart",(()=>{this.settings.zStack.pushElements.forEach((t=>this.pushTransition(document.querySelector(t),this.instance.getPanelTransformY(),"all 0ms linear 0ms")))})),this.instance.on("onTransitionStart",(t=>{this.settings.zStack.pushElements.forEach((s=>this.pushTransition(document.querySelector(s),t.translateY.new,`all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`)))})))}setZstackConfig(t){this.settings.zStack=t?Object.assign(Object.assign({},this.zStackDefaults),t):null}pushTransition(t,s,e){let i=this.settings.zStack.pushElements;t.style.transition=e,s=this.instance.screenHeightOffset-s;const n=this.settings.zStack.minPushHeight?this.settings.zStack.minPushHeight:this.instance.screenHeightOffset-this.breakpoints.bottomer,a=this.instance.screenHeightOffset-this.breakpoints.topper;let r=this.getPushMulitplicator(t),c=Math.pow(this.settings.zStack.cardZScale,r),h=Math.pow(this.settings.zStack.cardZScale,r-1),l=6+this.settings.zStack.cardYOffset,o=l*r*-1,u=o+l,p=Math.pow(this.settings.zStack.cardContrast,r),g=Math.pow(this.settings.zStack.cardContrast,r-1);const k=(e,n,a,r)=>{let c=Math.pow(e,this.settings.zStack.stackZAngle/100);t.style.transform=`translateY(${n*(c/e)}px) scale(${e})`,t.style.borderRadius=`${r}px`,t.style.filter=`contrast(${a})`;let h=document.querySelector(i[i.length-1]);s||t.className!==h.className||this.clearPushMultiplicators()};if(s<=n)return void k(h,u,g,0);const m=(t,e)=>{let i=-1*(a*e-n*t);return i-=(t-e)*s,i/=n-a,i>e&&(i=e),i<t&&(i=t),i};k(m(c,h),m(o,u),m(p,g),-1*m(-10,0))}setPushMultiplicators(){this.settings.zStack.pushElements.forEach((t=>{let s=document.querySelector(t),e=this.getPushMulitplicator(s);e=e?e+1:1,s.style.setProperty("--push-multiplicator",`${e}`)}))}getPushMulitplicator(t){let s=t.style.getPropertyValue("--push-multiplicator");return parseInt(s)}clearPushMultiplicators(){for(let t=0;t<this.settings.zStack.pushElements.length;t++){let s=document.querySelector(this.settings.zStack.pushElements[t]),e=this.getPushMulitplicator(s);e-=1,e?s.style.setProperty("--push-multiplicator",`${e}`):s.style.removeProperty("--push-multiplicator")}}}export{ZStackModule};

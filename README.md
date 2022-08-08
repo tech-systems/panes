@@ -339,11 +339,33 @@ pane.on('onBackdropTap', (ev) => {
 | **onTransitionEnd** | `void: () => {}` | Executes when transition and animation complete |
 
 ## Public Methods
-### present({animate: **boolean = false**}): Promise<CupertinoPane>
+### present({animate: **boolean = false**, transition: **{}**}): Promise<CupertinoPane>
 Will render pane DOM and show pane with setted params. 
 ```javascript
 myPane.present();
 ```
+Possible to pass custom transitions:
+```javascript
+myPane.present({
+  animate: true,
+  transition: {
+    duration: 600,
+    from: {
+      opacity: 0.7,
+      transform: `translateY(280px) perspective(250px) rotateX(65deg) scale(0.3)`
+    },
+    to: {
+      opacity: 1
+    }
+  }
+});
+```
+### destroy({animate: **boolean = false**, transition: **{}**}}}): Promise<CupertinoPane>
+Remove pane from DOM and clear styles
+```javascript
+myPane.destroy({animate: true});
+```
+Possible to pass custom transitions (look above present method for example)
 ### on({events: **string**, handler: **Function**}): Promise<CupertinoPane>
 Will assign a function to be executed when the event will be fired.
 ```javascript
@@ -363,11 +385,6 @@ myPane.moveToHeight(575);
 Dissappear pane from screen, still keep pane in DOM.
 ```javascript
 myPane.hide();
-```
-### destroy({animate: **boolean = false**}): Promise<CupertinoPane>
-Remove pane from DOM and clear styles
-```javascript
-myPane.destroy();
 ```
 ### isHidden()
 Determinate if pane position was moved out of screen, but pane still exist in DOM.

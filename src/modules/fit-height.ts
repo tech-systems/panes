@@ -118,38 +118,26 @@ export class FitHeightModule {
       this.instance.wrapperEl.style.display = 'block';
     }
 
+    // Bulletins with image height we get after images render
     let promises = [];
-
     if (images.length) {
-      // Bulletins with image height we get after image render
       promises = Array.from(images).map(
         (image) => new Promise((resolve) => {
+          // Already rendered or passed height attr
+          if (image.height 
+              || (image.complete && image.naturalHeight)) {
+            return resolve(true);
+          }
+
           image.onload = () => resolve(true);
           image.onerror = () => resolve(true);
-          // Already rendered
-          if (image.complete && image.naturalHeight) {
-            resolve(true);
-          }
         })
       );
     }
-
-    // resized timeouts - 0, render - 150
-    promises.push(
-      new Promise((resolve) => 
-        setTimeout(() => resolve(true), this.instance.rendered ? 0 : 150)
-      )
-    );
     await Promise.all(promises);
-
-    // height include margins
-    let elmHeight = parseInt(document.defaultView.getComputedStyle(this.instance.el, '').getPropertyValue('height'));
-    let elmMargin = parseInt(document.defaultView.getComputedStyle(this.instance.el, '').getPropertyValue('margin-top')) + parseInt(document.defaultView.getComputedStyle(this.instance.el, '').getPropertyValue('margin-bottom'));
-    let panePaddingBottom = parseInt(document.defaultView.getComputedStyle(this.instance.el.parentElement, '').getPropertyValue('padding-bottom'));
-    height = elmHeight + elmMargin
-    height += this.instance.el.offsetTop; // From top to element
-    height += panePaddingBottom; // From element to bottom
-
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    height = Math.round(this.instance.paneEl.getBoundingClientRect().height);
+    
     // Hide elements back
     if (!this.instance.rendered) {
       this.instance.el.style.visibility = 'unset';

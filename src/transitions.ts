@@ -85,12 +85,6 @@ export class Transitions {
         );
         let bounce = nextBreak && this.settings.breaks[nextBreak[0]]?.bounce;
 
-        // From: Allow custom transitions for present/destroy
-        Object.assign(this.instance.paneEl.style, subTransition.from);
-
-        // Request frame to be sure styles applied
-        await new Promise(resolve => requestAnimationFrame(resolve));
-        
         // transition style
         let buildedTransition = this.buildTransitionValue(bounce, subTransition.duration);
         this.instance.paneEl.style.setProperty('transition', buildedTransition);

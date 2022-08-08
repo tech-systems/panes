@@ -256,10 +256,13 @@ export class CupertinoPane {
       // Necessary Inlines with breakpoints
       this.paneEl.style.height = `${this.getPaneHeight()}px`;
 
+      // Custom transitions for present/destroy: set styles
+      Object.assign(this.paneEl.style, conf?.transition?.from);
+
       // Show elements
       // For some reason need timeout after show wrapper to make 
       // initial transition works
-      // TODO: timeout -> intersectionObserver
+      // TODO: resolve 100ms timeout with some render callbacks
       this.wrapperEl.style.display = 'block';
       await new Promise(resolve => setTimeout(resolve, 100));
       this.contentEl.style.display = 'block';

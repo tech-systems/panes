@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.3.0
+ * Cupertino Pane 1.3.01
  * New generation interfaces for web3 progressive applications
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: August 5, 2022
+ * Released on: August 8, 2022
  */
 
 /******************************************************************************
@@ -1032,10 +1032,6 @@ class Transitions {
                 // Get timing function && push for next 
                 const nextBreak = Object.entries(this.breakpoints.breaks).find(val => val[1] === params.translateY);
                 let bounce = nextBreak && ((_b = this.settings.breaks[nextBreak[0]]) === null || _b === void 0 ? void 0 : _b.bounce);
-                // From: Allow custom transitions for present/destroy
-                Object.assign(this.instance.paneEl.style, subTransition.from);
-                // Request frame to be sure styles applied
-                yield new Promise(resolve => requestAnimationFrame(resolve));
                 // transition style
                 let buildedTransition = this.buildTransitionValue(bounce, subTransition.duration);
                 this.instance.paneEl.style.setProperty('transition', buildedTransition);
@@ -1524,28 +1520,22 @@ class FitHeightModule {
                 this.instance.wrapperEl.style.pointerEvents = 'none';
                 this.instance.wrapperEl.style.display = 'block';
             }
+            // Bulletins with image height we get after images render
             let promises = [];
             if (images.length) {
-                // Bulletins with image height we get after image render
                 promises = Array.from(images).map((image) => new Promise((resolve) => {
+                    // Already rendered or passed height attr
+                    if (image.height
+                        || (image.complete && image.naturalHeight)) {
+                        return resolve(true);
+                    }
                     image.onload = () => resolve(true);
                     image.onerror = () => resolve(true);
-                    // Already rendered
-                    if (image.complete && image.naturalHeight) {
-                        resolve(true);
-                    }
                 }));
             }
-            // resized timeouts - 0, render - 150
-            promises.push(new Promise((resolve) => setTimeout(() => resolve(true), this.instance.rendered ? 0 : 150)));
             yield Promise.all(promises);
-            // height include margins
-            let elmHeight = parseInt(document.defaultView.getComputedStyle(this.instance.el, '').getPropertyValue('height'));
-            let elmMargin = parseInt(document.defaultView.getComputedStyle(this.instance.el, '').getPropertyValue('margin-top')) + parseInt(document.defaultView.getComputedStyle(this.instance.el, '').getPropertyValue('margin-bottom'));
-            let panePaddingBottom = parseInt(document.defaultView.getComputedStyle(this.instance.el.parentElement, '').getPropertyValue('padding-bottom'));
-            height = elmHeight + elmMargin;
-            height += this.instance.el.offsetTop; // From top to element
-            height += panePaddingBottom; // From element to bottom
+            yield new Promise(resolve => requestAnimationFrame(resolve));
+            height = Math.round(this.instance.paneEl.getBoundingClientRect().height);
             // Hide elements back
             if (!this.instance.rendered) {
                 this.instance.el.style.visibility = 'unset';
@@ -2005,6 +1995,7 @@ class CupertinoPane {
         this.emit('DOMElementsReady');
     }
     present(conf = { animate: false }) {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             if (!this.el || !document.body.contains(this.el)) {
                 console.warn('Cupertino Pane: specified DOM element must be attached to the DOM');
@@ -2027,10 +2018,12 @@ class CupertinoPane {
             yield this.setBreakpoints();
             // Necessary Inlines with breakpoints
             this.paneEl.style.height = `${this.getPaneHeight()}px`;
+            // Custom transitions for present/destroy: set styles
+            Object.assign(this.paneEl.style, (_a = conf === null || conf === void 0 ? void 0 : conf.transition) === null || _a === void 0 ? void 0 : _a.from);
             // Show elements
             // For some reason need timeout after show wrapper to make 
             // initial transition works
-            // TODO: timeout -> intersectionObserver
+            // TODO: resolve 100ms timeout with some render callbacks
             this.wrapperEl.style.display = 'block';
             yield new Promise(resolve => setTimeout(resolve, 100));
             this.contentEl.style.display = 'block';
