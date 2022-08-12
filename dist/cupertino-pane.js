@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.3.01
+ * Cupertino Pane 1.3.12
  * New generation interfaces for web3 progressive applications
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: August 12, 2022
+ * Released on: August 13, 2022
  */
 
 (function (global, factory) {
@@ -1123,6 +1123,10 @@
             if (!this.settings.zStack) {
                 return;
             }
+            // bind to primary instance
+            // TODO: change binding strategy according to TypeScript
+            // E.G. Using public module methods from modules
+            this.instance['setZstackConfig'] = (zStack) => __awaiter(this, void 0, void 0, function* () { return this.setZstackConfig(zStack); });
             // Assign multiplicators for push elements
             this.instance.on('rendered', () => {
                 this.setZstackConfig(this.settings.zStack);

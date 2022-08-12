@@ -32,6 +32,7 @@ export declare class CupertinoPane {
     backdrop: (conf: {
         show: true;
     }) => void;
+    setZstackConfig: (zStack: any) => void;
     constructor(selector: (string | HTMLElement), conf?: CupertinoSettings);
     private drawBaseElements;
     present(conf?: {

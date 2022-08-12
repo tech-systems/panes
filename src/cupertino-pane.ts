@@ -42,6 +42,7 @@ export class CupertinoPane {
   // should be moved under modules
   public calcFitHeight: (animated?: any) => Promise<any>;
   public backdrop: (conf: { show: true }) => void;
+  public setZstackConfig: (zStack: any) => void;
 
   constructor(private selector: (string | HTMLElement), 
               conf: CupertinoSettings = {}) {

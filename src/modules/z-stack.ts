@@ -27,6 +27,11 @@ export class ZStackModule {
       return;
     }
 
+    // bind to primary instance
+    // TODO: change binding strategy according to TypeScript
+    // E.G. Using public module methods from modules
+    this.instance['setZstackConfig'] = async(zStack: ZStackSettings) => this.setZstackConfig(zStack);
+
     // Assign multiplicators for push elements
     this.instance.on('rendered', () => {
       this.setZstackConfig(this.settings.zStack);
