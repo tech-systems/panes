@@ -8,8 +8,9 @@ export declare class FitHeightModule {
     calcHeightInProcess: boolean;
     private breakpoints;
     private settings;
+    private contentElHeight;
     constructor(instance: CupertinoPane);
     private beforeBuildBreakpoints;
-    private calcFitHeight;
+    calcFitHeight(animated?: boolean): Promise<any>;
     private getPaneFitHeight;
 }

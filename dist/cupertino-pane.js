@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: August 8, 2022
+ * Released on: August 12, 2022
  */
 
 (function (global, factory) {
@@ -1437,6 +1437,8 @@
                 return;
             }
             // bind to primary instance
+            // TODO: change binding strategy according to TypeScript
+            // E.G. Using public module methods from modules
             this.instance['calcFitHeight'] = (animated) => __awaiter(this, void 0, void 0, function* () { return this.calcFitHeight(animated); });
             // Class to wrapper
             this.instance.on('DOMElementsReady', () => {
@@ -1515,7 +1517,6 @@
             return __awaiter(this, void 0, void 0, function* () {
                 this.calcHeightInProcess = true;
                 let images = this.instance.el.querySelectorAll('img');
-                let height;
                 // Make element visible to calculate height
                 this.instance.el.style.height = 'unset';
                 if (!this.instance.rendered) {
@@ -1541,7 +1542,12 @@
                 }
                 yield Promise.all(promises);
                 yield new Promise(resolve => requestAnimationFrame(resolve));
-                height = Math.round(this.instance.paneEl.getBoundingClientRect().height);
+                // Calculate heights
+                const getHeight = (el) => Math.round(el.getBoundingClientRect().height);
+                let contentElHeight = getHeight(this.instance.el);
+                let diff = Math.abs(this.contentElHeight - contentElHeight);
+                let paneElHeight = (!diff) ? getHeight(this.instance.paneEl) : getHeight(this.instance.paneEl) + diff;
+                this.contentElHeight = getHeight(this.instance.el);
                 // Hide elements back
                 if (!this.instance.rendered) {
                     this.instance.el.style.visibility = 'unset';
@@ -1552,7 +1558,7 @@
                     this.instance.wrapperEl.style.display = 'none';
                 }
                 this.calcHeightInProcess = false;
-                return height;
+                return paneElHeight;
             });
         }
     }

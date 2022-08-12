@@ -282,6 +282,10 @@ declare class CupertinoPane {
     eventsListeners: {};
     on: Function;
     emit: Function;
+    calcFitHeight: (animated?: any) => Promise<any>;
+    backdrop: (conf: {
+        show: true;
+    }) => void;
     constructor(selector: (string | HTMLElement), conf?: CupertinoSettings);
     private drawBaseElements;
     present(conf?: {

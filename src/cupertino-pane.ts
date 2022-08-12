@@ -38,6 +38,11 @@ export class CupertinoPane {
   public on: Function = on;
   public emit: Function = emit;
 
+  // Temporary: modules public functions
+  // should be moved under modules
+  public calcFitHeight: (animated?: any) => Promise<any>;
+  public backdrop: (conf: { show: true }) => void;
+
   constructor(private selector: (string | HTMLElement), 
               conf: CupertinoSettings = {}) {
     // Element or selector

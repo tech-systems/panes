@@ -12,6 +12,7 @@ export class FitHeightModule {
   public calcHeightInProcess: boolean = false;
   private breakpoints: Breakpoints;
   private settings: CupertinoSettings;
+  private contentElHeight: number;
 
   constructor(private instance: CupertinoPane) {
     this.breakpoints = this.instance.breakpoints;
@@ -22,6 +23,8 @@ export class FitHeightModule {
     }
 
     // bind to primary instance
+    // TODO: change binding strategy according to TypeScript
+    // E.G. Using public module methods from modules
     this.instance['calcFitHeight'] = async(animated) => this.calcFitHeight(animated);
 
     // Class to wrapper
@@ -87,7 +90,7 @@ export class FitHeightModule {
     this.breakpoints.conf.bottom = this.settings.breaks?.bottom || { enabled: true, height: 0 };
   }
 
-  private async calcFitHeight(animated: boolean = true) {
+  public async calcFitHeight(animated: boolean = true) {
     // Allow user to call method asap, dont check with this.isPanePresented()
     if (!this.instance.wrapperEl || !this.instance.el) {
       return null;
@@ -104,7 +107,6 @@ export class FitHeightModule {
   private async getPaneFitHeight(): Promise<number> {
     this.calcHeightInProcess = true;
     let images: NodeListOf<HTMLImageElement> = this.instance.el.querySelectorAll('img'); 
-    let height: number;
 
     // Make element visible to calculate height
     this.instance.el.style.height = 'unset';
@@ -136,7 +138,13 @@ export class FitHeightModule {
     }
     await Promise.all(promises);
     await new Promise(resolve => requestAnimationFrame(resolve));
-    height = Math.round(this.instance.paneEl.getBoundingClientRect().height);
+
+    // Calculate heights
+    const getHeight = (el) =>  Math.round(el.getBoundingClientRect().height);
+    let contentElHeight = getHeight(this.instance.el);
+    let diff = Math.abs(this.contentElHeight - contentElHeight);
+    let paneElHeight = (!diff) ? getHeight(this.instance.paneEl) : getHeight(this.instance.paneEl) + diff;
+    this.contentElHeight = getHeight(this.instance.el); 
     
     // Hide elements back
     if (!this.instance.rendered) {
@@ -149,6 +157,6 @@ export class FitHeightModule {
     }
 
     this.calcHeightInProcess = false;
-    return height;
+    return paneElHeight;
   }
 }
