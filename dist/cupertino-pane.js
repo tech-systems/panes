@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: August 13, 2022
+ * Released on: September 11, 2022
  */
 
 (function (global, factory) {
@@ -1549,8 +1549,13 @@
                 // Calculate heights
                 const getHeight = (el) => Math.round(el.getBoundingClientRect().height);
                 let contentElHeight = getHeight(this.instance.el);
-                let diff = Math.abs(this.contentElHeight - contentElHeight);
-                let paneElHeight = (!diff) ? getHeight(this.instance.paneEl) : getHeight(this.instance.paneEl) + diff;
+                let diff = this.contentElHeight - contentElHeight;
+                // If content el changes
+                let paneElHeight = getHeight(this.instance.paneEl);
+                if (Math.abs(diff)) {
+                    paneElHeight -= diff;
+                }
+                // Set value for future checks
                 this.contentElHeight = getHeight(this.instance.el);
                 // Hide elements back
                 if (!this.instance.rendered) {
