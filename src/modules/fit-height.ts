@@ -152,6 +152,10 @@ export class FitHeightModule {
 
     // Set value for future checks
     this.contentElHeight = getHeight(this.instance.el); 
+    // Fit to screen if fitScreenHeight happens
+    if (getHeight(this.instance.el) > this.instance.screen_height) {
+      this.contentElHeight = this.instance.screen_height
+    } 
     
     // Hide elements back
     if (!this.instance.rendered) {
