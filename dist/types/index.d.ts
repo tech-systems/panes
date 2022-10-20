@@ -38,7 +38,7 @@ interface PaneSettings {
     horizontal: boolean;
     horizontalOffset: number;
     inverse: boolean;
-    parentElement: any;
+    parentElement: string | HTMLElement;
     followerElement: string;
     cssClass: string;
     fitHeight: boolean;

@@ -68,14 +68,17 @@ export class CupertinoPane {
     this.el = this.selector;
     this.el.style.display = 'none';
     this.settings = {...this.settings, ...conf};
-    
+
+
+    // Parent el as string or HTMLelement or get default element method
+    let parentElement = this.el.parentElement;
     if (this.settings.parentElement) {
-      this.settings.parentElement = <HTMLElement>document.querySelector(
-        this.settings.parentElement
-      );
-    } else {
-      this.settings.parentElement = this.el.parentElement;
+        parentElement = this.settings.parentElement instanceof HTMLElement
+          ? this.settings.parentElement 
+          : <HTMLElement>document.querySelector(this.settings.parentElement);
     }
+    this.settings.parentElement = parentElement;
+
 
     // Events listeners
     if (this.settings.events) {
@@ -97,7 +100,7 @@ export class CupertinoPane {
 
   private drawBaseElements() {
     // Parent
-    this.parentEl = this.settings.parentElement;
+    this.parentEl = <HTMLElement>this.settings.parentElement;
     
     // Wrapper
     this.wrapperEl = document.createElement('div');

@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.3.12
+ * Cupertino Pane 1.3.13
  * New generation interfaces for web3 progressive applications
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: September 13, 2022
+ * Released on: October 20, 2022
  */
 
 /******************************************************************************
@@ -1869,12 +1869,14 @@ class CupertinoPane {
         this.el = this.selector;
         this.el.style.display = 'none';
         this.settings = Object.assign(Object.assign({}, this.settings), conf);
+        // Parent el as string or HTMLelement or get default element method
+        let parentElement = this.el.parentElement;
         if (this.settings.parentElement) {
-            this.settings.parentElement = document.querySelector(this.settings.parentElement);
+            parentElement = this.settings.parentElement instanceof HTMLElement
+                ? this.settings.parentElement
+                : document.querySelector(this.settings.parentElement);
         }
-        else {
-            this.settings.parentElement = this.el.parentElement;
-        }
+        this.settings.parentElement = parentElement;
         // Events listeners
         if (this.settings.events) {
             Object.keys(this.settings.events).forEach(name => this.on(name, this.settings.events[name]));
