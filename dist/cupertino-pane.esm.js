@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: October 20, 2022
+ * Released on: October 29, 2022
  */
 
 /******************************************************************************
@@ -1891,6 +1891,9 @@ class CupertinoPane {
         modules.forEach((module) => this.modules[this.getModuleRef(module.name)] = new module(this));
     }
     drawBaseElements() {
+        // Style element on head
+        this.styleEl = document.createElement('style');
+        this.styleEl.id = `cupertino-pane-${(Math.random() + 1).toString(36).substring(7)}`;
         // Parent
         this.parentEl = this.settings.parentElement;
         // Wrapper
@@ -2003,7 +2006,8 @@ class CupertinoPane {
         this.contentEl.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
         this.contentEl.style.overflowX = 'hidden';
         // Inject internal CSS
-        this.addStyle(internalStyles);
+        this.styleEl.textContent = internalStyles.replace(/\s\s+/g, ' ');
+        document.head.prepend(this.styleEl);
         // inject DOM
         this.parentEl.appendChild(this.wrapperEl);
         this.wrapperEl.appendChild(this.paneEl);
@@ -2161,17 +2165,7 @@ class CupertinoPane {
      * @param {string} styleString
      */
     addStyle(styleString) {
-        styleString = styleString.replace(/\s\s+/g, ' ');
-        if (!document.querySelector('#cupertino-panes-internal')) {
-            const style = document.createElement('style');
-            style.id = 'cupertino-panes-internal';
-            style.textContent = styleString;
-            document.head.prepend(style);
-        }
-        else {
-            const style = document.querySelector('#cupertino-panes-internal');
-            style.textContent += styleString;
-        }
+        this.styleEl.textContent += styleString.replace(/\s\s+/g, ' ');
     }
     ;
     getModuleRef(className) {
@@ -2328,6 +2322,7 @@ class CupertinoPane {
     destroyResets() {
         this.parentEl.appendChild(this.contentEl);
         this.wrapperEl.remove();
+        this.styleEl.remove();
         /****** Detach Events *******/
         this.events.detachAllEvents();
         // Reset vars

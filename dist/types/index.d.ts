@@ -270,6 +270,7 @@ declare class CupertinoPane {
     el: HTMLElement;
     contentEl: HTMLElement;
     parentEl: HTMLElement;
+    private styleEl;
     private draggableEl;
     private moveEl;
     private destroyButtonEl;

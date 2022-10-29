@@ -22,6 +22,7 @@ export class CupertinoPane {
   public el: HTMLElement;
   public contentEl: HTMLElement;
   public parentEl: HTMLElement;
+  private styleEl: HTMLStyleElement;
   private draggableEl: HTMLDivElement;
   private moveEl: HTMLDivElement;
   private destroyButtonEl: HTMLDivElement;
@@ -99,6 +100,10 @@ export class CupertinoPane {
   }
 
   private drawBaseElements() {
+    // Style element on head
+    this.styleEl = document.createElement('style');
+    this.styleEl.id = `cupertino-pane-${(Math.random() + 1).toString(36).substring(7)}`;
+
     // Parent
     this.parentEl = <HTMLElement>this.settings.parentElement;
     
@@ -218,7 +223,8 @@ export class CupertinoPane {
     this.contentEl.style.overflowX = 'hidden';
     
     // Inject internal CSS
-    this.addStyle(internalStyles);
+    this.styleEl.textContent = internalStyles.replace(/\s\s+/g, ' ');
+    document.head.prepend(this.styleEl);
     
     // inject DOM
     this.parentEl.appendChild(this.wrapperEl);
@@ -449,16 +455,7 @@ export class CupertinoPane {
    * @param {string} styleString
    */
   public addStyle(styleString): void {
-    styleString = styleString.replace(/\s\s+/g, ' ');
-    if (!document.querySelector('#cupertino-panes-internal')) {
-      const style = document.createElement('style');
-      style.id = 'cupertino-panes-internal';
-      style.textContent = styleString;
-      document.head.prepend(style);
-    } else {
-      const style = document.querySelector('#cupertino-panes-internal');
-      style.textContent += styleString;
-    }
+    this.styleEl.textContent += styleString.replace(/\s\s+/g, ' ');
   };
 
   private getModuleRef(className): string {
@@ -636,6 +633,7 @@ export class CupertinoPane {
   public destroyResets(): void {
     this.parentEl.appendChild(this.contentEl);
     this.wrapperEl.remove();
+    this.styleEl.remove();
     
     /****** Detach Events *******/
     this.events.detachAllEvents();
