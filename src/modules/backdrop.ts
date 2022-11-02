@@ -155,7 +155,7 @@ export class BackdropModule {
     this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
     this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
     this.instance.wrapperEl.appendChild(this.backdropEl);
-    this.backdropEl.addEventListener('click', () => this.instance.emit('onBackdropTap'));
+    this.backdropEl.addEventListener('click', (event) => this.instance.emit('onBackdropTap', event));
   }
 
   private isBackdropPresented() {
