@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: October 29, 2022
+ * Released on: November 3, 2022
  */
 
 (function (global, factory) {
@@ -1113,6 +1113,7 @@
             this.zStackDefaults = {
                 pushElements: null,
                 minPushHeight: null,
+                cardBorderRadius: null,
                 cardYOffset: 0,
                 cardZScale: 0.93,
                 cardContrast: 0.85,
@@ -1164,6 +1165,7 @@
         pushTransition(pushElement, newPaneY, transition) {
             let zStack = this.settings.zStack.pushElements;
             pushElement.style.transition = transition;
+            pushElement.style.overflow = this.settings.zStack.cardBorderRadius && 'hidden';
             newPaneY = this.instance.screenHeightOffset - newPaneY;
             const topHeight = this.settings.zStack.minPushHeight
                 ? this.settings.zStack.minPushHeight : this.instance.screenHeightOffset - this.breakpoints.bottomer;
@@ -1210,7 +1212,7 @@
                     val = min;
                 return val;
             };
-            setStyles(getXbyY(scaleNew, scaleNormal), getXbyY(yNew, yNormal), getXbyY(contrastNew, contrastNormal), getXbyY(-10, 0) * -1);
+            setStyles(getXbyY(scaleNew, scaleNormal), getXbyY(yNew, yNormal), getXbyY(contrastNew, contrastNormal), getXbyY(this.settings.zStack.cardBorderRadius * -1, 0) * -1);
         }
         // Z-Stack: Pushed elements multiplicators
         setPushMultiplicators() {
@@ -1414,7 +1416,7 @@
             this.backdropEl.style.transition = `all ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
             this.backdropEl.style.backgroundColor = `rgba(0,0,0, ${this.settings.backdropOpacity})`;
             this.instance.wrapperEl.appendChild(this.backdropEl);
-            this.backdropEl.addEventListener('click', () => this.instance.emit('onBackdropTap'));
+            this.backdropEl.addEventListener('click', (event) => this.instance.emit('onBackdropTap', event));
         }
         isBackdropPresented() {
             return document.querySelector(`.cupertino-pane-wrapper .backdrop`)

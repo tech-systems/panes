@@ -11,6 +11,7 @@ interface PaneBreaks {
 interface ZStackSettings {
     pushElements: string[];
     minPushHeight?: number;
+    cardBorderRadius: number;
     cardYOffset?: number;
     cardZScale?: number;
     cardContrast?: number;
