@@ -3,11 +3,11 @@
  * New generation interfaces for web3 progressive applications
  * https://github.com/roman-rr/cupertino-pane/
  *
- * Copyright 2019-2022 Roman Antonov (roman-rr)
+ * Copyright 2019-2023 Roman Antonov (roman-rr)
  *
  * Released under the MIT License
  *
- * Released on: November 3, 2022
+ * Released on: February 2, 2023
  */
 
 /******************************************************************************
@@ -592,6 +592,10 @@ class Events {
             if (!this.isOnViewport()) {
                 return;
             }
+            if (this.device.android
+                && !this.device.cordova) {
+                this.fixAndroidResize(true);
+            }
             this.keyboardVisible = true;
             // calculate distances
             const currentHeight = this.settings.breaks[this.breakpoints.prevBreakpoint].height;
@@ -628,6 +632,10 @@ class Events {
         // pane not visible on viewport
         if (!this.isOnViewport()) {
             return;
+        }
+        if (this.device.android
+            && !this.device.cordova) {
+            this.fixAndroidResize(false);
         }
         this.keyboardVisible = false;
         // Clear
@@ -746,6 +754,27 @@ class Events {
             prevention = true;
         }
         return prevention;
+    }
+    /**
+     * Fix OSK
+     * https://developer.chrome.com/blog/viewport-resize-behavior/
+     * Chrome 108+ will adjust with content-overlays
+     * When everyones updates, can be replaced with adding content-overlays to meta
+     */
+    fixAndroidResize(showKeyboard) {
+        if (!this.instance.paneEl)
+            return;
+        const metaViewport = document.querySelector('meta[name=viewport]');
+        window.requestAnimationFrame(() => {
+            if (showKeyboard) {
+                document.documentElement.style.setProperty('overflow', 'hidden');
+                metaViewport.setAttribute('content', 'height=' + this.instance.screen_height + 'px, width=device-width, initial-scale=1.0');
+            }
+            else {
+                document.documentElement.style.setProperty('overflow', 'hidden');
+                metaViewport.setAttribute('content', 'viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no');
+            }
+        });
     }
     willScrolled() {
         if (!(this.isElementScrollable(this.instance.overflowEl)

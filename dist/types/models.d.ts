@@ -74,4 +74,4 @@ export interface PaneSettings {
     events: CupertinoEvents;
     modules: any[];
 }
-export declare type CupertinoSettings = Partial<PaneSettings>;
+export type CupertinoSettings = Partial<PaneSettings>;
