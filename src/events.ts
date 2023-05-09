@@ -494,11 +494,6 @@ export class Events {
       return;
     }
 
-    if (this.device.android 
-      && !this.device.cordova) {
-      this.fixAndroidResize(true);
-    }
-
     this.keyboardVisible = true;
 
     // calculate distances
@@ -547,8 +542,7 @@ export class Events {
       return;
     }
 
-    if (this.device.android 
-      && !this.device.cordova) {
+    if (this.device.android) {
       this.fixAndroidResize(false);
     }  
 
@@ -585,6 +579,12 @@ export class Events {
   private async onWindowResize(e) {
     // We should separate keyboard and resize events
     if (this.isKeyboardEvent()) {
+
+      // Android resize fixes
+      if (this.device.android) {
+        this.fixAndroidResize(true);
+      }
+
       // Cordova & PWA iOS
       if (this.device.cordova 
           || this.device.ios) {
@@ -706,9 +706,11 @@ export class Events {
     window.requestAnimationFrame(() => {
       if (showKeyboard) {
         document.documentElement.style.setProperty('overflow', 'hidden');
-        metaViewport.setAttribute('content', 'height=' + this.instance.screen_height + 'px, width=device-width, initial-scale=1.0')
+        document.body.style.setProperty('min-height', `${this.instance.screen_height}px`);
+        metaViewport.setAttribute('content', 'height=' + this.instance.screen_height + ', width=device-width, initial-scale=1.0')
       } else {
-        document.documentElement.style.setProperty('overflow', 'hidden');
+        document.documentElement.style.removeProperty('overflow');
+        document.body.style.removeProperty('min-height');
         metaViewport.setAttribute('content', 'viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no');
       }
     });
