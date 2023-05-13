@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: May 9, 2023
+ * Released on: May 13, 2023
  */
 
 (function (global, factory) {
@@ -599,8 +599,8 @@
                     return;
                 }
                 this.keyboardVisible = true;
-                // calculate distances
-                const currentHeight = this.settings.breaks[this.breakpoints.prevBreakpoint].height;
+                // calculate distances based on transformY
+                let currentHeight = (this.instance.getPanelTransformY() - this.instance.screen_height) * -1;
                 const inputEl = document.activeElement;
                 const inputElBottomBound = inputEl.getBoundingClientRect().bottom;
                 const inputSpaceBelow = this.instance.screen_height - inputElBottomBound - this.inputBottomOffset;

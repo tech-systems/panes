@@ -496,8 +496,8 @@ export class Events {
 
     this.keyboardVisible = true;
 
-    // calculate distances
-    const currentHeight = this.settings.breaks[this.breakpoints.prevBreakpoint].height;
+    // calculate distances based on transformY
+    let currentHeight = (this.instance.getPanelTransformY() - this.instance.screen_height) * -1;
     const inputEl = document.activeElement;
     const inputElBottomBound = inputEl.getBoundingClientRect().bottom;
     const inputSpaceBelow = this.instance.screen_height - inputElBottomBound - this.inputBottomOffset;
