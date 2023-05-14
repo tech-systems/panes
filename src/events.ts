@@ -542,9 +542,7 @@ export class Events {
       return;
     }
 
-    if (this.device.android) {
-      this.fixAndroidResize(false);
-    }  
+    this.fixBodyKeyboardResize(false);
 
     this.keyboardVisible = false;
     
@@ -581,9 +579,7 @@ export class Events {
     if (this.isKeyboardEvent()) {
 
       // Android resize fixes
-      if (this.device.android) {
-        this.fixAndroidResize(true);
-      }
+      this.fixBodyKeyboardResize(true);
 
       // Cordova & PWA iOS
       if (this.device.cordova 
@@ -694,12 +690,13 @@ export class Events {
   }
 
   /**
+   * TODO: Check also document.body resizing for iOS/Chrome
    * Fix OSK
    * https://developer.chrome.com/blog/viewport-resize-behavior/
    * Chrome 108+ will adjust with content-overlays
    * When everyones updates, can be replaced with adding content-overlays to meta
    */
-  private fixAndroidResize(showKeyboard) {
+  private fixBodyKeyboardResize(showKeyboard) {
     if (!this.instance.paneEl) return;
     const metaViewport = document.querySelector('meta[name=viewport]');
 

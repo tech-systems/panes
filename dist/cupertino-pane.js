@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.3.2
+ * Cupertino Pane 1.3.21
  * New generation interfaces for web3 progressive applications
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: May 13, 2023
+ * Released on: May 14, 2023
  */
 
 (function (global, factory) {
@@ -635,9 +635,7 @@
             if (!this.isOnViewport()) {
                 return;
             }
-            if (this.device.android) {
-                this.fixAndroidResize(false);
-            }
+            this.fixBodyKeyboardResize(false);
             this.keyboardVisible = false;
             // Clear
             this.inputBottomOffset = 0;
@@ -662,9 +660,7 @@
                 // We should separate keyboard and resize events
                 if (this.isKeyboardEvent()) {
                     // Android resize fixes
-                    if (this.device.android) {
-                        this.fixAndroidResize(true);
-                    }
+                    this.fixBodyKeyboardResize(true);
                     // Cordova & PWA iOS
                     if (this.device.cordova
                         || this.device.ios) {
@@ -761,12 +757,13 @@
             return prevention;
         }
         /**
+         * TODO: Check also document.body resizing for iOS/Chrome
          * Fix OSK
          * https://developer.chrome.com/blog/viewport-resize-behavior/
          * Chrome 108+ will adjust with content-overlays
          * When everyones updates, can be replaced with adding content-overlays to meta
          */
-        fixAndroidResize(showKeyboard) {
+        fixBodyKeyboardResize(showKeyboard) {
             if (!this.instance.paneEl)
                 return;
             const metaViewport = document.querySelector('meta[name=viewport]');
