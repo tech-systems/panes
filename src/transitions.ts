@@ -55,6 +55,14 @@ export class Transitions {
           this.isPaneHidden = false;
         }
 
+        // toggle ion-content scroll-y
+        if ((params.type === CupertinoTransition.Hide
+            || params.type === CupertinoTransition.Destroy)
+            && this.instance.ionContent
+            && !this.settings.ionContentScroll) {
+          this.instance.ionContent.removeAttribute('scroll-y');
+        }
+
         // Emit event
         this.instance.emit('onTransitionEnd', {
           type: params.type,

@@ -45,6 +45,7 @@ interface PaneSettings {
     fitHeight: boolean;
     maxFitHeight: number;
     fitScreenHeight: boolean;
+    ionContentScroll: boolean;
     backdrop: boolean;
     backdropOpacity: number;
     animationType: string;
@@ -279,6 +280,7 @@ declare class CupertinoPane {
     el: HTMLElement;
     contentEl: HTMLElement;
     parentEl: HTMLElement;
+    ionContent: HTMLElement;
     private styleEl;
     private draggableEl;
     private moveEl;

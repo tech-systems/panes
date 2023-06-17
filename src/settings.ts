@@ -15,6 +15,7 @@ export class Settings {
       fitHeight: false,
       maxFitHeight: null,
       fitScreenHeight: true,
+      ionContentScroll: false,
       backdrop: false,
       backdropOpacity: 0.4,
       animationType: 'ease',

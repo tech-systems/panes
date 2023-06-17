@@ -48,6 +48,7 @@ export interface PaneSettings {
   fitHeight: boolean;
   maxFitHeight: number;
   fitScreenHeight: boolean;
+  ionContentScroll: boolean;
   backdrop: boolean;
   backdropOpacity: number;
   animationType: string;
