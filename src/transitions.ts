@@ -60,7 +60,7 @@ export class Transitions {
             || params.type === CupertinoTransition.Destroy)
             && this.instance.ionContent
             && !this.settings.ionContentScroll) {
-          this.instance.ionContent.removeAttribute('scroll-y');
+          this.instance.ionContent.setAttribute('scroll-y', 'true');
         }
 
         // Emit event
