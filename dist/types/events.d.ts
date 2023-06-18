@@ -121,6 +121,7 @@ export declare class Events {
     private fixBodyKeyboardResize;
     willScrolled(): boolean;
     private isPaneDescendant;
+    private isDraggableElement;
     private isFormElement;
     isElementScrollable(el: any): boolean;
     private isOnViewport;

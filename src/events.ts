@@ -191,9 +191,12 @@ export class Events {
     if (t.type === 'mousedown') this.mouseDown = true;
 
     // if overflow content was scrolled
+    // and drag not by draggable
     // increase to scrolled value
-    if (this.contentScrollTop && this.willScrolled()) {
-      this.startY += this.contentScrollTop;  
+    if (this.contentScrollTop 
+        && this.willScrolled() 
+        && !this.isDraggableElement(t)) {
+      this.startY += this.contentScrollTop;
     }
     
     this.steps.push({posY: this.startY, posX: this.startX, time: Date.now()});
@@ -305,7 +308,8 @@ export class Events {
     // Not allow move panel with positive overflow scroll
     // Scroll handler
     if (this.instance.overflowEl.style.overflowY === 'auto' 
-      && this.scrollPreventDrag(t)) {
+      && this.scrollPreventDrag(t)
+      && !this.isDraggableElement(t)) {
       return;
     }
 
@@ -721,6 +725,7 @@ export class Events {
     return true;
   }
 
+  // TODO: switch to contains
   private isPaneDescendant(el): boolean {
     if (!el) {
       return false;
@@ -733,6 +738,11 @@ export class Events {
         node = node.parentNode;
     }
     return false;
+  }
+
+  private isDraggableElement(t) {
+    return t.target === this.instance.draggableEl 
+      || t.target === this.instance.moveEl;
   }
 
   private isFormElement(el):boolean {

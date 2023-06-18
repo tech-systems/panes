@@ -261,6 +261,7 @@ declare class Events {
     private fixBodyKeyboardResize;
     willScrolled(): boolean;
     private isPaneDescendant;
+    private isDraggableElement;
     private isFormElement;
     isElementScrollable(el: any): boolean;
     private isOnViewport;
@@ -281,9 +282,9 @@ declare class CupertinoPane {
     contentEl: HTMLElement;
     parentEl: HTMLElement;
     ionContent: HTMLElement;
+    draggableEl: HTMLDivElement;
+    moveEl: HTMLDivElement;
     private styleEl;
-    private draggableEl;
-    private moveEl;
     private destroyButtonEl;
     settings: CupertinoSettings;
     private device;

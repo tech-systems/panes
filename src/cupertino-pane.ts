@@ -23,9 +23,9 @@ export class CupertinoPane {
   public contentEl: HTMLElement;
   public parentEl: HTMLElement;
   public ionContent: HTMLElement;
+  public draggableEl: HTMLDivElement;
+  public moveEl: HTMLDivElement;
   private styleEl: HTMLStyleElement;
-  private draggableEl: HTMLDivElement;
-  private moveEl: HTMLDivElement;
   private destroyButtonEl: HTMLDivElement;
 
   public settings: CupertinoSettings = (new Settings()).instance;

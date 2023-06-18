@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: June 17, 2023
+ * Released on: June 18, 2023
  */
 
 /******************************************************************************
@@ -354,8 +354,11 @@ class Events {
         if (t.type === 'mousedown')
             this.mouseDown = true;
         // if overflow content was scrolled
+        // and drag not by draggable
         // increase to scrolled value
-        if (this.contentScrollTop && this.willScrolled()) {
+        if (this.contentScrollTop
+            && this.willScrolled()
+            && !this.isDraggableElement(t)) {
             this.startY += this.contentScrollTop;
         }
         this.steps.push({ posY: this.startY, posX: this.startX, time: Date.now() });
@@ -447,7 +450,8 @@ class Events {
         // Not allow move panel with positive overflow scroll
         // Scroll handler
         if (this.instance.overflowEl.style.overflowY === 'auto'
-            && this.scrollPreventDrag(t)) {
+            && this.scrollPreventDrag(t)
+            && !this.isDraggableElement(t)) {
             return;
         }
         // Topper-top/Lower-bottom recognizers
@@ -781,6 +785,7 @@ class Events {
         }
         return true;
     }
+    // TODO: switch to contains
     isPaneDescendant(el) {
         if (!el) {
             return false;
@@ -793,6 +798,10 @@ class Events {
             node = node.parentNode;
         }
         return false;
+    }
+    isDraggableElement(t) {
+        return t.target === this.instance.draggableEl
+            || t.target === this.instance.moveEl;
     }
     isFormElement(el) {
         const formElements = [
