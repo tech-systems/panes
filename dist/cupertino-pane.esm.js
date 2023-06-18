@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: June 18, 2023
+ * Released on: June 19, 2023
  */
 
 /******************************************************************************
@@ -709,9 +709,12 @@ class Events {
      * Otherwise don't changes
      */
     handleTopperLowerPositions(coords) {
-        // Disallow drag topper than top point
+        // Disallow drag upper than top point
+        // And drag bottom when upper than top point
         if (!this.settings.upperThanTop
-            && (coords.newVal <= this.breakpoints.topper)) {
+            && (coords.newVal <= this.breakpoints.topper
+                || coords.clientY <= this.breakpoints.topper)) {
+            this.steps = [];
             return this.breakpoints.topper;
         }
         /**

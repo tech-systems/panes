@@ -644,9 +644,12 @@ export class Events {
      clientX: number, clientY: number, 
      newVal:number, diffY: number, 
   }):number {
-    // Disallow drag topper than top point
+    // Disallow drag upper than top point
+    // And drag bottom when upper than top point
     if (!this.settings.upperThanTop 
-        && (coords.newVal <= this.breakpoints.topper)) {
+        && (coords.newVal <= this.breakpoints.topper 
+            || coords.clientY <= this.breakpoints.topper)) {
+      this.steps = [];
       return this.breakpoints.topper;
     }
 
