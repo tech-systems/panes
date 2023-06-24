@@ -266,8 +266,6 @@ export class CupertinoPane {
         return;
       }
 
-      console.time("Presenting time");
-
       // Emit event
       this.emit('onWillPresent');
       
@@ -282,9 +280,6 @@ export class CupertinoPane {
       Object.assign(this.paneEl.style, conf?.transition?.from);
 
       // Show elements
-      // For some reason need requestAnimationFrame after show wrapper to make 
-      // initial transition works
-      // TODO: resolve animation frame for transition on pane init
       this.wrapperEl.style.display = 'block';
       this.contentEl.style.display = 'block';
       this.wrapperEl.classList.add('rendered');
@@ -331,13 +326,9 @@ export class CupertinoPane {
 
       // System event
       this.emit('beforePresentTransition', {animate: conf.animate});
-      
 
       // One frame before transition
       await new Promise(resolve => requestAnimationFrame(resolve));
-
-      console.timeEnd("Presenting time");
-
 
       if (conf.animate) {
         await this.transitions.doTransition({
@@ -377,13 +368,12 @@ export class CupertinoPane {
     }
     this.overflowEl.style.overscrollBehavior = 'none';
     
-    if (this.settings.topperOverflow) {   
-      if (this.settings.upperThanTop) {
-        console.warn('Cupertino Pane: "upperThanTop" allowed for disabled "topperOverflow"');
-      }
-
-      this.setOverflowHeight();
+    if (this.settings.topperOverflow 
+        && this.settings.upperThanTop) {   
+      console.warn('Cupertino Pane: "upperThanTop" allowed for disabled "topperOverflow"');
     }
+
+    this.setOverflowHeight();
   }
 
   public setOverflowHeight(offset = 0) {

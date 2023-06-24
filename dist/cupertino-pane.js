@@ -2096,7 +2096,6 @@
                     console.warn('Cupertino Pane: specified selector or DOM element already in use', this.selector);
                     return;
                 }
-                console.time("Presenting time");
                 // Emit event
                 this.emit('onWillPresent');
                 this.updateScreenHeights();
@@ -2107,9 +2106,6 @@
                 // Custom transitions for present/destroy: set styles
                 Object.assign(this.paneEl.style, (_a = conf === null || conf === void 0 ? void 0 : conf.transition) === null || _a === void 0 ? void 0 : _a.from);
                 // Show elements
-                // For some reason need requestAnimationFrame after show wrapper to make 
-                // initial transition works
-                // TODO: resolve animation frame for transition on pane init
                 this.wrapperEl.style.display = 'block';
                 this.contentEl.style.display = 'block';
                 this.wrapperEl.classList.add('rendered');
@@ -2149,7 +2145,6 @@
                 this.emit('beforePresentTransition', { animate: conf.animate });
                 // One frame before transition
                 yield new Promise(resolve => requestAnimationFrame(resolve));
-                console.timeEnd("Presenting time");
                 if (conf.animate) {
                     yield this.transitions.doTransition({
                         type: 'present', conf,
@@ -2184,12 +2179,11 @@
                 this.overflowEl.style.overflowX = 'hidden';
             }
             this.overflowEl.style.overscrollBehavior = 'none';
-            if (this.settings.topperOverflow) {
-                if (this.settings.upperThanTop) {
-                    console.warn('Cupertino Pane: "upperThanTop" allowed for disabled "topperOverflow"');
-                }
-                this.setOverflowHeight();
+            if (this.settings.topperOverflow
+                && this.settings.upperThanTop) {
+                console.warn('Cupertino Pane: "upperThanTop" allowed for disabled "topperOverflow"');
             }
+            this.setOverflowHeight();
         }
         setOverflowHeight(offset = 0) {
             this.overflowEl.style.height = `${this.getPaneHeight()
