@@ -50,7 +50,8 @@ export class Transitions {
         if (params.type === CupertinoTransition.Hide) {
           this.isPaneHidden = true;
         }
-        if (params.type === CupertinoTransition.Breakpoint 
+        if (params.type === CupertinoTransition.Breakpoint
+            || params.type === CupertinoTransition.Present
             || params.type === CupertinoTransition.TouchEnd) {
           this.isPaneHidden = false;
         }

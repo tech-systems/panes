@@ -645,10 +645,10 @@ export class Events {
      newVal:number, diffY: number, 
   }):number {
     // Disallow drag upper than top point
-    // And drag bottom when upper than top point
+    // And drag bottom when upper than top point (for zStack allowed)
     if (!this.settings.upperThanTop 
         && (coords.newVal <= this.breakpoints.topper 
-            || coords.clientY <= this.breakpoints.topper)) {
+            || (coords.clientY <= this.breakpoints.topper && !this.settings.zStack))) {
       this.steps = [];
       return this.breakpoints.topper;
     }

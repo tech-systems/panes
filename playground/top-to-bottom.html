@@ -14,28 +14,30 @@
 </head>
 
 <body>
-  <ion-content>
-      <ion-drawer style="height: 482.8px;">
-        <div class="main-container">
-          <h1>header here</h1>
-          <div class="content">
-            <h1>Header</h1>
-            <p>This is good example of Cupertino Pane with inversed direction.</p>
-            <p>Events switched into <strong>top-to-bottom</strong></p>
+  <ion-app>
+    <ion-content>
+        <ion-drawer style="height: 482.8px;">
+          <div class="main-container">
+            <h1>header here</h1>
+            <div class="content">
+              <h1>Header</h1>
+              <p>This is good example of Cupertino Pane with inversed direction.</p>
+              <p>Events switched into <strong>top-to-bottom</strong></p>
+            </div>
           </div>
+        </ion-drawer>
+
+        <div class="buttons-container">
+          <ion-button expand="block" color="danger" onclick="presentDrawer()">Present Drawer</ion-button>
+          <ion-button expand="block" color="danger" onclick="destroyDrawer()">Destroy Drawer</ion-button>
+
+          <ion-button expand="block" onclick="hideDrawer()">Hide Drawer</ion-button>
+          <ion-button expand="block" onclick="isHiddenDrawer()">Drawer is hidden</ion-button>
+
+          <ion-button expand="block" onclick="setBreakpoints()">Set breakpoints</ion-button>
         </div>
-      </ion-drawer>
-
-      <div class="buttons-container">
-        <ion-button expand="block" color="danger" onclick="presentDrawer()">Present Drawer</ion-button>
-        <ion-button expand="block" color="danger" onclick="destroyDrawer()">Destroy Drawer</ion-button>
-
-        <ion-button expand="block" onclick="hideDrawer()">Hide Drawer</ion-button>
-        <ion-button expand="block" onclick="isHiddenDrawer()">Drawer is hidden</ion-button>
-
-        <ion-button expand="block" onclick="setBreakpoints()">Set breakpoints</ion-button>
-      </div>
-  </ion-content>
+    </ion-content>
+  </ion-app>
   <style>
     .buttons-container {
       display: flex;
@@ -112,9 +114,10 @@
       })
     };
 
-    window.addEventListener('load', function() {
+    window.onload = async function () {
+      await document.querySelector('ion-app').componentOnReady();
       presentDrawer();
-    })
+    }
   </script>
 </body>
 

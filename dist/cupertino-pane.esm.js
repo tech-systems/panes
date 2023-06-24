@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.3.21
+ * Cupertino Pane 1.3.3
  * New generation interfaces for web3 progressive applications
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: June 19, 2023
+ * Released on: June 24, 2023
  */
 
 /******************************************************************************
@@ -710,10 +710,10 @@ class Events {
      */
     handleTopperLowerPositions(coords) {
         // Disallow drag upper than top point
-        // And drag bottom when upper than top point
+        // And drag bottom when upper than top point (for zStack allowed)
         if (!this.settings.upperThanTop
             && (coords.newVal <= this.breakpoints.topper
-                || coords.clientY <= this.breakpoints.topper)) {
+                || (coords.clientY <= this.breakpoints.topper && !this.settings.zStack))) {
             this.steps = [];
             return this.breakpoints.topper;
         }
@@ -1046,6 +1046,7 @@ class Transitions {
                     this.isPaneHidden = true;
                 }
                 if (params.type === CupertinoTransition.Breakpoint
+                    || params.type === CupertinoTransition.Present
                     || params.type === CupertinoTransition.TouchEnd) {
                     this.isPaneHidden = false;
                 }
@@ -2089,6 +2090,7 @@ class CupertinoPane {
                 console.warn('Cupertino Pane: specified selector or DOM element already in use', this.selector);
                 return;
             }
+            console.time("Presenting time");
             // Emit event
             this.emit('onWillPresent');
             this.updateScreenHeights();
@@ -2099,11 +2101,10 @@ class CupertinoPane {
             // Custom transitions for present/destroy: set styles
             Object.assign(this.paneEl.style, (_a = conf === null || conf === void 0 ? void 0 : conf.transition) === null || _a === void 0 ? void 0 : _a.from);
             // Show elements
-            // For some reason need timeout after show wrapper to make 
+            // For some reason need requestAnimationFrame after show wrapper to make 
             // initial transition works
-            // TODO: resolve 100ms timeout with some render callbacks
+            // TODO: resolve animation frame for transition on pane init
             this.wrapperEl.style.display = 'block';
-            yield new Promise(resolve => setTimeout(resolve, 100));
             this.contentEl.style.display = 'block';
             this.wrapperEl.classList.add('rendered');
             this.rendered = true;
@@ -2140,6 +2141,9 @@ class CupertinoPane {
             }
             // System event
             this.emit('beforePresentTransition', { animate: conf.animate });
+            // One frame before transition
+            yield new Promise(resolve => requestAnimationFrame(resolve));
+            console.timeEnd("Presenting time");
             if (conf.animate) {
                 yield this.transitions.doTransition({
                     type: 'present', conf,

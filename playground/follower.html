@@ -3,7 +3,7 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Cupertino Pane - Basic</title>
+  <title>Cupertino Pane - Follower</title>
 
   <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
@@ -19,29 +19,31 @@
 </head>
 
 <body>
-  <ion-content>
-      <ion-fab horizontal="end" vertical="bottom">
-        <ion-fab-button size="small">
-          <ion-icon name="add"></ion-icon>
-        </ion-fab-button>
-      </ion-fab>
-      
-      <ion-drawer>
-        <h1>Header</h1>
-        <p hide-on-bottom>Content</p> 
-      </ion-drawer>
+  <ion-app>
+    <ion-content>
+        <ion-fab horizontal="end" vertical="bottom">
+          <ion-fab-button size="small">
+            <ion-icon name="add"></ion-icon>
+          </ion-fab-button>
+        </ion-fab>
+        
+        <ion-drawer>
+          <h1>Header</h1>
+          <p hide-on-bottom>Content</p> 
+        </ion-drawer>
 
-      <ion-button expand="block" color="danger" onclick="presentDrawer()">Present Drawer</ion-button>
-      <ion-button expand="block" color="danger" onclick="destroyDrawer()">Destroy Drawer</ion-button>
+        <ion-button expand="block" color="danger" onclick="presentDrawer()">Present Drawer</ion-button>
+        <ion-button expand="block" color="danger" onclick="destroyDrawer()">Destroy Drawer</ion-button>
 
-      <ion-button expand="block" onclick="hideDrawer()">Hide Drawer</ion-button>
-      <ion-button expand="block" onclick="isHiddenDrawer()">Drawer is hidden</ion-button>
+        <ion-button expand="block" onclick="hideDrawer()">Hide Drawer</ion-button>
+        <ion-button expand="block" onclick="isHiddenDrawer()">Drawer is hidden</ion-button>
 
-      <ion-button expand="block" color="secondary" onclick="setMiddleDrawer()">Set Middle</ion-button>
-      <ion-button expand="block" color="secondary" onclick="setBottomDrawer()">Set Bottom</ion-button>
+        <ion-button expand="block" color="secondary" onclick="setMiddleDrawer()">Set Middle</ion-button>
+        <ion-button expand="block" color="secondary" onclick="setBottomDrawer()">Set Bottom</ion-button>
 
-      <ion-button expand="block" color="tertiary" onclick="setBreakpoints()">Set Breakpoints</ion-button>
-  </ion-content>
+        <ion-button expand="block" color="tertiary" onclick="setBreakpoints()">Set Breakpoints</ion-button>
+    </ion-content>
+  </ion-app>
   <script>
     var element = document.querySelector('ion-drawer');
     var drawer = new CupertinoPane(element, { 
@@ -89,9 +91,10 @@
       });
     };
 
-    window.addEventListener('load', function() {
+    window.onload = async function () {
+      await document.querySelector('ion-app').componentOnReady();
       presentDrawer();
-    })
+    }
   </script>
 </body>
 

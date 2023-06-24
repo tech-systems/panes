@@ -14,7 +14,8 @@
 </head>
 
 <body>
-  <ion-content scroll-y="false">
+  <ion-app>
+    <ion-content>
       <ion-drawer>
         <h1>Header</h1>
         <p hide-on-bottom>Content</p> 
@@ -80,7 +81,9 @@
       <ion-button expand="block" onclick="showBackdrop()">Show Backdrop</ion-button>
       <ion-button expand="block" onclick="extraPane()">Extra Pane</ion-button>
   </ion-content>
-  <script>
+</ion-app>
+
+<script>
     var element = document.querySelector('ion-drawer');
     var drawer = new CupertinoPane(element, { 
         breaks: {
@@ -112,7 +115,12 @@
         // freeMode: true,
 
     });
-    setTimeout(() => drawer.present({animate: true}));
+
+    window.onload = async function () {
+      await document.querySelector('ion-app').componentOnReady();
+      drawer.present({animate: true});
+    }
+
 
     // Extra pane
     var extraDrawer = new CupertinoPane('ion-extra-drawer', {

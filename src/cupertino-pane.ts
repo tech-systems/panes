@@ -266,6 +266,8 @@ export class CupertinoPane {
         return;
       }
 
+      console.time("Presenting time");
+
       // Emit event
       this.emit('onWillPresent');
       
@@ -280,11 +282,10 @@ export class CupertinoPane {
       Object.assign(this.paneEl.style, conf?.transition?.from);
 
       // Show elements
-      // For some reason need timeout after show wrapper to make 
+      // For some reason need requestAnimationFrame after show wrapper to make 
       // initial transition works
-      // TODO: resolve 100ms timeout with some render callbacks
+      // TODO: resolve animation frame for transition on pane init
       this.wrapperEl.style.display = 'block';
-      await new Promise(resolve => setTimeout(resolve, 100));
       this.contentEl.style.display = 'block';
       this.wrapperEl.classList.add('rendered');
       this.rendered = true;
@@ -331,6 +332,13 @@ export class CupertinoPane {
       // System event
       this.emit('beforePresentTransition', {animate: conf.animate});
       
+
+      // One frame before transition
+      await new Promise(resolve => requestAnimationFrame(resolve));
+
+      console.timeEnd("Presenting time");
+
+
       if (conf.animate) {
         await this.transitions.doTransition({
           type: 'present', conf,

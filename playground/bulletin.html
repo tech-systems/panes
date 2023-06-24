@@ -67,45 +67,47 @@
     
 </style>
 <body>
-  <ion-content scroll-y="false">
-    <ion-header>
-      <ion-toolbar>
-        <ion-segment value="dogs">
-          <ion-segment-button value="cats">
-            <ion-label>Cats</ion-label>
-          </ion-segment-button>
-          <ion-segment-button value="dogs">
-            <ion-label>Dogs</ion-label>
-          </ion-segment-button>
-        </ion-segment>
-  
-        <ion-buttons slot="start">
-          <ion-button>
-            <ion-icon name="chevron-back-outline"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-        <ion-buttons slot="end">
-          <ion-button>
-            <ion-icon name="person-circle-outline"></ion-icon>
-          </ion-button>
-        </ion-buttons>
-  
-      </ion-toolbar>
-    </ion-header>
+  <ion-app>
+    <ion-content>
+      <ion-header>
+        <ion-toolbar>
+          <ion-segment value="dogs">
+            <ion-segment-button value="cats">
+              <ion-label>Cats</ion-label>
+            </ion-segment-button>
+            <ion-segment-button value="dogs">
+              <ion-label>Dogs</ion-label>
+            </ion-segment-button>
+          </ion-segment>
+    
+          <ion-buttons slot="start">
+            <ion-button>
+              <ion-icon name="chevron-back-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+          <ion-buttons slot="end">
+            <ion-button>
+              <ion-icon name="person-circle-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+    
+        </ion-toolbar>
+      </ion-header>
 
-      <!-- Bulletin -->
-      <ion-bulletin>
-        <h1>Welcome to pet board!</h1>
-        <div class="emoji">😻</div>
-          <p>
-            Explore and choose a pet that you wanna play with.
-          </p>
-          <ion-button expand="block" onclick="setBreakpoints();">
-            Set bottom offset
-          </ion-button>
-      </ion-bulletin> <!-- End bulletin -->
+        <!-- Bulletin -->
+        <ion-bulletin>
+          <h1>Welcome to pet board!</h1>
+          <div class="emoji">😻</div>
+            <p>
+              Explore and choose a pet that you wanna play with.
+            </p>
+            <ion-button expand="block" onclick="setBreakpoints();">
+              Set bottom offset
+            </ion-button>
+        </ion-bulletin> <!-- End bulletin -->
 
-  </ion-content>
+    </ion-content>
+  </ion-app>
   <script>
     let bulletin;
     let elem = document.querySelector('ion-bulletin');
@@ -137,9 +139,10 @@
       bulletin.setBreakpoints({}, 150);
     }
 
-    window.addEventListener('load', function() {
+    window.onload = async function () {
+      await document.querySelector('ion-app').componentOnReady();
       present();
-    })
+    }
   </script>
 </body>
 
