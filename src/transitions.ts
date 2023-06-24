@@ -60,7 +60,8 @@ export class Transitions {
         if ((params.type === CupertinoTransition.Hide
             || params.type === CupertinoTransition.Destroy)
             && this.instance.ionContent
-            && !this.settings.ionContentScroll) {
+            && !this.settings.ionContentScroll
+            && !this.doesPanesExists()) {
           this.instance.ionContent.setAttribute('scroll-y', 'true');
         }
 
@@ -140,6 +141,7 @@ export class Transitions {
    * Private class methods
    */
 
-  
-
+  private doesPanesExists() {
+    return !!document.querySelector('.cupertino-pane-wrapper');
+  }
 }

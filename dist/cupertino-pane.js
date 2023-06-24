@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.3.3
+ * Cupertino Pane 1.3.31
  * New generation interfaces for web3 progressive applications
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: June 24, 2023
+ * Released on: June 25, 2023
  */
 
 (function (global, factory) {
@@ -1060,7 +1060,8 @@
                     if ((params.type === CupertinoTransition.Hide
                         || params.type === CupertinoTransition.Destroy)
                         && this.instance.ionContent
-                        && !this.settings.ionContentScroll) {
+                        && !this.settings.ionContentScroll
+                        && !this.doesPanesExists()) {
                         this.instance.ionContent.setAttribute('scroll-y', 'true');
                     }
                     // Emit event
@@ -1117,6 +1118,12 @@
                 return `all 300ms cubic-bezier(.155,1.105,.295,1.12)`;
             }
             return `all ${duration || this.settings.animationDuration}ms ${this.settings.animationType}`;
+        }
+        /**
+         * Private class methods
+         */
+        doesPanesExists() {
+            return !!document.querySelector('.cupertino-pane-wrapper');
         }
     }
 
