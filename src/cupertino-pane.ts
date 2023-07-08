@@ -273,8 +273,6 @@ export class CupertinoPane {
       this.drawBaseElements();
       await this.setBreakpoints();
 
-      // Necessary Inlines with breakpoints
-      this.paneEl.style.height = `${this.getPaneHeight()}px`;
 
       // Custom transitions for present/destroy: set styles
       Object.assign(this.paneEl.style, conf?.transition?.from);
@@ -284,13 +282,15 @@ export class CupertinoPane {
       this.contentEl.style.display = 'block';
       this.wrapperEl.classList.add('rendered');
       this.rendered = true;
-      
-      // set overflow element
+
+      // Init scroll (for some render DOM reasons important keep here for init)
       this.scrollElementInit();
-      this.checkOverflowAttr(this.breakpoints.currentBreakpoint);
 
       // System event
       this.emit('rendered');
+
+      // Cursor
+      this.setGrabCursor(true);
 
       // Button destroy
       if (this.settings.buttonDestroy) {
@@ -314,9 +314,6 @@ export class CupertinoPane {
       if (this.settings.freeMode) {
         this.settings.lowerThanBottom = false;
       }
-
-      this.setGrabCursor(true);
-      this.checkOpacityAttr(this.breakpoints.currentBreakpoint);
       
       /****** Fix android issues *******/
       if (this.device.android) {
@@ -359,6 +356,10 @@ export class CupertinoPane {
   }
 
   public scrollElementInit() {
+    if (!this.settings.fitHeight) {
+      this.paneEl.style.height = `${this.getPaneHeight()}px`; // todo: review ability to remove this line at all
+    }
+
     let attrElements = this.el.querySelectorAll('[overflow-y]');
     if (!attrElements.length || attrElements.length > 1) {
       this.overflowEl = this.contentEl;

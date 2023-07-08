@@ -119,13 +119,14 @@ export class Breakpoints {
           this.instance.moveToBreak(nextBreak[0]);
         }
       }
-
-      // Re-calc height 
-      this.instance.paneEl.style.height = `${this.instance.getPaneHeight()}px`;
-      this.instance.scrollElementInit();
-      this.instance.checkOpacityAttr(this.currentBreakpoint);
-      this.instance.checkOverflowAttr(this.currentBreakpoint);
     }
+
+    // Re-calc heights and scrolls
+    this.instance.scrollElementInit();
+
+    // Checks
+    this.instance.checkOpacityAttr(this.currentBreakpoint);
+    this.instance.checkOverflowAttr(this.currentBreakpoint);
 
     // System event
     this.instance.emit('buildBreakpointsCompleted');

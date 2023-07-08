@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: June 25, 2023
+ * Released on: July 9, 2023
  */
 
 /******************************************************************************
@@ -973,12 +973,12 @@ class Breakpoints {
                         this.instance.moveToBreak(nextBreak[0]);
                     }
                 }
-                // Re-calc height 
-                this.instance.paneEl.style.height = `${this.instance.getPaneHeight()}px`;
-                this.instance.scrollElementInit();
-                this.instance.checkOpacityAttr(this.currentBreakpoint);
-                this.instance.checkOverflowAttr(this.currentBreakpoint);
             }
+            // Re-calc heights and scrolls
+            this.instance.scrollElementInit();
+            // Checks
+            this.instance.checkOpacityAttr(this.currentBreakpoint);
+            this.instance.checkOverflowAttr(this.currentBreakpoint);
             // System event
             this.instance.emit('buildBreakpointsCompleted');
         });
@@ -2102,8 +2102,6 @@ class CupertinoPane {
             this.updateScreenHeights();
             this.drawBaseElements();
             yield this.setBreakpoints();
-            // Necessary Inlines with breakpoints
-            this.paneEl.style.height = `${this.getPaneHeight()}px`;
             // Custom transitions for present/destroy: set styles
             Object.assign(this.paneEl.style, (_a = conf === null || conf === void 0 ? void 0 : conf.transition) === null || _a === void 0 ? void 0 : _a.from);
             // Show elements
@@ -2111,11 +2109,12 @@ class CupertinoPane {
             this.contentEl.style.display = 'block';
             this.wrapperEl.classList.add('rendered');
             this.rendered = true;
-            // set overflow element
+            // Init scroll (for some render DOM reasons important keep here for init)
             this.scrollElementInit();
-            this.checkOverflowAttr(this.breakpoints.currentBreakpoint);
             // System event
             this.emit('rendered');
+            // Cursor
+            this.setGrabCursor(true);
             // Button destroy
             if (this.settings.buttonDestroy) {
                 this.paneEl.appendChild(this.destroyButtonEl);
@@ -2135,8 +2134,6 @@ class CupertinoPane {
             if (this.settings.freeMode) {
                 this.settings.lowerThanBottom = false;
             }
-            this.setGrabCursor(true);
-            this.checkOpacityAttr(this.breakpoints.currentBreakpoint);
             /****** Fix android issues *******/
             if (this.device.android) {
                 // Body patch prevent android pull-to-refresh
@@ -2171,6 +2168,9 @@ class CupertinoPane {
         this.screenHeightOffset = window.innerHeight;
     }
     scrollElementInit() {
+        if (!this.settings.fitHeight) {
+            this.paneEl.style.height = `${this.getPaneHeight()}px`; // todo: review ability to remove this line at all
+        }
         let attrElements = this.el.querySelectorAll('[overflow-y]');
         if (!attrElements.length || attrElements.length > 1) {
             this.overflowEl = this.contentEl;
