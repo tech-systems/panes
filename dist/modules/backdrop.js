@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.3.31
+ * Cupertino Pane 1.3.32
  * New generation interfaces for web3 progressive applications
  * https://github.com/roman-rr/cupertino-pane/
  *
