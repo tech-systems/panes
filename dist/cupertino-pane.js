@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.3.32
+ * Cupertino Pane 1.3.33
  * New generation interfaces for web3 progressive applications
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: July 9, 2023
+ * Released on: July 10, 2023
  */
 
 (function (global, factory) {
@@ -1603,21 +1603,8 @@
                 }
                 yield Promise.all(promises);
                 yield new Promise(resolve => requestAnimationFrame(resolve));
-                // Calculate heights
-                const getHeight = (el) => Math.round(el.getBoundingClientRect().height);
-                let contentElHeight = getHeight(this.instance.el);
-                let diff = this.contentElHeight - contentElHeight;
-                // If content el changes
-                let paneElHeight = getHeight(this.instance.paneEl);
-                if (Math.abs(diff)) {
-                    paneElHeight -= diff;
-                }
-                // Set value for future checks
-                this.contentElHeight = getHeight(this.instance.el);
-                // Fit to screen if fitScreenHeight happens
-                if (getHeight(this.instance.el) > this.instance.screen_height) {
-                    this.contentElHeight = this.instance.screen_height;
-                }
+                // Base calc
+                let paneElHeight = Math.round(this.instance.paneEl.getBoundingClientRect().height);
                 // Hide elements back
                 if (!this.instance.rendered) {
                     this.instance.el.style.visibility = 'unset';
@@ -2404,4 +2391,3 @@
     return CupertinoPane;
 
 }));
-//# sourceMappingURL=cupertino-pane.js.map

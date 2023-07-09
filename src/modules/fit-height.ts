@@ -139,24 +139,9 @@ export class FitHeightModule {
     await Promise.all(promises);
     await new Promise(resolve => requestAnimationFrame(resolve));
 
-    // Calculate heights
-    const getHeight = (el) => Math.round(el.getBoundingClientRect().height);
-    let contentElHeight = getHeight(this.instance.el);
-    let diff = this.contentElHeight - contentElHeight;
+    // Base calc
+    let paneElHeight = Math.round(this.instance.paneEl.getBoundingClientRect().height);
 
-    // If content el changes
-    let paneElHeight = getHeight(this.instance.paneEl);
-    if (Math.abs(diff)) {
-      paneElHeight -= diff;
-    }
-
-    // Set value for future checks
-    this.contentElHeight = getHeight(this.instance.el); 
-    // Fit to screen if fitScreenHeight happens
-    if (getHeight(this.instance.el) > this.instance.screen_height) {
-      this.contentElHeight = this.instance.screen_height
-    } 
-    
     // Hide elements back
     if (!this.instance.rendered) {
       this.instance.el.style.visibility = 'unset';
