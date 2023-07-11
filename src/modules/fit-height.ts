@@ -26,6 +26,8 @@ export class FitHeightModule {
     // TODO: change binding strategy according to TypeScript
     // E.G. Using public module methods from modules
     this.instance['calcFitHeight'] = async(animated) => this.calcFitHeight(animated);
+    this.instance['setOverflowHeight'] = () => this.setOverflowHeight();
+    // re-bind functions
 
     // Class to wrapper
     this.instance.on('DOMElementsReady', () => {
@@ -67,6 +69,15 @@ export class FitHeightModule {
         }
       }
     }, true);
+  }
+
+  /**
+   * fitHeight overflow-content el is with height:unset;
+   * fitHeight we base on pane height as static for smooth transition on calcFitHeight()
+   * and we should set height for overflow element, or it give a wrong calculations
+   */
+  public setOverflowHeight() {
+    this.instance.paneEl.style.height = `${this.instance.getPaneHeight()}px`;
   }
 
   private async beforeBuildBreakpoints(): Promise<void> {
@@ -140,7 +151,7 @@ export class FitHeightModule {
     await new Promise(resolve => requestAnimationFrame(resolve));
 
     // Base calc
-    let paneElHeight = Math.round(this.instance.paneEl.getBoundingClientRect().height);
+    let contentElHeight = Math.round(this.instance.el.getBoundingClientRect().height);
 
     // Hide elements back
     if (!this.instance.rendered) {
@@ -153,6 +164,6 @@ export class FitHeightModule {
     }
 
     this.calcHeightInProcess = false;
-    return paneElHeight;
+    return contentElHeight;
   }
 }

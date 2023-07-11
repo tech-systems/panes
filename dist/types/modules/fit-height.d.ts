@@ -10,6 +10,12 @@ export declare class FitHeightModule {
     private settings;
     private contentElHeight;
     constructor(instance: CupertinoPane);
+    /**
+     * fitHeight overflow-content el is with height:unset;
+     * fitHeight we base on pane height as static for smooth transition on calcFitHeight()
+     * and we should set height for overflow element, or it give a wrong calculations
+     */
+    setOverflowHeight(): void;
     private beforeBuildBreakpoints;
     calcFitHeight(animated?: boolean): Promise<any>;
     private getPaneFitHeight;

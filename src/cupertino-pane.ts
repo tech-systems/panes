@@ -356,10 +356,6 @@ export class CupertinoPane {
   }
 
   public scrollElementInit() {
-    if (!this.settings.fitHeight) {
-      this.paneEl.style.height = `${this.getPaneHeight()}px`; // todo: review ability to remove this line at all
-    }
-
     let attrElements = this.el.querySelectorAll('[overflow-y]');
     if (!attrElements.length || attrElements.length > 1) {
       this.overflowEl = this.contentEl;
@@ -373,11 +369,12 @@ export class CupertinoPane {
         && this.settings.upperThanTop) {   
       console.warn('Cupertino Pane: "upperThanTop" allowed for disabled "topperOverflow"');
     }
-
-    this.setOverflowHeight();
+  
+    this.setOverflowHeight(); 
   }
 
   public setOverflowHeight(offset = 0) {
+    this.paneEl.style.height = `${this.getPaneHeight()}px`;
     this.overflowEl.style.height = `${this.getPaneHeight()
       - this.settings.topperOverflowOffset
       - this.overflowEl.offsetTop

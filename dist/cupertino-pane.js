@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.3.33
+ * Cupertino Pane 1.3.34
  * New generation interfaces for web3 progressive applications
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: July 10, 2023
+ * Released on: July 11, 2023
  */
 
 (function (global, factory) {
@@ -1501,6 +1501,8 @@
             // TODO: change binding strategy according to TypeScript
             // E.G. Using public module methods from modules
             this.instance['calcFitHeight'] = (animated) => __awaiter(this, void 0, void 0, function* () { return this.calcFitHeight(animated); });
+            this.instance['setOverflowHeight'] = () => this.setOverflowHeight();
+            // re-bind functions
             // Class to wrapper
             this.instance.on('DOMElementsReady', () => {
                 this.instance.wrapperEl.classList.add('fit-height');
@@ -1539,6 +1541,14 @@
                     }
                 }
             }, true);
+        }
+        /**
+         * fitHeight overflow-content el is with height:unset;
+         * fitHeight we base on pane height as static for smooth transition on calcFitHeight()
+         * and we should set height for overflow element, or it give a wrong calculations
+         */
+        setOverflowHeight() {
+            this.instance.paneEl.style.height = `${this.instance.getPaneHeight()}px`;
         }
         beforeBuildBreakpoints() {
             var _a, _b, _c;
@@ -1604,7 +1614,7 @@
                 yield Promise.all(promises);
                 yield new Promise(resolve => requestAnimationFrame(resolve));
                 // Base calc
-                let paneElHeight = Math.round(this.instance.paneEl.getBoundingClientRect().height);
+                let contentElHeight = Math.round(this.instance.el.getBoundingClientRect().height);
                 // Hide elements back
                 if (!this.instance.rendered) {
                     this.instance.el.style.visibility = 'unset';
@@ -1615,7 +1625,7 @@
                     this.instance.wrapperEl.style.display = 'none';
                 }
                 this.calcHeightInProcess = false;
-                return paneElHeight;
+                return contentElHeight;
             });
         }
     }
@@ -2161,9 +2171,6 @@
             this.screenHeightOffset = window.innerHeight;
         }
         scrollElementInit() {
-            if (!this.settings.fitHeight) {
-                this.paneEl.style.height = `${this.getPaneHeight()}px`; // todo: review ability to remove this line at all
-            }
             let attrElements = this.el.querySelectorAll('[overflow-y]');
             if (!attrElements.length || attrElements.length > 1) {
                 this.overflowEl = this.contentEl;
@@ -2180,6 +2187,7 @@
             this.setOverflowHeight();
         }
         setOverflowHeight(offset = 0) {
+            this.paneEl.style.height = `${this.getPaneHeight()}px`;
             this.overflowEl.style.height = `${this.getPaneHeight()
             - this.settings.topperOverflowOffset
             - this.overflowEl.offsetTop
