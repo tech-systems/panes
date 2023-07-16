@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: July 11, 2023
+ * Released on: July 16, 2023
  */
 
 (function (global, factory) {
@@ -551,6 +551,7 @@
         }
         onScroll(t) {
             return __awaiter(this, void 0, void 0, function* () {
+                console.log('ON SCROLL');
                 this.isScrolling = true;
                 this.contentScrollTop = t.target.scrollTop;
             });
@@ -1501,11 +1502,16 @@
             // TODO: change binding strategy according to TypeScript
             // E.G. Using public module methods from modules
             this.instance['calcFitHeight'] = (animated) => __awaiter(this, void 0, void 0, function* () { return this.calcFitHeight(animated); });
-            this.instance['setOverflowHeight'] = () => this.setOverflowHeight();
-            // re-bind functions
+            this.instance['setOverflowHeight'] = () => { };
             // Class to wrapper
             this.instance.on('DOMElementsReady', () => {
                 this.instance.wrapperEl.classList.add('fit-height');
+            });
+            this.instance.on('onDidPresent', () => {
+                this.instance.paneEl.style.height = `unset`;
+            });
+            this.instance.on('onTransitionEnd', () => {
+                this.instance.paneEl.style.height = `unset`;
             });
             // Pass our code into function buildBreakpoints()
             this.instance.on('onWillPresent', () => {
@@ -1541,14 +1547,6 @@
                     }
                 }
             }, true);
-        }
-        /**
-         * fitHeight overflow-content el is with height:unset;
-         * fitHeight we base on pane height as static for smooth transition on calcFitHeight()
-         * and we should set height for overflow element, or it give a wrong calculations
-         */
-        setOverflowHeight() {
-            this.instance.paneEl.style.height = `${this.instance.getPaneHeight()}px`;
         }
         beforeBuildBreakpoints() {
             var _a, _b, _c;
@@ -1613,8 +1611,14 @@
                 }
                 yield Promise.all(promises);
                 yield new Promise(resolve => requestAnimationFrame(resolve));
-                // Base calc
-                let contentElHeight = Math.round(this.instance.el.getBoundingClientRect().height);
+                let newPaneElHeight = Math.round(this.instance.paneEl.getBoundingClientRect().height);
+                /**
+                 * To prevent raggy transition on pane icrease/decrease,
+                 * we set height before animation transition,
+                 * and afrer transition we release height to be 'unset'
+                 * for proper calculations in further.
+                 */
+                this.instance.paneEl.style.height = `${(newPaneElHeight <= this.paneElHeight) ? this.paneElHeight : newPaneElHeight}px`;
                 // Hide elements back
                 if (!this.instance.rendered) {
                     this.instance.el.style.visibility = 'unset';
@@ -1625,7 +1629,8 @@
                     this.instance.wrapperEl.style.display = 'none';
                 }
                 this.calcHeightInProcess = false;
-                return contentElHeight;
+                this.paneElHeight = newPaneElHeight;
+                return this.paneElHeight;
             });
         }
     }
@@ -1647,7 +1652,7 @@
             // re-bind functions
             this.instance['getPaneHeight'] = () => this.getPaneHeight();
             this.instance['updateScreenHeights'] = () => this.updateScreenHeights();
-            this.instance['setOverflowHeight'] = () => this.setOverflowHeight();
+            this.instance['setOverflowHeight'] = () => this.settings.fitHeight ? {} : this.setOverflowHeight();
             this.instance['checkOpacityAttr'] = () => { };
             this.instance['checkOverflowAttr'] = (val) => this.checkOverflowAttr(val);
             this.instance['prepareBreaksSwipeNextPoint'] = () => this.prepareBreaksSwipeNextPoint();

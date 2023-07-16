@@ -28,7 +28,7 @@ export class InverseModule {
     // re-bind functions
     this.instance['getPaneHeight'] = () => this.getPaneHeight();
     this.instance['updateScreenHeights'] = () => this.updateScreenHeights();
-    this.instance['setOverflowHeight'] = () => this.setOverflowHeight();
+    this.instance['setOverflowHeight'] = () => this.settings.fitHeight ? {} : this.setOverflowHeight();
     this.instance['checkOpacityAttr'] = () => {};
     this.instance['checkOverflowAttr'] = (val) => this.checkOverflowAttr(val);
     this.instance['prepareBreaksSwipeNextPoint'] = () => this.prepareBreaksSwipeNextPoint();
@@ -106,7 +106,7 @@ export class InverseModule {
         || !this.instance.overflowEl) {
       return;
     }
-
+ 
     this.instance.overflowEl.style.overflowY = (val >= this.breakpoints.bottomer) ? 'auto' : 'hidden';
   }
 
