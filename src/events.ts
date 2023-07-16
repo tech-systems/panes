@@ -431,7 +431,6 @@ export class Events {
    */
   public onScrollCb = (t) => this.onScroll(t);
   private async onScroll(t) {
-    console.log('ON SCROLL');
     this.isScrolling = true;
     this.contentScrollTop = t.target.scrollTop;
   }
