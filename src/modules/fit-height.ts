@@ -148,15 +148,21 @@ export class FitHeightModule {
     await Promise.all(promises);
     await new Promise(resolve => requestAnimationFrame(resolve));
 
-    let newPaneElHeight = Math.round(this.instance.paneEl.getBoundingClientRect().height);
+    let newPaneElHeight = Math.floor(this.instance.paneEl.getBoundingClientRect().height);
 
     /**
      * To prevent raggy transition on pane icrease/decrease, 
      * we set height before animation transition,
      * and afrer transition we release height to be 'unset'
      * for proper calculations in further. 
+     * 
+     * Only for changes in pane height, 
+     * to release `height` on 'onTransitionEnd'. 
      */
-    this.instance.paneEl.style.height = `${(newPaneElHeight <= this.paneElHeight) ? this.paneElHeight : newPaneElHeight}px`; 
+
+    if (this.paneElHeight !== newPaneElHeight) {
+      this.instance.paneEl.style.height = `${(newPaneElHeight <= this.paneElHeight) ? this.paneElHeight : newPaneElHeight}px`; 
+    }
 
     // Hide elements back
     if (!this.instance.rendered) {

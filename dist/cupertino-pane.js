@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.3.34
+ * Cupertino Pane 1.3.4
  * New generation interfaces for web3 progressive applications
  * https://github.com/roman-rr/cupertino-pane/
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: July 16, 2023
+ * Released on: July 20, 2023
  */
 
 (function (global, factory) {
@@ -40,6 +40,11 @@
             step((generator = generator.apply(thisArg, _arguments || [])).next());
         });
     }
+
+    typeof SuppressedError === "function" ? SuppressedError : function (error, suppressed, message) {
+        var e = new Error(message);
+        return e.name = "SuppressedError", e.error = error, e.suppressed = suppressed, e;
+    };
 
     class Support {
         static get touch() {
@@ -551,7 +556,6 @@
         }
         onScroll(t) {
             return __awaiter(this, void 0, void 0, function* () {
-                console.log('ON SCROLL');
                 this.isScrolling = true;
                 this.contentScrollTop = t.target.scrollTop;
             });
@@ -1611,14 +1615,19 @@
                 }
                 yield Promise.all(promises);
                 yield new Promise(resolve => requestAnimationFrame(resolve));
-                let newPaneElHeight = Math.round(this.instance.paneEl.getBoundingClientRect().height);
+                let newPaneElHeight = Math.floor(this.instance.paneEl.getBoundingClientRect().height);
                 /**
                  * To prevent raggy transition on pane icrease/decrease,
                  * we set height before animation transition,
                  * and afrer transition we release height to be 'unset'
                  * for proper calculations in further.
+                 *
+                 * Only for changes in pane height,
+                 * to release `height` on 'onTransitionEnd'.
                  */
-                this.instance.paneEl.style.height = `${(newPaneElHeight <= this.paneElHeight) ? this.paneElHeight : newPaneElHeight}px`;
+                if (this.paneElHeight !== newPaneElHeight) {
+                    this.instance.paneEl.style.height = `${(newPaneElHeight <= this.paneElHeight) ? this.paneElHeight : newPaneElHeight}px`;
+                }
                 // Hide elements back
                 if (!this.instance.rendered) {
                     this.instance.el.style.visibility = 'unset';

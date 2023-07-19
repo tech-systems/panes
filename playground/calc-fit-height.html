@@ -34,6 +34,18 @@
       background: green !important;
     }
 
+    #content-d {
+      height: 175px;
+      display: none;
+      background: rgb(115, 0, 128) !important;
+    }
+
+    #content-e {
+      height: 300px;
+      display: none;
+      background: darkkhaki !important;
+    }
+
     .pane {
       background: black !important;
     }
@@ -43,7 +55,9 @@
 <body>
   <div class="drawer">
     <div id="content-b">Content B (200px)</div>
-    <div id="content-c">Content c (175px)</div>
+    <div id="content-c">Content C (175px)</div>
+    <div id="content-d">Content D (175px)</div>
+    <div id="content-e">Content E (300px)</div>
     <div id="content-a">
       <div style="display:flex;flex-direction:column;height:100%">
         <span style="flex:1 1 auto">Content A (100px)</span>
@@ -61,24 +75,34 @@
     window.onload = async function () {
       drawer.present();
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       document.querySelector('#content-a').style.display = 'none';
       document.querySelector('#content-b').style.display = 'block';
       drawer.calcFitHeight();
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       document.querySelector('#content-a').style.display = 'block';
       document.querySelector('#content-b').style.display = 'none';
       drawer.calcFitHeight();
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       document.querySelector('#content-a').style.display = 'block';
       document.querySelector('#content-b').style.display = 'none';
       document.querySelector('#content-c').style.display = 'block';
       drawer.calcFitHeight();
 
-      await new Promise((resolve) => setTimeout(resolve, 1000));
+      await new Promise((resolve) => setTimeout(resolve, 500));
       document.querySelector('#content-a').style.display = 'none';
+      drawer.calcFitHeight();
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      document.querySelector('#content-c').style.display = 'none';
+      document.querySelector('#content-d').style.display = 'block';
+      drawer.calcFitHeight();
+
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      document.querySelector('#content-d').style.display = 'none';
+      document.querySelector('#content-e').style.display = 'block';
       drawer.calcFitHeight();
     }
   </script>
