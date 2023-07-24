@@ -49,23 +49,23 @@ Support this project with your organization. Your logo will show up here with a 
 <a href="https://opencollective.com/cupertino-pane"><img src="https://opencollective.com/cupertino-pane/organizations.svg?width=890"></a>
 
 ## Demonstration
-- [Synthwave live](https://output.jsbin.com/garijar)
-- [Picture-in-Picture live](https://output.jsbin.com/dubixep)
-- [Rich notifications live](https://jsbin.com/neqoxef)
-- [Base live](https://output.jsbin.com/fuhisey)
-- [Overflow top live](https://output.jsbin.com/baguroy)
-- [Z-stack full live](https://output.jsbin.com/benidub)
-- [Z-Stack simple live](https://output.jsbin.com/daqihir)
-- [3D Push live](https://output.jsbin.com/vidaqa)
-- [Overflow top-middle live](https://output.jsbin.com/piwecad)
-- [Draggable over live](https://jsbin.com/hamedec)
-- [Prevent dismiss live](https://output.jsbin.com/keravam)
-- [Top-to-bottom live](https://output.jsbin.com/muhabuf)
-- [Follower live](https://output.jsbin.com/xogavec)
-- [Apple Clips live](https://output.jsbin.com/luqaxud)
-- [Bulletin live](https://output.jsbin.com/maqigod)
-- [Starbucks live](https://output.jsbin.com/jayicip)
-- [Backdrop drag-opacity live](https://output.jsbin.com/riwahab)
+- [Base](https://panejs.com/demo/base.html)
+- [Overflow Top](https://panejs.com/demo/overflow-top.html)
+- [Auto Height](https://panejs.com/demo/auto-height.html)
+- [Top-to-Bottom](https://panejs.com/demo/top-to-bottom.html)
+- [Synthwave](https://panejs.com/demo/synthwave.html)
+- [Picture-in-Picture](https://panejs.com/demo/picture-in-picture.html)
+- [Rich notifications](https://panejs.com/demo/rich-notifications.html)
+- [Z-stack full](https://panejs.com/demo/z-stack-full.html)
+- [Z-Stack simple](https://panejs.com/demo/z-stack-simple.html)
+- [3D Push](https://panejs.com/demo/3d-push.html)
+- [Backdrop drag-opacity](https://panejs.com/demo/backdrop-drag-opacity.html)
+- [Overflow Top-Middle](https://panejs.com/demo/overflow-top-middle.html)
+- [Draggable Over](https://panejs.com/demo/draggable-over.html)
+- [Prevent Dismiss](https://panejs.com/demo/prevent-dismiss.html)
+- [Follower](https://panejs.com/demo/follower.html)
+- [Apple Clips](https://panejs.com/demo/apple-clips.html)
+- [Starbucks](https://panejs.com/demo/starbucks.html)
 
 <div style="display:flex;flex-wrap:wrap;">
   <img style="width: 200px;" width="200" height="433.59" src="docs/images/custom-transitions.gif?raw=true" alt="Cupertino Pane - Roman Antonov" >
@@ -74,7 +74,6 @@ Support this project with your organization. Your logo will show up here with a 
   <img style="width: 200px;" width="200" src="docs/images/z-stack.gif?raw=true" alt="Cupertino Pane - Roman Antonov" >
   <img style="width: 200px;" width="200" src="docs/images/overflow.gif?raw=true" alt="Cupertino Pane - Roman Antonov" >
   <img style="width: 200px;" width="200" src="docs/images/bulletin.gif?raw=true" alt="Cupertino Pane - Roman Antonov" >
-
 </div>
 
 ## Docs & Guidelines
