@@ -23,7 +23,9 @@
 <!-- <img src="https://user-images.githubusercontent.com/10646478/79794348-4846bc00-837c-11ea-8b74-7c71fac120aa.png" 
      align="right" alt="Cupertino Pane logo Roman Antonov" width="260px" height="421px"> -->
      
-Cupertino Panes is multi-functional modals, cards & panes with touch technologies. <br>
+### Cupertino Panes is multi-functional modals, cards & panes with touch technologies. <br>
+
+#### One instance – Thousands solutions. <br>
 
 * **Small.** 12kb (minified and gzipped bundle with all modules). No dependencies.
 * **Modularized.** Add extra features to your panes and create own modules.
