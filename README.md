@@ -11,7 +11,7 @@
 
 # Cupertino Panes
 
-[![CircleCI](https://circleci.com/gh/roman-rr/cupertino-pane.svg?style=svg)](https://circleci.com/gh/roman-rr/cupertino-pane)
+[![CircleCI](https://circleci.com/gh/roman-rr/cupertino-pane.svg?style=svg)](https://circleci.com/gh/tech-systems/panes)
 ![npm](https://img.shields.io/npm/v/cupertino-pane)
 ![npm](https://img.shields.io/npm/dm/cupertino-pane?color=%23007DC5)
 ![NPM](https://img.shields.io/npm/l/cupertino-pane?color=%23007DC5)
@@ -87,7 +87,7 @@ All **new features** and **new investigations** moved to open collective [Goals]
 
 ## Contributors
 We are welcome contributions of all kinds from anyone. 
-Please review the [contributing](https://github.com/roman-rr/cupertino-pane/blob/master/CONTRIBUTING.md) guideline.
+Please review the [contributing](https://github.com/tech-systems/panes/blob/master/CONTRIBUTING.md) guideline.
 
 Commit Message Format [angular commit format](https://github.com/angular/angular/blob/master/CONTRIBUTING.md#-commit-message-format)
 
