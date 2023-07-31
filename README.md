@@ -11,7 +11,7 @@
 
 # Cupertino Panes
 
-[![CircleCI](https://circleci.com/gh/roman-rr/cupertino-pane.svg?style=svg)](https://circleci.com/gh/tech-systems/panes)
+[![CircleCI](https://circleci.com/gh/tech-systems/panes.svg?style=svg)](https://circleci.com/gh/tech-systems/panes)
 ![npm](https://img.shields.io/npm/v/cupertino-pane)
 ![npm](https://img.shields.io/npm/dm/cupertino-pane?color=%23007DC5)
 ![NPM](https://img.shields.io/npm/l/cupertino-pane?color=%23007DC5)
