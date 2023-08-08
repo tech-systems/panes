@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html dir="ltr">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Cupertino Pane - Using with swiperjs</title>
+
+  <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+  <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
+  <script src="../dist/cupertino-pane.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css"/> 
+  <script src="https://cdn.jsdelivr.net/npm/swiper@10/swiper-element-bundle.min.js"></script>
+  <style>
+    ion-drawer, ion-extra-drawer { padding: 0 20px; } ion-slides { height: 150px; }
+    swiper-slide { height: 150px; }
+    swiper-slide:nth-child(1) { background-color: darkslateblue; }
+    swiper-slide:nth-child(2) { background-color: teal; }
+    swiper-slide:nth-child(3) { background-color: rosybrown; }
+  </style>
+</head>
+
+<body>
+  <ion-app>
+    <ion-content>
+      <ion-drawer>
+        <h1>Header</h1>
+        <p hide-on-bottom>Content</p> 
+
+        <swiper-container>
+          <swiper-slide>Slide 1</swiper-slide>
+          <swiper-slide>Slide 2</swiper-slide>
+          <swiper-slide>Slide 3</swiper-slide>
+        </swiper-container>
+      </ion-drawer>
+
+      
+      <ion-button expand="block" color="danger" onclick="presentDrawer()">Present Drawer</ion-button>
+      <ion-button expand="block" color="danger" onclick="destroyDrawer()">Destroy Drawer</ion-button>
+
+  </ion-content>
+</ion-app>
+
+<script>
+    var element = document.querySelector('ion-drawer');
+    var drawer = new CupertinoPane(element);
+
+    window.onload = async function () {
+      await document.querySelector('ion-app').componentOnReady();
+      drawer.present({animate: true});
+    }
+  
+    async function presentDrawer() {
+      drawer.present({animate: true});
+    };
+
+    async function destroyDrawer() {
+      drawer.destroy({animate: true});
+    };
+    
+  </script>
+</body>
+
+</html>

@@ -1,13 +1,13 @@
 /**
- * Cupertino Pane 1.3.4
- * New generation interfaces for web3 progressive applications
- * https://github.com/roman-rr/cupertino-pane/
+ * Cupertino Pane 1.3.41
+ * Cupertino Panes is multi-functional modals, cards & panes with touch technologies.
+ * https://panejs.com
  *
  * Copyright 2019-2023 Roman Antonov (roman-rr)
  *
  * Released under the MIT License
  *
- * Released on: July 20, 2023
+ * Released on: August 8, 2023
  */
 
 (function (global, factory) {
@@ -359,7 +359,13 @@
             this.isScrolling = false;
             // Allow pereventDismiss by default
             this.instance.preventedDismiss = false;
+            /**
+             * TODO: Switch to pointer events
+             */
             const { clientY, clientX } = this.getEventClientYX(t, 'touchstart');
+            if (!clientY || !clientX) {
+                return;
+            }
             this.startY = clientY;
             this.startX = clientX;
             if (t.type === 'mousedown')
@@ -376,7 +382,13 @@
         }
         touchMove(t) {
             var _a;
+            /**
+             * TODO: Switch to pointer events
+             */
             const { clientY, clientX, velocityY } = this.getEventClientYX(t, 'touchmove');
+            if (!clientY || !clientX) {
+                return;
+            }
             // Deskop: check that touchStart() was initiated
             if (t.type === 'mousemove' && !this.mouseDown)
                 return;
@@ -754,8 +766,8 @@
         getEventClientYX(ev, name) {
             var _a, _b;
             const targetTouch = ev.type === name && ev.targetTouches && (ev.targetTouches[0] || ev.changedTouches[0]);
-            const clientY = ev.type === name ? targetTouch.clientY : ev.clientY;
-            const clientX = ev.type === name ? targetTouch.clientX : ev.clientX;
+            const clientY = (ev.type === name) ? targetTouch === null || targetTouch === void 0 ? void 0 : targetTouch.clientY : ev.clientY;
+            const clientX = (ev.type === name) ? targetTouch === null || targetTouch === void 0 ? void 0 : targetTouch.clientX : ev.clientX;
             const timeDiff = (Date.now()) - (((_a = this.steps[this.steps.length - 1]) === null || _a === void 0 ? void 0 : _a.time) || 0);
             const distanceY = Math.abs(clientY - (((_b = this.steps[this.steps.length - 1]) === null || _b === void 0 ? void 0 : _b.posY) || 0));
             const velocityY = distanceY / timeDiff;

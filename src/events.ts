@@ -184,7 +184,14 @@ export class Events {
     // Allow pereventDismiss by default
     this.instance.preventedDismiss = false;
 
+    /**
+     * TODO: Switch to pointer events
+     */
     const { clientY, clientX } = this.getEventClientYX(t, 'touchstart');
+    if (!clientY || !clientX) {
+      return;
+    }
+
     this.startY = clientY;
     this.startX = clientX;
 
@@ -208,7 +215,14 @@ export class Events {
    */
   public touchMoveCb = (t) => this.touchMove(t);
   private touchMove(t) {
+
+    /**
+     * TODO: Switch to pointer events
+     */
     const { clientY, clientX, velocityY } = this.getEventClientYX(t, 'touchmove');
+    if (!clientY || !clientX) {
+      return;
+    }
 
     // Deskop: check that touchStart() was initiated
     if(t.type === 'mousemove' && !this.mouseDown) return;
@@ -680,8 +694,8 @@ export class Events {
 
   private getEventClientYX(ev, name) {
     const targetTouch = ev.type === name && ev.targetTouches && (ev.targetTouches[0] || ev.changedTouches[0]);
-    const clientY: number = (ev.type === name && targetTouch) ? targetTouch.clientY : ev.clientY;
-    const clientX: number = (ev.type === name && targetTouch) ? targetTouch.clientX : ev.clientX;
+    const clientY: number = (ev.type === name) ? targetTouch?.clientY : ev.clientY;
+    const clientX: number = (ev.type === name) ? targetTouch?.clientX : ev.clientX;
     const timeDiff: number = (Date.now()) - (this.steps[this.steps.length - 1]?.time || 0);
     const distanceY: number = Math.abs(clientY - (this.steps[this.steps.length - 1]?.posY || 0));
     const velocityY: number = distanceY / timeDiff;
