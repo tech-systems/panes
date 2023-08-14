@@ -286,6 +286,7 @@ declare class CupertinoPane {
     contentEl: HTMLElement;
     parentEl: HTMLElement;
     ionContent: HTMLElement;
+    ionApp: HTMLElement;
     draggableEl: HTMLDivElement;
     moveEl: HTMLDivElement;
     private styleEl;

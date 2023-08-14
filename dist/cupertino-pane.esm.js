@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: August 8, 2023
+ * Released on: August 14, 2023
  */
 
 /******************************************************************************
@@ -1960,6 +1960,7 @@ class CupertinoPane {
         // Ion-content element
         if (this.device.ionic) {
             this.ionContent = document.querySelector('ion-content');
+            this.ionApp = document.querySelector('ion-app');
         }
         // Events listeners
         if (this.settings.events) {
@@ -2129,6 +2130,15 @@ class CupertinoPane {
             Object.assign(this.paneEl.style, (_a = conf === null || conf === void 0 ? void 0 : conf.transition) === null || _a === void 0 ? void 0 : _a.from);
             // Show elements
             this.wrapperEl.style.display = 'block';
+            /**
+             * Ionic cancel transition if the app is not ready
+             * https://github.com/tech-systems/panes/issues/216
+             * Good to get rid of that.
+             */
+            if (this.device.ionic) {
+                yield this.ionApp['componentOnReady']();
+                yield new Promise(resolve => requestAnimationFrame(resolve));
+            }
             this.contentEl.style.display = 'block';
             this.wrapperEl.classList.add('rendered');
             this.rendered = true;

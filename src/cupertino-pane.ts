@@ -23,6 +23,7 @@ export class CupertinoPane {
   public contentEl: HTMLElement;
   public parentEl: HTMLElement;
   public ionContent: HTMLElement;
+  public ionApp: HTMLElement;
   public draggableEl: HTMLDivElement;
   public moveEl: HTMLDivElement;
   private styleEl: HTMLStyleElement;
@@ -84,6 +85,7 @@ export class CupertinoPane {
     // Ion-content element
     if (this.device.ionic) {
       this.ionContent = document.querySelector('ion-content');
+      this.ionApp = document.querySelector('ion-app');
     }
 
     // Events listeners
@@ -273,12 +275,22 @@ export class CupertinoPane {
       this.drawBaseElements();
       await this.setBreakpoints();
 
-
       // Custom transitions for present/destroy: set styles
       Object.assign(this.paneEl.style, conf?.transition?.from);
 
       // Show elements
       this.wrapperEl.style.display = 'block';
+
+      /**
+       * Ionic cancel transition if the app is not ready
+       * https://github.com/tech-systems/panes/issues/216
+       * Good to get rid of that.
+       */
+      if (this.device.ionic) {
+        await this.ionApp['componentOnReady']();
+        await new Promise(resolve => requestAnimationFrame(resolve));
+      }
+
       this.contentEl.style.display = 'block';
       this.wrapperEl.classList.add('rendered');
       this.rendered = true;
