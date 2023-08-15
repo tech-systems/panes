@@ -255,14 +255,6 @@ declare class Events {
     private handleTopperLowerPositions;
     private getEventClientYX;
     scrollPreventDrag(t: any): boolean;
-    /**
-     * TODO: Check also document.body resizing for iOS/Chrome
-     * Fix OSK
-     * https://developer.chrome.com/blog/viewport-resize-behavior/
-     * Chrome 108+ will adjust with content-overlays
-     * When everyones updates, can be replaced with adding content-overlays to meta
-     */
-    private fixBodyKeyboardResize;
     willScrolled(): boolean;
     private isPaneDescendant;
     private isDraggableElement;

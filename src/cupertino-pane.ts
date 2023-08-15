@@ -280,17 +280,6 @@ export class CupertinoPane {
 
       // Show elements
       this.wrapperEl.style.display = 'block';
-
-      /**
-       * Ionic cancel transition if the app is not ready
-       * https://github.com/tech-systems/panes/issues/216
-       * Good to get rid of that.
-       */
-      if (this.device.ionic) {
-        await this.ionApp['componentOnReady']();
-        await new Promise(resolve => requestAnimationFrame(resolve));
-      }
-
       this.contentEl.style.display = 'block';
       this.wrapperEl.classList.add('rendered');
       this.rendered = true;
@@ -340,6 +329,18 @@ export class CupertinoPane {
       await new Promise(resolve => requestAnimationFrame(resolve));
 
       if (conf.animate) {
+        if (this.device.ionic) {
+          /**
+           * Ionic cancel transition if the app is not ready
+           * https://github.com/tech-systems/panes/issues/216
+           * Good to get rid of that, but Ionic team seems not
+           * have a solution for this 
+           * https://github.com/ionic-team/ionic-framework/issues/27984
+           */
+          await this.ionApp['componentOnReady']();
+          await new Promise(resolve => requestAnimationFrame(resolve));
+        }
+
         await this.transitions.doTransition({
           type: 'present', conf,
           translateY: this.breakpoints.breaks[this.settings.initialBreak]

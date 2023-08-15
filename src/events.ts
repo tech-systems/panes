@@ -517,15 +517,15 @@ export class Events {
     // calculate distances based on transformY
     let currentHeight = (this.instance.getPanelTransformY() - this.instance.screen_height) * -1;
     const inputEl = document.activeElement;
-    const inputElBottomBound = inputEl.getBoundingClientRect().bottom;
-    const inputSpaceBelow = this.instance.screen_height - inputElBottomBound - this.inputBottomOffset;
-    const offset = this.device.cordova && this.device.android ? 150 : 100;
+    const inputElTopBound = inputEl.getBoundingClientRect().top + 30;
+    const inputSpaceBelow = this.instance.screen_height - inputElTopBound - this.inputBottomOffset;
+    let offset = this.device.cordova && this.device.android ? 130 : 100;
     let spaceBelowOffset = 0;
     let newHeight = currentHeight + (e.keyboardHeight - inputSpaceBelow);
 
     // Multiple event fired with opened keyboard
     if (this.prevNewHeight) {
-      spaceBelowOffset = this.previousInputBottomOffset - inputElBottomBound;
+      spaceBelowOffset = this.previousInputBottomOffset - inputElTopBound;
       newHeight = this.prevNewHeight;
     }
 
@@ -538,13 +538,23 @@ export class Events {
     if (e.keyboardHeight > inputSpaceBelow) {
       this.prevNewHeight = newHeight - spaceBelowOffset;
       this.prevFocusedElement = document.activeElement;
+
+      // Not push more than pane height
+      if (offset > this.instance.screen_height - inputElTopBound) {
+        offset = this.instance.screen_height - inputElTopBound;
+      }
+
+      /**
+       * TODO: textarea issues
+       * Need to resize textarea dynamically with keyboard
+       */
       await this.instance.moveToHeight(newHeight - spaceBelowOffset + offset);
 
       // Determinate device offset for presented keyboard
       const newInputBottomOffset = inputEl.getBoundingClientRect().bottom;
       this.previousInputBottomOffset = newInputBottomOffset;
       if (!this.inputBottomOffset) {
-        this.inputBottomOffset = inputElBottomBound - newInputBottomOffset;
+        this.inputBottomOffset = inputElTopBound - newInputBottomOffset;
       }
     }
   }
@@ -559,8 +569,8 @@ export class Events {
     if (!this.isOnViewport()) {
       return;
     }
-
-    this.fixBodyKeyboardResize(false);
+    
+    this.instance.emit('onKeyboardWillHide');
 
     this.keyboardVisible = false;
     
@@ -595,9 +605,7 @@ export class Events {
   private async onWindowResize(e) {
     // We should separate keyboard and resize events
     if (this.isKeyboardEvent()) {
-
-      // Android resize fixes
-      this.fixBodyKeyboardResize(true);
+      this.instance.emit('onWindowResizeForKeyboard');
 
       // Cordova & PWA iOS
       if (this.device.cordova 
@@ -708,30 +716,6 @@ export class Events {
       prevention = true;
     }
     return prevention;
-  }
-
-  /**
-   * TODO: Check also document.body resizing for iOS/Chrome
-   * Fix OSK
-   * https://developer.chrome.com/blog/viewport-resize-behavior/
-   * Chrome 108+ will adjust with content-overlays
-   * When everyones updates, can be replaced with adding content-overlays to meta
-   */
-  private fixBodyKeyboardResize(showKeyboard) {
-    if (!this.instance.paneEl) return;
-    const metaViewport = document.querySelector('meta[name=viewport]');
-
-    window.requestAnimationFrame(() => {
-      if (showKeyboard) {
-        document.documentElement.style.setProperty('overflow', 'hidden');
-        document.body.style.setProperty('min-height', `${this.instance.screen_height}px`);
-        metaViewport.setAttribute('content', 'height=' + this.instance.screen_height + ', width=device-width, initial-scale=1.0')
-      } else {
-        document.documentElement.style.removeProperty('overflow');
-        document.body.style.removeProperty('min-height');
-        metaViewport.setAttribute('content', 'viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no');
-      }
-    });
   }
 
   public willScrolled(): boolean {

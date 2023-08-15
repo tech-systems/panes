@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: August 14, 2023
+ * Released on: August 15, 2023
  */
 
 (function (global, factory) {
@@ -623,14 +623,14 @@
                 // calculate distances based on transformY
                 let currentHeight = (this.instance.getPanelTransformY() - this.instance.screen_height) * -1;
                 const inputEl = document.activeElement;
-                const inputElBottomBound = inputEl.getBoundingClientRect().bottom;
-                const inputSpaceBelow = this.instance.screen_height - inputElBottomBound - this.inputBottomOffset;
-                const offset = this.device.cordova && this.device.android ? 150 : 100;
+                const inputElTopBound = inputEl.getBoundingClientRect().top + 30;
+                const inputSpaceBelow = this.instance.screen_height - inputElTopBound - this.inputBottomOffset;
+                let offset = this.device.cordova && this.device.android ? 130 : 100;
                 let spaceBelowOffset = 0;
                 let newHeight = currentHeight + (e.keyboardHeight - inputSpaceBelow);
                 // Multiple event fired with opened keyboard
                 if (this.prevNewHeight) {
-                    spaceBelowOffset = this.previousInputBottomOffset - inputElBottomBound;
+                    spaceBelowOffset = this.previousInputBottomOffset - inputElTopBound;
                     newHeight = this.prevNewHeight;
                 }
                 // Re-focus input dublicate events
@@ -641,12 +641,20 @@
                 if (e.keyboardHeight > inputSpaceBelow) {
                     this.prevNewHeight = newHeight - spaceBelowOffset;
                     this.prevFocusedElement = document.activeElement;
+                    // Not push more than pane height
+                    if (offset > this.instance.screen_height - inputElTopBound) {
+                        offset = this.instance.screen_height - inputElTopBound;
+                    }
+                    /**
+                     * TODO: textarea issues
+                     * Need to resize textarea dynamically with keyboard
+                     */
                     yield this.instance.moveToHeight(newHeight - spaceBelowOffset + offset);
                     // Determinate device offset for presented keyboard
                     const newInputBottomOffset = inputEl.getBoundingClientRect().bottom;
                     this.previousInputBottomOffset = newInputBottomOffset;
                     if (!this.inputBottomOffset) {
-                        this.inputBottomOffset = inputElBottomBound - newInputBottomOffset;
+                        this.inputBottomOffset = inputElTopBound - newInputBottomOffset;
                     }
                 }
             });
@@ -656,7 +664,7 @@
             if (!this.isOnViewport()) {
                 return;
             }
-            this.fixBodyKeyboardResize(false);
+            this.instance.emit('onKeyboardWillHide');
             this.keyboardVisible = false;
             // Clear
             this.inputBottomOffset = 0;
@@ -680,8 +688,7 @@
             return __awaiter(this, void 0, void 0, function* () {
                 // We should separate keyboard and resize events
                 if (this.isKeyboardEvent()) {
-                    // Android resize fixes
-                    this.fixBodyKeyboardResize(true);
+                    this.instance.emit('onWindowResizeForKeyboard');
                     // Cordova & PWA iOS
                     if (this.device.cordova
                         || this.device.ios) {
@@ -779,30 +786,6 @@
                 prevention = true;
             }
             return prevention;
-        }
-        /**
-         * TODO: Check also document.body resizing for iOS/Chrome
-         * Fix OSK
-         * https://developer.chrome.com/blog/viewport-resize-behavior/
-         * Chrome 108+ will adjust with content-overlays
-         * When everyones updates, can be replaced with adding content-overlays to meta
-         */
-        fixBodyKeyboardResize(showKeyboard) {
-            if (!this.instance.paneEl)
-                return;
-            const metaViewport = document.querySelector('meta[name=viewport]');
-            window.requestAnimationFrame(() => {
-                if (showKeyboard) {
-                    document.documentElement.style.setProperty('overflow', 'hidden');
-                    document.body.style.setProperty('min-height', `${this.instance.screen_height}px`);
-                    metaViewport.setAttribute('content', 'height=' + this.instance.screen_height + ', width=device-width, initial-scale=1.0');
-                }
-                else {
-                    document.documentElement.style.removeProperty('overflow');
-                    document.body.style.removeProperty('min-height');
-                    metaViewport.setAttribute('content', 'viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no');
-                }
-            });
         }
         willScrolled() {
             if (!(this.isElementScrollable(this.instance.overflowEl)
@@ -1353,6 +1336,36 @@
             this.instance.on('onTransitionStart', (ev) => {
                 this.followerEl.style.transition = ev.transition;
                 this.followerEl.style.transform = `translateY(${ev.translateY.new - this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+            });
+            this.instance.on('onKeyboardWillHide', () => {
+                this.fixBodyKeyboardResize(false);
+            });
+            this.instance.on('onWindowResizeForKeyboard', () => {
+                this.fixBodyKeyboardResize(true);
+            });
+        }
+        /**
+         * Using only to fix follower elemennts jumps out by OSK
+         * Fix OSK
+         * https://developer.chrome.com/blog/viewport-resize-behavior/
+         * Chrome 108+ will adjust with overlays-content
+         * When everyones updates, can be replaced with adding content-overlays to meta
+         */
+        fixBodyKeyboardResize(showKeyboard) {
+            if (!this.instance.paneEl)
+                return;
+            const metaViewport = document.querySelector('meta[name=viewport]');
+            window.requestAnimationFrame(() => {
+                if (showKeyboard) {
+                    document.documentElement.style.setProperty('overflow', 'hidden');
+                    document.body.style.setProperty('min-height', `${this.instance.screen_height}px`);
+                    metaViewport.setAttribute('content', 'height=' + this.instance.screen_height + ', width=device-width, initial-scale=1.0');
+                }
+                else {
+                    document.documentElement.style.removeProperty('overflow');
+                    document.body.style.removeProperty('min-height');
+                    metaViewport.setAttribute('content', 'viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no');
+                }
             });
         }
     }
@@ -2136,15 +2149,6 @@
                 Object.assign(this.paneEl.style, (_a = conf === null || conf === void 0 ? void 0 : conf.transition) === null || _a === void 0 ? void 0 : _a.from);
                 // Show elements
                 this.wrapperEl.style.display = 'block';
-                /**
-                 * Ionic cancel transition if the app is not ready
-                 * https://github.com/tech-systems/panes/issues/216
-                 * Good to get rid of that.
-                 */
-                if (this.device.ionic) {
-                    yield this.ionApp['componentOnReady']();
-                    yield new Promise(resolve => requestAnimationFrame(resolve));
-                }
                 this.contentEl.style.display = 'block';
                 this.wrapperEl.classList.add('rendered');
                 this.rendered = true;
@@ -2183,6 +2187,17 @@
                 // One frame before transition
                 yield new Promise(resolve => requestAnimationFrame(resolve));
                 if (conf.animate) {
+                    if (this.device.ionic) {
+                        /**
+                         * Ionic cancel transition if the app is not ready
+                         * https://github.com/tech-systems/panes/issues/216
+                         * Good to get rid of that, but Ionic team seems not
+                         * have a solution for this
+                         * https://github.com/ionic-team/ionic-framework/issues/27984
+                         */
+                        yield this.ionApp['componentOnReady']();
+                        yield new Promise(resolve => requestAnimationFrame(resolve));
+                    }
                     yield this.transitions.doTransition({
                         type: 'present', conf,
                         translateY: this.breakpoints.breaks[this.settings.initialBreak]
