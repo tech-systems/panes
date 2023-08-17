@@ -517,15 +517,16 @@ export class Events {
     // calculate distances based on transformY
     let currentHeight = (this.instance.getPanelTransformY() - this.instance.screen_height) * -1;
     const inputEl = document.activeElement;
-    const inputElTopBound = inputEl.getBoundingClientRect().top + 30;
-    const inputSpaceBelow = this.instance.screen_height - inputElTopBound - this.inputBottomOffset;
+    const inputElTopBound = inputEl.getBoundingClientRect().top;
+    const inputElBottomBound = inputEl.getBoundingClientRect().bottom;
+    const inputSpaceBelow = this.instance.screen_height - inputElBottomBound - this.inputBottomOffset;
     let offset = this.device.cordova && this.device.android ? 130 : 100;
     let spaceBelowOffset = 0;
     let newHeight = currentHeight + (e.keyboardHeight - inputSpaceBelow);
 
     // Multiple event fired with opened keyboard
     if (this.prevNewHeight) {
-      spaceBelowOffset = this.previousInputBottomOffset - inputElTopBound;
+      spaceBelowOffset = this.previousInputBottomOffset - inputElBottomBound;
       newHeight = this.prevNewHeight;
     }
 
@@ -540,13 +541,14 @@ export class Events {
       this.prevFocusedElement = document.activeElement;
 
       // Not push more than pane height
-      if (offset > this.instance.screen_height - inputElTopBound) {
-        offset = this.instance.screen_height - inputElTopBound;
+      if (offset > this.instance.screen_height - inputElBottomBound) {
+        offset = this.instance.screen_height - inputElBottomBound;
       }
 
       /**
        * TODO: textarea issues
-       * Need to resize textarea dynamically with keyboard
+       * Not push pane more than height (fitScreenHeight) in case of 
+       * log textarea. or need to resize textarea dynamically with keyboard
        */
       await this.instance.moveToHeight(newHeight - spaceBelowOffset + offset);
 
@@ -554,7 +556,7 @@ export class Events {
       const newInputBottomOffset = inputEl.getBoundingClientRect().bottom;
       this.previousInputBottomOffset = newInputBottomOffset;
       if (!this.inputBottomOffset) {
-        this.inputBottomOffset = inputElTopBound - newInputBottomOffset;
+        this.inputBottomOffset = inputElBottomBound - newInputBottomOffset;
       }
     }
   }
@@ -565,6 +567,7 @@ export class Events {
    */
   public onKeyboardWillHideCb = (e) => this.onKeyboardWillHide(e);
   private onKeyboardWillHide(e) {
+
     // pane not visible on viewport
     if (!this.isOnViewport()) {
       return;
@@ -603,6 +606,7 @@ export class Events {
    */
   public onWindowResizeCb = (e) => this.onWindowResize(e);
   private async onWindowResize(e) {
+    
     // We should separate keyboard and resize events
     if (this.isKeyboardEvent()) {
       this.instance.emit('onWindowResizeForKeyboard');

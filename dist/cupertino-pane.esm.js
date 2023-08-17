@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.3.41
+ * Cupertino Pane 1.3.51
  * Cupertino Panes is multi-functional modals, cards & panes with touch technologies.
  * https://panejs.com
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: August 15, 2023
+ * Released on: August 18, 2023
  */
 
 /******************************************************************************
@@ -617,14 +617,15 @@ class Events {
             // calculate distances based on transformY
             let currentHeight = (this.instance.getPanelTransformY() - this.instance.screen_height) * -1;
             const inputEl = document.activeElement;
-            const inputElTopBound = inputEl.getBoundingClientRect().top + 30;
-            const inputSpaceBelow = this.instance.screen_height - inputElTopBound - this.inputBottomOffset;
+            inputEl.getBoundingClientRect().top;
+            const inputElBottomBound = inputEl.getBoundingClientRect().bottom;
+            const inputSpaceBelow = this.instance.screen_height - inputElBottomBound - this.inputBottomOffset;
             let offset = this.device.cordova && this.device.android ? 130 : 100;
             let spaceBelowOffset = 0;
             let newHeight = currentHeight + (e.keyboardHeight - inputSpaceBelow);
             // Multiple event fired with opened keyboard
             if (this.prevNewHeight) {
-                spaceBelowOffset = this.previousInputBottomOffset - inputElTopBound;
+                spaceBelowOffset = this.previousInputBottomOffset - inputElBottomBound;
                 newHeight = this.prevNewHeight;
             }
             // Re-focus input dublicate events
@@ -636,19 +637,20 @@ class Events {
                 this.prevNewHeight = newHeight - spaceBelowOffset;
                 this.prevFocusedElement = document.activeElement;
                 // Not push more than pane height
-                if (offset > this.instance.screen_height - inputElTopBound) {
-                    offset = this.instance.screen_height - inputElTopBound;
+                if (offset > this.instance.screen_height - inputElBottomBound) {
+                    offset = this.instance.screen_height - inputElBottomBound;
                 }
                 /**
                  * TODO: textarea issues
-                 * Need to resize textarea dynamically with keyboard
+                 * Not push pane more than height (fitScreenHeight) in case of
+                 * log textarea. or need to resize textarea dynamically with keyboard
                  */
                 yield this.instance.moveToHeight(newHeight - spaceBelowOffset + offset);
                 // Determinate device offset for presented keyboard
                 const newInputBottomOffset = inputEl.getBoundingClientRect().bottom;
                 this.previousInputBottomOffset = newInputBottomOffset;
                 if (!this.inputBottomOffset) {
-                    this.inputBottomOffset = inputElTopBound - newInputBottomOffset;
+                    this.inputBottomOffset = inputElBottomBound - newInputBottomOffset;
                 }
             }
         });
