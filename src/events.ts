@@ -502,6 +502,7 @@ export class Events {
   public onKeyboardShowCb = (e) => this.onKeyboardShow(e);
   private async onKeyboardShow(e) {
 
+    
     // focud element not inside pane
     if (!this.isPaneDescendant(document.activeElement)) {
       return;
@@ -517,9 +518,9 @@ export class Events {
     // calculate distances based on transformY
     let currentHeight = (this.instance.getPanelTransformY() - this.instance.screen_height) * -1;
     const inputEl = document.activeElement;
-    const inputElTopBound = inputEl.getBoundingClientRect().top;
-    const inputElBottomBound = inputEl.getBoundingClientRect().bottom;
+    const inputElBottomBound: number = this.getActiveInputClientBottomRect();
     const inputSpaceBelow = this.instance.screen_height - inputElBottomBound - this.inputBottomOffset;
+    
     let offset = this.device.cordova && this.device.android ? 130 : 100;
     let spaceBelowOffset = 0;
     let newHeight = currentHeight + (e.keyboardHeight - inputSpaceBelow);
@@ -537,6 +538,7 @@ export class Events {
 
     // Keyboard will overlaps input
     if (e.keyboardHeight > inputSpaceBelow) {
+
       this.prevNewHeight = newHeight - spaceBelowOffset;
       this.prevFocusedElement = document.activeElement;
 
@@ -567,7 +569,6 @@ export class Events {
    */
   public onKeyboardWillHideCb = (e) => this.onKeyboardWillHide(e);
   private onKeyboardWillHide(e) {
-
     // pane not visible on viewport
     if (!this.isOnViewport()) {
       return;
@@ -606,7 +607,6 @@ export class Events {
    */
   public onWindowResizeCb = (e) => this.onWindowResize(e);
   private async onWindowResize(e) {
-    
     // We should separate keyboard and resize events
     if (this.isKeyboardEvent()) {
       this.instance.emit('onWindowResizeForKeyboard');
@@ -776,4 +776,22 @@ export class Events {
 
     return true;
   }
+
+  /**
+   * Deal with Ionic Framework.
+   * ion-input, ion-textarea changes in Client rects after window resize.
+   * get rects by parent, not shadowDom el
+   */
+  private getActiveInputClientBottomRect(): number {
+    if (document.activeElement.classList.contains('native-textarea') 
+        || document.activeElement.classList.contains('native-input')) {
+        // Go top until ionic element
+        let ionElement = document.activeElement.parentElement?.parentElement?.parentElement;
+        return ionElement.getBoundingClientRect().bottom;
+    }
+
+    return document.activeElement.getBoundingClientRect().bottom;
+  }
+
+
 }

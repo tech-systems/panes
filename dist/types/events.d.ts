@@ -117,4 +117,10 @@ export declare class Events {
     private isFormElement;
     isElementScrollable(el: any): boolean;
     private isOnViewport;
+    /**
+     * Deal with Ionic Framework.
+     * ion-input, ion-textarea changes in Client rects after window resize.
+     * get rects by parent, not shadowDom el
+     */
+    private getActiveInputClientBottomRect;
 }

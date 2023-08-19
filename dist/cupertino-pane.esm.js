@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: August 18, 2023
+ * Released on: August 20, 2023
  */
 
 /******************************************************************************
@@ -617,8 +617,7 @@ class Events {
             // calculate distances based on transformY
             let currentHeight = (this.instance.getPanelTransformY() - this.instance.screen_height) * -1;
             const inputEl = document.activeElement;
-            inputEl.getBoundingClientRect().top;
-            const inputElBottomBound = inputEl.getBoundingClientRect().bottom;
+            const inputElBottomBound = this.getActiveInputClientBottomRect();
             const inputSpaceBelow = this.instance.screen_height - inputElBottomBound - this.inputBottomOffset;
             let offset = this.device.cordova && this.device.android ? 130 : 100;
             let spaceBelowOffset = 0;
@@ -829,6 +828,21 @@ class Events {
             return false;
         }
         return true;
+    }
+    /**
+     * Deal with Ionic Framework.
+     * ion-input, ion-textarea changes in Client rects after window resize.
+     * get rects by parent, not shadowDom el
+     */
+    getActiveInputClientBottomRect() {
+        var _a, _b;
+        if (document.activeElement.classList.contains('native-textarea')
+            || document.activeElement.classList.contains('native-input')) {
+            // Go top until ionic element
+            let ionElement = (_b = (_a = document.activeElement.parentElement) === null || _a === void 0 ? void 0 : _a.parentElement) === null || _b === void 0 ? void 0 : _b.parentElement;
+            return ionElement.getBoundingClientRect().bottom;
+        }
+        return document.activeElement.getBoundingClientRect().bottom;
     }
 }
 
