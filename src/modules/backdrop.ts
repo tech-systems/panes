@@ -1,6 +1,6 @@
 import { CupertinoPane } from '../cupertino-pane';
 import { CupertinoSettings } from '../models';
-import { Events } from '../events';
+import { Events } from '../events/events';
 import { CupertinoTransition } from '../transitions';
 import { Support } from '../support';
 

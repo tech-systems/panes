@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.3.51
+ * Cupertino Pane 1.3.6
  * Cupertino Panes is multi-functional modals, cards & panes with touch technologies.
  * https://panejs.com
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: August 20, 2023
+ * Released on: August 22, 2023
  */
 
 /******************************************************************************
@@ -175,28 +175,23 @@ class Device {
 }
 
 /**
- * Touch start, Touch move, Touch end,
- * Click, Keyboard show, Keyboard hide
+ * Touch start, Touch move, Touch end
+ * Click, Scroll
  */
 class Events {
-    constructor(instance, settings, device, breakpoints, transitions) {
+    constructor(instance, settings, device, breakpoints, transitions, keyboardEvents) {
         this.instance = instance;
         this.settings = settings;
         this.device = device;
         this.breakpoints = breakpoints;
         this.transitions = transitions;
+        this.keyboardEvents = keyboardEvents;
         this.allowClick = true;
         this.disableDragAngle = false;
         this.mouseDown = false;
         this.contentScrollTop = 0;
         this.steps = [];
         this.isScrolling = false;
-        // Keyboard help vars
-        this.keyboardVisible = false;
-        this.inputBluredbyMove = false;
-        this.inputBottomOffset = 0;
-        this.previousInputBottomOffset = 0;
-        this.prevNewHeight = 0;
         /**
          * Touch Start Event
          * @param t
@@ -222,21 +217,6 @@ class Events {
          * @param t
          */
         this.onClickCb = (t) => this.onClick(t);
-        /**
-         * Open Cordova Keyboard event
-         * @param e
-         */
-        this.onKeyboardShowCb = (e) => this.onKeyboardShow(e);
-        /**
-         * Close Cordova Keyboard event
-         * @param e
-         */
-        this.onKeyboardWillHideCb = (e) => this.onKeyboardWillHide(e);
-        /**
-         * Window resize event
-         * @param e
-         */
-        this.onWindowResizeCb = (e) => this.onWindowResize(e);
         this.touchEvents = this.getTouchEvents();
         // Set sensivity lower for web
         this.swipeNextSensivity = window.hasOwnProperty('cordova')
@@ -270,10 +250,10 @@ class Events {
         if (this.settings.topperOverflow) {
             this.instance.overflowEl.addEventListener('scroll', this.onScrollCb);
         }
-        // Handle keyboard events for cordova
+        // Handle keyboard events for cordova ios/android
         if (this.settings.handleKeyboard && this.device.cordova) {
-            window.addEventListener('keyboardWillShow', this.onKeyboardShowCb);
-            window.addEventListener('keyboardWillHide', this.onKeyboardWillHideCb);
+            window.addEventListener('keyboardWillShow', this.keyboardEvents.onKeyboardShowCb);
+            window.addEventListener('keyboardWillHide', this.keyboardEvents.onKeyboardWillHideCb);
         }
         // Fix Ionic-Android issue with ion-page scroll on keyboard
         if (this.device.ionic && this.device.android) {
@@ -287,7 +267,7 @@ class Events {
             });
         }
         // Orientation change + window resize
-        window.addEventListener('resize', this.onWindowResizeCb);
+        window.addEventListener('resize', this.keyboardEvents.onWindowResizeCb);
     }
     detachAllEvents() {
         if (!this.settings.dragBy) {
@@ -306,11 +286,11 @@ class Events {
         }
         // Handle keyboard events for cordova
         if (this.settings.handleKeyboard && this.device.cordova) {
-            window.removeEventListener('keyboardWillShow', this.onKeyboardShowCb);
-            window.removeEventListener('keyboardWillHide', this.onKeyboardWillHideCb);
+            window.removeEventListener('keyboardWillShow', this.keyboardEvents.onKeyboardShowCb);
+            window.removeEventListener('keyboardWillHide', this.keyboardEvents.onKeyboardWillHideCb);
         }
         // Orientation change + window resize
-        window.removeEventListener('resize', this.onWindowResizeCb);
+        window.removeEventListener('resize', this.keyboardEvents.onWindowResizeCb);
     }
     resetEvents() {
         this.detachAllEvents();
@@ -445,7 +425,7 @@ class Events {
             if (this.isFormElement(document.activeElement)
                 && !(this.isFormElement(t.target))) {
                 document.activeElement.blur();
-                this.inputBluredbyMove = true;
+                this.keyboardEvents.inputBluredbyMove = true;
             }
         }
         // Touch angle
@@ -581,9 +561,7 @@ class Events {
         if (!this.device.cordova
             && this.device.android
             && this.isFormElement(t.target)) {
-            this.onKeyboardShow({
-                keyboardHeight: this.instance.screen_height - window.innerHeight
-            });
+            this.keyboardEvents.onKeyboardShowCb({ keyboardHeight: this.instance.screen_height - window.innerHeight });
             return;
         }
         // Click to bottom - open middle
@@ -603,108 +581,6 @@ class Events {
             }
         }
     }
-    onKeyboardShow(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // focud element not inside pane
-            if (!this.isPaneDescendant(document.activeElement)) {
-                return;
-            }
-            // pane not visible on viewport
-            if (!this.isOnViewport()) {
-                return;
-            }
-            this.keyboardVisible = true;
-            // calculate distances based on transformY
-            let currentHeight = (this.instance.getPanelTransformY() - this.instance.screen_height) * -1;
-            const inputEl = document.activeElement;
-            const inputElBottomBound = this.getActiveInputClientBottomRect();
-            const inputSpaceBelow = this.instance.screen_height - inputElBottomBound - this.inputBottomOffset;
-            let offset = this.device.cordova && this.device.android ? 130 : 100;
-            let spaceBelowOffset = 0;
-            let newHeight = currentHeight + (e.keyboardHeight - inputSpaceBelow);
-            // Multiple event fired with opened keyboard
-            if (this.prevNewHeight) {
-                spaceBelowOffset = this.previousInputBottomOffset - inputElBottomBound;
-                newHeight = this.prevNewHeight;
-            }
-            // Re-focus input dublicate events
-            if (inputEl.isEqualNode(this.prevFocusedElement)) {
-                return;
-            }
-            // Keyboard will overlaps input
-            if (e.keyboardHeight > inputSpaceBelow) {
-                this.prevNewHeight = newHeight - spaceBelowOffset;
-                this.prevFocusedElement = document.activeElement;
-                // Not push more than pane height
-                if (offset > this.instance.screen_height - inputElBottomBound) {
-                    offset = this.instance.screen_height - inputElBottomBound;
-                }
-                /**
-                 * TODO: textarea issues
-                 * Not push pane more than height (fitScreenHeight) in case of
-                 * log textarea. or need to resize textarea dynamically with keyboard
-                 */
-                yield this.instance.moveToHeight(newHeight - spaceBelowOffset + offset);
-                // Determinate device offset for presented keyboard
-                const newInputBottomOffset = inputEl.getBoundingClientRect().bottom;
-                this.previousInputBottomOffset = newInputBottomOffset;
-                if (!this.inputBottomOffset) {
-                    this.inputBottomOffset = inputElBottomBound - newInputBottomOffset;
-                }
-            }
-        });
-    }
-    onKeyboardWillHide(e) {
-        // pane not visible on viewport
-        if (!this.isOnViewport()) {
-            return;
-        }
-        this.instance.emit('onKeyboardWillHide');
-        this.keyboardVisible = false;
-        // Clear
-        this.inputBottomOffset = 0;
-        this.previousInputBottomOffset = 0;
-        this.prevNewHeight = 0;
-        delete this.prevFocusedElement;
-        if (this.inputBluredbyMove) {
-            this.inputBluredbyMove = false;
-            return;
-        }
-        if (this.instance.isHidden()) {
-            return;
-        }
-        // Position doesn't changed
-        if (this.instance.getPanelTransformY() === this.breakpoints.breaks[this.breakpoints.prevBreakpoint]) {
-            return;
-        }
-        this.instance.moveToBreak(this.breakpoints.prevBreakpoint);
-    }
-    onWindowResize(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            // We should separate keyboard and resize events
-            if (this.isKeyboardEvent()) {
-                this.instance.emit('onWindowResizeForKeyboard');
-                // Cordova & PWA iOS
-                if (this.device.cordova
-                    || this.device.ios) {
-                    return;
-                }
-                // PWA Android: we still handle keyboard with resize if input is active
-                if (this.isFormElement(document.activeElement)) {
-                    this.onKeyboardShow({
-                        keyboardHeight: this.instance.screen_height - window.innerHeight
-                    });
-                }
-                else {
-                    this.onKeyboardWillHide({});
-                }
-                return;
-            }
-            yield new Promise((resolve) => setTimeout(() => resolve(true), 150));
-            this.instance.updateScreenHeights();
-            this.breakpoints.buildBreakpoints(JSON.parse(this.breakpoints.lockedBreakpoints));
-        });
-    }
     fastSwipeNext(axis) {
         var _a, _b;
         const diff = ((_a = this.steps[this.steps.length - 1]) === null || _a === void 0 ? void 0 : _a['pos' + axis]) - ((_b = this.steps[this.steps.length - 2]) === null || _b === void 0 ? void 0 : _b['pos' + axis]);
@@ -713,21 +589,6 @@ class Events {
     /**
      * Private class methods
      */
-    /**
-     * Determinate if event is keyboard not resize
-     * If form element active - recognize here as KeyboardWillShow
-     */
-    isKeyboardEvent() {
-        if (this.isFormElement(document.activeElement)) {
-            return true;
-        }
-        if (!this.isFormElement(document.activeElement)
-            && this.keyboardVisible) {
-            this.keyboardVisible = false;
-            return true;
-        }
-        return false;
-    }
     /**
      * Topper Than Top
      * Lower Than Bottom
@@ -789,20 +650,6 @@ class Events {
         }
         return true;
     }
-    // TODO: switch to contains
-    isPaneDescendant(el) {
-        if (!el) {
-            return false;
-        }
-        let node = el.parentNode;
-        while (node != null) {
-            if (node == this.instance.paneEl) {
-                return true;
-            }
-            node = node.parentNode;
-        }
-        return false;
-    }
     isDraggableElement(t) {
         return t.target === this.instance.draggableEl
             || t.target === this.instance.moveEl;
@@ -820,6 +667,168 @@ class Events {
     }
     isElementScrollable(el) {
         return el.scrollHeight > el.clientHeight ? true : false;
+    }
+}
+
+/**
+ * Resize, Keyboard show, Keyboard hide
+ */
+class KeyboardEvents {
+    constructor(instance, device, breakpoints) {
+        this.instance = instance;
+        this.device = device;
+        this.breakpoints = breakpoints;
+        // Keyboard help vars
+        this.inputBluredbyMove = false;
+        this.keyboardVisibleResize = false;
+        this.inputBottomOffset = 0;
+        this.previousInputBottomOffset = 0;
+        this.prevNewHeight = 0;
+        /**
+         * Open Cordova Keyboard event
+         * @param e
+         */
+        this.onKeyboardShowCb = (e) => this.onKeyboardShow(e);
+        /**
+         * Close Cordova Keyboard event
+         * @param e
+         */
+        this.onKeyboardWillHideCb = (e) => this.onKeyboardWillHide(e);
+        /**
+         * Window resize event
+         * We handle here keyboard event as well
+         * @param e
+         */
+        this.onWindowResizeCb = (e) => this.onWindowResize(e);
+    }
+    onKeyboardShow(e) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // focus element not inside pane
+            if (!this.isPaneDescendant(document.activeElement)) {
+                return;
+            }
+            // pane not visible on viewport
+            if (!this.isOnViewport()) {
+                return;
+            }
+            this.keyboardVisibleResize = true;
+            this.fixBodyKeyboardResize(true);
+            // calculate distances based on transformY
+            let currentHeight = (this.instance.getPanelTransformY() - this.instance.screen_height) * -1;
+            const inputEl = document.activeElement;
+            const inputElBottomBound = this.getActiveInputClientBottomRect();
+            const inputSpaceBelow = this.instance.screen_height - inputElBottomBound - this.inputBottomOffset;
+            let offset = this.device.cordova && this.device.android ? 130 : 100;
+            let spaceBelowOffset = 0;
+            let newHeight = currentHeight + (e.keyboardHeight - inputSpaceBelow);
+            // Multiple event fired with opened keyboard
+            if (this.prevNewHeight) {
+                spaceBelowOffset = this.previousInputBottomOffset - inputElBottomBound;
+                newHeight = this.prevNewHeight;
+            }
+            // Re-focus input dublicate events
+            if (inputEl.isEqualNode(this.prevFocusedElement)) {
+                return;
+            }
+            // Keyboard will overlaps input
+            if (e.keyboardHeight > inputSpaceBelow) {
+                this.prevNewHeight = newHeight - spaceBelowOffset;
+                this.prevFocusedElement = document.activeElement;
+                let nextHeight = newHeight - spaceBelowOffset + offset;
+                // Not push more than pane height
+                if (nextHeight > this.instance.getPaneHeight() + e.keyboardHeight) {
+                    nextHeight = this.instance.getPaneHeight() + e.keyboardHeight;
+                }
+                /**
+                 * TODO: textarea issues
+                 */
+                yield this.instance.moveToHeight(nextHeight);
+                // Determinate device offset for presented keyboard
+                const newInputBottomOffset = this.getActiveInputClientBottomRect();
+                this.previousInputBottomOffset = newInputBottomOffset;
+                if (!this.inputBottomOffset) {
+                    this.inputBottomOffset = inputElBottomBound - newInputBottomOffset;
+                }
+            }
+        });
+    }
+    onKeyboardWillHide(e) {
+        // pane not visible on viewport
+        if (!this.isOnViewport()) {
+            return;
+        }
+        this.fixBodyKeyboardResize(false);
+        // Clear
+        this.inputBottomOffset = 0;
+        this.previousInputBottomOffset = 0;
+        this.prevNewHeight = 0;
+        delete this.prevFocusedElement;
+        if (this.inputBluredbyMove) {
+            this.inputBluredbyMove = false;
+            return;
+        }
+        if (this.instance.isHidden()) {
+            return;
+        }
+        // Position doesn't changed
+        if (this.instance.getPanelTransformY() === this.breakpoints.breaks[this.breakpoints.prevBreakpoint]) {
+            return;
+        }
+        this.instance.moveToBreak(this.breakpoints.prevBreakpoint);
+    }
+    onWindowResize(e) {
+        return __awaiter(this, void 0, void 0, function* () {
+            /**
+             * Keyboard event detection
+             * We should separate keyboard and resize events
+             */
+            if (this.isFormElement(document.activeElement)) {
+                // Only for non-cordova
+                if (!this.device.cordova) {
+                    this.onKeyboardShow({ keyboardHeight: this.instance.screen_height - window.innerHeight });
+                }
+                return;
+            }
+            if (this.keyboardVisibleResize) {
+                this.keyboardVisibleResize = false;
+                // Only for non-cordova
+                if (!this.device.cordova) {
+                    this.onKeyboardWillHide({});
+                }
+                return;
+            }
+            yield new Promise((resolve) => setTimeout(() => resolve(true), 150));
+            this.instance.updateScreenHeights();
+            this.breakpoints.buildBreakpoints(JSON.parse(this.breakpoints.lockedBreakpoints));
+        });
+    }
+    /**
+     * Private class methods
+     */
+    // TODO: switch to contains
+    isPaneDescendant(el) {
+        if (!el) {
+            return false;
+        }
+        let node = el.parentNode;
+        while (node != null) {
+            if (node == this.instance.paneEl) {
+                return true;
+            }
+            node = node.parentNode;
+        }
+        return false;
+    }
+    isFormElement(el) {
+        const formElements = [
+            'input', 'select', 'option',
+            'textarea', 'button', 'label'
+        ];
+        if (el && el.tagName
+            && formElements.includes(el.tagName.toLowerCase())) {
+            return true;
+        }
+        return false;
     }
     isOnViewport() {
         if (this.instance.paneEl
@@ -843,6 +852,30 @@ class Events {
             return ionElement.getBoundingClientRect().bottom;
         }
         return document.activeElement.getBoundingClientRect().bottom;
+    }
+    /**
+     * Using only to fix follower elemennts jumps out by OSK
+     * Fix OSK
+     * https://developer.chrome.com/blog/viewport-resize-behavior/
+     * Chrome 108+ will adjust with overlays-content
+     * When everyones updates, can be replaced with adding content-overlays to meta
+     */
+    fixBodyKeyboardResize(showKeyboard) {
+        if (!this.instance.paneEl)
+            return;
+        const metaViewport = document.querySelector('meta[name=viewport]');
+        window.requestAnimationFrame(() => {
+            if (showKeyboard) {
+                document.documentElement.style.setProperty('overflow', 'hidden');
+                document.body.style.setProperty('min-height', `${this.instance.screen_height}px`);
+                metaViewport.setAttribute('content', 'height=' + this.instance.screen_height + ', width=device-width, initial-scale=1.0');
+            }
+            else {
+                document.documentElement.style.removeProperty('overflow');
+                document.body.style.removeProperty('min-height');
+                metaViewport.setAttribute('content', 'viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no');
+            }
+        });
     }
 }
 
@@ -1346,36 +1379,6 @@ class FollowerModule {
         this.instance.on('onTransitionStart', (ev) => {
             this.followerEl.style.transition = ev.transition;
             this.followerEl.style.transform = `translateY(${ev.translateY.new - this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
-        });
-        this.instance.on('onKeyboardWillHide', () => {
-            this.fixBodyKeyboardResize(false);
-        });
-        this.instance.on('onWindowResizeForKeyboard', () => {
-            this.fixBodyKeyboardResize(true);
-        });
-    }
-    /**
-     * Using only to fix follower elemennts jumps out by OSK
-     * Fix OSK
-     * https://developer.chrome.com/blog/viewport-resize-behavior/
-     * Chrome 108+ will adjust with overlays-content
-     * When everyones updates, can be replaced with adding content-overlays to meta
-     */
-    fixBodyKeyboardResize(showKeyboard) {
-        if (!this.instance.paneEl)
-            return;
-        const metaViewport = document.querySelector('meta[name=viewport]');
-        window.requestAnimationFrame(() => {
-            if (showKeyboard) {
-                document.documentElement.style.setProperty('overflow', 'hidden');
-                document.body.style.setProperty('min-height', `${this.instance.screen_height}px`);
-                metaViewport.setAttribute('content', 'height=' + this.instance.screen_height + ', width=device-width, initial-scale=1.0');
-            }
-            else {
-                document.documentElement.style.removeProperty('overflow');
-                document.body.style.removeProperty('min-height');
-                metaViewport.setAttribute('content', 'viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no');
-            }
         });
     }
 }
@@ -1998,7 +2001,8 @@ class CupertinoPane {
         // Core classes
         this.breakpoints = new Breakpoints(this, this.settings);
         this.transitions = new Transitions(this, this.settings, this.breakpoints);
-        this.events = new Events(this, this.settings, this.device, this.breakpoints, this.transitions);
+        this.keyboardEvents = new KeyboardEvents(this, this.device, this.breakpoints);
+        this.events = new Events(this, this.settings, this.device, this.breakpoints, this.transitions, this.keyboardEvents);
         // Install modules
         let allModules = Object.keys(Modules).map((key) => Modules[key]);
         let modules = this.settings.modules || allModules;
@@ -2444,6 +2448,7 @@ class CupertinoPane {
         });
     }
     destroyResets() {
+        this.keyboardEvents.fixBodyKeyboardResize(false);
         this.parentEl.appendChild(this.contentEl);
         this.wrapperEl.remove();
         this.styleEl.remove();

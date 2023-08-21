@@ -1,7 +1,7 @@
 import { CupertinoPane } from '../cupertino-pane';
 import { Breakpoints } from '../breakpoints';
 import { CupertinoSettings } from '../models';
-import { Events } from '../events';
+import { Events } from '../events/events';
 
 /**
  * Inverse module

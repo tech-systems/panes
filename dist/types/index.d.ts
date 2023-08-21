@@ -148,8 +148,63 @@ declare class Transitions {
 }
 
 /**
- * Touch start, Touch move, Touch end,
- * Click, Keyboard show, Keyboard hide
+ * Resize, Keyboard show, Keyboard hide
+ */
+declare class KeyboardEvents {
+    private instance;
+    private device;
+    private breakpoints;
+    inputBluredbyMove: boolean;
+    private keyboardVisibleResize;
+    private inputBottomOffset;
+    private previousInputBottomOffset;
+    private prevNewHeight;
+    private prevFocusedElement;
+    constructor(instance: CupertinoPane, device: Device, breakpoints: Breakpoints);
+    /**
+     * Open Cordova Keyboard event
+     * @param e
+     */
+    onKeyboardShowCb: (e: any) => Promise<void>;
+    private onKeyboardShow;
+    /**
+     * Close Cordova Keyboard event
+     * @param e
+     */
+    onKeyboardWillHideCb: (e: any) => void;
+    private onKeyboardWillHide;
+    /**
+     * Window resize event
+     * We handle here keyboard event as well
+     * @param e
+     */
+    onWindowResizeCb: (e: any) => Promise<void>;
+    private onWindowResize;
+    /**
+     * Private class methods
+     */
+    private isPaneDescendant;
+    private isFormElement;
+    private isOnViewport;
+    /**
+     * Deal with Ionic Framework.
+     * ion-input, ion-textarea changes in Client rects after window resize.
+     * get rects by parent, not shadowDom el
+     */
+    private getActiveInputClientBottomRect;
+    /**
+     * Using only to fix follower elemennts jumps out by OSK
+     * Fix OSK
+     * https://developer.chrome.com/blog/viewport-resize-behavior/
+     * Chrome 108+ will adjust with overlays-content
+     * When everyones updates, can be replaced with adding content-overlays to meta
+     */
+    fixBodyKeyboardResize(showKeyboard: any): void;
+}
+
+/**
+ * Touch start, Touch move, Touch end
+ * Click, Scroll
  */
 declare class Events {
     private instance;
@@ -157,6 +212,7 @@ declare class Events {
     private device;
     private breakpoints;
     private transitions;
+    private keyboardEvents;
     touchEvents: {
         start: string;
         move: string;
@@ -173,13 +229,7 @@ declare class Events {
     isScrolling: boolean;
     startPointOverTop: number;
     swipeNextSensivity: number;
-    private keyboardVisible;
-    private inputBluredbyMove;
-    private inputBottomOffset;
-    private previousInputBottomOffset;
-    private prevNewHeight;
-    private prevFocusedElement;
-    constructor(instance: CupertinoPane, settings: CupertinoSettings, device: Device, breakpoints: Breakpoints, transitions: Transitions);
+    constructor(instance: CupertinoPane, settings: CupertinoSettings, device: Device, breakpoints: Breakpoints, transitions: Transitions, keyboardEvents: KeyboardEvents);
     private getTouchEvents;
     attachAllEvents(): void;
     detachAllEvents(): void;
@@ -220,33 +270,10 @@ declare class Events {
      */
     onClickCb: (t: any) => void;
     private onClick;
-    /**
-     * Open Cordova Keyboard event
-     * @param e
-     */
-    onKeyboardShowCb: (e: any) => Promise<void>;
-    private onKeyboardShow;
-    /**
-     * Close Cordova Keyboard event
-     * @param e
-     */
-    onKeyboardWillHideCb: (e: any) => void;
-    private onKeyboardWillHide;
-    /**
-     * Window resize event
-     * @param e
-     */
-    onWindowResizeCb: (e: any) => Promise<void>;
-    private onWindowResize;
     fastSwipeNext(axis: 'Y' | 'X'): boolean;
     /**
      * Private class methods
      */
-    /**
-     * Determinate if event is keyboard not resize
-     * If form element active - recognize here as KeyboardWillShow
-     */
-    private isKeyboardEvent;
     /**
      * Topper Than Top
      * Lower Than Bottom
@@ -256,17 +283,9 @@ declare class Events {
     private getEventClientYX;
     scrollPreventDrag(t: any): boolean;
     willScrolled(): boolean;
-    private isPaneDescendant;
     private isDraggableElement;
     private isFormElement;
     isElementScrollable(el: any): boolean;
-    private isOnViewport;
-    /**
-     * Deal with Ionic Framework.
-     * ion-input, ion-textarea changes in Client rects after window resize.
-     * get rects by parent, not shadowDom el
-     */
-    private getActiveInputClientBottomRect;
 }
 
 declare class CupertinoPane {
@@ -291,6 +310,7 @@ declare class CupertinoPane {
     private destroyButtonEl;
     settings: CupertinoSettings;
     private device;
+    keyboardEvents: KeyboardEvents;
     events: Events;
     breakpoints: Breakpoints;
     transitions: Transitions;

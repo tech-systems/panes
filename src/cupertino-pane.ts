@@ -1,6 +1,6 @@
 import { Support } from './support';
 import { Device } from './device';
-import { Events } from './events';
+import { Events, KeyboardEvents } from './events';
 import { CupertinoSettings, PaneBreaks } from './models';
 import { Settings } from './settings';
 import { Breakpoints } from './breakpoints';
@@ -31,6 +31,7 @@ export class CupertinoPane {
 
   public settings: CupertinoSettings = (new Settings()).instance;
   private device: Device = new Device();
+  public keyboardEvents: KeyboardEvents;
   public events: Events;
   public breakpoints: Breakpoints;
   public transitions: Transitions;
@@ -98,7 +99,8 @@ export class CupertinoPane {
     // Core classes
     this.breakpoints = new Breakpoints(this, this.settings);
     this.transitions = new Transitions(this, this.settings, this.breakpoints);
-    this.events = new Events(this, this.settings, this.device, this.breakpoints, this.transitions);
+    this.keyboardEvents = new KeyboardEvents(this, this.device, this.breakpoints);
+    this.events = new Events(this, this.settings, this.device, this.breakpoints, this.transitions, this.keyboardEvents);
 
     // Install modules
     let allModules = Object.keys(Modules).map((key) => Modules[key]);
@@ -650,6 +652,7 @@ export class CupertinoPane {
   }
 
   public destroyResets(): void {
+    this.keyboardEvents.fixBodyKeyboardResize(false);
     this.parentEl.appendChild(this.contentEl);
     this.wrapperEl.remove();
     this.styleEl.remove();

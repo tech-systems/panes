@@ -1,11 +1,12 @@
-import { CupertinoPane } from './cupertino-pane';
-import { CupertinoSettings } from './models';
-import { Device } from './device';
-import { Breakpoints } from './breakpoints';
-import { Transitions } from './transitions';
+import { CupertinoPane } from '../cupertino-pane';
+import { CupertinoSettings } from '../models';
+import { Device } from '../device';
+import { Breakpoints } from '../breakpoints';
+import { Transitions } from '../transitions';
+import { KeyboardEvents } from './keyboard';
 /**
- * Touch start, Touch move, Touch end,
- * Click, Keyboard show, Keyboard hide
+ * Touch start, Touch move, Touch end
+ * Click, Scroll
  */
 export declare class Events {
     private instance;
@@ -13,6 +14,7 @@ export declare class Events {
     private device;
     private breakpoints;
     private transitions;
+    private keyboardEvents;
     touchEvents: {
         start: string;
         move: string;
@@ -29,13 +31,7 @@ export declare class Events {
     isScrolling: boolean;
     startPointOverTop: number;
     swipeNextSensivity: number;
-    private keyboardVisible;
-    private inputBluredbyMove;
-    private inputBottomOffset;
-    private previousInputBottomOffset;
-    private prevNewHeight;
-    private prevFocusedElement;
-    constructor(instance: CupertinoPane, settings: CupertinoSettings, device: Device, breakpoints: Breakpoints, transitions: Transitions);
+    constructor(instance: CupertinoPane, settings: CupertinoSettings, device: Device, breakpoints: Breakpoints, transitions: Transitions, keyboardEvents: KeyboardEvents);
     private getTouchEvents;
     attachAllEvents(): void;
     detachAllEvents(): void;
@@ -76,33 +72,10 @@ export declare class Events {
      */
     onClickCb: (t: any) => void;
     private onClick;
-    /**
-     * Open Cordova Keyboard event
-     * @param e
-     */
-    onKeyboardShowCb: (e: any) => Promise<void>;
-    private onKeyboardShow;
-    /**
-     * Close Cordova Keyboard event
-     * @param e
-     */
-    onKeyboardWillHideCb: (e: any) => void;
-    private onKeyboardWillHide;
-    /**
-     * Window resize event
-     * @param e
-     */
-    onWindowResizeCb: (e: any) => Promise<void>;
-    private onWindowResize;
     fastSwipeNext(axis: 'Y' | 'X'): boolean;
     /**
      * Private class methods
      */
-    /**
-     * Determinate if event is keyboard not resize
-     * If form element active - recognize here as KeyboardWillShow
-     */
-    private isKeyboardEvent;
     /**
      * Topper Than Top
      * Lower Than Bottom
@@ -112,15 +85,7 @@ export declare class Events {
     private getEventClientYX;
     scrollPreventDrag(t: any): boolean;
     willScrolled(): boolean;
-    private isPaneDescendant;
     private isDraggableElement;
     private isFormElement;
     isElementScrollable(el: any): boolean;
-    private isOnViewport;
-    /**
-     * Deal with Ionic Framework.
-     * ion-input, ion-textarea changes in Client rects after window resize.
-     * get rects by parent, not shadowDom el
-     */
-    private getActiveInputClientBottomRect;
 }

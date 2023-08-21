@@ -1,13 +1,14 @@
-import { CupertinoPane } from './cupertino-pane';
-import { CupertinoSettings } from './models';
-import { Device } from './device';
-import { Support } from './support';
-import { Breakpoints } from './breakpoints';
-import { Transitions } from './transitions';
+import { CupertinoPane } from '../cupertino-pane';
+import { CupertinoSettings } from '../models';
+import { Device } from '../device';
+import { Support } from '../support';
+import { Breakpoints } from '../breakpoints';
+import { Transitions } from '../transitions';
+import { KeyboardEvents } from './keyboard';
 
 /**
- * Touch start, Touch move, Touch end,
- * Click, Keyboard show, Keyboard hide
+ * Touch start, Touch move, Touch end
+ * Click, Scroll
  */
 
 export class Events {
@@ -31,20 +32,13 @@ export class Events {
   public isScrolling: boolean = false;
   public startPointOverTop: number;
   public swipeNextSensivity: number;
-
-  // Keyboard help vars
-  private keyboardVisible: boolean = false;
-  private inputBluredbyMove: boolean = false;
-  private inputBottomOffset: number = 0;
-  private previousInputBottomOffset: number = 0;
-  private prevNewHeight: number = 0;
-  private prevFocusedElement: Element;
   
   constructor(private instance: CupertinoPane, 
               private settings: CupertinoSettings,
               private device: Device,
               private breakpoints: Breakpoints,
-              private transitions: Transitions) {
+              private transitions: Transitions,
+              private keyboardEvents: KeyboardEvents) {
     this.touchEvents = this.getTouchEvents();
 
     // Set sensivity lower for web
@@ -84,10 +78,10 @@ export class Events {
       this.instance.overflowEl.addEventListener('scroll', this.onScrollCb);
     }
 
-    // Handle keyboard events for cordova
+    // Handle keyboard events for cordova ios/android
     if (this.settings.handleKeyboard && this.device.cordova) {
-      window.addEventListener('keyboardWillShow', this.onKeyboardShowCb);
-      window.addEventListener('keyboardWillHide', this.onKeyboardWillHideCb);
+      window.addEventListener('keyboardWillShow', this.keyboardEvents.onKeyboardShowCb);
+      window.addEventListener('keyboardWillHide', this.keyboardEvents.onKeyboardWillHideCb);
     }
 
     // Fix Ionic-Android issue with ion-page scroll on keyboard
@@ -103,7 +97,7 @@ export class Events {
     }
 
     // Orientation change + window resize
-    window.addEventListener('resize', this.onWindowResizeCb);
+    window.addEventListener('resize', this.keyboardEvents.onWindowResizeCb);
   }
 
   public detachAllEvents() {
@@ -123,12 +117,12 @@ export class Events {
 
     // Handle keyboard events for cordova
     if (this.settings.handleKeyboard && this.device.cordova) {
-      window.removeEventListener('keyboardWillShow', this.onKeyboardShowCb);
-      window.removeEventListener('keyboardWillHide', this.onKeyboardWillHideCb);
+      window.removeEventListener('keyboardWillShow', this.keyboardEvents.onKeyboardShowCb);
+      window.removeEventListener('keyboardWillHide', this.keyboardEvents.onKeyboardWillHideCb);
     }
 
     // Orientation change + window resize
-    window.removeEventListener('resize', this.onWindowResizeCb);
+    window.removeEventListener('resize', this.keyboardEvents.onWindowResizeCb);
   }
 
   public resetEvents() {
@@ -298,7 +292,7 @@ export class Events {
       if (this.isFormElement(document.activeElement)
       && !(this.isFormElement(t.target))) {
         (<any>document.activeElement).blur();
-        this.inputBluredbyMove = true;
+        this.keyboardEvents.inputBluredbyMove = true;
       }
     }
 
@@ -470,9 +464,7 @@ export class Events {
     if (!this.device.cordova
         && this.device.android
         && this.isFormElement(t.target)) {
-      this.onKeyboardShow({
-        keyboardHeight: this.instance.screen_height - window.innerHeight
-      });
+      this.keyboardEvents.onKeyboardShowCb({keyboardHeight: this.instance.screen_height - window.innerHeight});
       return;
     }
     
@@ -495,145 +487,6 @@ export class Events {
     }
   }
 
-  /**
-   * Open Cordova Keyboard event
-   * @param e
-   */
-  public onKeyboardShowCb = (e) => this.onKeyboardShow(e);
-  private async onKeyboardShow(e) {
-
-    
-    // focud element not inside pane
-    if (!this.isPaneDescendant(document.activeElement)) {
-      return;
-    }
-
-    // pane not visible on viewport
-    if (!this.isOnViewport()) {
-      return;
-    }
-
-    this.keyboardVisible = true;
-
-    // calculate distances based on transformY
-    let currentHeight = (this.instance.getPanelTransformY() - this.instance.screen_height) * -1;
-    const inputEl = document.activeElement;
-    const inputElBottomBound: number = this.getActiveInputClientBottomRect();
-    const inputSpaceBelow = this.instance.screen_height - inputElBottomBound - this.inputBottomOffset;
-    
-    let offset = this.device.cordova && this.device.android ? 130 : 100;
-    let spaceBelowOffset = 0;
-    let newHeight = currentHeight + (e.keyboardHeight - inputSpaceBelow);
-
-    // Multiple event fired with opened keyboard
-    if (this.prevNewHeight) {
-      spaceBelowOffset = this.previousInputBottomOffset - inputElBottomBound;
-      newHeight = this.prevNewHeight;
-    }
-
-    // Re-focus input dublicate events
-    if (inputEl.isEqualNode(this.prevFocusedElement)) {
-      return;
-    }
-
-    // Keyboard will overlaps input
-    if (e.keyboardHeight > inputSpaceBelow) {
-
-      this.prevNewHeight = newHeight - spaceBelowOffset;
-      this.prevFocusedElement = document.activeElement;
-
-      // Not push more than pane height
-      if (offset > this.instance.screen_height - inputElBottomBound) {
-        offset = this.instance.screen_height - inputElBottomBound;
-      }
-
-      /**
-       * TODO: textarea issues
-       * Not push pane more than height (fitScreenHeight) in case of 
-       * log textarea. or need to resize textarea dynamically with keyboard
-       */
-      await this.instance.moveToHeight(newHeight - spaceBelowOffset + offset);
-
-      // Determinate device offset for presented keyboard
-      const newInputBottomOffset = inputEl.getBoundingClientRect().bottom;
-      this.previousInputBottomOffset = newInputBottomOffset;
-      if (!this.inputBottomOffset) {
-        this.inputBottomOffset = inputElBottomBound - newInputBottomOffset;
-      }
-    }
-  }
-
-  /**
-   * Close Cordova Keyboard event
-   * @param e
-   */
-  public onKeyboardWillHideCb = (e) => this.onKeyboardWillHide(e);
-  private onKeyboardWillHide(e) {
-    // pane not visible on viewport
-    if (!this.isOnViewport()) {
-      return;
-    }
-    
-    this.instance.emit('onKeyboardWillHide');
-
-    this.keyboardVisible = false;
-    
-    // Clear
-    this.inputBottomOffset = 0;
-    this.previousInputBottomOffset = 0;
-    this.prevNewHeight = 0;
-    delete this.prevFocusedElement;
-
-    if (this.inputBluredbyMove) {
-      this.inputBluredbyMove = false;
-      return;
-    }
-
-    if (this.instance.isHidden()) {
-      return;
-    }
-
-    // Position doesn't changed
-    if (this.instance.getPanelTransformY() === this.breakpoints.breaks[this.breakpoints.prevBreakpoint]) {
-      return;
-    }
-
-    this.instance.moveToBreak(this.breakpoints.prevBreakpoint);
-  }
-
-  /**
-   * Window resize event
-   * @param e
-   */
-  public onWindowResizeCb = (e) => this.onWindowResize(e);
-  private async onWindowResize(e) {
-    // We should separate keyboard and resize events
-    if (this.isKeyboardEvent()) {
-      this.instance.emit('onWindowResizeForKeyboard');
-
-      // Cordova & PWA iOS
-      if (this.device.cordova 
-          || this.device.ios) {
-        return;
-      }
-      
-      // PWA Android: we still handle keyboard with resize if input is active
-      if (this.isFormElement(document.activeElement)) {
-        this.onKeyboardShow({
-          keyboardHeight: this.instance.screen_height - window.innerHeight
-        });
-      } else {
-        this.onKeyboardWillHide({});
-      }
-
-      return;
-    }
-
-    await new Promise((resolve) => setTimeout(() => resolve(true), 150));
-    this.instance.updateScreenHeights();
-    this.breakpoints.buildBreakpoints(JSON.parse(this.breakpoints.lockedBreakpoints));
-  }
-
   public fastSwipeNext(axis: 'Y' | 'X'): boolean {
     const diff = this.steps[this.steps.length - 1]?.['pos' + axis] - this.steps[this.steps.length - 2]?.['pos' + axis];
     return (Math.abs(diff) >= this.swipeNextSensivity);
@@ -642,24 +495,6 @@ export class Events {
   /**
    * Private class methods
    */
-
-  /**
-   * Determinate if event is keyboard not resize
-   * If form element active - recognize here as KeyboardWillShow
-   */
-  private isKeyboardEvent() {
-    if (this.isFormElement(document.activeElement)) {
-      return true;
-    }
-
-    if (!this.isFormElement(document.activeElement) 
-        && this.keyboardVisible) {
-      this.keyboardVisible = false;
-      return true;
-    }
-
-    return false;
-  }
 
   /**
    * Topper Than Top
@@ -730,21 +565,6 @@ export class Events {
     return true;
   }
 
-  // TODO: switch to contains
-  private isPaneDescendant(el): boolean {
-    if (!el) {
-      return false;
-    }
-    let node = el.parentNode;
-    while (node != null) {
-        if (node == this.instance.paneEl) {
-            return true;
-        }
-        node = node.parentNode;
-    }
-    return false;
-  }
-
   private isDraggableElement(t) {
     return t.target === this.instance.draggableEl 
       || t.target === this.instance.moveEl;
@@ -766,32 +586,5 @@ export class Events {
   public isElementScrollable(el):boolean {
     return el.scrollHeight > el.clientHeight ? true : false;
   }
-
-  private isOnViewport(): boolean {
-    if (this.instance.paneEl 
-        && this.instance.paneEl.offsetWidth === 0 
-        && this.instance.paneEl.offsetHeight === 0 ) {
-      return false;
-    }
-
-    return true;
-  }
-
-  /**
-   * Deal with Ionic Framework.
-   * ion-input, ion-textarea changes in Client rects after window resize.
-   * get rects by parent, not shadowDom el
-   */
-  private getActiveInputClientBottomRect(): number {
-    if (document.activeElement.classList.contains('native-textarea') 
-        || document.activeElement.classList.contains('native-input')) {
-        // Go top until ionic element
-        let ionElement = document.activeElement.parentElement?.parentElement?.parentElement;
-        return ionElement.getBoundingClientRect().bottom;
-    }
-
-    return document.activeElement.getBoundingClientRect().bottom;
-  }
-
 
 }

@@ -1,4 +1,4 @@
-import { Events } from './events';
+import { Events, KeyboardEvents } from './events';
 import { CupertinoSettings, PaneBreaks } from './models';
 import { Breakpoints } from './breakpoints';
 import { Transitions } from './transitions';
@@ -24,6 +24,7 @@ export declare class CupertinoPane {
     private destroyButtonEl;
     settings: CupertinoSettings;
     private device;
+    keyboardEvents: KeyboardEvents;
     events: Events;
     breakpoints: Breakpoints;
     transitions: Transitions;
