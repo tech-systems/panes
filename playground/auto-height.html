@@ -3,11 +3,10 @@
 
 <head>
   <meta charset="UTF-8">
-  <title>Cupertino Pane - Bulletin</title>
+  <title>Panes - Auto Height</title>
 
   <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
-  <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
   <script src="../dist/cupertino-pane.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css"/> 
 </head>
@@ -109,38 +108,24 @@
     </ion-content>
   </ion-app>
   <script>
-    let bulletin;
-    let elem = document.querySelector('ion-bulletin');
-    let height = window.getComputedStyle(elem);
-    height = height.getPropertyValue('height');
-    height = parseFloat(height);
-    
-    var element = document.querySelector('ion-bulletin');
-    bulletin = new CupertinoPane(element, { 
-      // inverse: true,
-      fitHeight: true,
+    const bulletin = new CupertinoPane('ion-bulletin', { 
+      fitHeight:true,
       backdrop: true,
       backdropOpacity: 0.8,
       bottomClose: true,
       buttonDestroy: false,
       showDraggable: false,
       upperThanTop: true,
-      bottomOffset: 8,
-      events: {
-        onBackdropTap: () => bulletin.destroy({animate: true})
-      }
+      bottomOffset: 20,
+      onBackdropTap: () => bulletin.destroy({animate: true})
     });
 
-    function present() {
+    window.onload = async function () {
       bulletin.present({animate: true});
     }
 
-    function setBreakpoints() {
-      bulletin.setBreakpoints({}, 150);
-    }
-
-    window.onload = async function () {
-      present();
+    function present() {
+      bulletin.present({animate: true});
     }
   </script>
 </body>

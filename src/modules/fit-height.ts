@@ -68,6 +68,7 @@ export class FitHeightModule {
         if (this.settings.breaks['top'].height > this.instance.screen_height) {
           this.settings.breaks['top'].height = this.instance.screen_height - (this.settings.bottomOffset * 2);
           this.settings.topperOverflow = true;
+          this.settings.upperThanTop = false;
         } else {
           if (this.instance.overflowEl && !this.settings.maxFitHeight) {
             this.settings.topperOverflow = false;

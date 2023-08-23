@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: August 22, 2023
+ * Released on: August 23, 2023
  */
 
 /******************************************************************************
@@ -1580,6 +1580,7 @@ class FitHeightModule {
                 if (this.settings.breaks['top'].height > this.instance.screen_height) {
                     this.settings.breaks['top'].height = this.instance.screen_height - (this.settings.bottomOffset * 2);
                     this.settings.topperOverflow = true;
+                    this.settings.upperThanTop = false;
                 }
                 else {
                     if (this.instance.overflowEl && !this.settings.maxFitHeight) {
@@ -2154,6 +2155,18 @@ class CupertinoPane {
                 console.warn('Cupertino Pane: specified selector or DOM element already in use', this.selector);
                 return;
             }
+            /**
+             * Deal with Ionic Framework
+             * Ionic cancel transition if the app is not ready
+             * https://github.com/tech-systems/panes/issues/216
+             * Good to get rid of that, but Ionic team seems not
+             * have a solution for this
+             * https://github.com/ionic-team/ionic-framework/issues/27984
+             */
+            if (conf.animate && this.device.ionic) {
+                yield this.ionApp['componentOnReady']();
+                yield new Promise(resolve => requestAnimationFrame(resolve));
+            }
             // Emit event
             this.emit('onWillPresent');
             this.updateScreenHeights();
@@ -2201,17 +2214,6 @@ class CupertinoPane {
             // One frame before transition
             yield new Promise(resolve => requestAnimationFrame(resolve));
             if (conf.animate) {
-                if (this.device.ionic) {
-                    /**
-                     * Ionic cancel transition if the app is not ready
-                     * https://github.com/tech-systems/panes/issues/216
-                     * Good to get rid of that, but Ionic team seems not
-                     * have a solution for this
-                     * https://github.com/ionic-team/ionic-framework/issues/27984
-                     */
-                    yield this.ionApp['componentOnReady']();
-                    yield new Promise(resolve => requestAnimationFrame(resolve));
-                }
                 yield this.transitions.doTransition({
                     type: 'present', conf,
                     translateY: this.breakpoints.breaks[this.settings.initialBreak]
