@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: August 23, 2023
+ * Released on: August 25, 2023
  */
 
 /******************************************************************************
@@ -1917,6 +1917,14 @@ class CupertinoPane {
         this.eventsListeners = {};
         this.on = on;
         this.emit = emit;
+        // Temporary: modules public functions
+        // should be moved under modules completely
+        this.calcFitHeight = () => {
+            if (!this.settings.fitHeight) {
+                console.warn(`Cupertino Pane: calcFitHeight() should be used for auto-height panes with enabled fitHeight option`);
+                return null;
+            }
+        };
         this.swipeNextPoint = (diff, maxDiff, closest) => {
             let { brs, settingsBreaks } = this.prepareBreaksSwipeNextPoint();
             if (this.breakpoints.currentBreakpoint === brs['top']) {

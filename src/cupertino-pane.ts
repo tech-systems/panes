@@ -43,8 +43,13 @@ export class CupertinoPane {
   public emit: Function = emit;
 
   // Temporary: modules public functions
-  // should be moved under modules
-  public calcFitHeight: (animated?: any) => Promise<any>;
+  // should be moved under modules completely
+  public calcFitHeight: (animated?: any) => Promise<any> = () => {
+    if (!this.settings.fitHeight) {
+      console.warn(`Cupertino Pane: calcFitHeight() should be used for auto-height panes with enabled fitHeight option`);
+      return null;
+    }
+  };
   public backdrop: (conf: { show: true }) => void;
   public setZstackConfig: (zStack: any) => void;
 
