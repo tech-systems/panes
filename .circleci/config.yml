@@ -3,7 +3,7 @@ version: 2
 defaults: &defaults
   working_directory: ~/cupertino-pane
   docker:
-    - image: circleci/node:18
+    - image: circleci/node:latest
 
 jobs:
   test:
