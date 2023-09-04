@@ -1,3 +1,46 @@
+# [1.4.0](https://github.com/tech-systems/panes/compare/1.3.0...1.4.0) (2023-09-04)
+
+### Extra
+
+- [Super Simple Modals 🔥](https://panejs.com/demo/modal.html)
+- [Synthwave scene](https://panejs.com/demo/synthwave.html)
+
+### Features
+
+* **modal:** Super Simple Modals 🔥 ([9f7a910](https://github.com/tech-systems/panes/commit/9f7a910ff971a7838f8f7a1bad3f0aa883741e2a))
+* **core:** custom transitions for present/destroy ([ed7e4c2](https://github.com/tech-systems/panes/commit/ed7e4c2312047d72f8d764ff5a3cf3715d3c444a))
+* **settings:** ion-content auto-disable scroll on present ([#202](https://github.com/tech-systems/panes/issues/202))
+* **settings:** parent instance as HTMLElement or string ([#193](https://github.com/tech-systems/panes/issues/193)) ([56049ae](https://github.com/tech-systems/panes/commit/56049ae3027b5437e402e1406146c4afc66679ac))
+* **zStack:** custom border radius for pushElement ([#195](https://github.com/tech-systems/panes/issues/195)) ([1eb1f4c](https://github.com/tech-systems/panes/commit/1eb1f4ccf967cec713e1b5fba6f829c5a5bf5cda))
+* **fitHeight:** calcFitHeight function fallback ([#218](https://github.com/tech-systems/panes/issues/218)) ([bb89ff7](https://github.com/tech-systems/panes/commit/bb89ff7a80fb8b8e66fc03285a20ef507728f36c))
+
+### Enhancements
+
+* **core:** fast initialization ([#186](https://github.com/tech-systems/panes/issues/186)) ([b36600b](https://github.com/tech-systems/panes/commit/b36600bd1070de4694d242f0dc6f2e6eed39e6f8))
+* **fitHeight:** remastered algorithm ([#192](https://github.com/tech-systems/panes/issues/192)) & test ([e641a1b](https://github.com/tech-systems/panes/commit/e641a1b2796b9e4e8287d558259d66b70a3228a5)) ([12b9f9a](https://github.com/tech-systems/panes/commit/12b9f9a5d9f2859b536b792383451f7c1d4edf82)) ([7340ff6](https://github.com/tech-systems/panes/commit/7340ff63cc9b08f644b79b79c8d42fa9b4421766)) ([42bccfa](https://github.com/tech-systems/panes/commit/42bccfafde6e06c083a9f6eeeeab42197d0030f8)) ([a62a2bd](https://github.com/tech-systems/panes/commit/a62a2bdf46aeccf6a5ee63b58ccba2b0c0aadc4e)) ([a4af25c](https://github.com/tech-systems/panes/commit/a4af25c4386ff9295bc264182c5f807a82811b59))
+* **core:** improved internal styles mechanics ([#189](https://github.com/tech-systems/panes/issues/189)) ([23af735](https://github.com/tech-systems/panes/commit/23af7352814882323fb17ddc03111daead1fc9fc))
+* **fitHeight:** improved pane height calculations ([#186](https://github.com/tech-systems/panes/issues/186)) ([cb8eb05](https://github.com/tech-systems/panes/commit/cb8eb05638ae6aa48fe08a59feef9b61a18c65c6))
+* **keyboard:** keyboard hero v3, v4 (([#215](https://github.com/tech-systems/panes/issues/215)) ([#208](https://github.com/tech-systems/panes/issues/208)) ([#203](https://github.com/tech-systems/panes/issues/203)) ([#188](https://github.com/tech-systems/panes/issues/188)) ([#187](https://github.com/tech-systems/panes/issues/187)))
+* **keyboard:** Keyboard improvements for non-cordova android with OSK ([#200](https://github.com/tech-systems/panes/issues/200)) ([#188](https://github.com/tech-systems/panes/issues/188)) ([#187](https://github.com/tech-systems/panes/issues/187)) ([8549050](https://github.com/tech-systems/panes/commit/85490503ae9787aa26fd756aa4e2c073b6459dc3))
+* **keyboard:** Keyboard improvements for lower chrome versions ([#200](https://github.com/tech-systems/panes/issues/200)) ([f23568b](https://github.com/tech-systems/panes/commit/f23568b518d957e7be6df67c9f9a03f64575dc98))
+* **types:** zStack public methods ([4c0f7d0](https://github.com/tech-systems/panes/commit/4c0f7d0ed25e08b1908168f8586f1972858208c4))
+* **backdrop:** pass MouseEvent to onBackdropTap callback ([bc8d5ca](https://github.com/tech-systems/panes/commit/bc8d5ca70e9a710134585fc9aa16c83b7740e4dd))
+* **gestures:** upper-than-top gestures unable to move pane by Y for disabled options ([2f3280](https://github.com/tech-systems/panes/commit/2f32800b0ac7c184582ba8ce1b6accefe5c21651))
+
+
+### Bug Fixes
+
+* **draggable:** able to move scrolled pane by draggable element ([#184](https://github.com/tech-systems/panes/issues/184)) ([9e3eaaa](https://github.com/tech-systems/panes/commit/9e3eaaa3f6566372a59f59fdd42ade43c27d963a))
+* **events:** getEventClientYX can be undefined [#214](https://github.com/tech-systems/panes/issues/214), [#209](https://github.com/tech-systems/panes/issues/209) ([1f283a3](https://github.com/tech-systems/panes/commit/1f283a33bd818f022d4ce3628944cea6fbc2b9ea))
+* **events:** ios OSK resizes body ([#200](https://github.com/tech-systems/panes/issues/200)) ([0fc6fac](https://github.com/tech-systems/panes/commit/0fc6fac577bc59fe824dd205ae392b0872fed381))
+* **events:** keyboard push based on transformY ([#200](https://github.com/tech-systems/panes/issues/200)) ([e2108e5](https://github.com/tech-systems/panes/commit/e2108e51b35b7d77e0cc792ca21cd7a1e22a7d0d))
+* **fitHeight:** deal with Ionic framework ([029d625](https://github.com/tech-systems/panes/commit/029d625ed884df6fa7a6937179fe6d0e2c9f3d3b))
+* **fitHeight:** calcFitHeight with fitScreenHeight ([#192](https://github.com/tech-systems/panes/issues/192)) ([016c4d3](https://github.com/tech-systems/panes/commit/016c4d3067688db810bc725607740e9029086333))
+* **inverse:** calcFitHeight for inverse pane cause animation swing ([91359a0](https://github.com/tech-systems/panes/commit/91359a0837867b97c29ad47639e3ba65fb780a60))
+* **modules:** modules public methods typings, calcFitHeight fix ([deb7de8](https://github.com/tech-systems/panes/commit/deb7de882b4ffda481713a4d5ed5e3111e29b980))
+* **present:** ionic cancel transitions on initialization ([#216](https://github.com/tech-systems/panes/issues/216)) ([a944d32](https://github.com/tech-systems/panes/commit/a944d32a0f0c597cce80491750c9d67dec55ba88))
+
+
 # [1.3.0](https://github.com/roman-rr/cupertino-pane/compare/1.1.57...1.3.0) (2022-07-04)
 
 ### Extra 
