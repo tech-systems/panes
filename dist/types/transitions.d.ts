@@ -1,6 +1,4 @@
 import { CupertinoPane } from './cupertino-pane';
-import { CupertinoSettings } from './models';
-import { Breakpoints } from './breakpoints';
 /**
  * Transitions class
  * Z-Push transitions class
@@ -15,10 +13,10 @@ export declare enum CupertinoTransition {
 }
 export declare class Transitions {
     private instance;
+    isPaneHidden: boolean;
     private settings;
     private breakpoints;
-    isPaneHidden: boolean;
-    constructor(instance: CupertinoPane, settings: CupertinoSettings, breakpoints: Breakpoints);
+    constructor(instance: CupertinoPane);
     /***********************************
     * Transitions handler
     */

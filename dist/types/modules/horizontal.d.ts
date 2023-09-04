@@ -4,6 +4,8 @@ import { CupertinoPane } from '../cupertino-pane';
  */
 export declare class HorizontalModule {
     private instance;
+    private static readonly forceSettings;
+    static CollectSettings(settings: any): any;
     private defaultRect;
     private horizontalBreaks;
     private currentBreakpoint;

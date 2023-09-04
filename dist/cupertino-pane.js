@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: August 25, 2023
+ * Released on: September 5, 2023
  */
 
 (function (global, factory) {
@@ -185,13 +185,8 @@
      * Click, Scroll
      */
     class Events {
-        constructor(instance, settings, device, breakpoints, transitions, keyboardEvents) {
+        constructor(instance) {
             this.instance = instance;
-            this.settings = settings;
-            this.device = device;
-            this.breakpoints = breakpoints;
-            this.transitions = transitions;
-            this.keyboardEvents = keyboardEvents;
             this.allowClick = true;
             this.disableDragAngle = false;
             this.mouseDown = false;
@@ -223,6 +218,11 @@
              * @param t
              */
             this.onClickCb = (t) => this.onClick(t);
+            this.settings = this.instance.settings;
+            this.device = this.instance.device;
+            this.breakpoints = this.instance.breakpoints;
+            this.transitions = this.instance.transitions;
+            this.keyboardEvents = this.instance.keyboardEvents;
             this.touchEvents = this.getTouchEvents();
             // Set sensivity lower for web
             this.swipeNextSensivity = window.hasOwnProperty('cordova')
@@ -457,13 +457,19 @@
                 && !this.isDraggableElement(t)) {
                 return;
             }
-            // Topper-top/Lower-bottom recognizers
-            let forceNewVal = this.handleTopperLowerPositions({
-                clientX, clientY,
-                newVal, diffY
+            // Handle Superposition
+            let forceNewVal = this.handleSuperposition({
+                clientX, clientY, newVal,
+                newValX, diffY, diffX
             });
-            if (!isNaN(forceNewVal)) {
-                newVal = forceNewVal;
+            if (forceNewVal) {
+                if (!isNaN(forceNewVal.y))
+                    newVal = forceNewVal.y;
+                if (!isNaN(forceNewVal.x))
+                    newValX = forceNewVal.x;
+            }
+            if (forceNewVal === false) {
+                return;
             }
             // No changes Y/X
             if (this.instance.getPanelTransformY() === newVal
@@ -596,18 +602,21 @@
          * Private class methods
          */
         /**
+         * Superposition handler.
+         * Superposition is the ability of a quantum system to be in multiple states at the same time until it is measured.
          * Topper Than Top
          * Lower Than Bottom
-         * Otherwise don't changes
+         * Lefter Than Left
+         * Righter Than Right
          */
-        handleTopperLowerPositions(coords) {
+        handleSuperposition(coords) {
             // Disallow drag upper than top point
             // And drag bottom when upper than top point (for zStack allowed)
             if (!this.settings.upperThanTop
                 && (coords.newVal <= this.breakpoints.topper
                     || (coords.clientY <= this.breakpoints.topper && !this.settings.zStack))) {
                 this.steps = [];
-                return this.breakpoints.topper;
+                return { y: this.breakpoints.topper };
             }
             /**
              * Allow drag topper than top point
@@ -624,12 +633,12 @@
                 }
                 const screenDelta = this.instance.screen_height - this.instance.screenHeightOffset;
                 const differKoef = (screenDelta - this.instance.getPanelTransformY()) / (screenDelta - this.breakpoints.topper) / 8;
-                return this.instance.getPanelTransformY() + (coords.diffY * differKoef);
+                return { y: this.instance.getPanelTransformY() + (coords.diffY * differKoef) };
             }
             // Disallow drag lower then bottom
             if (!this.settings.lowerThanBottom
                 && coords.newVal >= this.breakpoints.bottomer) {
-                return this.breakpoints.bottomer;
+                return { y: this.breakpoints.bottomer };
             }
         }
         getEventClientYX(ev, name) {
@@ -680,10 +689,8 @@
      * Resize, Keyboard show, Keyboard hide
      */
     class KeyboardEvents {
-        constructor(instance, device, breakpoints) {
+        constructor(instance) {
             this.instance = instance;
-            this.device = device;
-            this.breakpoints = breakpoints;
             // Keyboard help vars
             this.inputBluredbyMove = false;
             this.keyboardVisibleResize = false;
@@ -706,6 +713,8 @@
              * @param e
              */
             this.onWindowResizeCb = (e) => this.onWindowResize(e);
+            this.device = this.instance.device;
+            this.breakpoints = this.instance.breakpoints;
         }
         onKeyboardShow(e) {
             return __awaiter(this, void 0, void 0, function* () {
@@ -900,7 +909,8 @@
                 fitScreenHeight: true,
                 ionContentScroll: false,
                 backdrop: false,
-                backdropOpacity: 0.4,
+                backdropBlur: false,
+                backdropOpacity: 0.6,
                 animationType: 'ease',
                 animationDuration: 300,
                 dragBy: null,
@@ -924,6 +934,7 @@
                 touchMoveStopPropagation: false,
                 touchAngle: 45,
                 breaks: {},
+                modal: null,
                 zStack: null,
                 events: null,
                 modules: null
@@ -935,9 +946,8 @@
      * Breakpoints builder
      */
     class Breakpoints {
-        constructor(instance, settings) {
+        constructor(instance) {
             this.instance = instance;
-            this.settings = settings;
             this.breaks = {};
             this.brs = [];
             this.beforeBuildBreakpoints = () => { };
@@ -946,6 +956,7 @@
                 middle: { enabled: true, height: 300 },
                 bottom: { enabled: true, height: 100 },
             };
+            this.settings = this.instance.settings;
         }
         /**
          * Function builder for breakpoints and heights
@@ -1070,11 +1081,11 @@
         CupertinoTransition["TouchEnd"] = "end";
     })(CupertinoTransition || (CupertinoTransition = {}));
     class Transitions {
-        constructor(instance, settings, breakpoints) {
+        constructor(instance) {
             this.instance = instance;
-            this.settings = settings;
-            this.breakpoints = breakpoints;
             this.isPaneHidden = false;
+            this.settings = this.instance.settings;
+            this.breakpoints = this.instance.breakpoints;
         }
         /***********************************
         * Transitions handler
@@ -1129,7 +1140,9 @@
                     || params.type === CupertinoTransition.Hide
                     || params.type === CupertinoTransition.Destroy) {
                     // Allow custom transitions for present/destroy
-                    let subTransition = ((_a = params.conf) === null || _a === void 0 ? void 0 : _a.transition) || {};
+                    // + Fix arguments mutations from re-call present
+                    let subTransition = ((_a = params.conf) === null || _a === void 0 ? void 0 : _a.transition)
+                        ? JSON.parse(JSON.stringify(params.conf.transition)) : {};
                     // freemode
                     if (params.type === CupertinoTransition.TouchEnd && this.settings.freeMode)
                         return resolve(true);
@@ -1148,8 +1161,15 @@
                     });
                     // Move pane
                     this.setPaneElTransform(params);
-                    // To: Allow custom transitions for present/destroy
-                    Object.assign(this.instance.paneEl.style, subTransition.to);
+                    /**
+                     * Custom transitions for present/destroy functions
+                     */
+                    if (subTransition.to) {
+                        if (!subTransition.to.transform) {
+                            subTransition.to.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+                        }
+                        Object.assign(this.instance.paneEl.style, subTransition.to);
+                    }
                     // set prev breakpoint for service needs
                     let getNextBreakpoint = Object.entries(this.breakpoints.breaks).find(val => val[1] === params.translateY);
                     if (getNextBreakpoint) {
@@ -1419,6 +1439,10 @@
           top: 0;
           display: none;
           z-index: 10;
+          ${Support.backdropFilter && this.settings.backdropBlur ? `
+            backdrop-filter: saturate(180%) blur(10px);
+            -webkit-backdrop-filter: saturate(180%) blur(10px);
+          ` : ``}
         }
       `);
                 if (this.settings.backdrop) {
@@ -1582,7 +1606,7 @@
                     }
                 }
                 // fitHeight (bullet-in styles for screen)
-                if (this.settings.fitHeight && ev.break === 'top') {
+                if (ev.break === 'top') {
                     if (this.settings.breaks['top'].height > this.instance.screen_height) {
                         this.settings.breaks['top'].height = this.instance.screen_height - (this.settings.bottomOffset * 2);
                         this.settings.topperOverflow = true;
@@ -1711,7 +1735,7 @@
             this.instance['checkOverflowAttr'] = (val) => this.checkOverflowAttr(val);
             this.instance['prepareBreaksSwipeNextPoint'] = () => this.prepareBreaksSwipeNextPoint();
             // re-bind events functions
-            this.events['handleTopperLowerPositions'] = (coords) => this.handleTopperLowerPositions(coords);
+            this.events['handleSuperposition'] = (coords) => this.handleSuperposition(coords);
             this.events['scrollPreventDrag'] = (t) => this.scrollPreventDrag(t);
             this.events['onScroll'] = () => this.onScroll();
             // Class to wrapper
@@ -1794,7 +1818,7 @@
          * Lower Than Bottom
          * Otherwise don't changes
          */
-        handleTopperLowerPositions(coords) {
+        handleSuperposition(coords) {
             // Inverse gestures
             // Allow drag topper than top point
             if (this.settings.upperThanTop
@@ -1809,12 +1833,12 @@
                 }
                 const screenDelta = this.instance.screen_height - this.instance.screenHeightOffset;
                 const differKoef = (screenDelta - this.instance.getPanelTransformY()) / (screenDelta - this.breakpoints.topper) / 8;
-                return this.instance.getPanelTransformY() + (coords.diffY * differKoef);
+                return { y: this.instance.getPanelTransformY() + (coords.diffY * differKoef) };
             }
             // Disallow drag topper than top point
             if (!this.settings.upperThanTop
                 && (coords.newVal >= this.breakpoints.topper)) {
-                return this.breakpoints.topper;
+                return { y: this.breakpoints.topper };
             }
         }
         scrollPreventDrag(t) {
@@ -1849,15 +1873,19 @@
      * Horizontal module
      */
     class HorizontalModule {
+        // Force to use settings by module
+        static CollectSettings(settings) {
+            return settings.horizontal
+                ? Object.assign(Object.assign({}, settings), HorizontalModule.forceSettings) : settings;
+        }
         constructor(instance) {
             this.instance = instance;
             this.settings = this.instance.settings;
             this.transitions = this.instance.transitions;
             this.events = this.instance.events;
             if (!this.settings.horizontal) {
-                return;
+                return null;
             }
-            this.settings.touchAngle = null;
             // re-bind functions
             this.transitions['setPaneElTransform'] = (params) => this.setPaneElTransform(params);
             // Calculate horizontal breakpoints on left-right edges
@@ -1867,6 +1895,11 @@
                     && !this.instance.getPanelTransformX()) {
                     this.calcHorizontalBreaks();
                 }
+            });
+            // In case of present({animate: false})
+            this.instance.on('onDidPresent', (ev) => {
+                if (!ev.animate)
+                    this.calcHorizontalBreaks();
             });
             this.instance.on('onDragEnd', (ev) => {
                 this.fastSwipeNext = this.events.fastSwipeNext('X');
@@ -1907,8 +1940,171 @@
             });
         }
     }
+    HorizontalModule.forceSettings = {
+        touchAngle: null
+    };
 
-    const Modules = { ZStackModule: ZStackModule, FollowerModule: FollowerModule, BackdropModule: BackdropModule, FitHeightModule: FitHeightModule, InverseModule: InverseModule, HorizontalModule: HorizontalModule };
+    /**
+     * Modal module
+     */
+    class ModalModule {
+        // Force to use settings by module
+        static CollectSettings(settings) {
+            return settings.modal
+                ? Object.assign(Object.assign({}, settings), ModalModule.ForceSettings) : settings;
+        }
+        constructor(instance) {
+            this.instance = instance;
+            this.modalDefaults = {
+                transition: 'fade',
+                flying: false,
+                dismissOnIntense: false
+            };
+            this.settings = this.instance.settings;
+            this.events = this.instance.events;
+            this.breakpoints = this.instance.breakpoints;
+            this.transitions = this.instance.transitions;
+            if (!this.settings.modal) {
+                return;
+            }
+            // set defaults
+            this.settings.modal = (typeof this.settings.modal === "object")
+                ? Object.assign(Object.assign({}, this.modalDefaults), this.settings.modal) : this.modalDefaults;
+            // ehance + re-bind functions (+ get rid of recursion)
+            this.instance['customPresent'] = this.instance['present'];
+            this.instance['present'] = (conf) => this.present(conf);
+            this.instance['customDestroy'] = this.instance['destroy'];
+            this.instance['destroy'] = (conf) => this.destroy(conf);
+            // re-bind functions
+            this.events['handleSuperposition'] = (coords) => this.handleSuperposition(coords);
+            this.transitions['setPaneElTransform'] = (params) => this.setPaneElTransform(params);
+            // Hooks
+            this.instance.on('beforeBreakHeightApplied', (ev) => {
+                if (ev.break === 'top') {
+                    this.settings.breaks['top'].height -= this.settings.bottomOffset * 2;
+                    this.settings.breaks['top'].height += (this.instance.screen_height - this.settings.breaks['top'].height) / 2;
+                }
+                if (ev.break === 'bottom') {
+                    this.settings.breaks['bottom'] = { enabled: false };
+                }
+                this.instance.addStyle(`
+        .cupertino-pane-wrapper .pane {
+          transform-origin: center ${this.breakpoints.breaks[this.settings.initialBreak]}px
+        }
+      `);
+            });
+            this.instance.on('rendered', () => {
+                this.instance.addStyle(`
+        .cupertino-pane-wrapper .pane {
+          border-radius: var(--cupertino-pane-border-radius, 20px) 
+                         var(--cupertino-pane-border-radius, 20px)
+                         var(--cupertino-pane-border-radius, 20px)
+                         var(--cupertino-pane-border-radius, 20px);
+          width: calc(100% - 16px) !important;
+          margin: auto;
+        }
+        .cupertino-pane-wrapper .pane.modal-flying {
+          animation: modalFlyingX 2000ms ease-in-out infinite alternate,
+                     modalFlyingY 3000ms ease-in-out infinite alternate;
+        }
+        @keyframes modalFlyingX {
+          0% { left: -10px; }
+          100% { left: 10px; }
+        }
+        @keyframes modalFlyingY {
+          0% { top: -10px; }
+          100% { top: 0px; }
+        }
+      `);
+                if (this.settings.modal['flying']) {
+                    this.instance.paneEl.classList.add('modal-flying');
+                }
+            });
+        }
+        setPaneElTransform(params) {
+            let closest = params.type === 'end' ? 0 : params.translateX;
+            this.instance.paneEl.style.transform = `translateX(${closest || 0}px) translateY(${params.translateY}px) translateZ(0px)`;
+        }
+        /**
+         * Private class methods
+         */
+        // Enhance with animation
+        present(conf) {
+            let { transition } = conf;
+            if (!transition) {
+                transition = ModalModule.BuildInTransition[this.settings.modal['transition']];
+            }
+            if (this.settings.modal['dismissOnIntense']) {
+                this.instance.enableDrag();
+            }
+            return this.instance['customPresent'](Object.assign(Object.assign({}, conf), { transition }));
+        }
+        // Enhance with animation
+        destroy(conf) {
+            let { transition } = conf;
+            if (!transition) {
+                transition = JSON.parse(JSON.stringify({
+                    duration: ModalModule.BuildInTransition[this.settings.modal['transition']].duration,
+                    from: ModalModule.BuildInTransition[this.settings.modal['transition']].to,
+                    to: ModalModule.BuildInTransition[this.settings.modal['transition']].from
+                }));
+            }
+            if (conf.fromCurrentPosition) {
+                let computedTranslate = new WebKitCSSMatrix(window.getComputedStyle(this.instance.paneEl).transform);
+                transition.to.transform = `translateY(${computedTranslate.m42}px) translateX(${computedTranslate.m41}px) translateZ(0px)`;
+            }
+            return this.instance['customDestroy'](Object.assign(Object.assign({}, conf), { transition }));
+        }
+        handleSuperposition(coords) {
+            // dismissOnIntense 
+            let intenseKoeff = 40;
+            let differY = Math.abs(this.instance.getPanelTransformY() - this.breakpoints.topper);
+            let differX = Math.abs(this.instance.getPanelTransformX());
+            if (this.settings.modal['dismissOnIntense']
+                && (differY > intenseKoeff || differX > intenseKoeff - 10)) {
+                this.instance.disableDrag();
+                this.destroy({ animate: true, fromCurrentPosition: true });
+                return false;
+            }
+            // calc new-pos
+            let hardness = 8;
+            const differKoefY = this.instance.getPanelTransformY() / this.breakpoints.topper / hardness;
+            const differKoefX = this.instance.getPanelTransformX() / this.breakpoints.topper / hardness;
+            return {
+                y: this.instance.getPanelTransformY() + (coords.diffY * (differKoefY + differKoefX)),
+                x: this.instance.getPanelTransformX() + (coords.diffX * (differKoefY + differKoefX))
+            };
+        }
+    }
+    ModalModule.BuildInTransition = {
+        fade: {
+            duration: 300,
+            from: {
+                opacity: 0
+            },
+            to: {
+                opacity: 1
+            },
+        },
+        zoom: {
+            duration: 300,
+            from: {
+                opacity: 0,
+                scale: 0.5
+            },
+            to: {
+                opacity: 1,
+                scale: 1
+            },
+        }
+    };
+    ModalModule.ForceSettings = {
+        fitHeight: true,
+        touchAngle: null,
+        showDraggable: false
+    };
+
+    const Modules = { ZStackModule: ZStackModule, FollowerModule: FollowerModule, BackdropModule: BackdropModule, FitHeightModule: FitHeightModule, InverseModule: InverseModule, HorizontalModule: HorizontalModule, ModalModule: ModalModule };
     class CupertinoPane {
         constructor(selector, conf = {}) {
             this.selector = selector;
@@ -1996,6 +2192,10 @@
             this.el = this.selector;
             this.el.style.display = 'none';
             this.settings = Object.assign(Object.assign({}, this.settings), conf);
+            // Get modules and collect settings 
+            let allModules = Object.keys(Modules).map((key) => Modules[key]);
+            let modules = this.settings.modules || allModules;
+            modules.forEach((module) => !!module.CollectSettings ? this.settings = module.CollectSettings(this.settings) : null);
             // Parent el as string or HTMLelement or get default element method
             let parentElement = this.el.parentElement;
             if (this.settings.parentElement) {
@@ -2014,13 +2214,11 @@
                 Object.keys(this.settings.events).forEach(name => this.on(name, this.settings.events[name]));
             }
             // Core classes
-            this.breakpoints = new Breakpoints(this, this.settings);
-            this.transitions = new Transitions(this, this.settings, this.breakpoints);
-            this.keyboardEvents = new KeyboardEvents(this, this.device, this.breakpoints);
-            this.events = new Events(this, this.settings, this.device, this.breakpoints, this.transitions, this.keyboardEvents);
+            this.breakpoints = new Breakpoints(this);
+            this.transitions = new Transitions(this);
+            this.keyboardEvents = new KeyboardEvents(this);
+            this.events = new Events(this);
             // Install modules
-            let allModules = Object.keys(Modules).map((key) => Modules[key]);
-            let modules = this.settings.modules || allModules;
             modules.forEach((module) => this.modules[this.getModuleRef(module.name)] = new module(this));
         }
         drawBaseElements() {
@@ -2125,6 +2323,7 @@
       .cupertino-pane-wrapper .destroy-button {
         width: 26px;
         height: 26px;
+        cursor: pointer;
         position: absolute;
         background: var(--cupertino-pane-destroy-button-background, #ebebeb);
         fill: var(--cupertino-pane-icon-close-color, #7a7a7e);
@@ -2186,8 +2385,18 @@
                 this.updateScreenHeights();
                 this.drawBaseElements();
                 yield this.setBreakpoints();
-                // Custom transitions for present/destroy: set styles
-                Object.assign(this.paneEl.style, (_a = conf === null || conf === void 0 ? void 0 : conf.transition) === null || _a === void 0 ? void 0 : _a.from);
+                /**
+                 * Custom transitions for present/destroy functions
+                 * + Fix mutations on arguments
+                 */
+                let customTransitionFrom = ((_a = conf === null || conf === void 0 ? void 0 : conf.transition) === null || _a === void 0 ? void 0 : _a.from)
+                    ? JSON.parse(JSON.stringify(conf.transition.from)) : null;
+                if (customTransitionFrom) {
+                    if (!customTransitionFrom.transform) {
+                        customTransitionFrom.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+                    }
+                    Object.assign(this.paneEl.style, customTransitionFrom);
+                }
                 // Show elements
                 this.wrapperEl.style.display = 'block';
                 this.contentEl.style.display = 'block';
@@ -2240,7 +2449,7 @@
                 /****** Attach Events *******/
                 this.events.attachAllEvents();
                 // Emit event
-                this.emit('onDidPresent');
+                this.emit('onDidPresent', { animate: conf.animate });
                 return this;
             });
         }

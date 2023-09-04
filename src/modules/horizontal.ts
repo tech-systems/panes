@@ -9,6 +9,19 @@ import { Transitions } from '../transitions';
  */
 
 export class HorizontalModule {
+
+  private static readonly forceSettings = {
+    touchAngle: null
+  }
+
+  // Force to use settings by module
+  public static CollectSettings(settings) {
+    return settings.horizontal 
+      ? { ...settings, ...HorizontalModule.forceSettings} 
+      : settings;
+  }
+
+
   private defaultRect;
   private horizontalBreaks;
   private currentBreakpoint: string;
@@ -23,10 +36,8 @@ export class HorizontalModule {
     this.events = this.instance.events;
 
     if (!this.settings.horizontal) {
-      return;
+      return null;
     }
-    
-    this.settings.touchAngle = null;
 
     // re-bind functions
     this.transitions['setPaneElTransform'] = (params) => this.setPaneElTransform(params);
@@ -38,6 +49,11 @@ export class HorizontalModule {
         && !this.instance.getPanelTransformX()) {
           this.calcHorizontalBreaks();
       }
+    });
+
+    // In case of present({animate: false})
+    this.instance.on('onDidPresent', (ev) => {
+      if (!ev.animate) this.calcHorizontalBreaks();
     });
 
     this.instance.on('onDragEnd', (ev) => {

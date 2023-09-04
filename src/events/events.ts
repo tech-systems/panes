@@ -32,13 +32,18 @@ export class Events {
   public isScrolling: boolean = false;
   public startPointOverTop: number;
   public swipeNextSensivity: number;
-  
-  constructor(private instance: CupertinoPane, 
-              private settings: CupertinoSettings,
-              private device: Device,
-              private breakpoints: Breakpoints,
-              private transitions: Transitions,
-              private keyboardEvents: KeyboardEvents) {
+
+  private settings: CupertinoSettings;
+  private device: Device;
+  private breakpoints: Breakpoints;
+  private transitions: Transitions;
+  private keyboardEvents: KeyboardEvents;
+  constructor(private instance: CupertinoPane) {
+    this.settings = this.instance.settings;
+    this.device = this.instance.device;
+    this.breakpoints = this.instance.breakpoints;
+    this.transitions = this.instance.transitions;
+    this.keyboardEvents = this.instance.keyboardEvents;
     this.touchEvents = this.getTouchEvents();
 
     // Set sensivity lower for web
@@ -321,14 +326,17 @@ export class Events {
       return;
     }
 
-    // Topper-top/Lower-bottom recognizers
-    let forceNewVal = this.handleTopperLowerPositions({
-        clientX, clientY, 
-        newVal, diffY
+    // Handle Superposition
+    let forceNewVal = this.handleSuperposition({ 
+        clientX, clientY, newVal,
+        newValX, diffY, diffX
     });
-
-    if (!isNaN(forceNewVal)) {
-      newVal = forceNewVal;
+    if (forceNewVal) {
+      if (!isNaN(forceNewVal.y)) newVal = forceNewVal.y;
+      if (!isNaN(forceNewVal.x)) newValX = forceNewVal.x;
+    }
+    if (forceNewVal === false) {
+      return;
     }
 
     // No changes Y/X
@@ -497,21 +505,24 @@ export class Events {
    */
 
   /**
+   * Superposition handler.
+   * Superposition is the ability of a quantum system to be in multiple states at the same time until it is measured.
    * Topper Than Top
    * Lower Than Bottom
-   * Otherwise don't changes
+   * Lefter Than Left
+   * Righter Than Right
    */
-   private handleTopperLowerPositions(coords: {
-     clientX: number, clientY: number, 
-     newVal:number, diffY: number, 
-  }):number {
+   private handleSuperposition(coords: {
+        clientX: number, clientY: number, newVal: number, 
+        newValX: number, diffY: number, diffX: number
+  }): {x?: number, y?: number} | false {
     // Disallow drag upper than top point
     // And drag bottom when upper than top point (for zStack allowed)
     if (!this.settings.upperThanTop 
         && (coords.newVal <= this.breakpoints.topper 
             || (coords.clientY <= this.breakpoints.topper && !this.settings.zStack))) {
       this.steps = [];
-      return this.breakpoints.topper;
+      return { y: this.breakpoints.topper };
     }
 
     /**
@@ -529,13 +540,13 @@ export class Events {
       }
       const screenDelta = this.instance.screen_height - this.instance.screenHeightOffset;
       const differKoef = (screenDelta - this.instance.getPanelTransformY()) / (screenDelta - this.breakpoints.topper) / 8;  
-      return this.instance.getPanelTransformY() + (coords.diffY * differKoef);
+      return { y: this.instance.getPanelTransformY() + (coords.diffY * differKoef) };
     }
 
     // Disallow drag lower then bottom
     if (!this.settings.lowerThanBottom
         && coords.newVal >= this.breakpoints.bottomer) {
-      return this.breakpoints.bottomer;
+      return { y: this.breakpoints.bottomer };
     }
   }
 

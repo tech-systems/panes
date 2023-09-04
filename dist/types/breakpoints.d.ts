@@ -1,11 +1,10 @@
 import { CupertinoPane } from './cupertino-pane';
-import { PaneBreaks, CupertinoSettings } from './models';
+import { PaneBreaks } from './models';
 /**
  * Breakpoints builder
  */
 export declare class Breakpoints {
     private instance;
-    private settings;
     topper: number;
     bottomer: number;
     breaks: {};
@@ -16,7 +15,8 @@ export declare class Breakpoints {
     beforeBuildBreakpoints: () => any;
     conf: PaneBreaks;
     private defaultBreaksConf;
-    constructor(instance: CupertinoPane, settings: CupertinoSettings);
+    private settings;
+    constructor(instance: CupertinoPane);
     /**
      * Function builder for breakpoints and heights
      * @param conf breakpoints

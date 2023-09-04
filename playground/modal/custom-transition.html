@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html mode="ios" dir="ltr">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Panes - Modal - Custom Transition</title>
+
+  <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+  <script src="../../dist/cupertino-pane.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css"/> 
+</head>
+<style>
+  .modal {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    padding-top: 5px;
+  }
+</style>
+<body>
+  <ion-app>
+    <ion-content>
+      
+        <!-- Panes -->
+        <div class="modal">
+          <h1>Custom Transition modal</h1>
+          <p>Modal with custom configured transition for present and destroy functions.</p>
+          <p>Try to move this modal</p>
+          <ion-button expand="block" onclick="dismiss();">
+            Dismiss Modal
+          </ion-button>
+        </div>
+
+        <ion-button expand="block" onclick="present();">
+          Present Modal
+        </ion-button>
+
+    </ion-content>
+  </ion-app>
+  <script>
+    const paneModal = new CupertinoPane('.modal', { 
+      modal: true,
+      backdrop: true,
+      events: {
+        onBackdropTap: () => dismiss()
+      }
+    });
+
+    const customPresentTransition = {
+      duration: 600,
+      from: {
+        transform: `translateY(0)`,
+        opacity: 0,
+        scale: 0.5
+      },
+      to: {
+        opacity: 1,
+        scale: 1
+      }
+    };
+
+    const customDestroyTransition = {
+      duration: 600,
+      from: {
+        opacity: 1,
+        scale: 1
+      },
+      to: {
+        opacity: 0,
+        scale: 0.5,
+        transform: `translateY(${window.innerHeight}px)`,
+      }
+    };
+
+    function present() {
+      paneModal.present({animate: true, transition: customPresentTransition});
+    }
+
+    function dismiss() {
+      paneModal.destroy({animate: true, transition: customDestroyTransition});
+    }
+
+    window.onload = async function () {
+      present();
+    }
+  </script>
+</body>
+
+</html>

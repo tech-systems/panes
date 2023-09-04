@@ -18,7 +18,7 @@ export declare class InverseModule {
      * Lower Than Bottom
      * Otherwise don't changes
      */
-    private handleTopperLowerPositions;
+    private handleSuperposition;
     scrollPreventDrag(t: any): boolean;
     private isOverflowEl;
     private onScroll;

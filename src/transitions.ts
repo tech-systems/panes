@@ -20,9 +20,12 @@ export enum CupertinoTransition {
 export class Transitions {
 
   public isPaneHidden: boolean = false;
-  constructor(private instance: CupertinoPane,
-              private settings: CupertinoSettings,
-              private breakpoints: Breakpoints) {
+
+  private settings: CupertinoSettings;
+  private breakpoints: Breakpoints;
+  constructor(private instance: CupertinoPane) {
+    this.settings = this.instance.settings;
+    this.breakpoints = this.instance.breakpoints;
   }
 
   /***********************************
@@ -84,7 +87,9 @@ export class Transitions {
           || params.type === CupertinoTransition.Destroy) {
         
         // Allow custom transitions for present/destroy
-        let subTransition = params.conf?.transition || {};
+        // + Fix arguments mutations from re-call present
+        let subTransition = params.conf?.transition 
+          ? JSON.parse(JSON.stringify(params.conf.transition)) : {};
 
         // freemode
         if (params.type === CupertinoTransition.TouchEnd && this.settings.freeMode) return resolve(true); 
@@ -106,12 +111,19 @@ export class Transitions {
           translateY: {new: params.translateY}, 
           transition: this.instance.paneEl.style.transition
         });
-        
+
         // Move pane
         this.setPaneElTransform(params);
         
-        // To: Allow custom transitions for present/destroy
-        Object.assign(this.instance.paneEl.style, subTransition.to);
+        /**
+         * Custom transitions for present/destroy functions
+         */
+        if (subTransition.to) {
+          if (!subTransition.to.transform) {
+            subTransition.to.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+          }
+          Object.assign(this.instance.paneEl.style, subTransition.to);
+        }
 
         // set prev breakpoint for service needs
         let getNextBreakpoint = Object.entries(this.breakpoints.breaks).find(val => val[1] === params.translateY);

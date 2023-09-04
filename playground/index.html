@@ -4,18 +4,18 @@
 <head>
   <meta charset="UTF-8">
   <title>Cupertino Pane - Playground</title>
-
   <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <script>var exports = {"__esModule": true};</script> <!-- Required if exports not defined earlier -->
   <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
-  <script nomodule src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.js"></script>
-  <script src="../dist/cupertino-pane.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css"/> 
 </head>
 
 <body>
   <ion-content class="ion-padding">
     <ion-list>
+      <ion-list-header>
+        <ion-label>Main</ion-label>
+      </ion-list-header>
+
       <ion-item>
         <ion-label>
           <a href="./base.html">Base</a>
@@ -49,6 +49,42 @@
       <ion-item>
         <ion-label>
           <a href="./calc-fit-height.html">Calc fitHeight</a>
+        </ion-label>
+      </ion-item>
+    </ion-list>
+
+    <ion-list>
+      <ion-list-header>
+        <ion-label>Modal</ion-label>
+      </ion-list-header>
+
+      <ion-item>
+        <ion-label>
+          <a href="./modal/basic.html">Basic Modal</a>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <a href="./modal/zoom-transition.html">Zoom Transition</a>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <a href="./modal/custom-transition.html">Custom Transition</a>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <a href="./modal/flying.html">Flying Mode</a>
+        </ion-label>
+      </ion-item>
+
+      <ion-item>
+        <ion-label>
+          <a href="./modal/dismiss-on-intense.html">Dismiss-on-Intense</a>
         </ion-label>
       </ion-item>
     </ion-list>

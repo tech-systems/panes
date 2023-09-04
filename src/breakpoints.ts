@@ -22,8 +22,9 @@ export class Breakpoints {
     bottom: { enabled: true, height: 100 },
   };
 
-  constructor(private instance: CupertinoPane, 
-              private settings: CupertinoSettings) {
+  private settings: CupertinoSettings;
+  constructor(private instance: CupertinoPane) {
+    this.settings = this.instance.settings;
   }
 
   /**

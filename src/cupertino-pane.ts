@@ -30,7 +30,7 @@ export class CupertinoPane {
   private destroyButtonEl: HTMLDivElement;
 
   public settings: CupertinoSettings = (new Settings()).instance;
-  private device: Device = new Device();
+  public device: Device = new Device();
   public keyboardEvents: KeyboardEvents;
   public events: Events;
   public breakpoints: Breakpoints;
@@ -78,6 +78,11 @@ export class CupertinoPane {
     this.el.style.display = 'none';
     this.settings = {...this.settings, ...conf};
 
+    // Get modules and collect settings 
+    let allModules = Object.keys(Modules).map((key) => Modules[key]);
+    let modules = this.settings.modules || allModules;
+    modules.forEach((module) => !!module.CollectSettings ? this.settings = module.CollectSettings(this.settings) : null);
+
 
     // Parent el as string or HTMLelement or get default element method
     let parentElement = this.el.parentElement;
@@ -102,14 +107,12 @@ export class CupertinoPane {
     }
 
     // Core classes
-    this.breakpoints = new Breakpoints(this, this.settings);
-    this.transitions = new Transitions(this, this.settings, this.breakpoints);
-    this.keyboardEvents = new KeyboardEvents(this, this.device, this.breakpoints);
-    this.events = new Events(this, this.settings, this.device, this.breakpoints, this.transitions, this.keyboardEvents);
+    this.breakpoints = new Breakpoints(this);
+    this.transitions = new Transitions(this);
+    this.keyboardEvents = new KeyboardEvents(this);
+    this.events = new Events(this);
 
     // Install modules
-    let allModules = Object.keys(Modules).map((key) => Modules[key]);
-    let modules = this.settings.modules || allModules;
     modules.forEach((module) => this.modules[this.getModuleRef(module.name)] = new module(this));
   }
 
@@ -221,6 +224,7 @@ export class CupertinoPane {
       .cupertino-pane-wrapper .destroy-button {
         width: 26px;
         height: 26px;
+        cursor: pointer;
         position: absolute;
         background: var(--cupertino-pane-destroy-button-background, #ebebeb);
         fill: var(--cupertino-pane-icon-close-color, #7a7a7e);
@@ -295,8 +299,18 @@ export class CupertinoPane {
       this.drawBaseElements();
       await this.setBreakpoints();
 
-      // Custom transitions for present/destroy: set styles
-      Object.assign(this.paneEl.style, conf?.transition?.from);
+      /**
+       * Custom transitions for present/destroy functions
+       * + Fix mutations on arguments
+       */
+      let customTransitionFrom = conf?.transition?.from 
+        ? JSON.parse(JSON.stringify(conf.transition.from)) : null; 
+      if (customTransitionFrom) {
+        if (!customTransitionFrom.transform) {
+          customTransitionFrom.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+        }
+        Object.assign(this.paneEl.style, customTransitionFrom);
+      }
 
       // Show elements
       this.wrapperEl.style.display = 'block';
@@ -362,7 +376,7 @@ export class CupertinoPane {
       this.events.attachAllEvents();
 
       // Emit event
-      this.emit('onDidPresent');
+      this.emit('onDidPresent', {animate: conf.animate} as any);
 
       return this;
   }

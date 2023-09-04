@@ -37,6 +37,10 @@ export class BackdropModule {
           top: 0;
           display: none;
           z-index: 10;
+          ${Support.backdropFilter && this.settings.backdropBlur ? `
+            backdrop-filter: saturate(180%) blur(10px);
+            -webkit-backdrop-filter: saturate(180%) blur(10px);
+          ` : ``}
         }
       `);
 

@@ -16,10 +16,11 @@ export class KeyboardEvents {
   private previousInputBottomOffset: number = 0;
   private prevNewHeight: number = 0;
   private prevFocusedElement: Element;
-  
-  constructor(private instance: CupertinoPane, 
-              private device: Device,
-              private breakpoints: Breakpoints) {
+  private device: Device;
+  private breakpoints: Breakpoints;
+  constructor(private instance: CupertinoPane) {
+    this.device = this.instance.device;
+    this.breakpoints = this.instance.breakpoints;
   }
 
   /**

@@ -1,20 +1,18 @@
 import { CupertinoPane } from '../cupertino-pane';
-import { Device } from '../device';
-import { Breakpoints } from '../breakpoints';
 /**
  * Resize, Keyboard show, Keyboard hide
  */
 export declare class KeyboardEvents {
     private instance;
-    private device;
-    private breakpoints;
     inputBluredbyMove: boolean;
     private keyboardVisibleResize;
     private inputBottomOffset;
     private previousInputBottomOffset;
     private prevNewHeight;
     private prevFocusedElement;
-    constructor(instance: CupertinoPane, device: Device, breakpoints: Breakpoints);
+    private device;
+    private breakpoints;
+    constructor(instance: CupertinoPane);
     /**
      * Open Cordova Keyboard event
      * @param e

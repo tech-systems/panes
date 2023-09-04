@@ -17,7 +17,8 @@ export class Settings {
       fitScreenHeight: true,
       ionContentScroll: false,
       backdrop: false,
-      backdropOpacity: 0.4,
+      backdropBlur: false,
+      backdropOpacity: 0.6,
       animationType: 'ease',
       animationDuration: 300,
       dragBy: null,
@@ -41,6 +42,7 @@ export class Settings {
       touchMoveStopPropagation: false,
       touchAngle: 45,
       breaks: {},
+      modal: null,
       zStack: null,
       events: null,
       modules: null

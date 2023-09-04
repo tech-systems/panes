@@ -117,7 +117,9 @@
       showDraggable: false,
       upperThanTop: true,
       bottomOffset: 20,
-      onBackdropTap: () => bulletin.destroy({animate: true})
+      events: {
+        onBackdropTap: () => bulletin.destroy({animate: true})
+      }
     });
 
     window.onload = async function () {

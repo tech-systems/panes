@@ -20,6 +20,12 @@ export interface ZStackSettings {
   stackZAngle?: number;
 }
 
+export interface ModalSettings {
+  transition?: 'fade' | 'zoom';
+  flying?: boolean;
+  dismissOnIntense?: boolean;
+}
+
 export interface TransitionStartEvent {
   translateY: { new: number};
 }
@@ -50,6 +56,7 @@ export interface PaneSettings {
   fitScreenHeight: boolean;
   ionContentScroll: boolean;
   backdrop: boolean;
+  backdropBlur: boolean;
   backdropOpacity: number;
   animationType: string;
   animationDuration: number;
@@ -74,7 +81,8 @@ export interface PaneSettings {
   touchMoveStopPropagation: boolean;
   touchAngle: number;
   breaks: PaneBreaks;
-  zStack: ZStackSettings; // todo; remove question mark 
+  modal: ModalSettings | boolean;
+  zStack: ZStackSettings;
   events: CupertinoEvents;
   modules: any[];
 }

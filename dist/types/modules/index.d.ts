@@ -4,4 +4,5 @@ import { BackdropModule } from "./backdrop";
 import { FitHeightModule } from "./fit-height";
 import { InverseModule } from './inverse';
 import { HorizontalModule } from './horizontal';
-export { ZStackModule, FollowerModule, BackdropModule, FitHeightModule, InverseModule, HorizontalModule };
+import { ModalModule } from "./modal";
+export { ZStackModule, FollowerModule, BackdropModule, FitHeightModule, InverseModule, HorizontalModule, ModalModule };

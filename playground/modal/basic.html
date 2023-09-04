@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html mode="ios" dir="ltr">
+
+<head>
+  <meta charset="UTF-8">
+  <title>Panes - Modal - Basic</title>
+
+  <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+  <script src="../../dist/cupertino-pane.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css"/> 
+</head>
+<style>
+  .modal {
+    padding-left: 20px;
+    padding-right: 20px;
+    padding-bottom: 20px;
+    padding-top: 5px;
+  }
+</style>
+<body>
+  <ion-app>
+    <ion-content>
+      
+        <!-- Panes -->
+        <div class="modal">
+          <h1>Default modal example</h1>
+          <p>With basic default fade built-in transition, and automatically calculated modal height.</p>
+          <p>Try to move this modal</p>
+          <ion-button expand="block" onclick="dismiss();">
+            Dismiss Modal
+          </ion-button>
+        </div>
+
+        <ion-button expand="block" onclick="present();">
+          Present Modal
+        </ion-button>
+
+    </ion-content>
+  </ion-app>
+  <script>
+    const paneModal = new CupertinoPane('.modal', { 
+      modal:true,
+      backdrop: true,
+      events: {
+        onBackdropTap: () => dismiss()
+      }
+    });
+
+    function present() {
+      paneModal.present({animate: true});
+    }
+
+    function dismiss() {
+      paneModal.destroy({animate: true});
+    }
+
+    window.onload = async function () {
+      present();
+    }
+  </script>
+</body>
+
+</html>

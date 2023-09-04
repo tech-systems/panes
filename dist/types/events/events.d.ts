@@ -1,20 +1,10 @@
 import { CupertinoPane } from '../cupertino-pane';
-import { CupertinoSettings } from '../models';
-import { Device } from '../device';
-import { Breakpoints } from '../breakpoints';
-import { Transitions } from '../transitions';
-import { KeyboardEvents } from './keyboard';
 /**
  * Touch start, Touch move, Touch end
  * Click, Scroll
  */
 export declare class Events {
     private instance;
-    private settings;
-    private device;
-    private breakpoints;
-    private transitions;
-    private keyboardEvents;
     touchEvents: {
         start: string;
         move: string;
@@ -31,7 +21,12 @@ export declare class Events {
     isScrolling: boolean;
     startPointOverTop: number;
     swipeNextSensivity: number;
-    constructor(instance: CupertinoPane, settings: CupertinoSettings, device: Device, breakpoints: Breakpoints, transitions: Transitions, keyboardEvents: KeyboardEvents);
+    private settings;
+    private device;
+    private breakpoints;
+    private transitions;
+    private keyboardEvents;
+    constructor(instance: CupertinoPane);
     private getTouchEvents;
     attachAllEvents(): void;
     detachAllEvents(): void;
@@ -77,11 +72,14 @@ export declare class Events {
      * Private class methods
      */
     /**
+     * Superposition handler.
+     * Superposition is the ability of a quantum system to be in multiple states at the same time until it is measured.
      * Topper Than Top
      * Lower Than Bottom
-     * Otherwise don't changes
+     * Lefter Than Left
+     * Righter Than Right
      */
-    private handleTopperLowerPositions;
+    private handleSuperposition;
     private getEventClientYX;
     scrollPreventDrag(t: any): boolean;
     willScrolled(): boolean;

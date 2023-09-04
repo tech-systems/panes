@@ -1,82 +1,3 @@
-interface PaneBreak {
-    enabled: boolean;
-    height?: number;
-    bounce?: boolean;
-}
-interface PaneBreaks {
-    top?: PaneBreak;
-    middle?: PaneBreak;
-    bottom?: PaneBreak;
-}
-interface ZStackSettings {
-    pushElements: string[];
-    minPushHeight?: number;
-    cardBorderRadius: number;
-    cardYOffset?: number;
-    cardZScale?: number;
-    cardContrast?: number;
-    stackZAngle?: number;
-}
-interface TransitionStartEvent {
-    translateY: {
-        new: number;
-    };
-}
-interface CupertinoEvents {
-    onDidDismiss?: (event?: CustomEvent) => void;
-    onWillDismiss?: (event?: CustomEvent) => void;
-    onDidPresent?: (event?: CustomEvent) => void;
-    onWillPresent?: (event?: CustomEvent) => void;
-    onDragStart?: (event?: CustomEvent) => void;
-    onDrag?: (event?: any) => void;
-    onDragEnd?: (event?: CustomEvent) => void;
-    onBackdropTap?: (event?: CustomEvent) => void;
-    onTransitionStart?: (event?: TransitionStartEvent) => void;
-    onTransitionEnd?: (event?: any) => void;
-}
-interface PaneSettings {
-    initialBreak: ('top' | 'middle' | 'bottom');
-    horizontal: boolean;
-    horizontalOffset: number;
-    inverse: boolean;
-    parentElement: string | HTMLElement;
-    followerElement: string;
-    cssClass: string;
-    fitHeight: boolean;
-    maxFitHeight: number;
-    fitScreenHeight: boolean;
-    ionContentScroll: boolean;
-    backdrop: boolean;
-    backdropOpacity: number;
-    animationType: string;
-    animationDuration: number;
-    bottomOffset: number;
-    bottomClose: boolean;
-    fastSwipeClose: boolean;
-    fastSwipeSensivity: number;
-    freeMode: boolean;
-    buttonDestroy: boolean;
-    topperOverflow: boolean;
-    topperOverflowOffset: number;
-    lowerThanBottom: boolean;
-    upperThanTop: boolean;
-    showDraggable: boolean;
-    draggableOver: boolean;
-    clickBottomOpen: boolean;
-    dragBy: string[];
-    preventClicks: boolean;
-    handleKeyboard: boolean;
-    simulateTouch: boolean;
-    passiveListeners: boolean;
-    touchMoveStopPropagation: boolean;
-    touchAngle: number;
-    breaks: PaneBreaks;
-    zStack: ZStackSettings;
-    events: CupertinoEvents;
-    modules: any[];
-}
-type CupertinoSettings = Partial<PaneSettings>;
-
 declare class Device {
     ios: boolean;
     android: boolean;
@@ -104,115 +25,11 @@ declare class Device {
 }
 
 /**
- * Breakpoints builder
- */
-declare class Breakpoints {
-    private instance;
-    private settings;
-    topper: number;
-    bottomer: number;
-    breaks: {};
-    lockedBreakpoints: any;
-    currentBreakpoint: number;
-    prevBreakpoint: string;
-    brs: number[];
-    beforeBuildBreakpoints: () => any;
-    conf: PaneBreaks;
-    private defaultBreaksConf;
-    constructor(instance: CupertinoPane, settings: CupertinoSettings);
-    /**
-     * Function builder for breakpoints and heights
-     * @param conf breakpoints
-     */
-    buildBreakpoints(conf?: PaneBreaks, bottomOffset?: number, animated?: boolean): Promise<void>;
-    getCurrentBreakName(): (string | null);
-    getClosestBreakY(): number;
-}
-
-declare class Transitions {
-    private instance;
-    private settings;
-    private breakpoints;
-    isPaneHidden: boolean;
-    constructor(instance: CupertinoPane, settings: CupertinoSettings, breakpoints: Breakpoints);
-    /***********************************
-    * Transitions handler
-    */
-    doTransition(params?: any): Promise<true>;
-    private setPaneElTransform;
-    buildTransitionValue(bounce: boolean, duration?: number): string;
-    /**
-     * Private class methods
-     */
-    private doesPanesExists;
-}
-
-/**
- * Resize, Keyboard show, Keyboard hide
- */
-declare class KeyboardEvents {
-    private instance;
-    private device;
-    private breakpoints;
-    inputBluredbyMove: boolean;
-    private keyboardVisibleResize;
-    private inputBottomOffset;
-    private previousInputBottomOffset;
-    private prevNewHeight;
-    private prevFocusedElement;
-    constructor(instance: CupertinoPane, device: Device, breakpoints: Breakpoints);
-    /**
-     * Open Cordova Keyboard event
-     * @param e
-     */
-    onKeyboardShowCb: (e: any) => Promise<void>;
-    private onKeyboardShow;
-    /**
-     * Close Cordova Keyboard event
-     * @param e
-     */
-    onKeyboardWillHideCb: (e: any) => void;
-    private onKeyboardWillHide;
-    /**
-     * Window resize event
-     * We handle here keyboard event as well
-     * @param e
-     */
-    onWindowResizeCb: (e: any) => Promise<void>;
-    private onWindowResize;
-    /**
-     * Private class methods
-     */
-    private isPaneDescendant;
-    private isFormElement;
-    private isOnViewport;
-    /**
-     * Deal with Ionic Framework.
-     * ion-input, ion-textarea changes in Client rects after window resize.
-     * get rects by parent, not shadowDom el
-     */
-    private getActiveInputClientBottomRect;
-    /**
-     * Using only to fix follower elemennts jumps out by OSK
-     * Fix OSK
-     * https://developer.chrome.com/blog/viewport-resize-behavior/
-     * Chrome 108+ will adjust with overlays-content
-     * When everyones updates, can be replaced with adding content-overlays to meta
-     */
-    fixBodyKeyboardResize(showKeyboard: any): void;
-}
-
-/**
  * Touch start, Touch move, Touch end
  * Click, Scroll
  */
 declare class Events {
     private instance;
-    private settings;
-    private device;
-    private breakpoints;
-    private transitions;
-    private keyboardEvents;
     touchEvents: {
         start: string;
         move: string;
@@ -229,7 +46,12 @@ declare class Events {
     isScrolling: boolean;
     startPointOverTop: number;
     swipeNextSensivity: number;
-    constructor(instance: CupertinoPane, settings: CupertinoSettings, device: Device, breakpoints: Breakpoints, transitions: Transitions, keyboardEvents: KeyboardEvents);
+    private settings;
+    private device;
+    private breakpoints;
+    private transitions;
+    private keyboardEvents;
+    constructor(instance: CupertinoPane);
     private getTouchEvents;
     attachAllEvents(): void;
     detachAllEvents(): void;
@@ -275,17 +97,205 @@ declare class Events {
      * Private class methods
      */
     /**
+     * Superposition handler.
+     * Superposition is the ability of a quantum system to be in multiple states at the same time until it is measured.
      * Topper Than Top
      * Lower Than Bottom
-     * Otherwise don't changes
+     * Lefter Than Left
+     * Righter Than Right
      */
-    private handleTopperLowerPositions;
+    private handleSuperposition;
     private getEventClientYX;
     scrollPreventDrag(t: any): boolean;
     willScrolled(): boolean;
     private isDraggableElement;
     private isFormElement;
     isElementScrollable(el: any): boolean;
+}
+
+/**
+ * Resize, Keyboard show, Keyboard hide
+ */
+declare class KeyboardEvents {
+    private instance;
+    inputBluredbyMove: boolean;
+    private keyboardVisibleResize;
+    private inputBottomOffset;
+    private previousInputBottomOffset;
+    private prevNewHeight;
+    private prevFocusedElement;
+    private device;
+    private breakpoints;
+    constructor(instance: CupertinoPane);
+    /**
+     * Open Cordova Keyboard event
+     * @param e
+     */
+    onKeyboardShowCb: (e: any) => Promise<void>;
+    private onKeyboardShow;
+    /**
+     * Close Cordova Keyboard event
+     * @param e
+     */
+    onKeyboardWillHideCb: (e: any) => void;
+    private onKeyboardWillHide;
+    /**
+     * Window resize event
+     * We handle here keyboard event as well
+     * @param e
+     */
+    onWindowResizeCb: (e: any) => Promise<void>;
+    private onWindowResize;
+    /**
+     * Private class methods
+     */
+    private isPaneDescendant;
+    private isFormElement;
+    private isOnViewport;
+    /**
+     * Deal with Ionic Framework.
+     * ion-input, ion-textarea changes in Client rects after window resize.
+     * get rects by parent, not shadowDom el
+     */
+    private getActiveInputClientBottomRect;
+    /**
+     * Using only to fix follower elemennts jumps out by OSK
+     * Fix OSK
+     * https://developer.chrome.com/blog/viewport-resize-behavior/
+     * Chrome 108+ will adjust with overlays-content
+     * When everyones updates, can be replaced with adding content-overlays to meta
+     */
+    fixBodyKeyboardResize(showKeyboard: any): void;
+}
+
+interface PaneBreak {
+    enabled: boolean;
+    height?: number;
+    bounce?: boolean;
+}
+interface PaneBreaks {
+    top?: PaneBreak;
+    middle?: PaneBreak;
+    bottom?: PaneBreak;
+}
+interface ZStackSettings {
+    pushElements: string[];
+    minPushHeight?: number;
+    cardBorderRadius: number;
+    cardYOffset?: number;
+    cardZScale?: number;
+    cardContrast?: number;
+    stackZAngle?: number;
+}
+interface ModalSettings {
+    transition?: 'fade' | 'zoom';
+    flying?: boolean;
+    dismissOnIntense?: boolean;
+}
+interface TransitionStartEvent {
+    translateY: {
+        new: number;
+    };
+}
+interface CupertinoEvents {
+    onDidDismiss?: (event?: CustomEvent) => void;
+    onWillDismiss?: (event?: CustomEvent) => void;
+    onDidPresent?: (event?: CustomEvent) => void;
+    onWillPresent?: (event?: CustomEvent) => void;
+    onDragStart?: (event?: CustomEvent) => void;
+    onDrag?: (event?: any) => void;
+    onDragEnd?: (event?: CustomEvent) => void;
+    onBackdropTap?: (event?: CustomEvent) => void;
+    onTransitionStart?: (event?: TransitionStartEvent) => void;
+    onTransitionEnd?: (event?: any) => void;
+}
+interface PaneSettings {
+    initialBreak: ('top' | 'middle' | 'bottom');
+    horizontal: boolean;
+    horizontalOffset: number;
+    inverse: boolean;
+    parentElement: string | HTMLElement;
+    followerElement: string;
+    cssClass: string;
+    fitHeight: boolean;
+    maxFitHeight: number;
+    fitScreenHeight: boolean;
+    ionContentScroll: boolean;
+    backdrop: boolean;
+    backdropBlur: boolean;
+    backdropOpacity: number;
+    animationType: string;
+    animationDuration: number;
+    bottomOffset: number;
+    bottomClose: boolean;
+    fastSwipeClose: boolean;
+    fastSwipeSensivity: number;
+    freeMode: boolean;
+    buttonDestroy: boolean;
+    topperOverflow: boolean;
+    topperOverflowOffset: number;
+    lowerThanBottom: boolean;
+    upperThanTop: boolean;
+    showDraggable: boolean;
+    draggableOver: boolean;
+    clickBottomOpen: boolean;
+    dragBy: string[];
+    preventClicks: boolean;
+    handleKeyboard: boolean;
+    simulateTouch: boolean;
+    passiveListeners: boolean;
+    touchMoveStopPropagation: boolean;
+    touchAngle: number;
+    breaks: PaneBreaks;
+    modal: ModalSettings | boolean;
+    zStack: ZStackSettings;
+    events: CupertinoEvents;
+    modules: any[];
+}
+type CupertinoSettings = Partial<PaneSettings>;
+
+/**
+ * Breakpoints builder
+ */
+declare class Breakpoints {
+    private instance;
+    topper: number;
+    bottomer: number;
+    breaks: {};
+    lockedBreakpoints: any;
+    currentBreakpoint: number;
+    prevBreakpoint: string;
+    brs: number[];
+    beforeBuildBreakpoints: () => any;
+    conf: PaneBreaks;
+    private defaultBreaksConf;
+    private settings;
+    constructor(instance: CupertinoPane);
+    /**
+     * Function builder for breakpoints and heights
+     * @param conf breakpoints
+     */
+    buildBreakpoints(conf?: PaneBreaks, bottomOffset?: number, animated?: boolean): Promise<void>;
+    getCurrentBreakName(): (string | null);
+    getClosestBreakY(): number;
+}
+
+declare class Transitions {
+    private instance;
+    isPaneHidden: boolean;
+    private settings;
+    private breakpoints;
+    constructor(instance: CupertinoPane);
+    /***********************************
+    * Transitions handler
+    */
+    doTransition(params?: any): Promise<true>;
+    private setPaneElTransform;
+    buildTransitionValue(bounce: boolean, duration?: number): string;
+    /**
+     * Private class methods
+     */
+    private doesPanesExists;
 }
 
 declare class CupertinoPane {
@@ -309,7 +319,7 @@ declare class CupertinoPane {
     private styleEl;
     private destroyButtonEl;
     settings: CupertinoSettings;
-    private device;
+    device: Device;
     keyboardEvents: KeyboardEvents;
     events: Events;
     breakpoints: Breakpoints;

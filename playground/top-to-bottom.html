@@ -80,8 +80,10 @@
         events: {
           // onDrag: () => console.log('Drag event'),
           onTransitionEnd: (e) => console.log('Transition end', e),
-          onBackdropTap: () => hideBackdrop(),
-          onBackdropTap: () => hideDrawer(),
+          onBackdropTap: () => {
+            hideDrawer();
+            hideBackdrop();
+          }
         }
         // freeMode: true,
     });

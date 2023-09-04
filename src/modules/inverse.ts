@@ -33,7 +33,7 @@ export class InverseModule {
     this.instance['checkOverflowAttr'] = (val) => this.checkOverflowAttr(val);
     this.instance['prepareBreaksSwipeNextPoint'] = () => this.prepareBreaksSwipeNextPoint();
     // re-bind events functions
-    this.events['handleTopperLowerPositions'] = (coords) => this.handleTopperLowerPositions(coords);
+    this.events['handleSuperposition'] = (coords) => this.handleSuperposition(coords);
     this.events['scrollPreventDrag'] = (t) => this.scrollPreventDrag(t);
     this.events['onScroll'] = () => this.onScroll();
 
@@ -129,10 +129,10 @@ export class InverseModule {
    * Lower Than Bottom
    * Otherwise don't changes
    */
-  private handleTopperLowerPositions(coords: {
-    clientX: number, clientY: number, 
-    newVal:number, diffY: number, 
-  }):number {
+  private handleSuperposition(coords: {
+    clientX: number, clientY: number, newVal: number, 
+    newValX: number, diffY: number, diffX: number
+  }): {x?: number, y?: number} {
     // Inverse gestures
     // Allow drag topper than top point
     if (this.settings.upperThanTop
@@ -147,13 +147,13 @@ export class InverseModule {
       }
       const screenDelta = this.instance.screen_height - this.instance.screenHeightOffset;
       const differKoef = (screenDelta - this.instance.getPanelTransformY()) / (screenDelta - this.breakpoints.topper) / 8;
-      return this.instance.getPanelTransformY() + (coords.diffY * differKoef);
+      return { y: this.instance.getPanelTransformY() + (coords.diffY * differKoef) };
     }
     
     // Disallow drag topper than top point
     if (!this.settings.upperThanTop 
         && (coords.newVal >= this.breakpoints.topper)) {
-      return this.breakpoints.topper;
+      return { y: this.breakpoints.topper };
     }
   }
 
