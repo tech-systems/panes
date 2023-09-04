@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.4.0
+ * Cupertino Pane 1.4.2
  * Cupertino Panes is multi-functional modals, cards & panes with touch technologies.
  * https://panejs.com
  *

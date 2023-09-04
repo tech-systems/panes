@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.4.0
+ * Cupertino Pane 1.4.2
  * Cupertino Panes is multi-functional modals, cards & panes with touch technologies.
  * https://panejs.com
  *
@@ -2013,6 +2013,9 @@ class ModalModule {
             if (this.settings.modal['flying']) {
                 this.instance.paneEl.classList.add('modal-flying');
             }
+            if (this.settings.modal['dismissOnIntense']) {
+                this.instance.enableDrag();
+            }
         });
     }
     setPaneElTransform(params) {
@@ -2027,9 +2030,6 @@ class ModalModule {
         let { transition } = conf;
         if (!transition) {
             transition = ModalModule.BuildInTransition[this.settings.modal['transition']];
-        }
-        if (this.settings.modal['dismissOnIntense']) {
-            this.instance.enableDrag();
         }
         return this.instance['customPresent'](Object.assign(Object.assign({}, conf), { transition }));
     }

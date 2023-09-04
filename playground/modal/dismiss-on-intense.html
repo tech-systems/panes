@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html mode="ios" dir="ltr">
+<html dir="ltr">
 
 <head>
   <meta charset="UTF-8">
@@ -18,14 +18,13 @@
     padding-top: 5px;
   }
 </style>
-<body>
+<body mode="ios">
   <ion-app>
     <ion-content>
-      
         <!-- Panes -->
         <div class="modal">
           <h1>Dismiss-on-Intense modal</h1>
-          <p>Modal will be nicely dismissed on hight intense move events.</p>
+          <p>Modal will be nicely dismissed on high-intense move events.</p>
           <p>Try to move pane out of the screen</p>
           <ion-button expand="block" onclick="dismiss();">
             Dismiss Modal
@@ -35,7 +34,6 @@
         <ion-button expand="block" onclick="present();">
           Present Modal
         </ion-button>
-
     </ion-content>
   </ion-app>
   <script>

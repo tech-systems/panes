@@ -125,6 +125,10 @@ export class ModalModule {
       if (this.settings.modal['flying']) {
         this.instance.paneEl.classList.add('modal-flying');
       }
+
+      if (this.settings.modal['dismissOnIntense']) {
+        this.instance.enableDrag();
+      }
     });
   }
 
@@ -142,10 +146,6 @@ export class ModalModule {
     let { transition } = conf;
     if (!transition) {
       transition = ModalModule.BuildInTransition[this.settings.modal['transition']];
-    }
-    
-    if (this.settings.modal['dismissOnIntense']) {
-      this.instance.enableDrag();
     }
 
     return this.instance['customPresent']({...conf, transition });
