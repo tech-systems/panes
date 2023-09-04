@@ -28,6 +28,7 @@
 #### One instance – Thousands solutions. <br>
 
 * **Small.** 12kb (minified and gzipped bundle with all modules). No dependencies.
+* **Reusable.** Create your configuration once. Use everywhere.
 * **Modularized.** Add extra features to your panes and create own modules.
 * **Accelerated.** Hardware accelerated transitions and amazing native behavior.
 * **Progressive.** Useful for mobile/web/hybrid applications.
@@ -51,6 +52,7 @@ Support this project with your organization. Your logo will show up here with a 
 <a href="https://opencollective.com/cupertino-pane"><img src="https://opencollective.com/cupertino-pane/organizations.svg?width=890"></a>
 
 ## Demonstration
+- [Modal](https://panejs.com/demo/modal.html)
 - [Base](https://panejs.com/demo/base.html)
 - [Overflow Top](https://panejs.com/demo/overflow-top.html)
 - [Auto Height](https://panejs.com/demo/auto-height.html)
