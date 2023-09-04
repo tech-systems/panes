@@ -3,7 +3,7 @@ version: 2
 defaults: &defaults
   working_directory: ~/cupertino-pane
   docker:
-    - image: circleci/node:latest
+    - image: circleci/node:16
 
 jobs:
   test:
@@ -13,7 +13,8 @@ jobs:
 
       - run:
           name: update-npm
-          command: 'sudo npm install -g npm@latest && sudo npm install -g gulp'
+          # command: 'sudo npm install -g npm@latest && sudo npm install -g gulp'
+          command: 'sudo npm install -g gulp'
 
       - restore_cache:
           keys:
