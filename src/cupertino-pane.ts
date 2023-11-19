@@ -288,7 +288,10 @@ export class CupertinoPane {
        * https://github.com/ionic-team/ionic-framework/issues/27984
        */
       if (conf.animate && this.device.ionic) {
-        await this.ionApp['componentOnReady']();
+        // Ionic/React removed componentOnReady ???
+        if (this.ionApp['componentOnReady']) {
+          await this.ionApp['componentOnReady']();
+        }
         await new Promise(resolve => requestAnimationFrame(resolve));
       }
 

@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: September 5, 2023
+ * Released on: November 19, 2023
  */
 
 /******************************************************************************
@@ -2371,7 +2371,10 @@ class CupertinoPane {
              * https://github.com/ionic-team/ionic-framework/issues/27984
              */
             if (conf.animate && this.device.ionic) {
-                yield this.ionApp['componentOnReady']();
+                // Ionic/React removed componentOnReady ???
+                if (this.ionApp['componentOnReady']) {
+                    yield this.ionApp['componentOnReady']();
+                }
                 yield new Promise(resolve => requestAnimationFrame(resolve));
             }
             // Emit event
