@@ -26,7 +26,7 @@ export class FitHeightModule {
     // TODO: change binding strategy according to TypeScript
     // E.G. Using public module methods from modules
     this.instance['calcFitHeight'] = async(animated) => this.calcFitHeight(animated);
-    this.instance['setOverflowHeight'] = () => {};
+    this.instance['setOverflowHeight'] = () => this.setOverflowHeight();
 
     // Class to wrapper
     this.instance.on('DOMElementsReady', () => {
@@ -112,6 +112,16 @@ export class FitHeightModule {
     }
 
     await this.breakpoints.buildBreakpoints(this.breakpoints.lockedBreakpoints, null, animated);
+  }
+
+  public setOverflowHeight(offset = 0) {
+    if (this.paneElHeight > this.instance.screen_height) {
+        this.instance.paneEl.style.height = `${this.instance.getPaneHeight()}px`;
+        this.instance.overflowEl.style.height = `${this.instance.getPaneHeight()
+          - this.settings.topperOverflowOffset
+          - this.instance.overflowEl.offsetTop
+          - offset}px`;
+    }
   }
 
   private async getPaneFitHeight(): Promise<number> {

@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: November 19, 2023
+ * Released on: December 17, 2023
  */
 
 (function (global, factory) {
@@ -1574,7 +1574,7 @@
             // TODO: change binding strategy according to TypeScript
             // E.G. Using public module methods from modules
             this.instance['calcFitHeight'] = (animated) => __awaiter(this, void 0, void 0, function* () { return this.calcFitHeight(animated); });
-            this.instance['setOverflowHeight'] = () => { };
+            this.instance['setOverflowHeight'] = () => this.setOverflowHeight();
             // Class to wrapper
             this.instance.on('DOMElementsReady', () => {
                 this.instance.wrapperEl.classList.add('fit-height');
@@ -1654,6 +1654,15 @@
                 }
                 yield this.breakpoints.buildBreakpoints(this.breakpoints.lockedBreakpoints, null, animated);
             });
+        }
+        setOverflowHeight(offset = 0) {
+            if (this.paneElHeight > this.instance.screen_height) {
+                this.instance.paneEl.style.height = `${this.instance.getPaneHeight()}px`;
+                this.instance.overflowEl.style.height = `${this.instance.getPaneHeight()
+                - this.settings.topperOverflowOffset
+                - this.instance.overflowEl.offsetTop
+                - offset}px`;
+            }
         }
         getPaneFitHeight() {
             return __awaiter(this, void 0, void 0, function* () {

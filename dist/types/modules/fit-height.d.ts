@@ -12,5 +12,6 @@ export declare class FitHeightModule {
     constructor(instance: CupertinoPane);
     private beforeBuildBreakpoints;
     calcFitHeight(animated?: boolean): Promise<any>;
+    setOverflowHeight(offset?: number): void;
     private getPaneFitHeight;
 }
