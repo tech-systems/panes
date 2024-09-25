@@ -16,7 +16,7 @@
     "changelog": "conventional-changelog -p angular -i CHANGELOG.md -s"
   },
   "devDependencies": {
-    "@rollup/plugin-replace": "^3.0.0",
+    "@rollup/plugin-replace": "^5.0.2",
     "chalk": "^4.1.2",
     "elapsed-time-logger": "^1.1.7",
     "fs-extra": "^10.0.0",
