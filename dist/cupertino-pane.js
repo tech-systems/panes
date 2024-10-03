@@ -1,13 +1,13 @@
 /**
- * Cupertino Pane 1.4.2
+ * Cupertino Pane 1.4.21
  * Cupertino Panes is multi-functional modals, cards & panes with touch technologies.
  * https://panejs.com
  *
- * Copyright 2019-2023 Roman Antonov (roman-rr)
+ * Copyright 2019-2024 Roman Antonov (roman-rr)
  *
  * Released under the MIT License
  *
- * Released on: December 17, 2023
+ * Released on: October 3, 2024
  */
 
 (function (global, factory) {
@@ -30,6 +30,8 @@
     OTHER TORTIOUS ACTION, ARISING OUT OF OR IN CONNECTION WITH THE USE OR
     PERFORMANCE OF THIS SOFTWARE.
     ***************************************************************************** */
+    /* global Reflect, Promise, SuppressedError, Symbol, Iterator */
+
 
     function __awaiter(thisArg, _arguments, P, generator) {
         function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -514,6 +516,8 @@
                 fastSwipeClose = this.settings.fastSwipeClose
                     && this.breakpoints.currentBreakpoint < closest;
             }
+            // update currentBreakpoint once `closest` is known so it's available in emitted events
+            this.breakpoints.currentBreakpoint = closest;
             // blur tap event
             let blurTapEvent = false;
             if ((this.isFormElement(document.activeElement))
