@@ -393,6 +393,9 @@ export class Events {
       fastSwipeClose = this.settings.fastSwipeClose
         && this.breakpoints.currentBreakpoint < closest;
     }
+    
+    // update currentBreakpoint once `closest` is known so it's available in emitted events
+    this.breakpoints.currentBreakpoint = closest;
 
     // blur tap event
     let blurTapEvent = false;
