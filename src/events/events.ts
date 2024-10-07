@@ -440,7 +440,6 @@ export class Events {
       this.instance.emit('onTransitionEnd', {target: this.instance.paneEl});
     }
 
-    this.breakpoints.currentBreakpoint = closest;
     this.transitions.doTransition({type: 'end', translateY: closest});
   }
 

@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: October 3, 2024
+ * Released on: October 7, 2024
  */
 
 (function (global, factory) {
@@ -553,7 +553,6 @@
             if (this.instance.getPanelTransformY() === closest) {
                 this.instance.emit('onTransitionEnd', { target: this.instance.paneEl });
             }
-            this.breakpoints.currentBreakpoint = closest;
             this.transitions.doTransition({ type: 'end', translateY: closest });
         }
         onScroll(t) {
@@ -2706,4 +2705,3 @@
     return CupertinoPane;
 
 }));
-//# sourceMappingURL=cupertino-pane.js.map
