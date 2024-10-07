@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.4.21
+ * Cupertino Pane 1.4.22
  * Cupertino Panes is multi-functional modals, cards & panes with touch technologies.
  * https://panejs.com
  *
@@ -2705,3 +2705,4 @@
     return CupertinoPane;
 
 }));
+//# sourceMappingURL=cupertino-pane.js.map
