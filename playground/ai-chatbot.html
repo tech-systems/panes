@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <title>Panes - AI Chatbot Demo</title>
+  <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
+  <script src="../dist/cupertino-pane.js"></script>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css"/> 
+<style>
+  .pane {
+    border-radius: 30px !important;
+    width: calc(100% - 16px) !important;
+    margin: auto;
+    left: 0;
+    right: 0;
+    height: auto !important;
+  }
+
+  .chat-container {
+    display: block;
+    margin: 20px;
+    margin-top: 5px;
+    padding-bottom: 20px;
+  }
+
+  .chat-header {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .chat-header h1 {
+    margin-top: 0px;
+    color: #9c9c9c;
+    font-size: 24px;
+  }
+
+  .ai-avatar {
+    font-size: 50px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 25px;
+    width: 80px;
+    height: 80px;
+    margin: auto;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+
+  .chat-messages {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+  }
+
+  .message {
+    margin-bottom: 15px;
+    display: flex;
+    align-items: flex-end;
+  }
+
+  .message.user {
+    flex-direction: row-reverse;
+  }
+
+  .message-bubble {
+    max-width: 70%;
+    padding: 12px 16px;
+    border-radius: 20px;
+    font-size: 16px;
+    line-height: 1.4;
+  }
+
+  .message.user .message-bubble {
+    background: #007AFF;
+    color: white;
+    border-bottom-right-radius: 5px;
+  }
+
+  .message.ai .message-bubble {
+    background: #E9E9EB;
+    color: #000;
+    border-bottom-left-radius: 5px;
+  }
+
+  .typing-indicator {
+    display: flex;
+    align-items: center;
+    padding: 12px 16px;
+    background: #E9E9EB;
+    border-radius: 20px;
+    border-bottom-left-radius: 5px;
+    max-width: 60px;
+  }
+
+  .typing-dots {
+    display: flex;
+    gap: 4px;
+  }
+
+  .typing-dot {
+    width: 8px;
+    height: 8px;
+    background: #999;
+    border-radius: 50%;
+    animation: typing 1.4s infinite ease-in-out;
+  }
+
+  .typing-dot:nth-child(1) { animation-delay: -0.32s; }
+  .typing-dot:nth-child(2) { animation-delay: -0.16s; }
+
+  @keyframes typing {
+    0%, 80%, 100% { opacity: 0.3; transform: scale(0.8); }
+    40% { opacity: 1; transform: scale(1); }
+  }
+
+  .input-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .input-container ion-input {
+    flex: 1;
+    --background: #F2F2F7;
+    --border-radius: 20px;
+    --padding-start: 15px;
+    --padding-end: 15px;
+  }
+
+  .input-container ion-button {
+    --border-radius: 20px;
+    height: 40px;
+    width: 40px;
+  }
+</style>
+</head>
+<body>
+  <ion-app>
+    <ion-content>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title>AI Assistant Demo</ion-title>
+          <ion-buttons slot="end">
+            <ion-button onclick="clearChat()">
+              <ion-icon name="refresh-outline"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+
+      <chat-pane>
+        <div class="chat-container">
+          <div class="chat-header">
+            <div class="ai-avatar">🤖</div>
+            <h1>AI Assistant</h1>
+            <p style="color: #666; font-size: 16px; margin: 0;">
+              Ask me anything! I'm here to help you explore the power of Cupertino Panes.
+            </p>
+          </div>
+
+          <div class="chat-messages" id="chatMessages">
+            <div class="message ai">
+              <div class="message-bubble">
+                👋 Hello! I'm your AI assistant. I can help you learn about Cupertino Panes, answer questions, or just have a chat. What would you like to know?
+              </div>
+            </div>
+          </div>
+
+          <div class="input-container">
+            <ion-input 
+              id="messageInput" 
+              placeholder="Type your message..." 
+              onkeydown="handleKeyPress(event)">
+            </ion-input>
+            <ion-button onclick="sendMessage()" color="primary">
+              <ion-icon name="send"></ion-icon>
+            </ion-button>
+          </div>
+        </div>
+      </chat-pane>
+    </ion-content>
+  </ion-app>
+<script>
+  const chatPane = new CupertinoPane('chat-pane', { 
+    fitHeight: true,
+    backdrop: true,
+    backdropOpacity: 0.4,
+    bottomClose: false,
+    buttonDestroy: false,
+    showDraggable: true,
+    upperThanTop: true,
+    bottomOffset: 20,
+    breaks: {
+      top: { enabled: true, height: window.innerHeight * 0.9 },
+      middle: { enabled: true, height: window.innerHeight * 0.6 },
+      bottom: { enabled: true, height: 200 }
+    },
+    events: {
+      onBackdropTap: () => chatPane.moveToBreak('bottom')
+    }
+  });
+
+  const aiResponses = [
+    "That's a great question! Cupertino Panes provides smooth, native-like modals and sheets for web applications.",
+    "🚀 Cupertino Panes supports multiple breakpoints, making it perfect for mobile-first design!",
+    "The library is lightweight at just 12kb and has no dependencies. Pretty amazing, right?",
+    "You can customize everything - from animations to touch gestures. The possibilities are endless!",
+    "💡 Did you know you can stack multiple panes using the Z-Stack feature?",
+    "The touch technologies in Cupertino Panes make interactions feel incredibly natural.",
+    "I'm here to help! Feel free to ask me about features, implementation, or anything else.",
+    "🎨 The backdrop and blur effects create beautiful, modern interfaces.",
+    "Hardware acceleration ensures smooth 60fps animations on all devices.",
+    "You can even integrate it with frameworks like Ionic, React, or Vue!"
+  ];
+
+  let messageCount = 0;
+
+  window.onload = async function () {
+    chatPane.present({animate: true});
+  }
+
+  function handleKeyPress(event) {
+    if (event.key === 'Enter') {
+      sendMessage();
+    }
+  }
+
+  async function sendMessage() {
+    const input = document.getElementById('messageInput');
+    const message = input.value.trim();
+    
+    if (!message) return;
+
+    // Add user message
+    addMessage(message, 'user');
+    input.value = '';
+
+    // Show typing indicator
+    showTypingIndicator();
+
+    // Simulate AI response delay
+    setTimeout(() => {
+      hideTypingIndicator();
+      const response = getAIResponse(message);
+      addMessage(response, 'ai');
+      
+      // Auto-expand pane for longer conversations
+      if (messageCount > 3) {
+        chatPane.moveToBreak('top');
+      }
+    }, Math.random() * 1500 + 800); // 0.8-2.3 second delay
+  }
+
+  function addMessage(text, sender) {
+    const messagesContainer = document.getElementById('chatMessages');
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${sender}`;
+    
+    const bubbleDiv = document.createElement('div');
+    bubbleDiv.className = 'message-bubble';
+    bubbleDiv.textContent = text;
+    
+    messageDiv.appendChild(bubbleDiv);
+    messagesContainer.appendChild(messageDiv);
+    
+    // Scroll to bottom
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    
+    messageCount++;
+    
+    // Recalculate pane height
+    setTimeout(() => chatPane.calcFitHeight(), 100);
+  }
+
+  function getAIResponse(userMessage) {
+    // Simple keyword-based responses
+    const message = userMessage.toLowerCase();
+    
+    if (message.includes('hello') || message.includes('hi')) {
+      return "Hello there! 👋 Great to meet you! What brings you to explore Cupertino Panes today?";
+    }
+    if (message.includes('how') || message.includes('what')) {
+      return "🤔 That's a thoughtful question! Cupertino Panes makes it easy to create iOS-style modals and sheets with smooth gestures and animations.";
+    }
+    if (message.includes('mobile')) {
+      return "📱 Cupertino Panes is perfect for mobile! It supports touch gestures, responsive breakpoints, and feels native on iOS and Android.";
+    }
+    if (message.includes('thank')) {
+      return "You're very welcome! 😊 I'm happy to help you discover what makes Cupertino Panes so special.";
+    }
+    
+    // Random response for other messages
+    return aiResponses[Math.floor(Math.random() * aiResponses.length)];
+  }
+
+  function showTypingIndicator() {
+    const messagesContainer = document.getElementById('chatMessages');
+    const typingDiv = document.createElement('div');
+    typingDiv.className = 'message ai typing-message';
+    typingDiv.id = 'typingIndicator';
+    
+    const bubbleDiv = document.createElement('div');
+    bubbleDiv.className = 'typing-indicator';
+    bubbleDiv.innerHTML = `
+      <div class="typing-dots">
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+        <div class="typing-dot"></div>
+      </div>
+    `;
+    
+    typingDiv.appendChild(bubbleDiv);
+    messagesContainer.appendChild(typingDiv);
+    messagesContainer.scrollTop = messagesContainer.scrollHeight;
+  }
+
+  function hideTypingIndicator() {
+    const typing = document.getElementById('typingIndicator');
+    if (typing) typing.remove();
+  }
+
+  function clearChat() {
+    const messagesContainer = document.getElementById('chatMessages');
+    messagesContainer.innerHTML = `
+      <div class="message ai">
+        <div class="message-bubble">
+          👋 Hello! I'm your AI assistant. I can help you learn about Cupertino Panes, answer questions, or just have a chat. What would you like to know?
+        </div>
+      </div>
+    `;
+    messageCount = 0;
+    chatPane.calcFitHeight();
+  }
+</script>
+</body>
+</html>
