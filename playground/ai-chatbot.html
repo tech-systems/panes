@@ -239,10 +239,39 @@
     --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     --background-activated: linear-gradient(135deg, #5a6fd6 0%, #6a4292 100%);
     --background-hover: linear-gradient(135deg, #5a6fd6 0%, #6a4292 100%);
-    --border-radius: 20px;
-    height: 40px;
-    width: 40px;
-    box-shadow: 0 0 10px rgba(102, 126, 234, 0.4);
+    --border-radius: 50%;
+    height: 45px;
+    width: 45px;
+    margin: 0;
+    box-shadow: 0 0 15px rgba(102, 126, 234, 0.6);
+    transition: all 0.3s ease;
+    overflow: hidden;
+  }
+  
+  .input-container ion-button::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    z-index: -1;
+  }
+  
+  .input-container ion-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.8);
+  }
+  
+  .input-container ion-button:hover::before {
+    opacity: 1;
+  }
+  
+  .input-container ion-button ion-icon {
+    font-size: 18px;
   }
 
   ion-toolbar {
@@ -328,6 +357,9 @@
         <ion-toolbar>
           <ion-title>AI Assistant Demo</ion-title>
           <ion-buttons slot="end">
+            <ion-button onclick="collapseChat()" color="light">
+              <ion-icon name="chevron-down-outline"></ion-icon>
+            </ion-button>
             <ion-button onclick="clearChat()">
               <ion-icon name="refresh-outline"></ion-icon>
             </ion-button>
