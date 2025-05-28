@@ -541,25 +541,25 @@
     isCollapsed = true;
   }
 
-  // Update existing event handlers
-  chatPane.settings.events = {
-    ...chatPane.settings.events,
-    onDidDismiss: () => collapseChat(),
-    onWillPresent: () => {
-      robotCollapsed.style.display = 'none';
-      isCollapsed = false;
-      setTimeout(() => {
-        moveArrows.style.opacity = '1';
-      }, 500);
-    },
-    onDragStart: () => {
-      moveArrows.style.opacity = '0';
-    }
-  };
+  // Set initial state
+  robotCollapsed.style.display = 'none';
   
-  // Hide robot initially since pane is shown on load
-  window.addEventListener('load', () => {
+  // Configure pane events
+  chatPane.on('onDidDismiss', function() {
+    robotCollapsed.style.display = 'flex';
+    isCollapsed = true;
+  });
+  
+  chatPane.on('onWillPresent', function() {
     robotCollapsed.style.display = 'none';
+    isCollapsed = false;
+    setTimeout(() => {
+      moveArrows.style.opacity = '1';
+    }, 500);
+  });
+  
+  chatPane.on('onDragStart', function() {
+    moveArrows.style.opacity = '0';
   });
 </script>
 </body>
