@@ -312,7 +312,7 @@
 </head>
 <body>
   <div class="synthwave-grid"></div>
-  <div class="robot-collapsed hidden" id="robotCollapsed" onclick="expandChat()">
+  <div class="robot-collapsed" id="robotCollapsed" onclick="expandChat()">
     🤖
   </div>
   <div class="arrows" id="moveArrows">
@@ -537,7 +537,7 @@
 
   function collapseChat() {
     chatPane.hide();
-    robotCollapsed.classList.remove('hidden');
+    robotCollapsed.style.display = 'flex';
     isCollapsed = true;
   }
 
@@ -546,7 +546,7 @@
     ...chatPane.settings.events,
     onDidDismiss: () => collapseChat(),
     onWillPresent: () => {
-      robotCollapsed.classList.add('hidden');
+      robotCollapsed.style.display = 'none';
       isCollapsed = false;
       setTimeout(() => {
         moveArrows.style.opacity = '1';
@@ -556,6 +556,11 @@
       moveArrows.style.opacity = '0';
     }
   };
+  
+  // Hide robot initially since pane is shown on load
+  window.addEventListener('load', () => {
+    robotCollapsed.style.display = 'none';
+  });
 </script>
 </body>
 </html>
