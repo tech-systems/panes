@@ -8,13 +8,103 @@
   <script src="../dist/cupertino-pane.js"></script>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css"/> 
 <style>
+  body {
+    background: linear-gradient(180deg, #0a0a0a 0%, #1a0a2e 100%);
+    overflow: hidden;
+    --cupertino-pane-icon-close-color: #a8a7ae;
+    --cupertino-pane-background: rgba(28, 28, 29, 0.8);
+    --cupertino-pane-color: #ffffff;
+    --cupertino-pane-shadow: 0 4px 16px rgb(0 0 0 / 12%);
+    --cupertino-pane-border-radius: 20px;
+    --cupertino-pane-move-background: #424246;
+    --cupertino-pane-destroy-button-background: #424246;
+    --ion-background-color: transparent;
+    --ion-color-primary: #0078d4;
+  }
+
+  .synthwave-grid {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      linear-gradient(rgba(147, 0, 211, 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(147, 0, 211, 0.3) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridMove 20s linear infinite;
+    z-index: -1;
+  }
+
+  @keyframes gridMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+  }
+
+  .synthwave-grid::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: radial-gradient(circle at center, transparent 0%, rgba(10, 10, 10, 0.8) 100%);
+  }
+  
+  @keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+  .robot-collapsed {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 15px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
+    animation: robotGlow 2s ease-in-out infinite alternate;
+    transition: all 0.3s ease;
+  }
+
+  .robot-collapsed:hover {
+    transform: scale(1.1);
+    box-shadow: 0 0 30px rgba(102, 126, 234, 0.8);
+  }
+
+  @keyframes robotGlow {
+    0% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.6); }
+    100% { box-shadow: 0 0 30px rgba(147, 0, 211, 0.8); }
+  }
+
+  .robot-collapsed.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.8);
+  }
+
   .pane {
-    border-radius: 30px !important;
-    width: calc(100% - 16px) !important;
+    border-radius: 10px !important;
+    width: 94% !important;
+    max-width: 250px !important;
     margin: auto;
     left: 0;
     right: 0;
     height: auto !important;
+    backdrop-filter: saturate(180%) blur(20px);
+    -webkit-backdrop-filter: saturate(180%) blur(20px);
+    background: rgba(28, 28, 29, 0.8) !important;
+    box-shadow: 0 -30px 80px 0 rgb(0 0 0 / 30%);
+    border: 1px solid rgb(37, 37, 37);
   }
 
   .chat-container {
@@ -134,9 +224,84 @@
     height: 40px;
     width: 40px;
   }
+
+  ion-toolbar {
+    --background: rgba(255, 255, 255, 0.1);
+    --color: white;
+  }
+
+  ion-content {
+    --background: transparent;
+  }
+
+  .arrows {
+    position: absolute;
+    bottom: 70px;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    transition: 300ms ease-in-out;
+    opacity: 0;
+    z-index: 1;
+  }
+
+  .arrows ion-icon {
+    color: #0d826c;
+    font-size: 30px;
+  }
+
+  .arrows .left-right {
+    display: flex;
+    width: 340px;
+    justify-content: space-between;
+    margin-top: 80px;
+  }
+
+  .arrows ion-icon[name="chevron-up-outline"] {
+    animation: upArrow 2s infinite;
+  }
+
+  .arrows ion-icon[name="chevron-back-outline"] {
+    animation: leftArrow 2s infinite;
+  }
+
+  .arrows ion-icon[name="chevron-forward-outline"] {
+    animation: rightArrow 2s infinite;
+  }
+
+  @keyframes upArrow {
+    0% { transform: translate3d(0px, 0px, 0px); }
+    50% { transform: translate3d(0px, -10px, 0px); }
+    100% { transform: translate3d(0px, 0px, 0px); }
+  }
+
+  @keyframes leftArrow {
+    0% { transform: translate3d(0px, 0px, 0px); }
+    50% { transform: translate3d(-10px, 0px, 0px); }
+    100% { transform: translate3d(0px, 0px, 0px); }
+  }
+
+  @keyframes rightArrow {
+    0% { transform: translate3d(0px, 0px, 0px); }
+    50% { transform: translate3d(10px, 0px, 0px); }
+    100% { transform: translate3d(0px, 0px, 0px); }
+  }
 </style>
 </head>
 <body>
+  <div class="synthwave-grid"></div>
+  <div class="robot-collapsed hidden" id="robotCollapsed" onclick="expandChat()">
+    🤖
+  </div>
+  <div class="arrows" id="moveArrows">
+    <ion-icon name="chevron-up-outline"></ion-icon>
+    <div class="left-right">
+      <ion-icon name="chevron-back-outline"></ion-icon>
+      <ion-icon name="chevron-forward-outline"></ion-icon>
+    </div>
+  </div>
   <ion-app>
     <ion-content>
       <ion-header>
@@ -184,16 +349,20 @@
   </ion-app>
 <script>
   const chatPane = new CupertinoPane('chat-pane', { 
+    horizontal: true,
+    horizontalOffset: 10,
+    initialBreak: 'bottom',
     fitHeight: true,
     backdrop: true,
     backdropOpacity: 0.4,
     bottomClose: false,
     buttonDestroy: false,
-    showDraggable: true,
+    showDraggable: false,
     upperThanTop: true,
     bottomOffset: 20,
+    clickBottomOpen: false,
     breaks: {
-      top: { enabled: true, height: window.innerHeight * 0.9 },
+      top: { enabled: true, height: window.innerHeight - 10 },
       middle: { enabled: true, height: window.innerHeight * 0.6 },
       bottom: { enabled: true, height: 200 }
     },
@@ -333,6 +502,40 @@
     messageCount = 0;
     chatPane.calcFitHeight();
   }
+
+  let isCollapsed = false;
+  const robotCollapsed = document.getElementById('robotCollapsed');
+  const moveArrows = document.getElementById('moveArrows');
+
+  function expandChat() {
+    if (isCollapsed) {
+      chatPane.present({animate: true});
+      robotCollapsed.classList.add('hidden');
+      isCollapsed = false;
+    }
+  }
+
+  function collapseChat() {
+    chatPane.hide();
+    robotCollapsed.classList.remove('hidden');
+    isCollapsed = true;
+  }
+
+  // Update existing event handlers
+  chatPane.settings.events = {
+    ...chatPane.settings.events,
+    onDidDismiss: () => collapseChat(),
+    onWillPresent: () => {
+      robotCollapsed.classList.add('hidden');
+      isCollapsed = false;
+      setTimeout(() => {
+        moveArrows.style.opacity = '1';
+      }, 500);
+    },
+    onDragStart: () => {
+      moveArrows.style.opacity = '0';
+    }
+  };
 </script>
 </body>
 </html>
