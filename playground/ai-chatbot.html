@@ -72,7 +72,9 @@
     cursor: pointer;
     z-index: 1000;
     box-shadow: 0 0 20px rgba(102, 126, 234, 0.6);
-    animation: robotGlow 2s ease-in-out infinite alternate;
+    animation: 
+      robotGlow 2s ease-in-out infinite alternate,
+      robotFloat 6s ease-in-out infinite;
     transition: all 0.3s ease;
   }
 
@@ -85,6 +87,14 @@
     0% { box-shadow: 0 0 20px rgba(102, 126, 234, 0.6); }
     100% { box-shadow: 0 0 30px rgba(147, 0, 211, 0.8); }
   }
+  
+  @keyframes robotFloat {
+    0% { transform: translateY(0px) rotate(0deg); }
+    25% { transform: translateY(-10px) rotate(-5deg); }
+    50% { transform: translateY(0px) rotate(0deg); }
+    75% { transform: translateY(10px) rotate(5deg); }
+    100% { transform: translateY(0px) rotate(0deg); }
+  }
 
   .robot-collapsed.hidden {
     opacity: 0;
@@ -94,8 +104,9 @@
 
   .pane {
     border-radius: 10px !important;
-    width: 94% !important;
-    max-width: 250px !important;
+    width: auto !important;
+    max-width: 350px !important;
+    min-width: 280px !important;
     margin: auto;
     left: 0;
     right: 0;
@@ -209,20 +220,29 @@
     display: flex;
     gap: 10px;
     align-items: center;
+    margin-top: 15px;
   }
 
   .input-container ion-input {
     flex: 1;
-    --background: #F2F2F7;
+    --background: rgba(255, 255, 255, 0.1);
     --border-radius: 20px;
     --padding-start: 15px;
     --padding-end: 15px;
+    --color: #ffffff;
+    --placeholder-color: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 20px;
   }
 
   .input-container ion-button {
+    --background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --background-activated: linear-gradient(135deg, #5a6fd6 0%, #6a4292 100%);
+    --background-hover: linear-gradient(135deg, #5a6fd6 0%, #6a4292 100%);
     --border-radius: 20px;
     height: 40px;
     width: 40px;
+    box-shadow: 0 0 10px rgba(102, 126, 234, 0.4);
   }
 
   ion-toolbar {
