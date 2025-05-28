@@ -544,13 +544,13 @@
   // Set initial state
   robotCollapsed.style.display = 'none';
   
-  // Configure pane events
-  chatPane.on('onDidDismiss', function() {
+  // Configure pane events directly
+  document.addEventListener('cupertinoPanelDidDismiss', function() {
     robotCollapsed.style.display = 'flex';
     isCollapsed = true;
   });
   
-  chatPane.on('onWillPresent', function() {
+  document.addEventListener('cupertinoPanelWillPresent', function() {
     robotCollapsed.style.display = 'none';
     isCollapsed = false;
     setTimeout(() => {
@@ -558,7 +558,7 @@
     }, 500);
   });
   
-  chatPane.on('onDragStart', function() {
+  document.addEventListener('cupertinoPanelDragStart', function() {
     moveArrows.style.opacity = '0';
   });
 </script>
