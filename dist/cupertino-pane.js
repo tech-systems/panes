@@ -3,11 +3,11 @@
  * Cupertino Panes is multi-functional modals, cards & panes with touch technologies.
  * https://panejs.com
  *
- * Copyright 2019-2024 Roman Antonov (roman-rr)
+ * Copyright 2019-2025 Roman Antonov (roman-rr)
  *
  * Released under the MIT License
  *
- * Released on: October 7, 2024
+ * Released on: June 1, 2025
  */
 
 (function (global, factory) {
@@ -2705,4 +2705,3 @@
     return CupertinoPane;
 
 }));
-//# sourceMappingURL=cupertino-pane.js.map
