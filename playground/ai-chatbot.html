@@ -405,8 +405,7 @@
     horizontalOffset: 10,
     initialBreak: 'bottom',
     fitHeight: true,
-    backdrop: true,
-    backdropOpacity: 0.4,
+    backdrop: false,
     bottomClose: false,
     buttonDestroy: false,
     showDraggable: false,
@@ -419,7 +418,6 @@
       bottom: { enabled: true, height: 200 }
     },
     events: {
-      onBackdropTap: () => chatPane.moveToBreak('bottom')
     }
   });
 
