@@ -341,6 +341,7 @@
     margin-bottom: 20px;
     padding: 0 5px;
     scroll-behavior: smooth;
+    padding-top: 2px !important;
   }
 
   .chat-messages::-webkit-scrollbar {
@@ -385,11 +386,6 @@
     font-size: 15px;
     line-height: 1.5;
     position: relative;
-    transition: transform 0.2s ease;
-  }
-
-  .message-bubble:hover {
-    transform: translateY(-1px);
   }
 
   .message.user .message-bubble {
@@ -428,6 +424,54 @@
     box-shadow: 
       0 2px 8px rgba(0, 0, 0, 0.2),
       inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  }
+
+  /* Agent workflow message styles */
+  .agent-workflow {
+    background: linear-gradient(135deg, rgba(131, 56, 236, 0.2) 0%, rgba(88, 28, 135, 0.15) 100%) !important;
+    border: 1px solid rgba(131, 56, 236, 0.4) !important;
+    border-left: 3px solid rgba(131, 56, 236, 0.8) !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    font-size: 13px !important;
+    font-weight: 500;
+    border-radius: 8px 16px 16px 8px !important;
+    position: relative;
+    box-shadow: 
+      0 2px 8px rgba(131, 56, 236, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+  }
+
+  .agent-workflow {
+    display: flex !important;
+    align-items: flex-start;
+    gap: 10px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .agent-workflow .agent-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    background: rgba(131, 56, 236, 0.3);
+    border-radius: 4px;
+    font-size: 11px;
+    border: 1px solid rgba(131, 56, 236, 0.5);
+    margin-top: 1px;
+  }
+
+  .agent-workflow .agent-text {
+    flex: 1;
+    letter-spacing: 0.3px;
+    line-height: 1.4;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
   }
 
   .typing-dots {
@@ -503,7 +547,7 @@
     background: rgb(28, 28, 29);
     border: 1px solid rgba(255, 255, 255, 0.2);
     border-radius: var(--border-radius);
-    padding: 12px 15px;
+    padding: 12px 15px 12px 50px;
     color: #ffffff;
     font-size: 16px;
     outline: none;
@@ -662,7 +706,7 @@
     justify-content: space-between;
     display: flex;
     flex-direction: column;
-    z-index: 2;
+    z-index: 0;
   }
 
   .titles {
@@ -775,6 +819,237 @@
       line-height: 18px;
     }
   }
+
+  /* Voice recording button styles - positioned inside input */
+  .voice-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #667eea 100%);
+    border: none;
+    border-radius: 50%;
+    height: 32px;
+    width: 32px;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    overflow: hidden;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    box-shadow: 
+      0 0 10px rgba(102, 126, 234, 0.3),
+      0 0 20px rgba(118, 75, 162, 0.1),
+      inset 0 0 10px rgba(255, 255, 255, 0.1);
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    z-index: 20;
+  }
+
+  .voice-button * {
+    pointer-events: none;
+  }
+
+  .voice-button:focus-visible {
+    outline: 2px solid rgba(102, 126, 234, 0.5);
+    outline-offset: 2px;
+  }
+
+  .voice-button:hover {
+    transform: translateY(-50%) scale(1.1);
+    box-shadow: 
+      0 0 15px rgba(102, 126, 234, 0.5),
+      0 0 30px rgba(118, 75, 162, 0.3),
+      inset 0 0 10px rgba(255, 255, 255, 0.15);
+  }
+
+  .voice-button:active {
+    transform: translateY(-50%) scale(0.95);
+  }
+
+  .voice-button ion-icon {
+    font-size: 16px;
+    color: #ffffff;
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5));
+    transition: all 0.3s ease;
+  }
+
+  .voice-button:hover ion-icon {
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.8));
+  }
+
+  /* Recording state */
+  .voice-button.recording {
+    background: linear-gradient(135deg, #ff006e 0%, #dc2626 50%, #ff006e 100%);
+    animation: recordingPulse 1s ease-in-out infinite;
+    box-shadow: 
+      0 0 15px rgba(255, 0, 110, 0.6),
+      0 0 30px rgba(220, 38, 38, 0.3),
+      inset 0 0 10px rgba(255, 255, 255, 0.15);
+  }
+
+  @keyframes recordingPulse {
+    0%, 100% { 
+      transform: translateY(-50%) scale(1);
+      box-shadow: 
+        0 0 15px rgba(255, 0, 110, 0.6),
+        0 0 30px rgba(220, 38, 38, 0.3),
+        inset 0 0 10px rgba(255, 255, 255, 0.15);
+    }
+    50% { 
+      transform: translateY(-50%) scale(1.05);
+      box-shadow: 
+        0 0 20px rgba(255, 0, 110, 0.8),
+        0 0 40px rgba(220, 38, 38, 0.5),
+        inset 0 0 10px rgba(255, 255, 255, 0.2);
+    }
+  }
+
+
+
+  /* Voice status indicator */
+  .voice-status {
+    position: absolute;
+    bottom: -35px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  .voice-status.show {
+    opacity: 1;
+  }
+
+  /* Remove the small voice representation styles and add full recording overlay */
+  .voice-representation {
+    display: none; /* Hide the small version */
+  }
+
+  /* Full recording waveform overlay */
+  .recording-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 0, 110, 0.1);
+    border: 2px solid rgba(255, 0, 110, 0.3);
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    pointer-events: none;
+    z-index: 15;
+    box-shadow: 
+      0 0 20px rgba(255, 0, 110, 0.4),
+      inset 0 0 20px rgba(255, 0, 110, 0.1);
+    animation: recordingGlow 2s ease-in-out infinite;
+  }
+
+  .recording-overlay.show {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  @keyframes recordingGlow {
+    0%, 100% {
+      box-shadow: 
+        0 0 20px rgba(255, 0, 110, 0.4),
+        inset 0 0 20px rgba(255, 0, 110, 0.1);
+      border-color: rgba(255, 0, 110, 0.3);
+    }
+    50% {
+      box-shadow: 
+        0 0 30px rgba(255, 0, 110, 0.6),
+        inset 0 0 30px rgba(255, 0, 110, 0.2);
+      border-color: rgba(255, 0, 110, 0.5);
+    }
+  }
+
+  .recording-wave {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+  }
+
+  .recording-wave-bar {
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(135deg, #ff006e 0%, #dc2626 100%);
+    border-radius: 2px;
+    animation: recordingWave 1s ease-in-out infinite;
+    transform-origin: center;
+  }
+
+  .recording-wave-bar:nth-child(1) { animation-delay: 0s; }
+  .recording-wave-bar:nth-child(2) { animation-delay: 0.1s; }
+  .recording-wave-bar:nth-child(3) { animation-delay: 0.2s; }
+  .recording-wave-bar:nth-child(4) { animation-delay: 0.3s; }
+  .recording-wave-bar:nth-child(5) { animation-delay: 0.4s; }
+  .recording-wave-bar:nth-child(6) { animation-delay: 0.5s; }
+  .recording-wave-bar:nth-child(7) { animation-delay: 0.6s; }
+  .recording-wave-bar:nth-child(8) { animation-delay: 0.7s; }
+  .recording-wave-bar:nth-child(9) { animation-delay: 0.8s; }
+  .recording-wave-bar:nth-child(10) { animation-delay: 0.9s; }
+
+  @keyframes recordingWave {
+    0%, 60%, 100% { 
+      height: 8px;
+      opacity: 0.5;
+    }
+    30% { 
+      height: 35px;
+      opacity: 1;
+    }
+  }
+
+  .recording-text {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    font-weight: 600;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .recording-dot {
+    width: 8px;
+    height: 8px;
+    background: #ff006e;
+    border-radius: 50%;
+    animation: recordingDot 1s ease-in-out infinite;
+  }
+
+  @keyframes recordingDot {
+    0%, 50%, 100% { opacity: 1; }
+    25%, 75% { opacity: 0.3; }
+  }
+
+  /* Hide input during recording */
+  .message-input.recording {
+    opacity: 0;
+    pointer-events: none;
+  }
 </style>
 </head>
 <body>
@@ -834,6 +1109,31 @@
 
           <div class="input-container">
             <div class="input-wrapper">
+              <button class="voice-button" id="voiceButton" onclick="toggleVoiceRecording()" type="button">
+                <ion-icon name="mic-outline" id="voiceIcon"></ion-icon>
+              </button>
+              <div class="voice-status" id="voiceStatus"></div>
+              
+              <!-- Full recording overlay -->
+              <div class="recording-overlay" id="recordingOverlay">
+                <div class="recording-wave">
+                  <div class="recording-wave-bar"></div>
+                  <div class="recording-wave-bar"></div>
+                  <div class="recording-wave-bar"></div>
+                  <div class="recording-wave-bar"></div>
+                  <div class="recording-wave-bar"></div>
+                  <div class="recording-wave-bar"></div>
+                  <div class="recording-wave-bar"></div>
+                  <div class="recording-wave-bar"></div>
+                  <div class="recording-wave-bar"></div>
+                  <div class="recording-wave-bar"></div>
+                </div>
+                <div class="recording-text" id="recordingText">
+                  <div class="recording-dot"></div>
+                  Recording...
+                </div>
+              </div>
+              
               <input 
                 id="messageInput" 
                 type="text"
@@ -889,15 +1189,199 @@
 
   let messageCount = 0;
 
+  // Voice recording variables
+  let isRecording = false;
+  let isVoiceMessage = false;
+  let recognition = null;
+  let voiceButton = null;
+  let voiceIcon = null;
+  let voiceStatus = null;
+  let recordingOverlay = null;
+  let messageInput = null;
+
   window.onload = async function () {
     setTimeout(() => {
       chatPane.present({animate: true});
     }, 100);
+    
+    // Initialize voice recording
+    initVoiceRecording();
   }
+
+  function initVoiceRecording() {
+    voiceButton = document.getElementById('voiceButton');
+    voiceIcon = document.getElementById('voiceIcon');
+    voiceStatus = document.getElementById('voiceStatus');
+    recordingOverlay = document.getElementById('recordingOverlay');
+    messageInput = document.getElementById('messageInput');
+
+    // Check if speech recognition is supported
+    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
+      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+      recognition = new SpeechRecognition();
+      
+      recognition.continuous = false;
+      recognition.interimResults = false;
+      recognition.lang = 'en-US';
+
+      recognition.onstart = function() {
+        isRecording = true;
+        voiceButton.classList.add('recording');
+        voiceIcon.setAttribute('name', 'stop-outline');
+        showVoiceStatus('Listening...');
+        
+        // Show full recording overlay and hide input
+        showRecordingOverlay();
+        messageInput.classList.add('recording');
+      };
+
+      recognition.onresult = function(event) {
+        // Only update if not already set by manual stop
+        if (!isVoiceMessage) {
+          messageInput.value = '🎤 Voice recording captured';
+          messageInput.style.fontStyle = 'italic';
+          messageInput.style.color = 'rgba(255, 255, 255, 0.8)';
+          isVoiceMessage = true;
+          
+          showVoiceStatus('Voice recording ready - click send to post');
+          setTimeout(() => hideVoiceStatus(), 3000);
+        }
+      };
+
+      recognition.onerror = function(event) {
+        console.error('Speech recognition error:', event.error);
+        let errorMessage = 'Voice recognition failed';
+        
+        switch(event.error) {
+          case 'no-speech':
+            errorMessage = 'No speech detected';
+            break;
+          case 'audio-capture':
+            errorMessage = 'No microphone found';
+            break;
+          case 'not-allowed':
+            errorMessage = 'Microphone access denied';
+            break;
+          case 'network':
+            errorMessage = 'Network error';
+            break;
+        }
+        
+        showVoiceStatus(errorMessage);
+        setTimeout(() => hideVoiceStatus(), 3000);
+        
+        // Reset UI state
+        hideRecordingOverlay();
+        messageInput.classList.remove('recording');
+        resetVoiceButton();
+      };
+
+      recognition.onend = function() {
+        // Clean up any remaining UI state
+        hideRecordingOverlay();
+        messageInput.classList.remove('recording');
+        resetVoiceButton();
+        
+        // Only show error message if no voice was captured at all
+        if (!isVoiceMessage && !messageInput.value.includes('🎤')) {
+          showVoiceStatus('No voice detected - try again');
+          setTimeout(() => hideVoiceStatus(), 2000);
+        }
+      };
+    } else {
+      // Hide voice button if not supported
+      voiceButton.style.display = 'none';
+      console.warn('Speech recognition not supported in this browser');
+    }
+  }
+
+  function toggleVoiceRecording() {
+    if (!recognition) {
+      showVoiceStatus('Voice recording not supported');
+      setTimeout(() => hideVoiceStatus(), 3000);
+      return;
+    }
+
+    if (isRecording) {
+      // Stop recording immediately and reset UI
+      isRecording = false;
+      voiceButton.classList.remove('recording');
+      voiceIcon.setAttribute('name', 'mic-outline');
+      hideRecordingOverlay();
+      messageInput.classList.remove('recording');
+      
+      // Always show voice representation when manually stopped
+      messageInput.value = '🎤 Voice recording captured';
+      messageInput.style.fontStyle = 'italic';
+      messageInput.style.color = 'rgba(255, 255, 255, 0.8)';
+      isVoiceMessage = true;
+      
+      showVoiceStatus('Voice recording ready - click send to post');
+      setTimeout(() => hideVoiceStatus(), 3000);
+      
+      recognition.stop();
+    } else {
+      // Clear any existing input and reset voice message state
+      messageInput.value = '';
+      messageInput.style.fontStyle = 'normal';
+      messageInput.style.color = '#ffffff';
+      isVoiceMessage = false;
+      
+      // Request microphone permission and start recording
+      try {
+        recognition.start();
+      } catch (error) {
+        console.error('Error starting recognition:', error);
+        showVoiceStatus('Could not start voice recording');
+        setTimeout(() => hideVoiceStatus(), 3000);
+      }
+    }
+  }
+
+  function resetVoiceButton() {
+    isRecording = false;
+    voiceButton.classList.remove('recording');
+    voiceIcon.setAttribute('name', 'mic-outline');
+  }
+
+  function showVoiceStatus(message) {
+    voiceStatus.textContent = message;
+    voiceStatus.classList.add('show');
+  }
+
+  function hideVoiceStatus() {
+    voiceStatus.classList.remove('show');
+  }
+
+  function showRecordingOverlay() {
+    recordingOverlay.classList.add('show');
+  }
+
+  function hideRecordingOverlay() {
+    recordingOverlay.classList.remove('show');
+    // Reset recording text
+    const recordingText = document.getElementById('recordingText');
+    if (recordingText) {
+      recordingText.innerHTML = `
+        <div class="recording-dot"></div>
+        Recording...
+      `;
+    }
+  }
+
+
 
   function handleKeyPress(event) {
     if (event.key === 'Enter') {
       sendMessage();
+    }
+    
+    // If user starts typing and there's a voice message, clear it
+    if (isVoiceMessage && event.key !== 'Enter') {
+      isVoiceMessage = false;
+      messageInput.style.fontStyle = 'normal';
+      messageInput.style.color = '#ffffff';
+      messageInput.value = '';
     }
   }
 
@@ -907,34 +1391,53 @@
     
     if (!message) return;
 
+    // Determine message type and content
+    let displayMessage = message;
+    let messageType = 'text';
+    
+    if (isVoiceMessage) {
+      displayMessage = '🎤 Voice recording';
+      messageType = 'voice';
+      
+      // Reset voice message state and input styling
+      isVoiceMessage = false;
+      input.style.fontStyle = 'normal';
+      input.style.color = '#ffffff';
+    }
+
     // Add user message
-    addMessage(message, 'user');
+    addMessage(displayMessage, 'user', messageType);
     input.value = '';
 
-    // Show typing indicator
-    showTypingIndicator();
-
-    // Simulate AI response delay
-    setTimeout(() => {
-      hideTypingIndicator();
-      const response = getAIResponse(message);
-      addMessage(response, 'ai');
-      
-      // Auto-expand pane for longer conversations
-      if (messageCount > 3) {
-        chatPane.moveToBreak('top');
-      }
-    }, Math.random() * 1500 + 800); // 0.8-2.3 second delay
+    // Start agentic workflow
+    await executeAgenticWorkflow(message, messageType);
   }
 
-  function addMessage(text, sender) {
+  function addMessage(text, sender, messageType = 'text', isAgentWorkflow = false) {
     const messagesContainer = document.getElementById('chatMessages');
     const messageDiv = document.createElement('div');
     messageDiv.className = `message ${sender}`;
     
     const bubbleDiv = document.createElement('div');
     bubbleDiv.className = 'message-bubble';
-    bubbleDiv.textContent = text;
+    
+    if (isAgentWorkflow) {
+      // Special styling for agent workflow messages
+      bubbleDiv.classList.add('agent-workflow');
+      // Text already contains the icon and formatted content
+      bubbleDiv.innerHTML = text;
+    } else if (messageType === 'voice' && sender === 'user') {
+      // Style voice messages differently
+      bubbleDiv.innerHTML = `
+        <span style="display: flex; align-items: center; gap: 8px;">
+          🎤
+          <span style="font-style: italic;">Voice recording</span>
+        </span>
+      `;
+      bubbleDiv.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
+    } else {
+      bubbleDiv.textContent = text;
+    }
     
     messageDiv.appendChild(bubbleDiv);
     messagesContainer.appendChild(messageDiv);
@@ -942,14 +1445,68 @@
     // Scroll to bottom
     messagesContainer.scrollTop = messagesContainer.scrollHeight;
     
-    messageCount++;
+    if (!isAgentWorkflow) {
+      messageCount++;
+    }
     
     // Recalculate pane height
     setTimeout(() => chatPane.calcFitHeight(), 100);
   }
 
-  function getAIResponse(userMessage) {
-    // Simple keyword-based responses
+  async function executeAgenticWorkflow(userMessage, messageType) {
+    // Step 1: Search Agent
+    await new Promise(resolve => {
+      setTimeout(() => {
+        const message = '<span class="agent-icon">🔍</span><span class="agent-text">SEARCH_AGENT: Scanning knowledge base...</span>';
+        addMessage(message, 'ai', 'text', true);
+        resolve();
+      }, 500);
+    });
+
+    // Step 2: Vector Database
+    await new Promise(resolve => {
+      setTimeout(() => {
+        const message = '<span class="agent-icon">🗄️</span><span class="agent-text">VECTOR_DB: Retrieving relevant context...</span>';
+        addMessage(message, 'ai', 'text', true);
+        resolve();
+      }, 900);
+    });
+
+    // Step 3: Processing and Analysis
+    await new Promise(resolve => {
+      setTimeout(() => {
+        const message = '<span class="agent-icon">🔧</span><span class="agent-text">ANALYZER: Processing and generating response...</span>';
+        addMessage(message, 'ai', 'text', true);
+        resolve();
+      }, 800);
+    });
+
+    // Step 4: Final Response
+    setTimeout(() => {
+      const response = getAIResponse(userMessage, messageType);
+      addMessage(response, 'ai');
+      
+      // Auto-expand pane for longer conversations
+      if (messageCount > 3) {
+        chatPane.moveToBreak('top');
+      }
+    }, 700);
+  }
+
+  function getAIResponse(userMessage, messageType = 'text') {
+    // Handle voice messages
+    if (messageType === 'voice') {
+      const voiceResponses = [
+        "🎤 I received your voice recording! Unfortunately, I don't have access to a Whisper model yet to decode it. Please type your message and I'll be happy to help!",
+        "🗣️ Thanks for the voice recording! I can't process audio without Whisper integration. Could you type what you'd like to ask?",
+        "🎙️ Your voice recording came through! I don't have speech-to-text capabilities yet - Whisper model access is planned for soon. What can I help you with in text?",
+        "🔊 I see your voice recording! Without Whisper model access, I can't understand audio yet. Feel free to type your question!",
+        "🎵 Voice recording received! I'm waiting for Whisper model integration to decode audio. In the meantime, how can I assist you via text?"
+      ];
+      return voiceResponses[Math.floor(Math.random() * voiceResponses.length)];
+    }
+    
+    // Simple keyword-based responses for text
     const message = userMessage.toLowerCase();
     
     if (message.includes('hello') || message.includes('hi')) {
@@ -1014,6 +1571,7 @@
   function expandChat() {
     if (isCollapsed) {
       chatPane.present({animate: true});
+      robotCollapsed.style.display = 'none';
       robotCollapsed.classList.add('hidden');
       isCollapsed = false;
     }
@@ -1022,6 +1580,7 @@
   function collapseChat() {
     chatPane.hide();
     robotCollapsed.style.display = 'flex';
+    robotCollapsed.classList.remove('hidden');
     isCollapsed = true;
   }
 
