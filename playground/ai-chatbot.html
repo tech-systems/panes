@@ -1050,6 +1050,30 @@
     opacity: 0;
     pointer-events: none;
   }
+
+  /* Responsive pane styles */
+  @media (max-width: 759px) {
+    .pane {
+      max-width: none !important;
+      min-width: none !important;
+      width: calc(100vw - 40px) !important;
+      margin: 0 auto !important;
+    }
+    
+    .chat-container {
+      margin: 20px;
+      margin-top: 10px;
+    }
+  }
+
+  @media (min-width: 760px) {
+    .pane {
+      max-width: 380px !important;
+      min-width: 320px !important;
+      width: auto !important;
+      margin: auto !important;
+    }
+  }
 </style>
 </head>
 <body>
@@ -1150,28 +1174,105 @@
     </ion-content>
   </ion-app>
 <script>
-  const chatPane = new CupertinoPane('chat-pane', { 
-    horizontal: true,
-    horizontalOffset: 10,
-    initialBreak: 'bottom',
-    fitHeight: true,
-    backdrop: false,
-    bottomClose: false,
-    buttonDestroy: false,
-    showDraggable: true,
-    draggableOver: true,
-    upperThanTop: true,
-    bottomOffset: 20,
-    clickBottomOpen: false,
-    topperOverflow: true,
-    topperOverflowOffset: 10,
-    breaks: {
-      top: { enabled: true, height: window.innerHeight - 10 },
-      middle: { enabled: true, height: window.innerHeight * 0.6 },
-      bottom: { enabled: true, height: 200 }
-    },
-    events: {
+  // Function to determine if horizontal mode should be enabled
+  function shouldEnableHorizontal() {
+    const screenWidth = window.innerWidth;
+    const paneWidth = 380; // max-width of pane
+    const minRequiredWidth = paneWidth * 2; // Need at least 2x pane width
+    
+    return screenWidth >= minRequiredWidth;
+  }
+
+  // Function to get responsive pane configuration
+  function getPaneConfig() {
+    const isHorizontal = shouldEnableHorizontal();
+    
+    const config = {
+      horizontal: isHorizontal,
+      horizontalOffset: isHorizontal ? 10 : 0,
+      initialBreak: isHorizontal ? 'top right' : 'top',
+      fitHeight: true,
+      backdrop: false,
+      bottomClose: false,
+      buttonDestroy: false,
+      showDraggable: true,
+      draggableOver: true,
+      upperThanTop: true,
+      bottomOffset: 20,
+      clickBottomOpen: false,
+      topperOverflow: true,
+      topperOverflowOffset: 10,
+      breaks: {
+        top: { enabled: true, height: window.innerHeight - 10 },
+        middle: { enabled: false, height: window.innerHeight * 0.6 },
+        bottom: { enabled: false, height: 200 }
+      },
+      events: {}
+    };
+    
+    return config;
+  }
+
+  // Initialize pane with responsive configuration
+  let chatPane = new CupertinoPane('chat-pane', getPaneConfig());
+
+  // Update CSS based on screen size
+  function updatePaneStyles() {
+    const isHorizontal = shouldEnableHorizontal();
+    const paneElement = document.querySelector('.pane');
+    
+    if (paneElement) {
+      if (isHorizontal) {
+        // Desktop/tablet: fixed width
+        paneElement.style.maxWidth = '380px';
+        paneElement.style.minWidth = '320px';
+        paneElement.style.width = 'auto';
+        paneElement.style.margin = 'auto';
+      } else {
+        // Mobile: full width minus margins
+        paneElement.style.maxWidth = 'none';
+        paneElement.style.minWidth = 'none';
+        paneElement.style.width = 'calc(100vw - 40px)'; // 20px margin on each side
+        paneElement.style.margin = '0 auto';
+      }
     }
+  }
+
+  // Handle window resize
+  function handleResize() {
+    const wasHorizontal = chatPane.settings.horizontal;
+    const shouldBeHorizontal = shouldEnableHorizontal();
+    
+    // If horizontal mode needs to change, recreate the pane
+    if (wasHorizontal !== shouldBeHorizontal) {
+      const wasPresented = chatPane.isPresented();
+      
+      // Destroy current pane
+      chatPane.destroy();
+      
+      // Create new pane with updated config
+      chatPane = new CupertinoPane('chat-pane', getPaneConfig());
+      
+      // Update styles
+      updatePaneStyles();
+      
+      // Re-present if it was presented before
+      if (wasPresented) {
+        setTimeout(() => {
+          chatPane.present({animate: true});
+        }, 100);
+      }
+    } else {
+      // Just update styles if no mode change needed
+      updatePaneStyles();
+    }
+  }
+
+  // Debounce resize handler
+  let resizeTimer;
+  window.addEventListener('resize', () => {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(handleResize, 250);
   });
 
   const aiResponses = [
@@ -1200,6 +1301,9 @@
   let messageInput = null;
 
   window.onload = async function () {
+    // Update initial styles
+    updatePaneStyles();
+    
     setTimeout(() => {
       chatPane.present({animate: true});
     }, 100);

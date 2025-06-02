@@ -1886,16 +1886,24 @@ class HorizontalModule {
     }
     constructor(instance) {
         this.instance = instance;
+        this.initialBreakX = 'left'; // Default horizontal position
+        this.initialBreakY = 'middle'; // Default vertical position
         this.settings = this.instance.settings;
         this.transitions = this.instance.transitions;
         this.events = this.instance.events;
         if (!this.settings.horizontal) {
             return null;
         }
-        // re-bind functions
+        // Parse combined initialBreak pattern
+        this.parseInitialBreak();
+        // Override transitions setPaneElTransform
         this.transitions['setPaneElTransform'] = (params) => this.setPaneElTransform(params);
-        // Calculate horizontal breakpoints on left-right edges
-        // On present or window resized when transformX = 0
+        // Override initial positioning
+        this.instance.on('beforePresentTransition', () => {
+            this.calcHorizontalBreaks();
+            this.overrideInitialPositioning();
+        });
+        // Calculate horizontal breakpoints when needed
         this.instance.on('onTransitionEnd', (ev) => {
             if ((ev.type === 'breakpoint' || ev.type === 'present')
                 && !this.instance.getPanelTransformX()) {
@@ -1911,39 +1919,98 @@ class HorizontalModule {
             this.fastSwipeNext = this.events.fastSwipeNext('X');
         });
     }
+    parseInitialBreak() {
+        const breakParts = this.settings.initialBreak.split(' ');
+        if (breakParts.length === 1) {
+            // Single break like 'middle' - use for Y, default X to left
+            this.initialBreakY = breakParts[0];
+            this.initialBreakX = 'left';
+        }
+        else if (breakParts.length === 2) {
+            // Combined break like 'middle right'
+            this.initialBreakY = breakParts[0]; // top/middle/bottom
+            this.initialBreakX = breakParts[1]; // left/right
+        }
+        // Validate Y break
+        if (!['top', 'middle', 'bottom'].includes(this.initialBreakY)) {
+            console.warn(`Cupertino Pane: Invalid Y breakpoint "${this.initialBreakY}", using "middle"`);
+            this.initialBreakY = 'middle';
+        }
+        // Validate X break
+        if (!['left', 'right'].includes(this.initialBreakX)) {
+            console.warn(`Cupertino Pane: Invalid X breakpoint "${this.initialBreakX}", using "left"`);
+            this.initialBreakX = 'left';
+        }
+    }
     calcHorizontalBreaks() {
         this.defaultRect = {
             width: this.instance.paneEl.getBoundingClientRect().width,
             left: this.instance.paneEl.getBoundingClientRect().left,
             right: this.instance.paneEl.getBoundingClientRect().right
         };
-        this.horizontalBreaks = [
-            -this.defaultRect.left + this.settings.horizontalOffset,
-            window.innerWidth - this.defaultRect.left - this.defaultRect.width - this.settings.horizontalOffset
-        ];
+        this.horizontalBreaks = {
+            left: -this.defaultRect.left + this.settings.horizontalOffset,
+            right: window.innerWidth - this.defaultRect.left - this.defaultRect.width - this.settings.horizontalOffset
+        };
+    }
+    overrideInitialPositioning() {
+        // Override the present method's initial transform
+        this.instance.paneEl.style.transform;
+        // Get Y position from breakpoints
+        const yPosition = this.instance.breakpoints.breaks[this.initialBreakY];
+        // Get X position from horizontal breaks
+        const xPosition = this.horizontalBreaks[this.initialBreakX];
+        // Set combined transform
+        this.instance.paneEl.style.transform = `translateX(${xPosition}px) translateY(${yPosition}px) translateZ(0px)`;
+        // Update currentBreakpoint to reflect actual position
+        this.currentBreakpoint = this.initialBreakX;
+        this.instance.breakpoints.currentBreakpoint = yPosition;
     }
     setPaneElTransform(params) {
-        let closest = params.translateX;
+        let closestY = params.translateY;
+        let closestX = params.translateX || this.instance.getPanelTransformX();
         if (params.type === 'end') {
-            closest = this.getClosestBreakX();
+            // Get closest Y breakpoint (existing logic)
+            closestY = this.instance.breakpoints.getClosestBreakY();
+            // Get closest X breakpoint
+            closestX = this.getClosestBreakX();
+            // Handle fast swipe in X direction
             if (this.fastSwipeNext) {
                 if (this.currentBreakpoint === 'left'
-                    && this.instance.getPanelTransformX() > this.horizontalBreaks[0]) {
-                    closest = this.horizontalBreaks[1];
+                    && this.instance.getPanelTransformX() > this.horizontalBreaks.left) {
+                    closestX = this.horizontalBreaks.right;
                 }
                 if (this.currentBreakpoint === 'right'
-                    && this.instance.getPanelTransformX() < this.horizontalBreaks[1]) {
-                    closest = this.horizontalBreaks[0];
+                    && this.instance.getPanelTransformX() < this.horizontalBreaks.right) {
+                    closestX = this.horizontalBreaks.left;
                 }
             }
-            this.currentBreakpoint = closest === this.horizontalBreaks[0] ? 'left' : 'right';
+            // Update current breakpoint
+            this.currentBreakpoint = closestX === this.horizontalBreaks.left ? 'left' : 'right';
+            this.instance.breakpoints.currentBreakpoint = closestY;
         }
-        this.instance.paneEl.style.transform = `translateX(${closest || 0}px) translateY(${params.translateY}px) translateZ(0px)`;
+        // Apply combined transform
+        this.instance.paneEl.style.transform = `translateX(${closestX || 0}px) translateY(${closestY || 0}px) translateZ(0px)`;
     }
     getClosestBreakX() {
-        return this.horizontalBreaks.reduce((prev, curr) => {
-            return (Math.abs(curr - this.instance.getPanelTransformX()) < Math.abs(prev - this.instance.getPanelTransformX()) ? curr : prev);
-        });
+        const currentX = this.instance.getPanelTransformX();
+        return Math.abs(this.horizontalBreaks.left - currentX) < Math.abs(this.horizontalBreaks.right - currentX)
+            ? this.horizontalBreaks.left
+            : this.horizontalBreaks.right;
+    }
+    // Public method to move to specific horizontal break
+    moveToHorizontalBreak(breakX) {
+        if (!this.horizontalBreaks) {
+            this.calcHorizontalBreaks();
+        }
+        const currentY = this.instance.getPanelTransformY();
+        const targetX = this.horizontalBreaks[breakX];
+        this.instance.paneEl.style.transform = `translateX(${targetX}px) translateY(${currentY}px) translateZ(0px)`;
+        this.currentBreakpoint = breakX;
+    }
+    // Get current horizontal breakpoint
+    getCurrentHorizontalBreak() {
+        return this.currentBreakpoint;
     }
 }
 HorizontalModule.forceSettings = {
