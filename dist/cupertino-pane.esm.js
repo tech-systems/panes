@@ -189,6 +189,9 @@ class Events {
         this.contentScrollTop = 0;
         this.steps = [];
         this.isScrolling = false;
+        // RequestAnimationFrame properties for smoother touch move
+        this.rafId = null;
+        this.pendingMoveData = null;
         /**
          * Touch Start Event
          * @param t
@@ -325,6 +328,12 @@ class Events {
     touchStart(t) {
         // Event emitter
         this.instance.emit('onDragStart', t);
+        // Cancel any pending animation frame
+        if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+            this.pendingMoveData = null;
+        }
         // Allow clicks by default -> disallow on move (allow click with disabled drag)
         this.allowClick = true;
         if (this.instance.disableDragEvents)
@@ -497,15 +506,45 @@ class Events {
                 return;
             }
         }
+        // Store the pending move data for requestAnimationFrame
+        this.pendingMoveData = { newVal, newValX, clientY, clientX };
+        // Request animation frame if not already pending
+        if (!this.rafId) {
+            this.rafId = requestAnimationFrame(() => this.applyMoveUpdate());
+        }
+        this.steps.push({ posY: clientY, posX: clientX, time: Date.now() });
+    }
+    /**
+     * Apply the pending move update in animation frame for smoother performance
+     */
+    applyMoveUpdate() {
+        if (!this.pendingMoveData) {
+            this.rafId = null;
+            return;
+        }
+        const { newVal, newValX } = this.pendingMoveData;
+        // Apply the opacity and overflow attributes
         this.instance.checkOpacityAttr(newVal);
         this.instance.checkOverflowAttr(newVal);
+        // Apply the transition
         this.transitions.doTransition({ type: 'move', translateY: newVal, translateX: newValX });
-        this.steps.push({ posY: clientY, posX: clientX, time: Date.now() });
+        // Clear the pending data and animation frame ID
+        this.pendingMoveData = null;
+        this.rafId = null;
     }
     touchEnd(t) {
         var _a, _b;
         if (this.instance.disableDragEvents)
             return;
+        // Cancel any pending animation frame
+        if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+            // Apply any pending move data immediately before ending
+            if (this.pendingMoveData) {
+                this.applyMoveUpdate();
+            }
+        }
         // Desktop fixes
         if (t.type === 'mouseleave' && !this.mouseDown)
             return;

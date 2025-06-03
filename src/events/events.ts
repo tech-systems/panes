@@ -33,6 +33,15 @@ export class Events {
   public startPointOverTop: number;
   public swipeNextSensivity: number;
 
+  // RequestAnimationFrame properties for smoother touch move
+  private rafId: number | null = null;
+  private pendingMoveData: {
+    newVal: number;
+    newValX: number;
+    clientY: number;
+    clientX: number;
+  } | null = null;
+
   private settings: CupertinoSettings;
   private device: Device;
   private breakpoints: Breakpoints;
@@ -168,6 +177,13 @@ export class Events {
   private touchStart(t) {
     // Event emitter
     this.instance.emit('onDragStart', (t as CustomEvent));
+
+    // Cancel any pending animation frame
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+      this.pendingMoveData = null;
+    }
 
     // Allow clicks by default -> disallow on move (allow click with disabled drag)
     this.allowClick = true;
@@ -375,10 +391,38 @@ export class Events {
       }
     }
 
+    // Store the pending move data for requestAnimationFrame
+    this.pendingMoveData = { newVal, newValX, clientY, clientX };
+
+    // Request animation frame if not already pending
+    if (!this.rafId) {
+      this.rafId = requestAnimationFrame(() => this.applyMoveUpdate());
+    }
+
+    this.steps.push({posY: clientY, posX: clientX, time: Date.now()});
+  }
+
+  /**
+   * Apply the pending move update in animation frame for smoother performance
+   */
+  private applyMoveUpdate() {
+    if (!this.pendingMoveData) {
+      this.rafId = null;
+      return;
+    }
+
+    const { newVal, newValX } = this.pendingMoveData;
+
+    // Apply the opacity and overflow attributes
     this.instance.checkOpacityAttr(newVal);
     this.instance.checkOverflowAttr(newVal);
+    
+    // Apply the transition
     this.transitions.doTransition({type: 'move', translateY: newVal, translateX: newValX});
-    this.steps.push({posY: clientY, posX: clientX, time: Date.now()});
+
+    // Clear the pending data and animation frame ID
+    this.pendingMoveData = null;
+    this.rafId = null;
   }
 
   /**
@@ -388,6 +432,17 @@ export class Events {
   public touchEndCb = (t) => this.touchEnd(t);
   private touchEnd(t) {
     if (this.instance.disableDragEvents) return;
+
+    // Cancel any pending animation frame
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+      
+      // Apply any pending move data immediately before ending
+      if (this.pendingMoveData) {
+        this.applyMoveUpdate();
+      }
+    }
 
     // Desktop fixes
     if (t.type === 'mouseleave' && !this.mouseDown) return;
