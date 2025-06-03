@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: June 2, 2025
+ * Released on: June 3, 2025
  */
 
 /******************************************************************************
@@ -357,7 +357,7 @@ class Events {
         this.steps.push({ posY: this.startY, posX: this.startX, time: Date.now() });
     }
     touchMove(t) {
-        var _a;
+        var _a, _b;
         /**
          * TODO: Switch to pointer events
          */
@@ -392,6 +392,17 @@ class Events {
             return;
         if (this.settings.touchMoveStopPropagation) {
             t.stopPropagation();
+        }
+        // Block upward drag immediately when scroll at initial position
+        if (this.contentScrollTop === 0
+            && this.instance.overflowEl.style.overflowY === 'auto'
+            && this.isElementScrollable(this.instance.overflowEl)
+            && !this.isDraggableElement(t)) {
+            const diffY = clientY - ((_b = this.steps[this.steps.length - 1]) === null || _b === void 0 ? void 0 : _b.posY) || 0;
+            // Prevent any upward movement (negative diffY) when scroll at initial position
+            if (diffY < 0) {
+                return; // Block immediately, no movement allowed
+            }
         }
         // Delta
         const diffY = clientY - this.steps[this.steps.length - 1].posY;
@@ -1610,10 +1621,7 @@ class FitHeightModule {
                     this.settings.upperThanTop = false;
                 }
                 else {
-                    if (this.instance.overflowEl && !this.settings.maxFitHeight) {
-                        this.settings.topperOverflow = false;
-                        this.instance.overflowEl.style.overflowY = 'hidden';
-                    }
+                    if (this.instance.overflowEl && !this.settings.maxFitHeight) ;
                 }
             }
         }, true);
@@ -1623,13 +1631,13 @@ class FitHeightModule {
         return __awaiter(this, void 0, void 0, function* () {
             this.settings.fitScreenHeight = false;
             this.settings.initialBreak = 'top';
-            this.settings.topperOverflow = false;
+            // this.settings.topperOverflow = false;
             let height = yield this.getPaneFitHeight();
             // maxFitHeight
             if (this.settings.maxFitHeight
                 && height > this.settings.maxFitHeight) {
                 height = this.settings.maxFitHeight;
-                this.settings.topperOverflow = true;
+                // this.settings.topperOverflow = true;
             }
             this.breakpoints.conf = {
                 top: { enabled: true, height },
@@ -2546,10 +2554,6 @@ class CupertinoPane {
             this.overflowEl.style.overflowX = 'hidden';
         }
         this.overflowEl.style.overscrollBehavior = 'none';
-        if (this.settings.topperOverflow
-            && this.settings.upperThanTop) {
-            console.warn('Cupertino Pane: "upperThanTop" allowed for disabled "topperOverflow"');
-        }
         this.setOverflowHeight();
     }
     setOverflowHeight(offset = 0) {

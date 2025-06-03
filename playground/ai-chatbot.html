@@ -337,9 +337,9 @@
 
   .chat-messages {
     max-height: 400px;
-    overflow-y: auto;
     margin-bottom: 20px;
     padding: 0 5px;
+    padding-right: 10px;
     scroll-behavior: smooth;
     padding-top: 2px !important;
   }
@@ -1123,7 +1123,7 @@
             </p>
           </div>
 
-          <div class="chat-messages" id="chatMessages">
+          <div class="chat-messages" id="chatMessages" overflow-y>
             <div class="message ai">
               <div class="message-bubble">
                 👋 Hello! I'm your AI assistant. I can help you learn about Cupertino Panes, answer questions, or just have a chat. What would you like to know?
@@ -1198,7 +1198,7 @@
       showDraggable: true,
       draggableOver: true,
       upperThanTop: true,
-      bottomOffset: 20,
+      bottomOffset: 30,
       clickBottomOpen: false,
       topperOverflow: true,
       topperOverflowOffset: 10,

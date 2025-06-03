@@ -255,6 +255,20 @@ export class Events {
       t.stopPropagation();
     }
 
+    // Block upward drag immediately when scroll at initial position
+    if (this.contentScrollTop === 0 
+        && this.instance.overflowEl.style.overflowY === 'auto'
+        && this.isElementScrollable(this.instance.overflowEl)
+        && !this.isDraggableElement(t)) {
+      
+      const diffY = clientY - this.steps[this.steps.length - 1]?.posY || 0;
+      
+      // Prevent any upward movement (negative diffY) when scroll at initial position
+      if (diffY < 0) {
+        return; // Block immediately, no movement allowed
+      }
+    }
+
     // Delta
     const diffY = clientY - this.steps[this.steps.length - 1].posY;
     const diffX = clientX - this.steps[this.steps.length - 1].posX;

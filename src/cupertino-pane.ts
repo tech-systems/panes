@@ -402,11 +402,6 @@ export class CupertinoPane {
       this.overflowEl.style.overflowX = 'hidden';
     }
     this.overflowEl.style.overscrollBehavior = 'none';
-    
-    if (this.settings.topperOverflow 
-        && this.settings.upperThanTop) {   
-      console.warn('Cupertino Pane: "upperThanTop" allowed for disabled "topperOverflow"');
-    }
   
     this.setOverflowHeight(); 
   }
