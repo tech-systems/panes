@@ -1,14 +1,4 @@
-<!DOCTYPE html>
-<html dir="ltr">
-<head>
-  <meta charset="UTF-8">
-  <title>Panes - AI Chatbot Demo</title>
-  <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
-  <script src="../dist/cupertino-pane.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css"/> 
-<style>
-  body {
+body {
     background: linear-gradient(180deg, #0a0a0a 0%, #1a0a2e 100%);
     overflow: hidden;
     --cupertino-pane-icon-close-color: #a8a7ae;
@@ -263,9 +253,29 @@
   }
 
   .chat-header {
-    text-align: center;
-    margin-bottom: 25px;
+    text-align: left;
+    padding-bottom: 20px;
     position: relative;
+    transition: border-bottom 0.3s ease;
+  }
+
+  /* Show subtle border-bottom when content is scrollable */
+  .chat-header.scrollable {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 25px;
+  }
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: 25px;
+  }
+
+  .header-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
   }
 
   .chat-header h1 {
@@ -274,78 +284,92 @@
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    font-size: 26px;
+    font-size: 22px;
     font-weight: 600;
     letter-spacing: -0.5px;
   }
 
   .ai-avatar {
-    width: 90px;
-    height: 90px;
-    margin: 0 auto 20px;
+    width: 50px;
+    height: 50px;
+    margin: 0;
     position: relative;
     display: flex;
     justify-content: center;
     align-items: center;
+    font-size: 24px;
+    background: rgba(28, 28, 29, 0.95);
+    border-radius: 15px;
+    box-shadow: 
+      inset 0 1px 3px rgba(0, 0, 0, 0.3),
+      0 2px 8px rgba(0, 0, 0, 0.2);
+    cursor: pointer;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+  }
+
+  .ai-avatar:hover {
+    transform: scale(1.05);
+    box-shadow: 
+      inset 0 1px 3px rgba(0, 0, 0, 0.4),
+      0 3px 12px rgba(0, 0, 0, 0.3);
+  }
+
+  .ai-avatar:active {
+    transform: scale(0.95);
   }
 
   .ai-avatar::before {
     content: '';
     position: absolute;
-    inset: -3px;
+    inset: -2px;
     background: linear-gradient(135deg, #ff006e 0%, #8338ec 50%, #3a86ff 100%);
-    border-radius: 30px;
-    animation: avatarGlow 4s ease-in-out infinite;
-    opacity: 0.8;
-  }
-
-  .ai-avatar::after {
-    content: '🤖';
-    position: relative;
-    font-size: 45px;
-    background: rgba(28, 28, 29, 0.95);
-    width: 84px;
-    height: 84px;
-    border-radius: 27px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 
-      inset 0 2px 4px rgba(0, 0, 0, 0.3),
-      0 4px 12px rgba(0, 0, 0, 0.2);
+    border-radius: 17px;
+    animation: avatarGlow 3s ease-in-out infinite;
+    opacity: 0.7;
+    z-index: -1;
   }
 
   @keyframes avatarGlow {
     0%, 100% { 
-      transform: rotate(0deg) scale(1);
-      filter: blur(3px);
+      background: linear-gradient(135deg, #ff006e 0%, #8338ec 50%, #3a86ff 100%);
+      opacity: 0.6;
+      filter: blur(2px);
+      transform: scale(1);
     }
     50% { 
-      transform: rotate(180deg) scale(1.05);
-      filter: blur(4px);
+      background: linear-gradient(135deg, #ff1a7a 0%, #9448f0 50%, #4a92ff 100%);
+      opacity: 0.9;
+      filter: blur(3px);
+      transform: scale(1.02);
     }
   }
 
   .header-subtitle {
     color: rgba(255, 255, 255, 0.5);
-    font-size: 13px;
-    margin: 8px 0 0 0;
+    font-size: 12px;
+    margin: 0;
     font-weight: 400;
     letter-spacing: 0.5px;
     text-transform: uppercase;
+    line-height: 1.2;
   }
 
   .chat-messages {
     max-height: 400px;
     margin-bottom: 20px;
-    padding: 0 5px;
-    padding-right: 10px;
+    padding: 8px 12px;
+    padding-right: 16px;
     scroll-behavior: smooth;
-    padding-top: 2px !important;
+    border-radius: 16px;
+    transition: all 0.3s ease;
+    position: relative;
   }
 
+
+
   .chat-messages::-webkit-scrollbar {
-    /* width: 4px; */
+    width: 4px;
   }
 
   .chat-messages::-webkit-scrollbar-track {
@@ -354,8 +378,13 @@
   }
 
   .chat-messages::-webkit-scrollbar-thumb {
-    background: rgba(255, 255, 255, 0.2);
+    background: rgba(255, 255, 255, 0.3);
     border-radius: 2px;
+    transition: background 0.3s ease;
+  }
+
+  .chat-messages::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.5);
   }
 
   .message {
@@ -529,8 +558,8 @@
     background-position: 0 0;
     -webkit-transition: background-position 1s ease;
     transition: background-position 1s ease;
-    -webkit-transition-delay: .1s;
-    transition-delay: .1s;
+    -webkit-transition-delay: 0s;
+    transition-delay: 0s;
     -webkit-animation-fill-mode: backwards;
     animation-fill-mode: backwards;
     z-index: -1;
@@ -538,8 +567,6 @@
   
   .input-wrapper:focus-within::before {
     background-position: 100% 100%;
-    -webkit-transition-delay: 0;
-    transition-delay: 0;
   }
 
   .message-input {
@@ -1074,633 +1101,355 @@
       margin: auto !important;
     }
   }
-</style>
-</head>
-<body>
-  <div class="synthwave-grid"></div>
-  
-  <!-- Top content with titles -->
-  <div class="top-content">
-    <div class="titles">
-      <h1>AI Assistant</h1>
-      <h2 class="subtitle">AI/UI POWERED by Panes</h2>
-      <div class="container-text">
-        <div class="icon">
-          <div class="ai-icon">🤖</div>
-        </div>
-        <div class="right">
-          <small>Experience the next generation of conversational AI with smooth, native-like interactions. Tap the robot to start chatting!</small>
-        </div>
-      </div>
-    </div>
-  </div>
-  
-  <div class="robot-collapsed" id="robotCollapsed" onclick="expandChat()">
-    🤖
-  </div>
 
-  <ion-app>
-    <ion-content>
-
-
-      <chat-pane>
-        <div class="pane-header">
-          <div class="pane-header-buttons">
-            <button class="pane-header-btn" onclick="clearChat()" title="Clear chat">
-              <ion-icon name="refresh-outline"></ion-icon>
-            </button>
-            <button class="pane-header-btn pane-minimize-btn" onclick="collapseChat()" title="Minimize">
-              <ion-icon name="remove-outline"></ion-icon>
-            </button>
-          </div>
-        </div>
-        <div class="chat-container">
-          <div class="chat-header">
-            <div class="ai-avatar"></div>
-            <h1>AI Assistant</h1>
-            <p class="header-subtitle">
-              Powered by Panes • Here to help 24/7
-            </p>
-          </div>
-
-          <div class="chat-messages" id="chatMessages" overflow-y>
-            <div class="message ai">
-              <div class="message-bubble">
-                👋 Hello! I'm your AI assistant. I can help you learn about Cupertino Panes, answer questions, or just have a chat. What would you like to know?
-              </div>
-            </div>
-          </div>
-
-          <div class="input-container">
-            <div class="input-wrapper">
-              <button class="voice-button" id="voiceButton" onclick="toggleVoiceRecording()" type="button">
-                <ion-icon name="mic-outline" id="voiceIcon"></ion-icon>
-              </button>
-              <div class="voice-status" id="voiceStatus"></div>
-              
-              <!-- Full recording overlay -->
-              <div class="recording-overlay" id="recordingOverlay">
-                <div class="recording-wave">
-                  <div class="recording-wave-bar"></div>
-                  <div class="recording-wave-bar"></div>
-                  <div class="recording-wave-bar"></div>
-                  <div class="recording-wave-bar"></div>
-                  <div class="recording-wave-bar"></div>
-                  <div class="recording-wave-bar"></div>
-                  <div class="recording-wave-bar"></div>
-                  <div class="recording-wave-bar"></div>
-                  <div class="recording-wave-bar"></div>
-                  <div class="recording-wave-bar"></div>
-                </div>
-                <div class="recording-text" id="recordingText">
-                  <div class="recording-dot"></div>
-                  Recording...
-                </div>
-              </div>
-              
-              <input 
-                id="messageInput" 
-                type="text"
-                placeholder="Type your message..." 
-                onkeydown="handleKeyPress(event)"
-                class="message-input">
-            </div>
-            <button class="send-button" onclick="sendMessage()" type="button">
-              <ion-icon name="send"></ion-icon>
-            </button>
-          </div>
-        </div>
-      </chat-pane>
-    </ion-content>
-  </ion-app>
-<script>
-  // Function to determine if horizontal mode should be enabled
-  function shouldEnableHorizontal() {
-    const screenWidth = window.innerWidth;
-    const paneWidth = 380; // max-width of pane
-    const minRequiredWidth = paneWidth * 2; // Need at least 2x pane width
-    
-    return screenWidth >= minRequiredWidth;
+  /* Voice recording captured overlay */
+  .voice-recording-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+    border: 2px solid rgba(102, 126, 234, 0.4);
+    border-radius: var(--border-radius);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    opacity: 0;
+    transform: scale(0.95);
+    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    pointer-events: none;
+    z-index: 25;
+    box-shadow: 
+      0 0 20px rgba(102, 126, 234, 0.3),
+      inset 0 0 20px rgba(102, 126, 234, 0.1);
   }
 
-  // Function to get responsive pane configuration
-  function getPaneConfig() {
-    const isHorizontal = shouldEnableHorizontal();
-    
-    const config = {
-      horizontal: isHorizontal,
-      horizontalOffset: isHorizontal ? 10 : 0,
-      initialBreak: isHorizontal ? 'top right' : 'top',
-      fitHeight: true,
-      backdrop: false,
-      bottomClose: false,
-      buttonDestroy: false,
-      showDraggable: true,
-      draggableOver: true,
-      upperThanTop: true,
-      bottomOffset: 30,
-      clickBottomOpen: false,
-      topperOverflow: true,
-      topperOverflowOffset: 10,
-      breaks: {
-        top: { enabled: true, height: window.innerHeight - 10 },
-        middle: { enabled: false, height: window.innerHeight * 0.6 },
-        bottom: { enabled: false, height: 200 }
-      },
-      events: {}
-    };
-    
-    return config;
+  .voice-recording-overlay.show {
+    opacity: 1;
+    transform: scale(1);
+    pointer-events: auto;
   }
 
-  // Initialize pane with responsive configuration
-  let chatPane = new CupertinoPane('chat-pane', getPaneConfig());
+  .voice-recording-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 15px;
+    font-weight: 600;
+    flex: 1;
+  }
 
-  // Update CSS based on screen size
-  function updatePaneStyles() {
-    const isHorizontal = shouldEnableHorizontal();
-    const paneElement = document.querySelector('.pane');
-    
-    if (paneElement) {
-      if (isHorizontal) {
-        // Desktop/tablet: fixed width
-        paneElement.style.maxWidth = '380px';
-        paneElement.style.minWidth = '320px';
-        paneElement.style.width = 'auto';
-        paneElement.style.margin = 'auto';
-      } else {
-        // Mobile: full width minus margins
-        paneElement.style.maxWidth = 'none';
-        paneElement.style.minWidth = 'none';
-        paneElement.style.width = 'calc(100vw - 40px)'; // 20px margin on each side
-        paneElement.style.margin = '0 auto';
-      }
+  .voice-recording-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    box-shadow: 
+      0 0 12px rgba(102, 126, 234, 0.4),
+      inset 0 0 8px rgba(255, 255, 255, 0.1);
+    flex-shrink: 0;
+  }
+
+  .voice-recording-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .voice-recording-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  .voice-recording-subtitle {
+    font-size: 12px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.7);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .voice-recording-close {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    padding-bottom: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1;
+  }
+
+  .voice-recording-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.9);
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  /* Hide input when voice recording overlay is shown */
+  .message-input.voice-captured {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  /* Voice message bubble styling */
+  .voice-message-bubble {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 
+      0 2px 8px rgba(102, 126, 234, 0.3),
+      0 4px 16px rgba(118, 75, 162, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+  }
+
+  .voice-message-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.95);
+  }
+
+  .voice-message-icon {
+    font-size: 20px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    animation: voiceMessagePulse 2s ease-in-out infinite;
+  }
+
+  @keyframes voiceMessagePulse {
+    0%, 100% { 
+      transform: scale(1);
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+    50% { 
+      transform: scale(1.1);
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
     }
   }
 
-  // Handle window resize
-  function handleResize() {
-    const wasHorizontal = chatPane.settings.horizontal;
-    const shouldBeHorizontal = shouldEnableHorizontal();
-    
-    // If horizontal mode needs to change, recreate the pane
-    if (wasHorizontal !== shouldBeHorizontal) {
-      const wasPresented = chatPane.isPresented();
-      
-      // Destroy current pane
-      chatPane.destroy();
-      
-      // Create new pane with updated config
-      chatPane = new CupertinoPane('chat-pane', getPaneConfig());
-      
-      // Update styles
-      updatePaneStyles();
-      
-      // Re-present if it was presented before
-      if (wasPresented) {
-        setTimeout(() => {
-          chatPane.present({animate: true});
-        }, 100);
-      }
-    } else {
-      // Just update styles if no mode change needed
-      updatePaneStyles();
+  .voice-message-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .voice-message-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .voice-message-subtitle {
+    font-size: 12px;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.7);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .voice-message-waveform {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: auto;
+  }
+
+  .voice-wave-bar {
+    width: 2px;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 1px;
+    animation: voiceWaveAnimation 1.5s ease-in-out infinite;
+  }
+
+  .voice-wave-bar:nth-child(1) { animation-delay: 0s; height: 8px; }
+  .voice-wave-bar:nth-child(2) { animation-delay: 0.1s; height: 14px; }
+  .voice-wave-bar:nth-child(3) { animation-delay: 0.2s; height: 10px; }
+  .voice-wave-bar:nth-child(4) { animation-delay: 0.3s; height: 16px; }
+  .voice-wave-bar:nth-child(5) { animation-delay: 0.4s; height: 12px; }
+  .voice-wave-bar:nth-child(6) { animation-delay: 0.5s; height: 8px; }
+
+  @keyframes voiceWaveAnimation {
+    0%, 60%, 100% { 
+      opacity: 0.4;
+      transform: scaleY(0.5);
+    }
+    30% { 
+      opacity: 1;
+      transform: scaleY(1);
     }
   }
 
-  // Debounce resize handler
-  let resizeTimer;
-  window.addEventListener('resize', () => {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(handleResize, 250);
-  });
-
-  const aiResponses = [
-    "That's a great question! Cupertino Panes provides smooth, native-like modals and sheets for web applications.",
-    "🚀 Cupertino Panes supports multiple breakpoints, making it perfect for mobile-first design!",
-    "The library is lightweight at just 12kb and has no dependencies. Pretty amazing, right?",
-    "You can customize everything - from animations to touch gestures. The possibilities are endless!",
-    "💡 Did you know you can stack multiple panes using the Z-Stack feature?",
-    "The touch technologies in Cupertino Panes make interactions feel incredibly natural.",
-    "I'm here to help! Feel free to ask me about features, implementation, or anything else.",
-    "🎨 The backdrop and blur effects create beautiful, modern interfaces.",
-    "Hardware acceleration ensures smooth 60fps animations on all devices.",
-    "You can even integrate it with frameworks like Ionic, React, or Vue!"
-  ];
-
-  let messageCount = 0;
-
-  // Voice recording variables
-  let isRecording = false;
-  let isVoiceMessage = false;
-  let recognition = null;
-  let voiceButton = null;
-  let voiceIcon = null;
-  let voiceStatus = null;
-  let recordingOverlay = null;
-  let messageInput = null;
-
-  window.onload = async function () {
-    // Update initial styles
-    updatePaneStyles();
-    
-    setTimeout(() => {
-      chatPane.present({animate: true});
-    }, 100);
-    
-    // Initialize voice recording
-    initVoiceRecording();
+  /* Powered by Panes link */
+  .powered-by-panes {
+    position: absolute;
+    bottom: -5px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 10;
+    text-align: center;
+    white-space: nowrap;
   }
 
-  function initVoiceRecording() {
-    voiceButton = document.getElementById('voiceButton');
-    voiceIcon = document.getElementById('voiceIcon');
-    voiceStatus = document.getElementById('voiceStatus');
-    recordingOverlay = document.getElementById('recordingOverlay');
-    messageInput = document.getElementById('messageInput');
-
-    // Check if speech recognition is supported
-    if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
-      const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-      recognition = new SpeechRecognition();
-      
-      recognition.continuous = false;
-      recognition.interimResults = false;
-      recognition.lang = 'en-US';
-
-      recognition.onstart = function() {
-        isRecording = true;
-        voiceButton.classList.add('recording');
-        voiceIcon.setAttribute('name', 'stop-outline');
-        showVoiceStatus('Listening...');
-        
-        // Show full recording overlay and hide input
-        showRecordingOverlay();
-        messageInput.classList.add('recording');
-      };
-
-      recognition.onresult = function(event) {
-        // Only update if not already set by manual stop
-        if (!isVoiceMessage) {
-          messageInput.value = '🎤 Voice recording captured';
-          messageInput.style.fontStyle = 'italic';
-          messageInput.style.color = 'rgba(255, 255, 255, 0.8)';
-          isVoiceMessage = true;
-          
-          showVoiceStatus('Voice recording ready - click send to post');
-          setTimeout(() => hideVoiceStatus(), 3000);
-        }
-      };
-
-      recognition.onerror = function(event) {
-        console.error('Speech recognition error:', event.error);
-        let errorMessage = 'Voice recognition failed';
-        
-        switch(event.error) {
-          case 'no-speech':
-            errorMessage = 'No speech detected';
-            break;
-          case 'audio-capture':
-            errorMessage = 'No microphone found';
-            break;
-          case 'not-allowed':
-            errorMessage = 'Microphone access denied';
-            break;
-          case 'network':
-            errorMessage = 'Network error';
-            break;
-        }
-        
-        showVoiceStatus(errorMessage);
-        setTimeout(() => hideVoiceStatus(), 3000);
-        
-        // Reset UI state
-        hideRecordingOverlay();
-        messageInput.classList.remove('recording');
-        resetVoiceButton();
-      };
-
-      recognition.onend = function() {
-        // Clean up any remaining UI state
-        hideRecordingOverlay();
-        messageInput.classList.remove('recording');
-        resetVoiceButton();
-        
-        // Only show error message if no voice was captured at all
-        if (!isVoiceMessage && !messageInput.value.includes('🎤')) {
-          showVoiceStatus('No voice detected - try again');
-          setTimeout(() => hideVoiceStatus(), 2000);
-        }
-      };
-    } else {
-      // Hide voice button if not supported
-      voiceButton.style.display = 'none';
-      console.warn('Speech recognition not supported in this browser');
-    }
+  .powered-by-panes a {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.4);
+    text-decoration: none;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    /* transition: all 0.2s ease; */
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
 
-  function toggleVoiceRecording() {
-    if (!recognition) {
-      showVoiceStatus('Voice recording not supported');
-      setTimeout(() => hideVoiceStatus(), 3000);
-      return;
-    }
-
-    if (isRecording) {
-      // Stop recording immediately and reset UI
-      isRecording = false;
-      voiceButton.classList.remove('recording');
-      voiceIcon.setAttribute('name', 'mic-outline');
-      hideRecordingOverlay();
-      messageInput.classList.remove('recording');
-      
-      // Always show voice representation when manually stopped
-      messageInput.value = '🎤 Voice recording captured';
-      messageInput.style.fontStyle = 'italic';
-      messageInput.style.color = 'rgba(255, 255, 255, 0.8)';
-      isVoiceMessage = true;
-      
-      showVoiceStatus('Voice recording ready - click send to post');
-      setTimeout(() => hideVoiceStatus(), 3000);
-      
-      recognition.stop();
-    } else {
-      // Clear any existing input and reset voice message state
-      messageInput.value = '';
-      messageInput.style.fontStyle = 'normal';
-      messageInput.style.color = '#ffffff';
-      isVoiceMessage = false;
-      
-      // Request microphone permission and start recording
-      try {
-        recognition.start();
-      } catch (error) {
-        console.error('Error starting recognition:', error);
-        showVoiceStatus('Could not start voice recording');
-        setTimeout(() => hideVoiceStatus(), 3000);
-      }
-    }
+  .powered-by-panes a:hover {
+    color: rgba(255, 255, 255, 0.7);
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    transform: translateY(-1px);
   }
 
-  function resetVoiceButton() {
-    isRecording = false;
-    voiceButton.classList.remove('recording');
-    voiceIcon.setAttribute('name', 'mic-outline');
+  .powered-by-panes a:active {
+    transform: translateY(0);
+    color: rgba(255, 255, 255, 0.6);
   }
 
-  function showVoiceStatus(message) {
-    voiceStatus.textContent = message;
-    voiceStatus.classList.add('show');
+  /* Style the separator bullet */
+  .powered-by-panes {
+    font-size: 10px;
+    color: rgba(255, 255, 255, 0.3);
+    letter-spacing: 0.3px;
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
 
-  function hideVoiceStatus() {
-    voiceStatus.classList.remove('show');
+  /* Integrations section styles */
+  .integrations-section {
+    margin-top: 25px;
+    padding-top: 20px;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
   }
 
-  function showRecordingOverlay() {
-    recordingOverlay.classList.add('show');
+  .integrations-title {
+    font-size: 16px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.9);
+    margin: 0 0 15px 0;
+    text-align: center;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    background: linear-gradient(135deg, #8338ec 0%, #3a86ff 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
   }
 
-  function hideRecordingOverlay() {
-    recordingOverlay.classList.remove('show');
-    // Reset recording text
-    const recordingText = document.getElementById('recordingText');
-    if (recordingText) {
-      recordingText.innerHTML = `
-        <div class="recording-dot"></div>
-        Recording...
-      `;
-    }
+  .integrations-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 15px;
   }
 
+  .integration-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    backdrop-filter: blur(5px);
+    -webkit-backdrop-filter: blur(5px);
+  }
 
+  .integration-item:hover {
+    background: rgba(255, 255, 255, 0.08);
+    border-color: rgba(131, 56, 236, 0.3);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(131, 56, 236, 0.2);
+  }
 
-  function handleKeyPress(event) {
-    if (event.key === 'Enter') {
-      sendMessage();
+  .integration-icon {
+    font-size: 20px;
+    width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, rgba(131, 56, 236, 0.2) 0%, rgba(58, 134, 255, 0.2) 100%);
+    border-radius: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+  }
+
+  .integration-name {
+    font-size: 11px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.8);
+    text-align: center;
+    letter-spacing: 0.3px;
+    line-height: 1.2;
+  }
+
+  .integrations-description {
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.7);
+    text-align: center;
+    line-height: 1.4;
+    margin: 0;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Mobile responsive adjustments */
+  @media (max-width: 480px) {
+    .integrations-section {
+      margin-top: 20px;
+      padding-top: 15px;
     }
     
-    // If user starts typing and there's a voice message, clear it
-    if (isVoiceMessage && event.key !== 'Enter') {
-      isVoiceMessage = false;
-      messageInput.style.fontStyle = 'normal';
-      messageInput.style.color = '#ffffff';
-      messageInput.value = '';
-    }
-  }
-
-  async function sendMessage() {
-    const input = document.getElementById('messageInput');
-    const message = input.value.trim();
-    
-    if (!message) return;
-
-    // Determine message type and content
-    let displayMessage = message;
-    let messageType = 'text';
-    
-    if (isVoiceMessage) {
-      displayMessage = '🎤 Voice recording';
-      messageType = 'voice';
-      
-      // Reset voice message state and input styling
-      isVoiceMessage = false;
-      input.style.fontStyle = 'normal';
-      input.style.color = '#ffffff';
-    }
-
-    // Add user message
-    addMessage(displayMessage, 'user', messageType);
-    input.value = '';
-
-    // Start agentic workflow
-    await executeAgenticWorkflow(message, messageType);
-  }
-
-  function addMessage(text, sender, messageType = 'text', isAgentWorkflow = false) {
-    const messagesContainer = document.getElementById('chatMessages');
-    const messageDiv = document.createElement('div');
-    messageDiv.className = `message ${sender}`;
-    
-    const bubbleDiv = document.createElement('div');
-    bubbleDiv.className = 'message-bubble';
-    
-    if (isAgentWorkflow) {
-      // Special styling for agent workflow messages
-      bubbleDiv.classList.add('agent-workflow');
-      // Text already contains the icon and formatted content
-      bubbleDiv.innerHTML = text;
-    } else if (messageType === 'voice' && sender === 'user') {
-      // Style voice messages differently
-      bubbleDiv.innerHTML = `
-        <span style="display: flex; align-items: center; gap: 8px;">
-          🎤
-          <span style="font-style: italic;">Voice recording</span>
-        </span>
-      `;
-      bubbleDiv.style.background = 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)';
-    } else {
-      bubbleDiv.textContent = text;
+    .integrations-title {
+      font-size: 14px;
+      margin-bottom: 12px;
     }
     
-    messageDiv.appendChild(bubbleDiv);
-    messagesContainer.appendChild(messageDiv);
-    
-    // Scroll to bottom
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-    
-    if (!isAgentWorkflow) {
-      messageCount++;
+    .integrations-grid {
+      gap: 10px;
     }
     
-    // Recalculate pane height
-    setTimeout(() => chatPane.calcFitHeight(), 100);
-  }
-
-  async function executeAgenticWorkflow(userMessage, messageType) {
-    // Step 1: Search Agent
-    await new Promise(resolve => {
-      setTimeout(() => {
-        const message = '<span class="agent-icon">🔍</span><span class="agent-text">SEARCH_AGENT: Scanning knowledge base...</span>';
-        addMessage(message, 'ai', 'text', true);
-        resolve();
-      }, 500);
-    });
-
-    // Step 2: Vector Database
-    await new Promise(resolve => {
-      setTimeout(() => {
-        const message = '<span class="agent-icon">🗄️</span><span class="agent-text">VECTOR_DB: Retrieving relevant context...</span>';
-        addMessage(message, 'ai', 'text', true);
-        resolve();
-      }, 900);
-    });
-
-    // Step 3: Processing and Analysis
-    await new Promise(resolve => {
-      setTimeout(() => {
-        const message = '<span class="agent-icon">🔧</span><span class="agent-text">ANALYZER: Processing and generating response...</span>';
-        addMessage(message, 'ai', 'text', true);
-        resolve();
-      }, 800);
-    });
-
-    // Step 4: Final Response
-    setTimeout(() => {
-      const response = getAIResponse(userMessage, messageType);
-      addMessage(response, 'ai');
-      
-      // Auto-expand pane for longer conversations
-      if (messageCount > 3) {
-        chatPane.moveToBreak('top');
-      }
-    }, 700);
-  }
-
-  function getAIResponse(userMessage, messageType = 'text') {
-    // Handle voice messages
-    if (messageType === 'voice') {
-      const voiceResponses = [
-        "🎤 I received your voice recording! Unfortunately, I don't have access to a Whisper model yet to decode it. Please type your message and I'll be happy to help!",
-        "🗣️ Thanks for the voice recording! I can't process audio without Whisper integration. Could you type what you'd like to ask?",
-        "🎙️ Your voice recording came through! I don't have speech-to-text capabilities yet - Whisper model access is planned for soon. What can I help you with in text?",
-        "🔊 I see your voice recording! Without Whisper model access, I can't understand audio yet. Feel free to type your question!",
-        "🎵 Voice recording received! I'm waiting for Whisper model integration to decode audio. In the meantime, how can I assist you via text?"
-      ];
-      return voiceResponses[Math.floor(Math.random() * voiceResponses.length)];
+    .integration-item {
+      padding: 10px 6px;
     }
     
-    // Simple keyword-based responses for text
-    const message = userMessage.toLowerCase();
-    
-    if (message.includes('hello') || message.includes('hi')) {
-      return "Hello there! 👋 Great to meet you! What brings you to explore Cupertino Panes today?";
-    }
-    if (message.includes('how') || message.includes('what')) {
-      return "🤔 That's a thoughtful question! Cupertino Panes makes it easy to create iOS-style modals and sheets with smooth gestures and animations.";
-    }
-    if (message.includes('mobile')) {
-      return "📱 Cupertino Panes is perfect for mobile! It supports touch gestures, responsive breakpoints, and feels native on iOS and Android.";
-    }
-    if (message.includes('thank')) {
-      return "You're very welcome! 😊 I'm happy to help you discover what makes Cupertino Panes so special.";
+    .integration-icon {
+      font-size: 18px;
+      width: 28px;
+      height: 28px;
     }
     
-    // Random response for other messages
-    return aiResponses[Math.floor(Math.random() * aiResponses.length)];
-  }
-
-  function showTypingIndicator() {
-    const messagesContainer = document.getElementById('chatMessages');
-    const typingDiv = document.createElement('div');
-    typingDiv.className = 'message ai typing-message';
-    typingDiv.id = 'typingIndicator';
+    .integration-name {
+      font-size: 10px;
+    }
     
-    const bubbleDiv = document.createElement('div');
-    bubbleDiv.className = 'typing-indicator';
-    bubbleDiv.innerHTML = `
-      <div class="typing-dots">
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-        <div class="typing-dot"></div>
-      </div>
-    `;
-    
-    typingDiv.appendChild(bubbleDiv);
-    messagesContainer.appendChild(typingDiv);
-    messagesContainer.scrollTop = messagesContainer.scrollHeight;
-  }
-
-  function hideTypingIndicator() {
-    const typing = document.getElementById('typingIndicator');
-    if (typing) typing.remove();
-  }
-
-  function clearChat() {
-    const messagesContainer = document.getElementById('chatMessages');
-    messagesContainer.innerHTML = `
-      <div class="message ai">
-        <div class="message-bubble">
-          👋 Hello! I'm your AI assistant. I can help you learn about Cupertino Panes, answer questions, or just have a chat. What would you like to know?
-        </div>
-      </div>
-    `;
-    messageCount = 0;
-    chatPane.calcFitHeight();
-  }
-
-  let isCollapsed = false;
-  const robotCollapsed = document.getElementById('robotCollapsed');
-
-  function expandChat() {
-    if (isCollapsed) {
-      chatPane.present({animate: true});
-      robotCollapsed.style.display = 'none';
-      robotCollapsed.classList.add('hidden');
-      isCollapsed = false;
+    .integrations-description {
+      font-size: 11px;
     }
   }
-
-  function collapseChat() {
-    chatPane.hide();
-    robotCollapsed.style.display = 'flex';
-    robotCollapsed.classList.remove('hidden');
-    isCollapsed = true;
-  }
-
-  // Set initial state
-  robotCollapsed.style.display = 'none';
-  
-  // Configure pane events directly
-  document.addEventListener('cupertinoPanelDidDismiss', function() {
-    robotCollapsed.style.display = 'flex';
-    isCollapsed = true;
-  });
-  
-  document.addEventListener('cupertinoPanelWillPresent', function() {
-    robotCollapsed.style.display = 'none';
-    isCollapsed = false;
-  });
-</script>
-</body>
-</html>

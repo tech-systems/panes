@@ -1,0 +1,56 @@
+// Replace the binary check with this smooth state management:
+private updateScrollDragState(diffY: number, clientY: number): void {
+  const isScrollable = this.instance.overflowEl.style.overflowY === 'auto' && 
+                      this.isElementScrollable(this.instance.overflowEl);
+  
+  if (!isScrollable) {
+    this.dragModeState = 'drag';
+    return;
+  }
+
+  switch (this.dragModeState) {
+    case 'scroll':
+      // KEY: Start transitioning when at scroll top AND moving down
+      if (this.contentScrollTop === 0 && diffY > 0) {
+        if (Math.abs(diffY) >= this.transitionStartThreshold) {
+          this.dragModeState = 'transitioning';
+          this.momentumVelocity = diffY; // Capture initial momentum
+        }
+      }
+      break;
+
+    case 'transitioning':
+      // KEY: Smooth momentum-based transition 
+      if (diffY > 0) {
+        // Continue transitioning with momentum decay
+        this.momentumVelocity = this.momentumVelocity * 0.95 + diffY * 0.05;
+        if (Math.abs(diffY) >= this.transitionStartThreshold * 2) {
+          this.dragModeState = 'drag'; // Full drag mode
+        }
+      } else {
+        this.dragModeState = 'scroll'; // Back to scroll
+        this.momentumVelocity = 0;
+      }
+      break;
+
+    case 'drag':
+      // Allow full drag mode
+      if (this.contentScrollTop > 0 || diffY < 0) {
+        this.dragModeState = 'scroll';
+        this.momentumVelocity = 0;
+      }
+      break;
+  }
+}
+
+// And modify the decision logic:
+private shouldProcessDragInCurrentState(diffY: number): boolean {
+  switch (this.dragModeState) {
+    case 'scroll':
+      return false; // Block drag
+    case 'transitioning':
+      return diffY > 0; // Only downward during transition
+    case 'drag':
+      return true; // Full drag allowed
+  }
+}
