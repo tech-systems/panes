@@ -1079,7 +1079,7 @@ body {
   }
 
   /* Responsive pane styles */
-  @media (max-width: 759px) {
+  /* @media (max-width: 759px) {
     .pane {
       max-width: none !important;
       min-width: none !important;
@@ -1100,7 +1100,7 @@ body {
       width: auto !important;
       margin: auto !important;
     }
-  }
+  } */
 
   /* Voice recording captured overlay */
   .voice-recording-overlay {

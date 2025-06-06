@@ -111,17 +111,24 @@ export class HorizontalModule {
   }
 
   private overrideInitialPositioning() {
-    // Override the present method's initial transform
-    const originalTransform = this.instance.paneEl.style.transform;
-    
     // Get Y position from breakpoints
     const yPosition = this.instance.breakpoints.breaks[this.initialBreakY];
     
-    // Get X position from horizontal breaks
+    // Get X position from horizontal breaks  
     const xPosition = this.horizontalBreaks[this.initialBreakX];
     
-    // Set combined transform
-    this.instance.paneEl.style.transform = `translateX(${xPosition}px) translateY(${yPosition}px) translateZ(0px)`;
+    // Check if we're in an animated presentation
+    // If so, we should start from the screen height offset for the animation
+    const currentTransform = this.instance.paneEl.style.transform;
+    const isAnimatedPresent = currentTransform.includes(`${this.instance.screenHeightOffset}px`);
+    
+    if (isAnimatedPresent) {
+      // For animated presentations, only set X position, keep Y at screen height offset
+      this.instance.paneEl.style.transform = `translateX(${xPosition}px) translateY(${this.instance.screenHeightOffset}px) translateZ(0px)`;
+    } else {
+      // For non-animated presentations, set both X and Y to final positions
+      this.instance.paneEl.style.transform = `translateX(${xPosition}px) translateY(${yPosition}px) translateZ(0px)`;
+    }
     
     // Update currentBreakpoint to reflect actual position
     this.currentBreakpoint = this.initialBreakX;

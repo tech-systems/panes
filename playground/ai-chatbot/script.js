@@ -40,65 +40,6 @@ function getPaneConfig() {
 // Initialize pane with responsive configuration
 let chatPane = new CupertinoPane('chat-pane', getPaneConfig());
 
-// Update CSS based on screen size
-function updatePaneStyles() {
-  const isHorizontal = shouldEnableHorizontal();
-  const paneElement = document.querySelector('.pane');
-  
-  if (paneElement) {
-    if (isHorizontal) {
-      // Desktop/tablet: fixed width
-      paneElement.style.maxWidth = '380px';
-      paneElement.style.minWidth = '320px';
-      paneElement.style.width = 'auto';
-      paneElement.style.margin = 'auto';
-    } else {
-      // Mobile: full width minus margins
-      paneElement.style.maxWidth = 'none';
-      paneElement.style.minWidth = 'none';
-      paneElement.style.width = 'calc(100vw - 40px)'; // 20px margin on each side
-      paneElement.style.margin = '0 auto';
-    }
-  }
-}
-
-// Handle window resize
-function handleResize() {
-  const wasHorizontal = chatPane.settings.horizontal;
-  const shouldBeHorizontal = shouldEnableHorizontal();
-  
-  // If horizontal mode needs to change, recreate the pane
-  if (wasHorizontal !== shouldBeHorizontal) {
-    const wasPresented = chatPane.isPresented();
-    
-    // Destroy current pane
-    chatPane.destroy();
-    
-    // Create new pane with updated config
-    chatPane = new CupertinoPane('chat-pane', getPaneConfig());
-    
-    // Update styles
-    updatePaneStyles();
-    
-    // Re-present if it was presented before
-    if (wasPresented) {
-      setTimeout(() => {
-        chatPane.present({animate: true});
-      }, 100);
-    }
-  } else {
-    // Just update styles if no mode change needed
-    updatePaneStyles();
-  }
-}
-
-// Debounce resize handler
-let resizeTimer;
-window.addEventListener('resize', () => {
-  clearTimeout(resizeTimer);
-  resizeTimer = setTimeout(handleResize, 250);
-});
-
 // Assistant profiles with tied emojis and names
 const assistants = [
   { emoji: '🚀', name: 'Elon' },
@@ -188,12 +129,7 @@ window.onload = async function () {
   // Set random assistant on load
   setRandomAssistant();
   
-  // Update initial styles
-  updatePaneStyles();
-  
-  setTimeout(() => {
-    chatPane.present({animate: true});
-  }, 100);
+  await chatPane.present({animate: true});
   
   // Initialize voice recording
   initVoiceRecording();
