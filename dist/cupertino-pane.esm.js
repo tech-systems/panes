@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: June 6, 2025
+ * Released on: July 1, 2025
  */
 
 /******************************************************************************
@@ -222,6 +222,7 @@ class Events {
         this.breakpoints = this.instance.breakpoints;
         this.transitions = this.instance.transitions;
         this.keyboardEvents = this.instance.keyboardEvents;
+        this.resizeEvents = this.instance.resizeEvents;
         this.touchEvents = this.getTouchEvents();
         // Set sensivity lower for web
         this.swipeNextSensivity = window.hasOwnProperty('cordova')
@@ -272,7 +273,7 @@ class Events {
             });
         }
         // Orientation change + window resize
-        window.addEventListener('resize', this.keyboardEvents.onWindowResizeCb);
+        window.addEventListener('resize', this.resizeEvents.onWindowResizeCb);
     }
     detachAllEvents() {
         if (!this.settings.dragBy) {
@@ -295,7 +296,7 @@ class Events {
             window.removeEventListener('keyboardWillHide', this.keyboardEvents.onKeyboardWillHideCb);
         }
         // Orientation change + window resize
-        window.removeEventListener('resize', this.keyboardEvents.onWindowResizeCb);
+        window.removeEventListener('resize', this.resizeEvents.onWindowResizeCb);
     }
     resetEvents() {
         this.detachAllEvents();
@@ -754,12 +755,6 @@ class KeyboardEvents {
          * @param e
          */
         this.onKeyboardWillHideCb = (e) => this.onKeyboardWillHide(e);
-        /**
-         * Window resize event
-         * We handle here keyboard event as well
-         * @param e
-         */
-        this.onWindowResizeCb = (e) => this.onWindowResize(e);
         this.device = this.instance.device;
         this.breakpoints = this.instance.breakpoints;
     }
@@ -838,31 +833,32 @@ class KeyboardEvents {
         }
         this.instance.moveToBreak(this.breakpoints.prevBreakpoint);
     }
-    onWindowResize(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            /**
-             * Keyboard event detection
-             * We should separate keyboard and resize events
-             */
-            if (this.isFormElement(document.activeElement)) {
-                // Only for non-cordova
-                if (!this.device.cordova) {
-                    this.onKeyboardShow({ keyboardHeight: this.instance.screen_height - window.innerHeight });
-                }
-                return;
+    /**
+     * Detect and handle keyboard events from window resize
+     * Public method to be called by resize handler
+     * @param e
+     */
+    handleKeyboardFromResize(e) {
+        /**
+         * Keyboard event detection
+         * We should separate keyboard and resize events
+         */
+        if (this.isFormElement(document.activeElement)) {
+            // Only for non-cordova
+            if (!this.device.cordova) {
+                this.onKeyboardShow({ keyboardHeight: this.instance.screen_height - window.innerHeight });
             }
-            if (this.keyboardVisibleResize) {
-                this.keyboardVisibleResize = false;
-                // Only for non-cordova
-                if (!this.device.cordova) {
-                    this.onKeyboardWillHide({});
-                }
-                return;
+            return true; // Keyboard event was handled
+        }
+        if (this.keyboardVisibleResize) {
+            this.keyboardVisibleResize = false;
+            // Only for non-cordova
+            if (!this.device.cordova) {
+                this.onKeyboardWillHide({});
             }
-            yield new Promise((resolve) => setTimeout(() => resolve(true), 150));
-            this.instance.updateScreenHeights();
-            this.breakpoints.buildBreakpoints(JSON.parse(this.breakpoints.lockedBreakpoints));
-        });
+            return true; // Keyboard event was handled
+        }
+        return false; // No keyboard event, proceed with resize
     }
     /**
      * Private class methods
@@ -941,6 +937,55 @@ class KeyboardEvents {
     }
 }
 
+/**
+ * Window resize, Orientation change
+ */
+class ResizeEvents {
+    constructor(instance) {
+        this.instance = instance;
+        this.rafId = null;
+        /**
+         * Window resize event handler
+         * Handles orientation changes and window resize
+         * @param e
+         */
+        this.onWindowResizeCb = (e) => this.onWindowResize(e);
+        this.device = this.instance.device;
+        this.breakpoints = this.instance.breakpoints;
+    }
+    onWindowResize(e) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Handle keyboard detection first
+            this.instance.keyboardEvents.handleKeyboardFromResize(e);
+            // Update screen heights immediately
+            this.instance.updateScreenHeights();
+            // Cancel previous RAF and schedule new one to to frequent calls
+            if (this.rafId) {
+                cancelAnimationFrame(this.rafId);
+            }
+            this.rafId = requestAnimationFrame(() => {
+                this.breakpoints.buildBreakpoints(JSON.parse(this.breakpoints.lockedBreakpoints));
+                this.rafId = null;
+            });
+        });
+    }
+    /**
+     * Check if element is a form element
+     * Shared utility method for form element detection
+     */
+    isFormElement(el) {
+        const formElements = [
+            'input', 'select', 'option',
+            'textarea', 'button', 'label'
+        ];
+        if (el && el.tagName
+            && formElements.includes(el.tagName.toLowerCase())) {
+            return true;
+        }
+        return false;
+    }
+}
+
 class Settings {
     constructor() {
         this.instance = {
@@ -1012,7 +1057,7 @@ class Breakpoints {
     buildBreakpoints(conf, bottomOffset = 0, animated = true) {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
-            this.breaks = {};
+            this.breaks = Object.create(null);
             this.conf = conf;
             this.settings.bottomOffset = bottomOffset || this.settings.bottomOffset;
             // Async hook for modules injections
@@ -1031,7 +1076,7 @@ class Breakpoints {
                 this.instance.emit('beforeBreakHeightApplied', { break: val });
                 // Apply initial breaks
                 if ((_a = this.settings.breaks[val]) === null || _a === void 0 ? void 0 : _a.enabled) {
-                    this.breaks[val] = this.breaks[val] || this.instance.screenHeightOffset;
+                    this.breaks[val] = this.instance.screenHeightOffset;
                     this.breaks[val] -= this.settings.bottomOffset;
                     this.breaks[val] -= this.settings.breaks[val].height;
                 }
@@ -1823,16 +1868,13 @@ class InverseModule {
         }
       `);
         });
-        this.instance.on('beforeBreakHeightApplied', (ev) => {
-            var _a;
-            if ((_a = this.settings.breaks[ev.break]) === null || _a === void 0 ? void 0 : _a.enabled) {
-                this.breakpoints.breaks[ev.break] = 2 * (this.settings.breaks[ev.break].height + this.settings.bottomOffset);
-            }
-        }, false);
         this.instance.on('buildBreakpointsCompleted', () => {
             this.breakpoints.topper = this.breakpoints.bottomer;
             // Re-calc top after setBreakpoints();
             this.instance.paneEl.style.top = `-${this.breakpoints.bottomer - this.settings.bottomOffset}px`;
+        });
+        this.instance.on('onWillPresent', () => {
+            this.breakpoints.beforeBuildBreakpoints = () => this.beforeBuildBreakpoints();
         });
     }
     getPaneHeight() {
@@ -1918,6 +1960,15 @@ class InverseModule {
     onScroll() {
         return __awaiter(this, void 0, void 0, function* () {
             this.events.isScrolling = true;
+        });
+    }
+    beforeBuildBreakpoints() {
+        // Set custom inverse values BEFORE main calculation starts
+        ['top', 'middle', 'bottom'].forEach((breakName) => {
+            var _a;
+            if ((_a = this.settings.breaks[breakName]) === null || _a === void 0 ? void 0 : _a.enabled) {
+                this.breakpoints.breaks[breakName] = 2 * (this.settings.breaks[breakName].height + this.settings.bottomOffset);
+            }
         });
     }
 }
@@ -2341,10 +2392,11 @@ class CupertinoPane {
         if (this.settings.events) {
             Object.keys(this.settings.events).forEach(name => this.on(name, this.settings.events[name]));
         }
-        // Core classes
+        // Core classes - Order matters! ResizeEvents needs to be before Events
         this.breakpoints = new Breakpoints(this);
         this.transitions = new Transitions(this);
         this.keyboardEvents = new KeyboardEvents(this);
+        this.resizeEvents = new ResizeEvents(this);
         this.events = new Events(this);
         // Install modules
         modules.forEach((module) => this.modules[this.getModuleRef(module.name)] = new module(this));

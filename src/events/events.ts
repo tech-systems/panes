@@ -5,6 +5,7 @@ import { Support } from '../support';
 import { Breakpoints } from '../breakpoints';
 import { Transitions } from '../transitions';
 import { KeyboardEvents } from './keyboard';
+import { ResizeEvents } from './resize';
 
 /**
  * Touch start, Touch move, Touch end
@@ -47,12 +48,14 @@ export class Events {
   private breakpoints: Breakpoints;
   private transitions: Transitions;
   private keyboardEvents: KeyboardEvents;
+  private resizeEvents: ResizeEvents;
   constructor(private instance: CupertinoPane) {
     this.settings = this.instance.settings;
     this.device = this.instance.device;
     this.breakpoints = this.instance.breakpoints;
     this.transitions = this.instance.transitions;
     this.keyboardEvents = this.instance.keyboardEvents;
+    this.resizeEvents = this.instance.resizeEvents;
     this.touchEvents = this.getTouchEvents();
 
     // Set sensivity lower for web
@@ -111,7 +114,7 @@ export class Events {
     }
 
     // Orientation change + window resize
-    window.addEventListener('resize', this.keyboardEvents.onWindowResizeCb);
+    window.addEventListener('resize', this.resizeEvents.onWindowResizeCb);
   }
 
   public detachAllEvents() {
@@ -136,7 +139,7 @@ export class Events {
     }
 
     // Orientation change + window resize
-    window.removeEventListener('resize', this.keyboardEvents.onWindowResizeCb);
+    window.removeEventListener('resize', this.resizeEvents.onWindowResizeCb);
   }
 
   public resetEvents() {

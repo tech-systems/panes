@@ -1,5 +1,5 @@
 import { Device } from './device';
-import { Events, KeyboardEvents } from './events';
+import { Events, KeyboardEvents, ResizeEvents } from './events';
 import { CupertinoSettings, PaneBreaks } from './models';
 import { Breakpoints } from './breakpoints';
 import { Transitions } from './transitions';
@@ -26,6 +26,7 @@ export declare class CupertinoPane {
     settings: CupertinoSettings;
     device: Device;
     keyboardEvents: KeyboardEvents;
+    resizeEvents: ResizeEvents;
     events: Events;
     breakpoints: Breakpoints;
     transitions: Transitions;

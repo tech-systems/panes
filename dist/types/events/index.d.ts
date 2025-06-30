@@ -1,3 +1,4 @@
 import { Events } from "./events";
 import { KeyboardEvents } from "./keyboard";
-export { Events, KeyboardEvents };
+import { ResizeEvents } from "./resize";
+export { Events, KeyboardEvents, ResizeEvents };

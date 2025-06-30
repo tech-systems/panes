@@ -28,6 +28,7 @@ export declare class Events {
     private breakpoints;
     private transitions;
     private keyboardEvents;
+    private resizeEvents;
     constructor(instance: CupertinoPane);
     private getTouchEvents;
     attachAllEvents(): void;

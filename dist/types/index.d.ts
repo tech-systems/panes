@@ -53,6 +53,7 @@ declare class Events {
     private breakpoints;
     private transitions;
     private keyboardEvents;
+    private resizeEvents;
     constructor(instance: CupertinoPane);
     private getTouchEvents;
     attachAllEvents(): void;
@@ -146,12 +147,11 @@ declare class KeyboardEvents {
     onKeyboardWillHideCb: (e: any) => void;
     private onKeyboardWillHide;
     /**
-     * Window resize event
-     * We handle here keyboard event as well
+     * Detect and handle keyboard events from window resize
+     * Public method to be called by resize handler
      * @param e
      */
-    onWindowResizeCb: (e: any) => Promise<void>;
-    private onWindowResize;
+    handleKeyboardFromResize(e: any): boolean;
     /**
      * Private class methods
      */
@@ -172,6 +172,29 @@ declare class KeyboardEvents {
      * When everyones updates, can be replaced with adding content-overlays to meta
      */
     fixBodyKeyboardResize(showKeyboard: any): void;
+}
+
+/**
+ * Window resize, Orientation change
+ */
+declare class ResizeEvents {
+    private instance;
+    private device;
+    private breakpoints;
+    private rafId;
+    constructor(instance: CupertinoPane);
+    /**
+     * Window resize event handler
+     * Handles orientation changes and window resize
+     * @param e
+     */
+    onWindowResizeCb: (e: any) => Promise<void>;
+    private onWindowResize;
+    /**
+     * Check if element is a form element
+     * Shared utility method for form element detection
+     */
+    isFormElement(el: any): boolean;
 }
 
 interface PaneBreak {
@@ -327,6 +350,7 @@ declare class CupertinoPane {
     settings: CupertinoSettings;
     device: Device;
     keyboardEvents: KeyboardEvents;
+    resizeEvents: ResizeEvents;
     events: Events;
     breakpoints: Breakpoints;
     transitions: Transitions;

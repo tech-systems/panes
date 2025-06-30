@@ -1,6 +1,6 @@
 import { Support } from './support';
 import { Device } from './device';
-import { Events, KeyboardEvents } from './events';
+import { Events, KeyboardEvents, ResizeEvents } from './events';
 import { CupertinoSettings, PaneBreaks } from './models';
 import { Settings } from './settings';
 import { Breakpoints } from './breakpoints';
@@ -32,6 +32,7 @@ export class CupertinoPane {
   public settings: CupertinoSettings = (new Settings()).instance;
   public device: Device = new Device();
   public keyboardEvents: KeyboardEvents;
+  public resizeEvents: ResizeEvents;
   public events: Events;
   public breakpoints: Breakpoints;
   public transitions: Transitions;
@@ -106,10 +107,11 @@ export class CupertinoPane {
       );
     }
 
-    // Core classes
+    // Core classes - Order matters! ResizeEvents needs to be before Events
     this.breakpoints = new Breakpoints(this);
     this.transitions = new Transitions(this);
     this.keyboardEvents = new KeyboardEvents(this);
+    this.resizeEvents = new ResizeEvents(this);
     this.events = new Events(this);
 
     // Install modules

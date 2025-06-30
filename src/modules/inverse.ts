@@ -71,17 +71,15 @@ export class InverseModule {
       `);
     });
 
-    this.instance.on('beforeBreakHeightApplied', (ev) => {
-      if (this.settings.breaks[ev.break]?.enabled) {
-        this.breakpoints.breaks[ev.break] = 2 * (this.settings.breaks[ev.break].height + this.settings.bottomOffset);
-      }
-    }, false);
-
     this.instance.on('buildBreakpointsCompleted', () => {
       this.breakpoints.topper = this.breakpoints.bottomer;
 
       // Re-calc top after setBreakpoints();
       this.instance.paneEl.style.top = `-${this.breakpoints.bottomer - this.settings.bottomOffset}px`;
+    });
+
+    this.instance.on('onWillPresent', () => {
+      this.breakpoints.beforeBuildBreakpoints = () => this.beforeBuildBreakpoints();
     });
   }
 
@@ -182,5 +180,14 @@ export class InverseModule {
 
   private async onScroll() {
     this.events.isScrolling = true;
+  }
+
+  private beforeBuildBreakpoints() {
+    // Set custom inverse values BEFORE main calculation starts
+    ['top', 'middle', 'bottom'].forEach((breakName) => {
+      if (this.settings.breaks[breakName]?.enabled) {
+        this.breakpoints.breaks[breakName] = 2 * (this.settings.breaks[breakName].height + this.settings.bottomOffset);
+      }
+    });
   }
 }

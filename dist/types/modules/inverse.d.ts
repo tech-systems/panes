@@ -22,4 +22,5 @@ export declare class InverseModule {
     scrollPreventDrag(t: any): boolean;
     private isOverflowEl;
     private onScroll;
+    private beforeBuildBreakpoints;
 }
