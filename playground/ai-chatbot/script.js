@@ -13,7 +13,7 @@ function getPaneConfig() {
   
   const config = {
     horizontal: isHorizontal,
-    horizontalOffset: isHorizontal ? 10 : 0,
+    horizontalOffset: isHorizontal ? 20 : 0,
     initialBreak: isHorizontal ? 'top right' : 'top',
     fitHeight: true,
     backdrop: false,

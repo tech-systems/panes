@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: July 1, 2025
+ * Released on: July 3, 2025
  */
 
 /******************************************************************************
@@ -1996,6 +1996,9 @@ class HorizontalModule {
         this.parseInitialBreak();
         // Override transitions setPaneElTransform
         this.transitions['setPaneElTransform'] = (params) => this.setPaneElTransform(params);
+        this.instance.on('beforeBreakHeightApplied', (ev) => {
+            this.calcHorizontalBreaks();
+        });
         // Override initial positioning
         this.instance.on('beforePresentTransition', () => {
             this.calcHorizontalBreaks();
@@ -2041,15 +2044,22 @@ class HorizontalModule {
         }
     }
     calcHorizontalBreaks() {
-        this.defaultRect = {
-            width: this.instance.paneEl.getBoundingClientRect().width,
-            left: this.instance.paneEl.getBoundingClientRect().left,
-            right: this.instance.paneEl.getBoundingClientRect().right
-        };
-        this.horizontalBreaks = {
-            left: -this.defaultRect.left + this.settings.horizontalOffset,
-            right: window.innerWidth - this.defaultRect.left - this.defaultRect.width - this.settings.horizontalOffset
-        };
+        return __awaiter(this, void 0, void 0, function* () {
+            const rect = this.instance.paneEl.getBoundingClientRect();
+            const paneWidth = rect.width;
+            // Calculate the original centered position (not the transformed position)
+            // The pane is centered using CSS: margin-left: auto; margin-right: auto
+            const originalCenteredLeft = (window.innerWidth - paneWidth) / 2;
+            this.defaultRect = {
+                width: paneWidth,
+                left: originalCenteredLeft,
+                right: originalCenteredLeft + paneWidth
+            };
+            this.horizontalBreaks = {
+                left: -this.defaultRect.left + this.settings.horizontalOffset,
+                right: window.innerWidth - this.defaultRect.left - this.defaultRect.width - this.settings.horizontalOffset
+            };
+        });
     }
     overrideInitialPositioning() {
         // Get Y position from breakpoints
@@ -2075,6 +2085,10 @@ class HorizontalModule {
     setPaneElTransform(params) {
         let closestY = params.translateY;
         let closestX = params.translateX || this.instance.getPanelTransformX();
+        // resize event for x-axis
+        if (params.type === 'breakpoint' && !params.translateX) {
+            closestX = this.horizontalBreaks[this.currentBreakpoint];
+        }
         if (params.type === 'end') {
             // Get closest Y breakpoint (existing logic)
             closestY = this.instance.breakpoints.getClosestBreakY();

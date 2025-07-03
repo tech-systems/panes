@@ -47,6 +47,10 @@ export class HorizontalModule {
     // Override transitions setPaneElTransform
     this.transitions['setPaneElTransform'] = (params) => this.setPaneElTransform(params);
 
+    this.instance.on('beforeBreakHeightApplied', (ev) => {
+        this.calcHorizontalBreaks();
+    });
+
     // Override initial positioning
     this.instance.on('beforePresentTransition', () => {
       this.calcHorizontalBreaks();
@@ -97,11 +101,18 @@ export class HorizontalModule {
     }
   }
 
-  private calcHorizontalBreaks() {
+  private async calcHorizontalBreaks() {
+    const rect = this.instance.paneEl.getBoundingClientRect();
+    const paneWidth = rect.width;
+    
+    // Calculate the original centered position (not the transformed position)
+    // The pane is centered using CSS: margin-left: auto; margin-right: auto
+    const originalCenteredLeft = (window.innerWidth - paneWidth) / 2;
+    
     this.defaultRect = {
-      width: this.instance.paneEl.getBoundingClientRect().width,
-      left: this.instance.paneEl.getBoundingClientRect().left,
-      right: this.instance.paneEl.getBoundingClientRect().right
+      width: paneWidth,
+      left: originalCenteredLeft,
+      right: originalCenteredLeft + paneWidth
     };
     
     this.horizontalBreaks = {
@@ -138,6 +149,11 @@ export class HorizontalModule {
   public setPaneElTransform(params) {
     let closestY = params.translateY;
     let closestX = params.translateX || this.instance.getPanelTransformX();
+
+    // resize event for x-axis
+    if (params.type === 'breakpoint' && !params.translateX) {
+      closestX = this.horizontalBreaks[this.currentBreakpoint];
+    }
     
     if (params.type === 'end') {
       // Get closest Y breakpoint (existing logic)
