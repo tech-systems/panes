@@ -112,13 +112,8 @@ body {
     left: 0;
     right: 0;
     height: auto !important;
-    backdrop-filter: saturate(200%) blur(30px);
-    -webkit-backdrop-filter: saturate(200%) blur(30px);
-    background: rgba(25, 25, 27, 0.85) !important;
-    box-shadow: 
-      0 -10px 40px rgba(0, 0, 0, 0.2),
-      0 -30px 80px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    background: rgba(25, 25, 27, 0.95) !important;
+    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
     border: 1px solid rgba(255, 255, 255, 0.08);
     overflow: visible;
   }
@@ -186,10 +181,8 @@ body {
   }
 
   .cupertino-pane-wrapper .draggable.over .move {
-    background: rgba(255, 255, 255, 0.2) !important;
+    background: rgba(255, 255, 255, 0.25) !important;
     width: 45px !important;
-    backdrop-filter: saturate(180%) blur(20px) !important;
-    -webkit-backdrop-filter: saturate(180%) blur(20px) !important;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
     -webkit-transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
@@ -428,36 +421,28 @@ body {
   }
 
   .message.ai .message-bubble {
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.12);
     color: rgba(255, 255, 255, 0.95);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 24px 24px 24px 4px;
-    box-shadow: 
-      0 2px 8px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
     margin-right: 10px;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
   }
 
   .typing-indicator {
     display: flex;
     align-items: center;
     padding: 14px 18px;
-    background: rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.12);
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 24px 24px 24px 4px;
     max-width: 70px;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    box-shadow: 
-      0 2px 8px rgba(0, 0, 0, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
   }
 
   /* Agent workflow message styles */
   .agent-workflow {
-    background: linear-gradient(135deg, rgba(131, 56, 236, 0.2) 0%, rgba(88, 28, 135, 0.15) 100%) !important;
+    background: linear-gradient(135deg, rgba(131, 56, 236, 0.25) 0%, rgba(88, 28, 135, 0.2) 100%) !important;
     border: 1px solid rgba(131, 56, 236, 0.4) !important;
     border-left: 3px solid rgba(131, 56, 236, 0.8) !important;
     color: rgba(255, 255, 255, 0.95) !important;
@@ -466,11 +451,7 @@ body {
     font-weight: 500;
     border-radius: 8px 16px 16px 8px !important;
     position: relative;
-    box-shadow: 
-      0 2px 8px rgba(131, 56, 236, 0.2),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
+    box-shadow: 0 2px 8px rgba(131, 56, 236, 0.2);
   }
 
   .agent-workflow {
@@ -579,8 +560,6 @@ body {
     font-size: 16px;
     outline: none;
     transition: all 0.3s ease;
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     position: relative;
     z-index: 2;
   }
@@ -971,11 +950,9 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: rgba(255, 0, 110, 0.1);
+    background: rgba(255, 0, 110, 0.15);
     border: 2px solid rgba(255, 0, 110, 0.3);
     border-radius: var(--border-radius);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -985,9 +962,7 @@ body {
     transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     pointer-events: none;
     z-index: 15;
-    box-shadow: 
-      0 0 20px rgba(255, 0, 110, 0.4),
-      inset 0 0 20px rgba(255, 0, 110, 0.1);
+    box-shadow: 0 0 20px rgba(255, 0, 110, 0.4);
     animation: recordingGlow 2s ease-in-out infinite;
   }
 
@@ -998,15 +973,11 @@ body {
 
   @keyframes recordingGlow {
     0%, 100% {
-      box-shadow: 
-        0 0 20px rgba(255, 0, 110, 0.4),
-        inset 0 0 20px rgba(255, 0, 110, 0.1);
+      box-shadow: 0 0 20px rgba(255, 0, 110, 0.4);
       border-color: rgba(255, 0, 110, 0.3);
     }
     50% {
-      box-shadow: 
-        0 0 30px rgba(255, 0, 110, 0.6),
-        inset 0 0 30px rgba(255, 0, 110, 0.2);
+      box-shadow: 0 0 30px rgba(255, 0, 110, 0.6);
       border-color: rgba(255, 0, 110, 0.5);
     }
   }
@@ -1109,11 +1080,9 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    background: linear-gradient(135deg, rgba(102, 126, 234, 0.15) 0%, rgba(118, 75, 162, 0.15) 100%);
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
     border: 2px solid rgba(102, 126, 234, 0.4);
     border-radius: var(--border-radius);
-    backdrop-filter: blur(8px);
-    -webkit-backdrop-filter: blur(8px);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1123,9 +1092,7 @@ body {
     transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
     pointer-events: none;
     z-index: 25;
-    box-shadow: 
-      0 0 20px rgba(102, 126, 234, 0.3),
-      inset 0 0 20px rgba(102, 126, 234, 0.1);
+    box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
   }
 
   .voice-recording-overlay.show {
