@@ -207,4 +207,21 @@ export class HorizontalModule {
   public getCurrentHorizontalBreak(): 'left' | 'right' {
     return this.currentBreakpoint as 'left' | 'right';
   }
+
+  // Public method to move to specified X,Y coordinates with smooth transition
+  public async moveToWidth(translateX: number, translateY: number): Promise<any> {
+    if (!this.instance.isPanePresented()) {
+      console.warn(`Cupertino Pane: Present pane before call moveToWidth()`);
+      return null;
+    }
+
+    // Use the library's transition system for smooth positioning
+    await this.instance.transitions.doTransition({
+      type: 'breakpoint', 
+      translateX: translateX,
+      translateY: translateY
+    });
+    
+    return Promise.resolve(true);
+  }
 }

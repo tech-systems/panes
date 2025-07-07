@@ -237,6 +237,13 @@ body {
     color: #ff006e;
   }
 
+  /* Special styling for maximize button */
+  .pane-maximize-btn:hover {
+    background: rgba(58, 134, 255, 0.1);
+    border-color: rgba(58, 134, 255, 0.3);
+    color: #3a86ff;
+  }
+
   .chat-container {
     display: block;
     margin: 25px;

@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: July 6, 2025
+ * Released on: July 8, 2025
  */
 
 /******************************************************************************
@@ -2131,6 +2131,22 @@ class HorizontalModule {
     // Get current horizontal breakpoint
     getCurrentHorizontalBreak() {
         return this.currentBreakpoint;
+    }
+    // Public method to move to specified X,Y coordinates with smooth transition
+    moveToWidth(translateX, translateY) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.instance.isPanePresented()) {
+                console.warn(`Cupertino Pane: Present pane before call moveToWidth()`);
+                return null;
+            }
+            // Use the library's transition system for smooth positioning
+            yield this.instance.transitions.doTransition({
+                type: 'breakpoint',
+                translateX: translateX,
+                translateY: translateY
+            });
+            return Promise.resolve(true);
+        });
     }
 }
 HorizontalModule.forceSettings = {
