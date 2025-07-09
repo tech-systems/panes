@@ -250,6 +250,11 @@ body {
     margin-top: 10px;
     padding-bottom: 25px;
     position: relative;
+    height: 358px;
+  }
+
+  .chat-container.maximized {
+    height: 658px;
   }
 
   .chat-header {
@@ -356,14 +361,16 @@ body {
   }
 
   .chat-messages {
-    max-height: 400px;
-    margin-bottom: 20px;
+    height: calc(100% - 120px);
+    margin-bottom: 0;
     padding: 8px 12px;
     padding-right: 16px;
+    /* padding-bottom: 90px; */
     scroll-behavior: smooth;
     border-radius: 16px;
     transition: all 0.3s ease;
     position: relative;
+    overflow-y: auto;
   }
 
 
@@ -526,6 +533,14 @@ body {
     gap: 10px;
     align-items: center;
     margin-top: 15px;
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 0 0 25px 0;
+    background: rgba(25, 25, 27, 0.95);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
   }
 
   .input-wrapper {

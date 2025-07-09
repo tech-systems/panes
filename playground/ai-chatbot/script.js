@@ -551,118 +551,75 @@ let isAnimating = false;
 const robotCollapsed = document.getElementById('robotCollapsed');
 
 function toggleMaximize() {
-  // Prevent overlapping animations
+  // Prevent overlapping operations
   if (isAnimating) {
     return;
   }
   
   isAnimating = true;
   
-  // Use requestAnimationFrame to ensure smooth animation start
-  requestAnimationFrame(() => {
-    const pane = document.querySelector('.pane');
-    const maximizeIcon = document.getElementById('maximizeIcon');
-    
-    if (!pane || !maximizeIcon) {
-      isAnimating = false;
-      return;
-    }
+  const pane = document.querySelector('.pane');
+  const maximizeIcon = document.getElementById('maximizeIcon');
+  const chatContainer = document.querySelector('.chat-container');
   
-      // Get current transform values and computed width
-    const currentX = chatPane.getPanelTransformX();
-    const currentY = chatPane.getPanelTransformY();
-    const currentWidth = parseInt(window.getComputedStyle(pane).width);
-    
-    let targetWidth, widthDifference;
-    
-    if (isMaximized) {
-      // Minimize back to original width (380px)
-      targetWidth = 380;
-      widthDifference = targetWidth - currentWidth; // negative value
-      
-      maximizeIcon.setAttribute('name', 'expand-outline');
-      isMaximized = false;
-    } else {
-      // Maximize to double width, but respect viewport constraints
-      const viewportWidth = window.innerWidth;
-      const maxAllowedWidth = viewportWidth - 40; // 20px margin on each side
-      const doubleWidth = 380 * 2; // Double the original width
-      targetWidth = Math.min(doubleWidth, maxAllowedWidth);
-      widthDifference = targetWidth - currentWidth; // positive value
-      
-      maximizeIcon.setAttribute('name', 'contract-outline');
-      isMaximized = true;
-    }
+  if (!pane || !maximizeIcon || !chatContainer) {
+    isAnimating = false;
+    return;
+  }
+
+  // Get current transform values and computed width
+  const currentX = chatPane.getPanelTransformX();
+  const currentY = chatPane.getPanelTransformY();
+  const currentWidth = parseInt(window.getComputedStyle(pane).width);
   
+  let targetWidth, widthDifference;
+  
+  if (isMaximized) {
+    // Minimize back to original width (380px)
+    targetWidth = 380;
+    widthDifference = targetWidth - currentWidth; // negative value
+    
+    maximizeIcon.setAttribute('name', 'expand-outline');
+    chatContainer.classList.remove('maximized');
+    isMaximized = false;
+  } else {
+    // Maximize to double width, but respect viewport constraints
+    const viewportWidth = window.innerWidth;
+    const maxAllowedWidth = viewportWidth - 40; // 20px margin on each side
+    const doubleWidth = 380 * 2; // Double the original width
+    targetWidth = Math.min(doubleWidth, maxAllowedWidth);
+    widthDifference = targetWidth - currentWidth; // positive value
+    
+    maximizeIcon.setAttribute('name', 'contract-outline');
+    chatContainer.classList.add('maximized');
+    isMaximized = true;
+  }
+
   // For 'left' breakpoint: move in opposite direction (+)
   // For 'right' breakpoint: move in normal direction (-)
   const currentBreakpoint = chatPane.modules.horizontal.getCurrentHorizontalBreak();
   const compensationDirection = currentBreakpoint === 'left' ? 1 : -1;
   const newTransformX = currentX + (compensationDirection * (widthDifference / 2));
   
-      // Start width changes and XY movement simultaneously using same transition timing
-    if (Math.abs(widthDifference) > 0) {
-      // Use the horizontal module's moveToWidth method when horizontal mode is enabled
-      if (chatPane.modules.horizontal && chatPane.modules.horizontal.moveToWidth) {
-        // Get the same transition timing that the library uses for breakpoint transitions
-      const libraryTransition = chatPane.transitions.buildTransitionValue(false);
-      
-      // Extract timing from library transition (e.g. "all 300ms cubic-bezier(0.4, 0, 0.2, 1)")
-      const timingMatch = libraryTransition.match(/(\d+ms)\s+(.+)/);
-      const duration = timingMatch ? timingMatch[1] : '300ms';
-      const easing = timingMatch ? timingMatch[2] : 'cubic-bezier(0.4, 0, 0.2, 1)';
-      
-      // Apply width transition with same timing as library uses
-      pane.style.setProperty('transition', `width ${duration} ${easing}, max-width ${duration} ${easing}`, 'important');
-      
-      // Start both transitions simultaneously
-      // 1. Width changes
-      pane.style.setProperty('max-width', targetWidth + 'px', 'important');
-      pane.style.setProperty('width', isMaximized ? targetWidth + 'px' : 'auto', 'important');
-      
-      // 2. Position movement (with same timing)
-      chatPane.modules.horizontal.moveToWidth(newTransformX, currentY).then(() => {
-        // Both transitions complete at the same time
-        cleanupTransitions();
-      });
-    } else {
-      // Fallback: apply width transition directly (non-horizontal mode)
-      applyWidthTransition();
+  // Apply width changes instantly
+  pane.style.setProperty('max-width', targetWidth + 'px', 'important');
+  pane.style.setProperty('width', isMaximized ? targetWidth + 'px' : 'auto', 'important');
+  
+  // Apply position changes instantly if needed
+  if (Math.abs(widthDifference) > 0 && chatPane.modules.horizontal) {
+    // Use direct transform for instant positioning
+    const paneElement = chatPane.paneEl;
+    if (paneElement) {
+      paneElement.style.transform = `translateX(${newTransformX}px) translateY(${currentY}px)`;
     }
-  } else {
-    applyWidthTransition();
   }
   
-  function applyWidthTransition() {
-    // Get the same transition timing that the library uses
-    const libraryTransition = chatPane.transitions.buildTransitionValue(false);
-    const timingMatch = libraryTransition.match(/(\d+ms)\s+(.+)/);
-    const duration = timingMatch ? timingMatch[1] : '300ms';
-    const easing = timingMatch ? timingMatch[2] : 'cubic-bezier(0.4, 0, 0.2, 1)';
-    
-    // Apply width transition with library timing
-    pane.style.setProperty('transition', `width ${duration} ${easing}, max-width ${duration} ${easing}`, 'important');
-    
-    // Apply new width
-    pane.style.setProperty('max-width', targetWidth + 'px', 'important');
-    pane.style.setProperty('width', isMaximized ? targetWidth + 'px' : 'auto', 'important');
-    
-    // Clean up after transition
-    const durationMs = parseInt(duration);
-    setTimeout(cleanupTransitions, durationMs);
-  }
+  // Trigger resize event to recalculate all positioning after width change
+  chatPane.calcFitHeight();
+  // window.dispatchEvent(new Event('resize'));
   
-    function cleanupTransitions() {
-      // Remove width transition after animation completes
-      pane.style.removeProperty('transition');
-      
-      // Trigger resize event to recalculate all positioning after width change
-      window.dispatchEvent(new Event('resize'));
-      
-      // Reset animation state
-      isAnimating = false;
-    }
-  });
+  // Reset animation state
+  isAnimating = false;
 }
 
 function expandChat() {
