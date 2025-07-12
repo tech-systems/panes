@@ -250,7 +250,7 @@ body {
     margin-top: 10px;
     padding-bottom: 25px;
     position: relative;
-    height: 358px;
+    /* min-height: 358px; */
   }
 
   .chat-container.maximized {
@@ -361,7 +361,8 @@ body {
   }
 
   .chat-messages {
-    height: calc(100% - 120px);
+    /* height: calc(100% - 120px); */
+    max-height: 50vh; /* 2/3 of screen height */
     margin-bottom: 0;
     padding: 8px 12px;
     padding-right: 16px;
@@ -526,6 +527,11 @@ body {
       opacity: 1;
       transform: scale(1.2) translateY(-3px);
     }
+  }
+
+  .input-spacer {
+    height: 71px; /* Reserve space for absolutely positioned input container */
+    position: relative;
   }
 
   .input-container {

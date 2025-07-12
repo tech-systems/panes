@@ -615,7 +615,7 @@ function toggleMaximize() {
   }
   
   // Trigger resize event to recalculate all positioning after width change
-  chatPane.calcFitHeight();
+  chatPane.calcFitHeight(false);
   // window.dispatchEvent(new Event('resize'));
   
   // Reset animation state
