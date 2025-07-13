@@ -7,9 +7,15 @@ function shouldEnableHorizontal() {
   return screenWidth >= minRequiredWidth;
 }
 
+// Function to detect mobile device
+function isMobile() {
+  return window.innerWidth <= 768;
+}
+
 // Function to get responsive pane configuration
 function getPaneConfig() {
   const isHorizontal = shouldEnableHorizontal();
+  const mobile = isMobile();
   
   const config = {
     horizontal: isHorizontal,
@@ -22,7 +28,7 @@ function getPaneConfig() {
     showDraggable: true,
     draggableOver: true,
     upperThanTop: true,
-    bottomOffset: 30,
+    bottomOffset: mobile ? 10 : 30, // Reduced bottom offset for mobile
     clickBottomOpen: false,
     topperOverflow: true,
     topperOverflowOffset: 10,
@@ -168,8 +174,86 @@ window.onload = async function () {
   const resizeObserver = new ResizeObserver(updateScrollState);
   resizeObserver.observe(chatMessages);
   
+  // Handle window resize for mobile/desktop mode switching
+  window.addEventListener('resize', handleWindowResize);
+  
   // Initial check
   setTimeout(updateScrollState, 200);
+}
+
+function handleWindowResize() {
+  const pane = document.querySelector('.pane');
+  if (!pane) return;
+  
+  // If we're in mobile fullscreen mode but no longer on mobile, exit fullscreen
+  if (isMobileMaximized && !isMobile()) {
+    pane.classList.remove('mobile-fullscreen');
+    isMobileMaximized = false;
+    
+    // Clear any active transitions
+    pane.style.removeProperty('transition');
+    
+    // Clear stored dimensions
+    originalMobileDimensions = null;
+    
+    // Re-enable drag events when exiting mobile fullscreen
+    chatPane.enableDrag();
+    
+    // Reset mobile-specific styles
+    pane.style.removeProperty('max-width');
+    pane.style.removeProperty('width');
+    pane.style.removeProperty('height');
+    pane.style.removeProperty('top');
+    pane.style.removeProperty('left');
+    pane.style.removeProperty('right');
+    pane.style.removeProperty('bottom');
+    
+    // Reset pane positioning
+    const paneElement = chatPane.paneEl;
+    if (paneElement) {
+      paneElement.style.transform = '';
+    }
+    
+    // Update maximize icon
+    const maximizeIcon = document.getElementById('maximizeIcon');
+    if (maximizeIcon) {
+      maximizeIcon.setAttribute('name', 'expand-outline');
+    }
+    
+    // Recalculate pane positioning
+    chatPane.calcFitHeight(false);
+  }
+  
+  // If we're in desktop maximized mode but now on mobile, exit desktop maximized
+  if (isMaximized && isMobile()) {
+    const chatContainer = document.querySelector('.chat-container');
+    if (chatContainer) {
+      chatContainer.classList.remove('desktop-maximized');
+    }
+    isMaximized = false;
+    
+    // Clear any active transitions
+    pane.style.removeProperty('transition');
+    
+    // Reset desktop-specific styles
+    pane.style.removeProperty('max-width');
+    pane.style.removeProperty('width');
+    
+    // Reset pane positioning
+    const paneElement = chatPane.paneEl;
+    if (paneElement) {
+      paneElement.style.transform = '';
+    }
+    
+    // Update maximize icon
+    const maximizeIcon = document.getElementById('maximizeIcon');
+    if (maximizeIcon) {
+      maximizeIcon.setAttribute('name', 'expand-outline');
+    }
+    
+    // Recalculate pane positioning
+    chatPane.calcFitHeight(false);
+  }
 }
 
 function initVoiceRecording() {
@@ -428,8 +512,10 @@ function addMessage(text, sender, messageType = 'text', isAgentWorkflow = false)
     messageCount++;
   }
   
-  // Recalculate pane height
-  setTimeout(() => chatPane.calcFitHeight(), 100);
+  // Recalculate pane height (skip if mobile is maximized)
+  if (!isMobileMaximized) {
+    setTimeout(() => chatPane.calcFitHeight(), 100);
+  }
 }
 
 async function executeAgenticWorkflow(userMessage, messageType) {
@@ -542,12 +628,18 @@ function clearChat() {
     </div>
   `;
   messageCount = 0;
-  chatPane.calcFitHeight();
+  
+  // Recalculate pane height (skip if mobile is maximized)
+  if (!isMobileMaximized) {
+    chatPane.calcFitHeight();
+  }
 }
 
 let isCollapsed = false;
 let isMaximized = false;
+let isMobileMaximized = false;
 let isAnimating = false;
+let originalMobileDimensions = null; // Store original dimensions before maximizing
 const robotCollapsed = document.getElementById('robotCollapsed');
 
 function toggleMaximize() {
@@ -567,6 +659,144 @@ function toggleMaximize() {
     return;
   }
 
+  // Handle mobile differently
+  if (isMobile()) {
+    toggleMobileMaximize(pane, maximizeIcon, chatContainer);
+  } else {
+    toggleDesktopMaximize(pane, maximizeIcon, chatContainer);
+  }
+  
+  // Reset animation state
+  isAnimating = false;
+}
+
+function toggleMobileMaximize(pane, maximizeIcon, chatContainer) {
+  // Get transition settings from Cupertino Pane (same as breakpoint transitions)
+  const animationDuration = chatPane.settings.animationDuration || 300;
+  const animationType = chatPane.settings.animationType || 'ease';
+  const transitionValue = `all ${animationDuration}ms ${animationType}`;
+  
+  if (isMobileMaximized) {
+    // Exit mobile fullscreen with transition back to original dimensions
+    pane.style.setProperty('transition', transitionValue);
+    
+    // Remove mobile fullscreen class
+    pane.classList.remove('mobile-fullscreen');
+    maximizeIcon.setAttribute('name', 'expand-outline');
+    chatContainer.classList.remove('maximized');
+    isMobileMaximized = false;
+    
+    // Restore original dimensions if we have them stored
+    if (originalMobileDimensions) {
+      // Animate back to original dimensions
+      pane.style.setProperty('max-width', originalMobileDimensions.maxWidth, 'important');
+      pane.style.setProperty('width', originalMobileDimensions.width, 'important');
+      pane.style.setProperty('height', originalMobileDimensions.height, 'important');
+      pane.style.setProperty('top', originalMobileDimensions.top, 'important');
+      pane.style.setProperty('left', originalMobileDimensions.left, 'important');
+      pane.style.setProperty('right', originalMobileDimensions.right, 'important');
+      pane.style.setProperty('bottom', originalMobileDimensions.bottom, 'important');
+      
+      // Restore original transform
+      const paneElement = chatPane.paneEl;
+      if (paneElement && originalMobileDimensions.transform) {
+        paneElement.style.transform = originalMobileDimensions.transform;
+      }
+    } else {
+      // Fallback: remove properties if no original dimensions stored
+      pane.style.removeProperty('max-width');
+      pane.style.removeProperty('width');
+      pane.style.removeProperty('height');
+      pane.style.removeProperty('top');
+      pane.style.removeProperty('left');
+      pane.style.removeProperty('right');
+      pane.style.removeProperty('bottom');
+      
+      const paneElement = chatPane.paneEl;
+      if (paneElement) {
+        paneElement.style.transform = '';
+      }
+    }
+    
+          // Clear transition and call calcFitHeight ONLY after exit animation completes
+      setTimeout(() => {
+        pane.style.removeProperty('transition');
+        
+        // Clean up stored dimensions and remove inline styles to return to CSS defaults
+        if (originalMobileDimensions) {
+          pane.style.removeProperty('max-width');
+          pane.style.removeProperty('width');
+          pane.style.removeProperty('height');
+          pane.style.removeProperty('top');
+          pane.style.removeProperty('left');
+          pane.style.removeProperty('right');
+          pane.style.removeProperty('bottom');
+          
+          const paneElement = chatPane.paneEl;
+          if (paneElement) {
+            paneElement.style.transform = originalMobileDimensions.transform || '';
+          }
+          
+          originalMobileDimensions = null; // Clear stored dimensions
+        }
+        
+        // Re-enable drag events after exiting maximized mode
+        chatPane.enableDrag();
+        
+        // Call calcFitHeight only after transition completes
+        chatPane.calcFitHeight(false);
+      }, animationDuration);
+    
+  } else {
+    // Store current dimensions before maximizing
+    const computedStyle = window.getComputedStyle(pane);
+    const paneElement = chatPane.paneEl;
+    
+    originalMobileDimensions = {
+      maxWidth: pane.style.maxWidth || computedStyle.maxWidth,
+      width: pane.style.width || computedStyle.width,
+      height: pane.style.height || computedStyle.height,
+      top: pane.style.top || computedStyle.top,
+      left: pane.style.left || computedStyle.left,
+      right: pane.style.right || computedStyle.right,
+      bottom: pane.style.bottom || computedStyle.bottom,
+      transform: paneElement ? paneElement.style.transform : ''
+    };
+    
+    // Enter mobile fullscreen with transition
+    pane.style.setProperty('transition', transitionValue);
+    
+    // Add mobile fullscreen class and set styles
+    pane.classList.add('mobile-fullscreen');
+    maximizeIcon.setAttribute('name', 'contract-outline');
+    chatContainer.classList.add('maximized');
+    isMobileMaximized = true;
+    
+    // Disable drag events when maximized
+    chatPane.disableDrag();
+    
+    // Set full screen dimensions and position
+    pane.style.setProperty('max-width', '100vw', 'important');
+    pane.style.setProperty('width', '100vw', 'important');
+    pane.style.setProperty('height', '100vh', 'important');
+    pane.style.setProperty('top', '0', 'important');
+    pane.style.setProperty('left', '0', 'important');
+    pane.style.setProperty('right', '0', 'important');
+    pane.style.setProperty('bottom', '0', 'important');
+    
+    // Position the pane element to cover full screen
+    if (paneElement) {
+      paneElement.style.transform = 'translateX(0px) translateY(0px)';
+    }
+    
+    // Clear transition after maximize animation completes
+    setTimeout(() => {
+      pane.style.removeProperty('transition');
+    }, animationDuration);
+  }
+}
+
+function toggleDesktopMaximize(pane, maximizeIcon, chatContainer) {
   // Get current transform values and computed width
   const currentX = chatPane.getPanelTransformX();
   const currentY = chatPane.getPanelTransformY();
@@ -580,7 +810,7 @@ function toggleMaximize() {
     widthDifference = targetWidth - currentWidth; // negative value
     
     maximizeIcon.setAttribute('name', 'expand-outline');
-    chatContainer.classList.remove('maximized');
+    chatContainer.classList.remove('desktop-maximized');
     isMaximized = false;
   } else {
     // Maximize to double width, but respect viewport constraints
@@ -591,7 +821,7 @@ function toggleMaximize() {
     widthDifference = targetWidth - currentWidth; // positive value
     
     maximizeIcon.setAttribute('name', 'contract-outline');
-    chatContainer.classList.add('maximized');
+    chatContainer.classList.add('desktop-maximized');
     isMaximized = true;
   }
 
@@ -616,10 +846,6 @@ function toggleMaximize() {
   
   // Trigger resize event to recalculate all positioning after width change
   chatPane.calcFitHeight(false);
-  // window.dispatchEvent(new Event('resize'));
-  
-  // Reset animation state
-  isAnimating = false;
 }
 
 function expandChat() {

@@ -90,73 +90,70 @@
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Spacer to reserve space for absolutely positioned input container -->
-          <div class="input-spacer"></div>
-
-          <div class="input-container">
-            <div class="input-wrapper">
-              <button class="voice-button" id="voiceButton" onclick="toggleVoiceRecording()" type="button">
-                <ion-icon name="mic-outline" id="voiceIcon"></ion-icon>
-              </button>
-              <div class="voice-status" id="voiceStatus"></div>
-              
-              <!-- Full recording overlay -->
-              <div class="recording-overlay" id="recordingOverlay">
-                <div class="recording-wave">
-                  <div class="recording-wave-bar"></div>
-                  <div class="recording-wave-bar"></div>
-                  <div class="recording-wave-bar"></div>
-                  <div class="recording-wave-bar"></div>
-                  <div class="recording-wave-bar"></div>
-                  <div class="recording-wave-bar"></div>
-                  <div class="recording-wave-bar"></div>
-                  <div class="recording-wave-bar"></div>
-                  <div class="recording-wave-bar"></div>
-                  <div class="recording-wave-bar"></div>
-                </div>
-                <div class="recording-text" id="recordingText">
-                  <div class="recording-dot"></div>
-                  Recording...
-                </div>
-              </div>
-              
-              <!-- Voice recording captured overlay -->
-              <div class="voice-recording-overlay" id="voiceRecordingOverlay">
-                <div class="voice-recording-close" onclick="clearVoiceRecording()" title="Clear voice recording">
-                  ×
-                </div>
-                <div class="voice-recording-content">
-                  <div class="voice-recording-icon">🎤</div>
-                  <div class="voice-recording-text">
-                    <div class="voice-recording-title">Voice Recording</div>
-                    <div class="voice-recording-subtitle">Ready to send</div>
-                  </div>
-                </div>
-              </div>
-              
-              <input 
-                id="messageInput" 
-                type="text"
-                placeholder="Type your message..." 
-                onkeydown="handleKeyPress(event)"
-                class="message-input"
-                autocomplete="off"
-                autocapitalize="off"
-                autocorrect="off"
-                spellcheck="false"
-                data-form-type="other">
-            </div>
-            <button class="send-button" onclick="sendMessage()" type="button">
-              <ion-icon name="send"></ion-icon>
+        <div class="input-container">
+          <div class="input-wrapper">
+            <button class="voice-button" id="voiceButton" onclick="toggleVoiceRecording()" type="button">
+              <ion-icon name="mic-outline" id="voiceIcon"></ion-icon>
             </button>
+            <div class="voice-status" id="voiceStatus"></div>
+            
+            <!-- Full recording overlay -->
+            <div class="recording-overlay" id="recordingOverlay">
+              <div class="recording-wave">
+                <div class="recording-wave-bar"></div>
+                <div class="recording-wave-bar"></div>
+                <div class="recording-wave-bar"></div>
+                <div class="recording-wave-bar"></div>
+                <div class="recording-wave-bar"></div>
+                <div class="recording-wave-bar"></div>
+                <div class="recording-wave-bar"></div>
+                <div class="recording-wave-bar"></div>
+                <div class="recording-wave-bar"></div>
+                <div class="recording-wave-bar"></div>
+              </div>
+              <div class="recording-text" id="recordingText">
+                <div class="recording-dot"></div>
+                Recording...
+              </div>
+            </div>
+            
+            <!-- Voice recording captured overlay -->
+            <div class="voice-recording-overlay" id="voiceRecordingOverlay">
+              <div class="voice-recording-close" onclick="clearVoiceRecording()" title="Clear voice recording">
+                ×
+              </div>
+              <div class="voice-recording-content">
+                <div class="voice-recording-icon">🎤</div>
+                <div class="voice-recording-text">
+                  <div class="voice-recording-title">Voice Recording</div>
+                  <div class="voice-recording-subtitle">Ready to send</div>
+                </div>
+              </div>
+            </div>
+            
+            <input 
+              id="messageInput" 
+              type="text"
+              placeholder="Type your message..." 
+              onkeydown="handleKeyPress(event)"
+              class="message-input"
+              autocomplete="off"
+              autocapitalize="off"
+              autocorrect="off"
+              spellcheck="false"
+              data-form-type="other">
           </div>
-          
-          <!-- Powered by Panes link -->
-          <div class="powered-by-panes">
-            <a href="https://panejs.com" target="_blank" rel="noopener noreferrer">Powered by Panes</a> • 
-            <a href="https://github.com/roman-rr" target="_blank" rel="noopener noreferrer">Created by Roman</a>
-          </div>
+          <button class="send-button" onclick="sendMessage()" type="button">
+            <ion-icon name="send"></ion-icon>
+          </button>
+        </div>
+        
+        <!-- Powered by Panes link -->
+        <div class="powered-by-panes">
+          <a href="https://panejs.com" target="_blank" rel="noopener noreferrer">Powered by Panes</a> • 
+          <a href="https://github.com/roman-rr" target="_blank" rel="noopener noreferrer">Created by Roman</a>
         </div>
       </chat-pane>
     </ion-content>
