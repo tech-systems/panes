@@ -243,6 +243,7 @@ interface PaneSettings {
     horizontal: boolean;
     horizontalOffset: number;
     inverse: boolean;
+    maximize: boolean;
     parentElement: string | HTMLElement;
     followerElement: string;
     cssClass: string;

@@ -48,45 +48,116 @@ body {
   }
 
   .robot-collapsed {
+    --liquid-size: 200%;
     position: fixed;
     bottom: 30px;
     right: 30px;
     width: 64px;
     height: 64px;
-    background: rgba(28, 28, 29, 0.95);
-    backdrop-filter: blur(10px);
-    -webkit-backdrop-filter: blur(10px);
-    border-radius: 20px;
+    background: rgba(28, 28, 29, 0.8);
+    backdrop-filter: blur(12px) saturate(180%);
+    -webkit-backdrop-filter: blur(12px) saturate(180%);
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     font-size: 28px;
     cursor: pointer;
     z-index: 1000;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
     box-shadow: 
-      0 8px 32px rgba(0, 0, 0, 0.4),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1);
-    transition: all 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+      0 10px 30px rgba(0, 0, 0, 0.5),
+      inset 0 2px 10px rgba(255, 255, 255, 0.1),
+      inset 0 0 20px rgba(0, 0, 0, 0.2);
     overflow: hidden;
+    animation: liquid-pulse 4s ease-in-out infinite;
+    opacity: 0;
+    transform: scale(0.8) translateY(20px);
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    transition: opacity 0.3s ease, transform 0.3s ease;
+  }
+
+  .robot-collapsed.show {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+
+  .robot-collapsed.left-corner {
+    right: auto;
+    left: 30px;
+  }
+
+  .robot-collapsed.right-corner {
+    left: auto;
+    right: 30px;
+  }
+
+  @keyframes liquid-pulse {
+    0%, 100% {
+      box-shadow: 
+        0 10px 30px rgba(0, 0, 0, 0.5),
+        inset 0 2px 10px rgba(255, 255, 255, 0.1),
+        inset 0 0 20px rgba(0, 0, 0, 0.2);
+    }
+    50% {
+      box-shadow: 
+        0 15px 40px rgba(0, 0, 0, 0.6),
+        0 0 20px rgba(131, 56, 236, 0.3),
+        inset 0 2px 15px rgba(255, 255, 255, 0.2),
+        inset 0 0 25px rgba(0, 0, 0, 0.3);
+    }
   }
 
   .robot-collapsed::before {
     content: '';
     position: absolute;
     inset: -2px;
-    background: linear-gradient(135deg, #ff006e 0%, #8338ec 50%, #3a86ff 100%);
-    border-radius: 20px;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 0, 110, 0.8),
+      rgba(131, 56, 236, 0.8),
+      rgba(58, 134, 255, 0.8),
+      rgba(131, 56, 236, 0.8),
+      rgba(255, 0, 110, 0.8)
+    ) 0 0 / var(--liquid-size) 100%;
+    border-radius: 50%;
     opacity: 0;
-    transition: opacity 0.3s ease;
     z-index: -1;
+    animation: liquid-move 8s linear infinite;
+  }
+
+  @keyframes liquid-move {
+    0% {
+      background-position: 0% 0;
+    }
+    100% {
+      background-position: var(--liquid-size) 0;
+    }
+  }
+
+  .robot-collapsed::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(
+      circle at 30% 30%,
+      rgba(255, 255, 255, 0.1) 0%,
+      transparent 50%
+    );
+    border-radius: 50%;
+    z-index: 1;
+    pointer-events: none;
   }
 
   .robot-collapsed:hover {
     transform: scale(1.05) translateY(-2px);
     box-shadow: 
-      0 12px 40px rgba(0, 0, 0, 0.5),
-      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+      0 15px 40px rgba(0, 0, 0, 0.5),
+      inset 0 2px 15px rgba(255, 255, 255, 0.2),
+      inset 0 0 25px rgba(0, 0, 0, 0.3);
   }
 
   .robot-collapsed:hover::before {
@@ -97,10 +168,35 @@ body {
     transform: scale(0.95);
   }
 
+  .robot-collapsed span {
+    position: relative;
+    z-index: 2;
+    font-size: 0.85em; /* Make icon smaller */
+    text-shadow: 
+      0 1px 2px rgba(0, 0, 0, 0.8),
+      0 -1px 1px rgba(255, 255, 255, 0.3),
+      inset 0 1px 2px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 50%, #cccccc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: 
+      drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5))
+      drop-shadow(0 -1px 1px rgba(255, 255, 255, 0.2));
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    pointer-events: none;
+  }
+
+
+
   .robot-collapsed.hidden {
     opacity: 0;
     pointer-events: none;
     transform: scale(0.8) translateY(10px);
+    filter: blur(5px);
   }
 
   .pane {

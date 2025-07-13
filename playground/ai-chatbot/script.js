@@ -96,7 +96,7 @@ function updateAssistantDisplay() {
   // Update robot collapsed icon
   const robotCollapsed = document.getElementById('robotCollapsed');
   if (robotCollapsed) {
-    robotCollapsed.textContent = assistant.emoji;
+    robotCollapsed.innerHTML = `<span>${assistant.emoji}</span>`;
   }
   
   // Update chat header title
@@ -146,6 +146,9 @@ window.onload = async function () {
     aiAvatar.style.cursor = 'pointer';
     aiAvatar.addEventListener('click', onAvatarClick);
   }
+
+  // Position robot button based on current horizontal break and show with fade-in
+  positionRobotButton();
 
   // Initialize scroll state tracking using library's methods
   function updateScrollState() {
@@ -850,10 +853,16 @@ function toggleDesktopMaximize(pane, maximizeIcon, chatContainer) {
 
 function expandChat() {
   if (isCollapsed) {
-    chatPane.present({animate: true});
-    robotCollapsed.style.display = 'none';
-    robotCollapsed.classList.add('hidden');
-    isCollapsed = false;
+    // Fade out the button
+    robotCollapsed.classList.remove('show');
+    
+    // Wait for fade-out animation, then present pane
+    setTimeout(() => {
+      chatPane.present({animate: true});
+      robotCollapsed.style.display = 'none';
+      robotCollapsed.classList.add('hidden');
+      isCollapsed = false;
+    }, 150);
   }
 }
 
@@ -862,23 +871,60 @@ function onAvatarClick() {
   changeAssistant();
 }
 
+function positionRobotButton() {
+  const robotCollapsed = document.getElementById('robotCollapsed');
+  if (!robotCollapsed) return;
+
+  // Check if horizontal mode is enabled
+  if (shouldEnableHorizontal() && chatPane.modules && chatPane.modules.horizontal) {
+    const currentBreak = chatPane.modules.horizontal.getCurrentHorizontalBreak();
+    
+    // Remove existing corner classes
+    robotCollapsed.classList.remove('left-corner', 'right-corner');
+    
+    // Add appropriate corner class
+    if (currentBreak === 'left') {
+      robotCollapsed.classList.add('left-corner');
+    } else {
+      robotCollapsed.classList.add('right-corner');
+    }
+  }
+
+  // Show with fade-in transition
+  setTimeout(() => {
+    robotCollapsed.classList.add('show');
+  }, 100);
+}
+
 function collapseChat() {
   chatPane.hide();
   robotCollapsed.style.display = 'flex';
   robotCollapsed.classList.remove('hidden');
   isCollapsed = true;
+  
+  // Position and show with fade-in
+  positionRobotButton();
 }
 
 // Set initial state
 robotCollapsed.style.display = 'none';
+robotCollapsed.classList.remove('show');
 
 // Configure pane events directly
 document.addEventListener('cupertinoPanelDidDismiss', function() {
   robotCollapsed.style.display = 'flex';
   isCollapsed = true;
+  positionRobotButton();
 });
 
 document.addEventListener('cupertinoPanelWillPresent', function() {
   robotCollapsed.style.display = 'none';
   isCollapsed = false;
+});
+
+// Listen for horizontal break changes
+document.addEventListener('cupertinoPanelBreakpointChange', function() {
+  if (isCollapsed) {
+    positionRobotButton();
+  }
 }); 
