@@ -5,5 +5,4 @@ import { FitHeightModule } from "./fit-height";
 import { InverseModule } from './inverse';
 import { HorizontalModule } from './horizontal';
 import { ModalModule } from "./modal";
-import { MaximizeModule } from "./maximize";
-export { ZStackModule, FollowerModule, BackdropModule, FitHeightModule, InverseModule, HorizontalModule, ModalModule, MaximizeModule };
+export { ZStackModule, FollowerModule, BackdropModule, FitHeightModule, InverseModule, HorizontalModule, ModalModule };
