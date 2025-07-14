@@ -275,6 +275,7 @@ interface PaneSettings {
     passiveListeners: boolean;
     touchMoveStopPropagation: boolean;
     touchAngle: number;
+    scrollZeroDragBottom: boolean;
     breaks: PaneBreaks;
     modal: ModalSettings | boolean;
     zStack: ZStackSettings;

@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: July 13, 2025
+ * Released on: July 14, 2025
  */
 
 (function (global, factory) {
@@ -409,15 +409,19 @@
             if (this.settings.touchMoveStopPropagation) {
                 t.stopPropagation();
             }
-            // Block upward drag immediately when scroll at initial position
+            // Block drag when scroll at initial position based on scrollZeroDragBottom setting
             if (this.contentScrollTop === 0
                 && this.instance.overflowEl.style.overflowY === 'auto'
                 && this.isElementScrollable(this.instance.overflowEl)
                 && !this.isDraggableElement(t)) {
                 const diffY = clientY - ((_b = this.steps[this.steps.length - 1]) === null || _b === void 0 ? void 0 : _b.posY) || 0;
-                // Prevent any upward movement (negative diffY) when scroll at initial position
+                // If scrollZeroDragBottom is false, prevent any movement when scroll at initial position
+                if (!this.settings.scrollZeroDragBottom) {
+                    return; // Block all movement when scroll at initial position
+                }
+                // If scrollZeroDragBottom is true, only prevent upward movement (negative diffY) when scroll at initial position
                 if (diffY < 0) {
-                    return; // Block immediately, no movement allowed
+                    return; // Block upward movement only
                 }
             }
             // Delta
@@ -610,6 +614,13 @@
             return __awaiter(this, void 0, void 0, function* () {
                 this.isScrolling = true;
                 this.contentScrollTop = t.target.scrollTop;
+                // Add/remove scroll class directly to overflow element
+                if (this.contentScrollTop > 0) {
+                    this.instance.paneEl.classList.add('scrolled');
+                }
+                else {
+                    this.instance.paneEl.classList.remove('scrolled');
+                }
             });
         }
         onClick(t) {
@@ -1031,6 +1042,7 @@
                 passiveListeners: true,
                 touchMoveStopPropagation: false,
                 touchAngle: 45,
+                scrollZeroDragBottom: true,
                 breaks: {},
                 modal: null,
                 zStack: null,

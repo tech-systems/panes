@@ -32,6 +32,7 @@ function getPaneConfig() {
     clickBottomOpen: false,
     topperOverflow: true,
     topperOverflowOffset: 10,
+    scrollZeroDragBottom: false, // Disable drag when scroll is at 0 for better UX in chatbot
     breaks: {
       top: { enabled: true, height: window.innerHeight - 10 },
       middle: { enabled: false, height: window.innerHeight * 0.6 },
@@ -150,38 +151,8 @@ window.onload = async function () {
   // Position robot button based on current horizontal break and show with fade-in
   positionRobotButton();
 
-  // Initialize scroll state tracking using library's methods
-  function updateScrollState() {
-    const chatMessages = document.getElementById('chatMessages');
-    const chatHeader = document.querySelector('.chat-header');
-    const isScrollable = chatPane.events.isElementScrollable(chatMessages);
-    const isScrolledFromTop = chatMessages.scrollTop > 0;
-    const isScrolledFromBottom = chatMessages.scrollTop < (chatMessages.scrollHeight - chatMessages.clientHeight);
-    
-    chatMessages.classList.toggle('scrollable', isScrollable);
-    chatMessages.classList.toggle('scrolled-from-top', isScrolledFromTop);
-    chatMessages.classList.toggle('scrolled-from-bottom', isScrolledFromBottom);
-    
-    // Also add scrollable class to chat-header for styling
-    if (chatHeader) {
-      chatHeader.classList.toggle('scrollable', isScrollable);
-    }
-  }
-
-  // Monitor scroll state
-  const chatMessages = document.getElementById('chatMessages');
-  chatMessages.addEventListener('scroll', updateScrollState);
-  
-  // Also check on resize and content changes
-  window.addEventListener('resize', updateScrollState);
-  const resizeObserver = new ResizeObserver(updateScrollState);
-  resizeObserver.observe(chatMessages);
-  
   // Handle window resize for mobile/desktop mode switching
   window.addEventListener('resize', handleWindowResize);
-  
-  // Initial check
-  setTimeout(updateScrollState, 200);
 }
 
 function handleWindowResize() {
@@ -805,11 +776,14 @@ function toggleDesktopMaximize(pane, maximizeIcon, chatContainer) {
   const currentY = chatPane.getPanelTransformY();
   const currentWidth = parseInt(window.getComputedStyle(pane).width);
   
+  // Get the original pane width from the rendered element (could be set by CSS, React, etc.)
+  const originalPaneWidth = parseInt(window.getComputedStyle(pane).maxWidth) || 380;
+  
   let targetWidth, widthDifference;
   
   if (isMaximized) {
-    // Minimize back to original width (380px)
-    targetWidth = 380;
+    // Minimize back to original width from rendered element
+    targetWidth = originalPaneWidth / 2;
     widthDifference = targetWidth - currentWidth; // negative value
     
     maximizeIcon.setAttribute('name', 'expand-outline');
@@ -819,7 +793,7 @@ function toggleDesktopMaximize(pane, maximizeIcon, chatContainer) {
     // Maximize to double width, but respect viewport constraints
     const viewportWidth = window.innerWidth;
     const maxAllowedWidth = viewportWidth - 40; // 20px margin on each side
-    const doubleWidth = 380 * 2; // Double the original width
+    const doubleWidth = originalPaneWidth * 2; // Double the original width
     targetWidth = Math.min(doubleWidth, maxAllowedWidth);
     widthDifference = targetWidth - currentWidth; // positive value
     

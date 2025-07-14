@@ -41,6 +41,7 @@ export class Settings {
       passiveListeners: true,
       touchMoveStopPropagation: false,
       touchAngle: 45,
+      scrollZeroDragBottom: true,
       breaks: {},
       modal: null,
       zStack: null,
