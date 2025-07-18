@@ -39,6 +39,7 @@ declare class Events {
     private allowClick;
     private disableDragAngle;
     private mouseDown;
+    private globalMouseListenersAttached;
     contentScrollTop: number;
     private startY;
     private startX;
@@ -65,6 +66,19 @@ declare class Events {
      * @param el
      */
     private eventListeners;
+    /**
+     * Global mouse event handlers for desktop
+     */
+    globalMouseMoveCb: (t: any) => void;
+    globalMouseUpCb: (t: any) => void;
+    /**
+     * Attach global mouse events for desktop dragging
+     */
+    private attachGlobalMouseEvents;
+    /**
+     * Detach global mouse events for desktop dragging
+     */
+    private detachGlobalMouseEvents;
     /**
      * Touch Start Event
      * @param t

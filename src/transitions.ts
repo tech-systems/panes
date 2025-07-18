@@ -103,6 +103,13 @@ export class Transitions {
         // transition style
         let buildedTransition = this.buildTransitionValue(bounce, subTransition.duration);
         this.instance.paneEl.style.setProperty('transition', buildedTransition);
+        // ------------------------------------------------------------------------------
+        // IMPORTANT!
+        // When transition is changed from 0ms linear to anything else e.g. 300ms ease,
+        // When drag event followed by breakpoint event,
+        // css property has no time to apply transition to paneEl 
+        // it's browser bug / limitation. 
+        // ------------------------------------------------------------------------------
 
         // Main transitions
         // Emit event
