@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: July 18, 2025
+ * Released on: July 19, 2025
  */
 
 (function (global, factory) {
@@ -192,19 +192,12 @@
             this.allowClick = true;
             this.disableDragAngle = false;
             this.mouseDown = false;
-            // Add flag to track if we have global mouse listeners attached
-            this.globalMouseListenersAttached = false;
             this.contentScrollTop = 0;
             this.steps = [];
             this.isScrolling = false;
             // RequestAnimationFrame properties for smoother touch move
             this.rafId = null;
             this.pendingMoveData = null;
-            /**
-             * Global mouse event handlers for desktop
-             */
-            this.globalMouseMoveCb = (t) => this.touchMove(t);
-            this.globalMouseUpCb = (t) => this.touchEnd(t);
             /**
              * Touch Start Event
              * @param t
@@ -243,7 +236,7 @@
         }
         getTouchEvents() {
             const touch = ['touchstart', 'touchmove', 'touchend', 'touchcancel'];
-            let desktop = ['mousedown', 'mousemove', 'mouseup', 'mouseup']; // Remove mouseleave
+            let desktop = ['mousedown', 'mousemove', 'mouseup', 'mouseleave'];
             const touchEventsTouch = {
                 start: touch[0], move: touch[1],
                 end: touch[2], cancel: touch[3]
@@ -308,8 +301,6 @@
                 window.removeEventListener('keyboardWillShow', this.keyboardEvents.onKeyboardShowCb);
                 window.removeEventListener('keyboardWillHide', this.keyboardEvents.onKeyboardWillHideCb);
             }
-            // Detach global mouse events for desktop
-            this.detachGlobalMouseEvents();
             // Orientation change + window resize
             window.removeEventListener('resize', this.resizeEvents.onWindowResizeCb);
         }
@@ -331,40 +322,14 @@
                 el[type](this.touchEvents.cancel, this.touchEndCb, passiveListener);
             }
             else {
-                // Desktop mouse events - only attach mousedown to element
                 el[type](this.touchEvents.start, this.touchStartCb, false);
-                // For desktop, we'll handle mousemove/mouseup globally in touchStart/touchEnd
-                // to allow dragging outside the pane element
-                if (!Support.touch && !this.settings.simulateTouch) ;
-                else {
-                    el[type](this.touchEvents.move, this.touchMoveCb, false);
-                    el[type](this.touchEvents.end, this.touchEndCb, false);
-                    el[type](this.touchEvents.cancel, this.touchEndCb, false);
-                }
+                el[type](this.touchEvents.move, this.touchMoveCb, false);
+                el[type](this.touchEvents.end, this.touchEndCb, false);
+                el[type](this.touchEvents.cancel, this.touchEndCb, false);
             }
             // Prevent accidental unwanted clicks events during swiping
             if (this.settings.preventClicks) {
                 el[type]('click', this.onClickCb, true);
-            }
-        }
-        /**
-         * Attach global mouse events for desktop dragging
-         */
-        attachGlobalMouseEvents() {
-            if (!this.globalMouseListenersAttached && (!Support.touch && !this.settings.simulateTouch)) {
-                document.addEventListener('mousemove', this.globalMouseMoveCb, false);
-                document.addEventListener('mouseup', this.globalMouseUpCb, false);
-                this.globalMouseListenersAttached = true;
-            }
-        }
-        /**
-         * Detach global mouse events for desktop dragging
-         */
-        detachGlobalMouseEvents() {
-            if (this.globalMouseListenersAttached) {
-                document.removeEventListener('mousemove', this.globalMouseMoveCb, false);
-                document.removeEventListener('mouseup', this.globalMouseUpCb, false);
-                this.globalMouseListenersAttached = false;
             }
         }
         touchStart(t) {
@@ -395,11 +360,8 @@
             }
             this.startY = clientY;
             this.startX = clientX;
-            if (t.type === 'mousedown') {
+            if (t.type === 'mousedown')
                 this.mouseDown = true;
-                // Attach global mouse events for desktop to allow dragging outside element
-                this.attachGlobalMouseEvents();
-            }
             // if overflow content was scrolled
             // and drag not by draggable
             // increase to scrolled value
@@ -594,12 +556,11 @@
                     this.applyMoveUpdate();
                 }
             }
-            // Desktop fixes - only handle mouseup now (no more mouseleave)
-            if (t.type === 'mouseup') {
+            // Desktop fixes
+            if (t.type === 'mouseleave' && !this.mouseDown)
+                return;
+            if (t.type === 'mouseup' || t.type === 'mouseleave')
                 this.mouseDown = false;
-                // Detach global mouse events when mouse is released
-                this.detachGlobalMouseEvents();
-            }
             // Determinate nearest point
             let closest = this.breakpoints.getClosestBreakY();
             // Swipe - next (if differ > 10)
@@ -1301,6 +1262,13 @@
                     // transition style
                     let buildedTransition = this.buildTransitionValue(bounce, subTransition.duration);
                     this.instance.paneEl.style.setProperty('transition', buildedTransition);
+                    // ------------------------------------------------------------------------------
+                    // IMPORTANT!
+                    // When transition is changed from 0ms linear to anything else e.g. 300ms ease,
+                    // When drag event followed by breakpoint event,
+                    // css property has no time to apply transition to paneEl 
+                    // it's browser bug / limitation. 
+                    // ------------------------------------------------------------------------------
                     // Main transitions
                     // Emit event
                     this.instance.emit('onTransitionStart', {

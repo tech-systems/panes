@@ -4,9 +4,7 @@
   <meta charset="UTF-8">
   <title>Panes - AI Chatbot Demo</title>
   <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <script type="module" src="https://cdn.jsdelivr.net/npm/@ionic/core/dist/ionic/ionic.esm.js"></script>
   <script src="../../dist/cupertino-pane.js"></script>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@ionic/core/css/ionic.bundle.css"/> 
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
@@ -54,19 +52,19 @@
     <span>🤖</span>
   </div>
 
-  <ion-app>
-    <ion-content>
+  <div class="app-container">
+    <div class="content-container">
       <chat-pane>
         <div class="pane-header">
           <div class="pane-header-buttons">
             <button class="pane-header-btn" onclick="clearChat()" title="Clear chat">
-              <ion-icon name="refresh-outline"></ion-icon>
+              <span class="icon-refresh"></span>
             </button>
             <button class="pane-header-btn pane-maximize-btn" onclick="toggleMaximize()" title="Maximize/Minimize">
-              <ion-icon name="expand-outline" id="maximizeIcon"></ion-icon>
+              <span class="icon-expand" id="maximizeIcon"></span>
             </button>
             <button class="pane-header-btn pane-minimize-btn" onclick="collapseChat()" title="Minimize">
-              <ion-icon name="remove-outline"></ion-icon>
+              <span class="icon-minimize"></span>
             </button>
           </div>
         </div>
@@ -95,7 +93,7 @@
         <div class="input-container">
           <div class="input-wrapper">
             <button class="voice-button" id="voiceButton" onclick="toggleVoiceRecording()" type="button">
-              <ion-icon name="mic-outline" id="voiceIcon"></ion-icon>
+              <span class="icon-mic" id="voiceIcon"></span>
             </button>
             <div class="voice-status" id="voiceStatus"></div>
             
@@ -146,7 +144,7 @@
               data-form-type="other">
           </div>
           <button class="send-button" onclick="sendMessage()" type="button">
-            <ion-icon name="send"></ion-icon>
+            <span class="icon-send"></span>
           </button>
         </div>
         
@@ -156,8 +154,8 @@
           <a href="https://github.com/roman-rr" target="_blank" rel="noopener noreferrer">Created by Roman</a>
         </div>
       </chat-pane>
-    </ion-content>
-  </ion-app>
+    </div>
+  </div>
 
   <script src="script.js"></script>
 </body>

@@ -131,8 +131,6 @@ let voiceRecordingOverlay = null;
 let messageInput = null;
 
 window.onload = async function () {
-  await document.querySelector('ion-app').componentOnReady();
-  
   // Set random assistant on load
   setRandomAssistant();
   
