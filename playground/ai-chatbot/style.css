@@ -152,7 +152,6 @@ body {
   width: 100%;
   color: var(--text-primary);
   font-family: inherit;
-  transition: background 0.3s ease, color 0.3s ease;
 }
 
 /* Replace ion-app */
@@ -222,12 +221,14 @@ input {
 }
 
 .icon-send::before {
-  content: "→";
-  font-size: 18px;
+  content: "";
+  width: 20px;
+  height: 20px;
   display: block;
-  line-height: 1;
-  font-weight: bold;
-  color: #ffffff; /* Force white color for send icon */
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' class='ionicon' viewBox='0 0 512 512'%3E%3Cpath d='M53.12 199.94l400-151.39a8 8 0 0110.33 10.33l-151.39 400a8 8 0 01-15-.34l-67.4-166.09a16 16 0 00-10.11-10.11L53.46 215a8 8 0 01-.34-15.06zM460 52L227 285' fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='32'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .icon-theme::before {
@@ -255,7 +256,7 @@ input {
 
 /* Ensure send button icon is always white */
 .send-button .icon-send::before {
-  color: #ffffff !important;
+  filter: brightness(0) invert(1); /* Make SVG white regardless of original color */
 }
 
 /* Alternative SVG-style icons (uncomment if you prefer these) */
@@ -375,7 +376,6 @@ html {
     background-size: 50px 50px;
     animation: gridMove 20s linear infinite;
     z-index: -1;
-    transition: background-image 0.3s ease;
   }
 
   @keyframes gridMove {
@@ -391,7 +391,6 @@ html {
     right: 0;
     bottom: 0;
     background: var(--grid-overlay);
-    transition: background 0.3s ease;
   }
   
   @keyframes gradient {
@@ -421,7 +420,7 @@ html {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
-    transition: opacity 0.2s ease, background 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
+    transition: opacity 0.2s ease;
   }
 
   .robot-collapsed.show {
@@ -1148,7 +1147,6 @@ html {
     padding: 25px;
     border: 1px solid var(--border-primary);
     box-shadow: 0 4px 16px var(--shadow-primary);
-    transition: background 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
   }
   
   /* Light theme: Enhanced background for better visibility */

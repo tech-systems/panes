@@ -54,7 +54,7 @@ let reloadTimeout;
 
 gulp.task('watch', () => {
   // Watch TypeScript source files - triggers build + reload
-  gulp.watch('./src/**/**/*.ts', (cb) => {
+  gulp.watch('./src/**/**/*.ts', function watchTS(cb) {
     clearTimeout(watchTimeout);
     watchTimeout = setTimeout(() => {
       gulp.series('js')(cb);
@@ -62,7 +62,7 @@ gulp.task('watch', () => {
   });
 
   // Watch playground files - triggers reload only (no build needed)
-  gulp.watch(['./playground/**/*.html', './playground/**/*.css', './playground/**/*.js'], (cb) => {
+  gulp.watch(['./playground/**/*.html', './playground/**/*.css', './playground/**/*.js'], function watchPlayground(cb) {
     clearTimeout(reloadTimeout);
     reloadTimeout = setTimeout(() => {
       gulp.src('./playground/**/*')

@@ -808,6 +808,11 @@ function toggleMobileMaximize(pane, maximizeIcon, chatContainer) {
 }
 
 function toggleDesktopMaximize(pane, maximizeIcon, chatContainer) {
+  // DESKTOP: Remove any active transitions for instant maximize/minimize behavior
+  pane.style.removeProperty('transition');
+  pane.style.removeProperty('-webkit-transition');
+  pane.style.removeProperty('transform-transition');
+  
   // Get current transform values and computed width
   const currentX = chatPane.getPanelTransformX();
   const currentY = chatPane.getPanelTransformY();
