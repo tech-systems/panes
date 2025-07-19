@@ -18,43 +18,48 @@ async function buildEntry(format) {
   const outputDir = 'dist/core';
 
   // Bundle
-  new Promise(async(resolve, reject) => {
-    let bundle = await rollup.rollup({
-      input: './src/index.ts',
-      plugins: [
-        replace({
-          delimiters: ['', ''],
-          preventAssignment: true,
-          '//EXPORT': `export { ${bundleName} }`,
-          // Remove modules from package, keep only core
-          'import * as Modules from \'./modules\'': 'const Modules = {};'
-        }),
-        typescript({
+  return new Promise(async(resolve, reject) => {
+    try {
+      let bundle = await rollup.rollup({
+        input: './src/index.ts',
+        plugins: [
+          replace({
+            delimiters: ['', ''],
+            preventAssignment: true,
+            '//EXPORT': `export { ${bundleName} }`,
+            // Remove modules from package, keep only core
+            'import * as Modules from \'./modules\'': 'const Modules = {};'
+          }),
+                  typescript({
           useTsconfigDeclarationDir: true,
-          cacheRoot: process.cwd() + `/.rpt2_cache/core.${filename}`,
+          cacheRoot: process.cwd() + `/.rpt2_cache/shared`,
+          clean: env === 'development',
         })
-      ],
-    });
+        ],
+      });
 
-    bundle = await bundle.write({
-      name: bundleName,
-      format: 'esm', 
-      banner,
-      strict: true,
-      exports: 'named',
-      file: `./${outputDir}/index.js`,
-    });
+      bundle = await bundle.write({
+        name: bundleName,
+        format: 'esm', 
+        banner,
+        strict: true,
+        exports: 'named',
+        file: `./${outputDir}/index.js`,
+      });
 
-    const result = bundle.output[0];
-    const { code } = await Terser.minify(result.code, {
-      output: { preamble: banner },
-    }).catch((err) => {
-      console.error(`Terser failed on file ${filename}: ${err.toString()}`);
-      return reject();
-    });
+      const result = bundle.output[0];
+      const { code } = await Terser.minify(result.code, {
+        output: { preamble: banner },
+      }).catch((err) => {
+        console.error(`Terser failed on file ${filename}: ${err.toString()}`);
+        return reject(err);
+      });
 
-    await fs.writeFile(`./${outputDir}/index.js`, code);
-    return resolve();
+      await fs.writeFile(`./${outputDir}/index.js`, code);
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
   });
 }
 

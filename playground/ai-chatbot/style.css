@@ -8,6 +8,119 @@
   padding: 0;
 }
 
+/* CSS Variables for theming */
+:root {
+  /* Dark theme (default) */
+  --bg-primary: linear-gradient(180deg, #0a0a0a 0%, #1a0a2e 100%);
+  --bg-secondary: rgba(28, 28, 29, 0.8);
+  --bg-tertiary: rgba(25, 25, 27, 0.95);
+  --bg-accent: rgba(255, 255, 255, 0.08);
+  --bg-accent-hover: rgba(255, 255, 255, 0.12);
+  --bg-button: rgba(255, 255, 255, 0.08);
+  --bg-button-hover: rgba(255, 255, 255, 0.12);
+  --bg-robot: rgba(28, 28, 29, 0.9);
+  --bg-robot-hover: rgba(28, 28, 29, 1);
+  --bg-robot-active: rgba(20, 20, 21, 1);
+  
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-tertiary: rgba(255, 255, 255, 0.4);
+  --text-accent: rgba(255, 255, 255, 0.9);
+  
+  --border-primary: rgba(255, 255, 255, 0.1);
+  --border-secondary: rgba(255, 255, 255, 0.08);
+  --border-accent: rgba(131, 56, 236, 0.3);
+  
+  --accent-primary: #ff006e;
+  --accent-secondary: #8338ec;
+  --accent-tertiary: #3a86ff;
+  --accent-gradient: linear-gradient(135deg, #ff006e 0%, #8338ec 50%, #3a86ff 100%);
+  --accent-gradient-alt: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  
+  --shadow-primary: rgba(0, 0, 0, 0.3);
+  --shadow-secondary: rgba(0, 0, 0, 0.12);
+  --shadow-accent: 0 4px 16px rgba(0, 0, 0, 0.12);
+  
+  --grid-color: rgba(147, 0, 211, 0.3);
+  --grid-overlay: radial-gradient(circle at center, transparent 0%, rgba(10, 10, 10, 0.8) 100%);
+  
+  --selection-bg: rgba(131, 56, 236, 0.3);
+  --focus-outline: rgba(131, 56, 236, 0.5);
+}
+
+/* Light theme */
+:root[data-theme="light"] {
+  --bg-primary: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
+  --bg-secondary: rgba(255, 255, 255, 0.95);
+  --bg-tertiary: rgba(255, 255, 255, 0.98);
+  --bg-accent: rgba(131, 56, 236, 0.12);
+  --bg-accent-hover: rgba(131, 56, 236, 0.18);
+  --bg-button: rgba(131, 56, 236, 0.12);
+  --bg-button-hover: rgba(131, 56, 236, 0.20);
+  --bg-robot: rgba(255, 255, 255, 0.95);
+  --bg-robot-hover: rgba(248, 249, 250, 1);
+  --bg-robot-active: rgba(233, 236, 239, 1);
+  
+  --text-primary: #1a1a1a;
+  --text-secondary: rgba(26, 26, 26, 0.7);
+  --text-tertiary: rgba(26, 26, 26, 0.5);
+  --text-accent: rgba(26, 26, 26, 0.9);
+  
+  --border-primary: rgba(0, 0, 0, 0.20);
+  --border-secondary: rgba(0, 0, 0, 0.15);
+  --border-accent: rgba(131, 56, 236, 0.7);
+  
+  --accent-primary: #d63384;
+  --accent-secondary: #6f42c1;
+  --accent-tertiary: #0d6efd;
+  --accent-gradient: linear-gradient(135deg, #e91e63 0%, #9c27b0 50%, #3f51b5 100%);
+  --accent-gradient-alt: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
+  
+  --shadow-primary: rgba(0, 0, 0, 0.1);
+  --shadow-secondary: rgba(0, 0, 0, 0.05);
+  --shadow-accent: 0 4px 16px rgba(0, 0, 0, 0.08);
+  
+  --grid-color: rgba(131, 56, 236, 0.2);
+  --grid-overlay: radial-gradient(circle at center, transparent 0%, rgba(248, 249, 250, 0.95) 100%);
+  
+  --selection-bg: rgba(131, 56, 236, 0.2);
+  --focus-outline: rgba(131, 56, 236, 0.6);
+  
+  /* 
+   * Light Theme: Override Cupertino Pane CSS Variables
+   * Ensure the library's pane components adapt to the light theme
+   */
+  --cupertino-pane-icon-close-color: var(--text-secondary);
+  --cupertino-pane-background: var(--bg-tertiary);
+  --cupertino-pane-color: var(--text-primary);
+  --cupertino-pane-shadow: var(--shadow-accent);
+  --cupertino-pane-border-radius: 28px;
+  --cupertino-pane-move-background: var(--bg-button);
+  --cupertino-pane-destroy-button-background: var(--bg-button);
+}
+
+/* 
+ * Light Theme: Input and Send Button Overrides
+ * Override the hardcoded input and send button styles for light mode
+ */
+:root[data-theme="light"] .input-container {
+  background: rgba(255, 255, 255, 0.98);
+}
+
+:root[data-theme="light"] .message-input {
+  background: rgb(255, 255, 255);
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  color: #1a1a1a;
+}
+
+:root[data-theme="light"] .message-input::placeholder {
+  color: rgba(26, 26, 26, 0.6);
+}
+
+:root[data-theme="light"] .message-input:focus {
+  border-color: rgba(131, 56, 236, 0.4);
+}
+
 html {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   -webkit-font-smoothing: antialiased;
@@ -18,19 +131,28 @@ html {
 }
 
 body {
-  background: linear-gradient(180deg, #0a0a0a 0%, #1a0a2e 100%);
+  background: var(--bg-primary);
   overflow: hidden;
-  --cupertino-pane-icon-close-color: #a8a7ae;
-  --cupertino-pane-background: rgba(28, 28, 29, 0.8);
-  --cupertino-pane-color: #ffffff;
-  --cupertino-pane-shadow: 0 4px 16px rgb(0 0 0 / 12%);
-  --cupertino-pane-border-radius: 20px;
-  --cupertino-pane-move-background: #424246;
-  --cupertino-pane-destroy-button-background: #424246;
+  
+  /* 
+   * Cupertino Pane Library Integration
+   * These CSS variables are provided by the @cupertino-pane library and allow us to theme
+   * the pane components without overriding their internal styles.
+   * We connect them to our custom theming system for seamless light/dark mode switching.
+   */
+  --cupertino-pane-icon-close-color: var(--text-secondary);
+  --cupertino-pane-background: var(--bg-tertiary);
+  --cupertino-pane-color: var(--text-primary);
+  --cupertino-pane-shadow: var(--shadow-accent);
+  --cupertino-pane-border-radius: 28px;
+  --cupertino-pane-move-background: var(--bg-accent);
+  --cupertino-pane-destroy-button-background: var(--bg-button);
+  
   min-height: 100vh;
   width: 100%;
-  color: #ffffff;
+  color: var(--text-primary);
   font-family: inherit;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 /* Replace ion-app */
@@ -106,6 +228,29 @@ input {
   line-height: 1;
   font-weight: bold;
   color: #ffffff; /* Force white color for send icon */
+}
+
+.icon-theme::before {
+  content: "☀";
+  font-size: 16px;
+  display: block;
+  line-height: 1;
+  transition: transform 0.3s ease;
+}
+
+/* Light theme icon */
+:root[data-theme="light"] .icon-theme::before {
+  content: "🌙";
+}
+
+/* Theme toggle button special styling */
+.theme-toggle-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-toggle-btn:hover .icon-theme::before {
+  transform: rotate(180deg);
 }
 
 /* Ensure send button icon is always white */
@@ -203,7 +348,7 @@ p {
 /* Improved focus styles */
 button:focus-visible,
 input:focus-visible {
-  outline: 2px solid rgba(131, 56, 236, 0.5);
+  outline: 2px solid var(--focus-outline);
   outline-offset: 2px;
 }
 
@@ -214,8 +359,8 @@ html {
 
 /* Selection colors */
 ::selection {
-  background: rgba(131, 56, 236, 0.3);
-  color: white;
+  background: var(--selection-bg);
+  color: var(--text-primary);
 }
 
   .synthwave-grid {
@@ -225,11 +370,12 @@ html {
     width: 100%;
     height: 100%;
     background-image: 
-      linear-gradient(rgba(147, 0, 211, 0.3) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(147, 0, 211, 0.3) 1px, transparent 1px);
+      linear-gradient(var(--grid-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
     background-size: 50px 50px;
     animation: gridMove 20s linear infinite;
     z-index: -1;
+    transition: background-image 0.3s ease;
   }
 
   @keyframes gridMove {
@@ -244,7 +390,8 @@ html {
     left: 0;
     right: 0;
     bottom: 0;
-    background: radial-gradient(circle at center, transparent 0%, rgba(10, 10, 10, 0.8) 100%);
+    background: var(--grid-overlay);
+    transition: background 0.3s ease;
   }
   
   @keyframes gradient {
@@ -259,7 +406,7 @@ html {
     right: 30px;
     width: 64px;
     height: 64px;
-    background: rgba(28, 28, 29, 0.9);
+    background: var(--bg-robot);
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -267,14 +414,14 @@ html {
     font-size: 28px;
     cursor: pointer;
     z-index: 1000;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    border: 1px solid var(--border-primary);
+    box-shadow: 0 4px 12px var(--shadow-primary);
     opacity: 0;
     user-select: none;
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.2s ease, background 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
   }
 
   .robot-collapsed.show {
@@ -292,17 +439,38 @@ html {
   }
 
   .robot-collapsed:hover {
-    background: rgba(28, 28, 29, 1);
+    background: var(--bg-robot-hover);
   }
 
   .robot-collapsed:active {
-    background: rgba(20, 20, 21, 1);
+    background: var(--bg-robot-active);
   }
 
   .robot-collapsed span {
     position: relative;
     z-index: 2;
     font-size: 0.85em; /* Make icon smaller */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    pointer-events: none;
+  }
+  
+  /* Light theme: Simplified robot icon styling */
+  :root[data-theme="light"] .robot-collapsed span {
+    text-shadow: none;
+    background: none;
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: unset;
+    background-clip: unset;
+    filter: none;
+    color: var(--text-primary);
+  }
+  
+  /* Dark theme: Complex robot icon styling */
+  :root[data-theme="dark"] .robot-collapsed span,
+  :root:not([data-theme]) .robot-collapsed span {
     text-shadow: 
       0 1px 2px rgba(0, 0, 0, 0.8),
       0 -1px 1px rgba(255, 255, 255, 0.3),
@@ -314,11 +482,6 @@ html {
     filter: 
       drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5))
       drop-shadow(0 -1px 1px rgba(255, 255, 255, 0.2));
-    user-select: none;
-    -webkit-user-select: none;
-    -moz-user-select: none;
-    -ms-user-select: none;
-    pointer-events: none;
   }
 
 
@@ -330,39 +493,41 @@ html {
     filter: blur(5px);
   }
 
-  .pane {
-    border-radius: 28px !important;
+  /* Use library's CSS variables instead of direct overrides */
+  .cupertino-pane-wrapper .pane {
     width: auto !important;
     max-width: 380px !important; /* Mobile default */
     min-width: 320px !important;
-    margin: auto;
-    left: 0;
-    right: 0;
+    margin: auto !important;
+    left: 0 !important;
+    right: 0 !important;
     height: auto !important;
-    background: rgba(25, 25, 27, 0.95) !important;
-    box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.3);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    overflow: visible;
-    border-top: 2px solid rgba(131, 56, 236, 0.3);
+    border: 1px solid var(--border-secondary) !important;
+    overflow: visible !important;
+    border-top: 2px solid var(--border-accent) !important;
+    border-radius: var(--cupertino-pane-border-radius) !important;
+    /* Enhanced shadow using library variable as base */
     box-shadow: 
-      0 -5px 20px rgba(0, 0, 0, 0.3),
-      inset 0 1px 0 rgba(131, 56, 236, 0.2);
+      var(--cupertino-pane-shadow),
+      0 -5px 20px var(--shadow-primary),
+      inset 0 1px 0 var(--border-accent) !important;
   }
 
   /* Desktop max-width */
   @media (min-width: 768px) {
-    .pane {
+    .cupertino-pane-wrapper .pane {
       max-width: 420px !important;
     }
   }
 
-  /* Mobile fullscreen mode */
-  .pane.mobile-fullscreen {
+  /* Mobile fullscreen mode - Override library defaults for fullscreen */
+  .cupertino-pane-wrapper .pane.mobile-fullscreen {
     border-radius: 0 !important;
     border: none !important;
     box-shadow: none !important;
     margin: 0 !important;
-    background: rgba(25, 25, 27, 1) !important; /* Remove opacity */
+    /* Use library variable but ensure full opacity for fullscreen */
+    background: var(--cupertino-pane-background) !important;
     position: fixed !important;
     z-index: 9999 !important;
     top: 0 !important;
@@ -381,28 +546,28 @@ html {
   chat-pane {
     display: flex;
     flex-direction: column;
-    border-radius: 28px;
+    border-radius: var(--cupertino-pane-border-radius);
     overflow: hidden;
     height: 100%;
   }
 
   /* Mobile fullscreen chat-pane */
-  .pane.mobile-fullscreen chat-pane {
+  .cupertino-pane-wrapper .pane.mobile-fullscreen chat-pane {
     border-radius: 0 !important;
     height: 100vh !important;
   }
 
   /* Remove gradient line in mobile fullscreen */
-  .pane.mobile-fullscreen::before {
+  .cupertino-pane-wrapper .pane.mobile-fullscreen::before {
     display: none !important;
   }
 
   /* Mobile fullscreen pane header */
-  .pane.mobile-fullscreen .pane-header {
+  .cupertino-pane-wrapper .pane.mobile-fullscreen .pane-header {
     padding: 10px 20px !important;
   }
   
-  .pane::before {
+  .cupertino-pane-wrapper .pane::before {
     content: '';
     position: absolute;
     top: 0;
@@ -412,11 +577,12 @@ html {
     background: linear-gradient(
       90deg,
       transparent 0%,
-      rgba(255, 255, 255, 0.1) 20%,
-      rgba(255, 255, 255, 0.15) 50%,
-      rgba(255, 255, 255, 0.1) 80%,
+      var(--border-primary) 20%,
+      var(--border-accent) 50%,
+      var(--border-primary) 80%,
       transparent 100%
     );
+    opacity: 0.5;
   }
 
   .pane-header {
@@ -428,7 +594,7 @@ html {
     background: transparent;
   }
 
-  /* Style the built-in Cupertino Pane draggable */
+  /* Style the built-in Cupertino Pane draggable - Enhanced version using library variables */
   .cupertino-pane-wrapper .draggable {
     z-index: 5 !important;
     padding: 8px !important;
@@ -439,8 +605,9 @@ html {
     justify-content: center !important;
   }
 
+  /* Override library's move background with our themed version */
   .cupertino-pane-wrapper .move {
-    background: rgba(255, 255, 255, 0.15) !important;
+    background: var(--cupertino-pane-move-background) !important;
     width: 36px !important;
     height: 4px !important;
     border-radius: 2px !important;
@@ -450,7 +617,7 @@ html {
   }
 
   .cupertino-pane-wrapper .draggable:hover .move {
-    background: rgba(255, 255, 255, 0.25) !important;
+    background: var(--bg-accent-hover) !important;
     width: 50px !important;
     transform: scaleY(1.2) !important;
     transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
@@ -458,14 +625,14 @@ html {
   }
 
   .cupertino-pane-wrapper .draggable.over .move {
-    background: rgba(255, 255, 255, 0.25) !important;
+    background: var(--bg-accent-hover) !important;
     width: 45px !important;
     transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
     -webkit-transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
 
   .cupertino-pane-wrapper .draggable.over:hover .move {
-    background: rgba(255, 255, 255, 0.3) !important;
+    background: var(--bg-button-hover) !important;
     width: 55px !important;
     transform: scaleY(1.2) !important;
   }
@@ -480,9 +647,9 @@ html {
     width: 28px;
     height: 28px;
     border-radius: 8px;
-    background: rgba(255, 255, 255, 0.08);
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: rgba(255, 255, 255, 0.6);
+    background: var(--bg-accent);
+    border: 1px solid var(--border-primary);
+    color: var(--text-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -494,8 +661,8 @@ html {
   }
 
   .pane-header-btn:hover {
-    background: rgba(255, 255, 255, 0.12);
-    color: rgba(255, 255, 255, 0.9);
+    background: var(--bg-accent-hover);
+    color: var(--text-accent);
     transform: scale(1.05);
   }
 
@@ -511,14 +678,14 @@ html {
   .pane-minimize-btn:hover {
     background: rgba(255, 0, 110, 0.1);
     border-color: rgba(255, 0, 110, 0.3);
-    color: #ff006e;
+    color: var(--accent-primary);
   }
 
   /* Special styling for maximize button */
   .pane-maximize-btn:hover {
     background: rgba(58, 134, 255, 0.1);
     border-color: rgba(58, 134, 255, 0.3);
-    color: #3a86ff;
+    color: var(--accent-tertiary);
   }
 
   .chat-container {
@@ -558,7 +725,7 @@ html {
   }
 
   /* Mobile fullscreen chat messages */
-  .pane.mobile-fullscreen .chat-messages {
+  .cupertino-pane-wrapper .pane.mobile-fullscreen .chat-messages {
     flex: 1 !important;
     max-height: none !important;
     margin-bottom: 0 !important;
@@ -573,8 +740,8 @@ html {
     padding-right: 20px;
   }
 
-  .pane.scrolled .chat-header {
-    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  .cupertino-pane-wrapper .pane.scrolled .chat-header {
+    border-bottom: 1px solid var(--border-secondary);
   }
 
   /* Show subtle border-bottom when content is scrollable */
@@ -598,7 +765,7 @@ html {
 
   .chat-header h1 {
     margin: 0;
-    background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 100%);
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -616,11 +783,11 @@ html {
     justify-content: center;
     align-items: center;
     font-size: 24px;
-    background: rgba(28, 28, 29, 0.95);
+    background: var(--bg-robot);
     border-radius: 15px;
     box-shadow: 
-      inset 0 1px 3px rgba(0, 0, 0, 0.3),
-      0 2px 8px rgba(0, 0, 0, 0.2);
+      inset 0 1px 3px var(--shadow-primary),
+      0 2px 8px var(--shadow-secondary);
     cursor: pointer;
     transition: all 0.2s ease;
     flex-shrink: 0;
@@ -629,8 +796,8 @@ html {
   .ai-avatar:hover {
     transform: scale(1.05);
     box-shadow: 
-      inset 0 1px 3px rgba(0, 0, 0, 0.4),
-      0 3px 12px rgba(0, 0, 0, 0.3);
+      inset 0 1px 3px var(--shadow-primary),
+      0 3px 12px var(--shadow-primary);
   }
 
   .ai-avatar:active {
@@ -641,14 +808,14 @@ html {
     content: '';
     position: absolute;
     inset: -2px;
-    background: linear-gradient(135deg, #ff006e 0%, #8338ec 50%, #3a86ff 100%);
+    background: var(--accent-gradient);
     border-radius: 17px;
     opacity: 0.5;
     z-index: -1;
   }
 
   .header-subtitle {
-    color: rgba(255, 255, 255, 0.5);
+    color: var(--text-tertiary);
     font-size: 12px;
     margin: 0;
     font-weight: 400;
@@ -678,18 +845,18 @@ html {
   }
 
   .chat-messages::-webkit-scrollbar-track {
-    background: rgba(255, 255, 255, 0.05);
+    background: var(--bg-accent);
     /* border-radius: 2px; */
   }
 
   .chat-messages::-webkit-scrollbar-thumb {
-    background: rgba(66, 66, 66, 0.69);
+    background: var(--bg-button);
     /* border-radius: 2px; */
     /* transition: background 0.3s ease; */
   }
 
   .chat-messages::-webkit-scrollbar-thumb:hover {
-    background: rgba(255, 255, 255, 0.5);
+    background: var(--bg-button-hover);
   } 
 
   .message {
@@ -723,21 +890,21 @@ html {
   }
 
   .message.user .message-bubble {
-    background: linear-gradient(135deg, #8338ec 0%, #ff006e 100%);
+    background: var(--accent-gradient);
     color: white;
     border-radius: 24px 24px 4px 24px;
     box-shadow: 
-      0 2px 8px rgba(131, 56, 236, 0.3),
-      0 4px 16px rgba(255, 0, 110, 0.2);
+      0 2px 8px var(--border-accent),
+      0 4px 16px var(--shadow-secondary);
     margin-left: 10px;
   }
 
   .message.ai .message-bubble {
-    background: rgba(255, 255, 255, 0.12);
-    color: rgba(255, 255, 255, 0.95);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--bg-accent-hover);
+    color: var(--text-accent);
+    border: 1px solid var(--border-primary);
     border-radius: 24px 24px 24px 4px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 8px var(--shadow-secondary);
     margin-right: 10px;
   }
 
@@ -745,11 +912,11 @@ html {
     display: flex;
     align-items: center;
     padding: 14px 18px;
-    background: rgba(255, 255, 255, 0.12);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--bg-accent-hover);
+    border: 1px solid var(--border-primary);
     border-radius: 24px 24px 24px 4px;
     max-width: 70px;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    box-shadow: 0 2px 8px var(--shadow-secondary);
   }
 
   /* Agent workflow message styles */
@@ -836,7 +1003,7 @@ html {
   }
 
   /* Mobile fullscreen input container */
-  .pane.mobile-fullscreen .input-container {
+  .cupertino-pane-wrapper .pane.mobile-fullscreen .input-container {
     /* margin: 15px 20px 25px 20px !important; */
   }
 
@@ -926,10 +1093,6 @@ html {
     outline-offset: 3px;
   }
 
-
-  
-
-  
   .send-button:hover {
     background: linear-gradient(135deg, #ff1a7a 0%, #9448f0 50%, #4a92ff 100%);
     transform: scale(1.05) rotate(3deg);
@@ -980,17 +1143,27 @@ html {
   }
 
   .titles {
-    background: rgba(10, 10, 10, 0.85);
+    background: var(--bg-secondary);
     border-radius: 20px;
     padding: 25px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.5);
+    border: 1px solid var(--border-primary);
+    box-shadow: 0 4px 16px var(--shadow-primary);
+    transition: background 0.3s ease, border 0.3s ease, box-shadow 0.3s ease;
+  }
+  
+  /* Light theme: Enhanced background for better visibility */
+  :root[data-theme="light"] .titles {
+    background: rgba(255, 255, 255, 0.85);
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    box-shadow: 
+      0 4px 16px rgba(0, 0, 0, 0.08),
+      0 1px 3px rgba(0, 0, 0, 0.1);
   }
 
   .titles h1 {
     font-size: 42px;
     font-weight: 700;
-    background: linear-gradient(135deg, #ff006e 0%, #8338ec 30%, #3a86ff 60%, #ffffff 100%);
+    background: var(--accent-gradient);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -1002,12 +1175,22 @@ html {
   .titles h2.subtitle {
     font-size: 20px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--text-accent);
     margin-top: 0;
     margin-bottom: 0;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+  }
+  
+  /* Light theme: Remove text shadow for subtitle */
+  :root[data-theme="light"] .titles h2.subtitle {
+    text-shadow: none;
+  }
+  
+  /* Dark theme: Keep text shadow for subtitle */
+  :root[data-theme="dark"] .titles h2.subtitle,
+  :root:not([data-theme]) .titles h2.subtitle {
+    text-shadow: 0 2px 10px var(--shadow-primary);
   }
 
   .container-text {
@@ -1022,17 +1205,17 @@ html {
     width: 40px;
     height: 40px;
     margin-top: 5px;
-    background: linear-gradient(135deg, rgba(255, 0, 110, 0.2) 0%, rgba(131, 56, 236, 0.2) 100%);
+    background: var(--bg-accent);
     border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-primary);
   }
 
   .ai-icon {
     font-size: 24px;
-    filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.5));
+    filter: drop-shadow(0 2px 8px var(--shadow-primary));
   }
 
   .container-text .right {
@@ -1044,11 +1227,21 @@ html {
 
   .container-text .right small {
     margin-top: 0px;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--text-secondary);
     display: block;
     font-size: 14px;
     line-height: 20px;
-    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  }
+  
+  /* Light theme: Remove text shadow for small text */
+  :root[data-theme="light"] .container-text .right small {
+    text-shadow: none;
+  }
+  
+  /* Dark theme: Keep text shadow for small text */
+  :root[data-theme="dark"] .container-text .right small,
+  :root:not([data-theme]) .container-text .right small {
+    text-shadow: 0 1px 4px var(--shadow-primary);
   }
 
   @media (max-width: 480px) {
@@ -1106,6 +1299,11 @@ html {
   .voice-button:focus-visible {
     outline: 2px solid rgba(102, 126, 234, 0.5);
     outline-offset: 2px;
+  }
+
+  /* Light theme: Voice button focus override */
+  :root[data-theme="light"] .voice-button:focus-visible {
+    outline: 2px solid rgba(102, 126, 234, 0.6);
   }
 
   .voice-button:hover {
@@ -1484,49 +1682,68 @@ html {
 
   .powered-by-panes a {
     font-size: 10px;
-    color: rgba(255, 255, 255, 0.4);
+    color: var(--text-tertiary);
     text-decoration: none;
     font-weight: 400;
     letter-spacing: 0.3px;
     /* transition: all 0.2s ease; */
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
   }
 
   .powered-by-panes a:hover {
-    color: rgba(255, 255, 255, 0.7);
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+    color: var(--text-secondary);
     transform: translateY(-1px);
   }
 
   .powered-by-panes a:active {
     transform: translateY(0);
-    color: rgba(255, 255, 255, 0.6);
+    color: var(--text-tertiary);
   }
 
   /* Style the separator bullet */
   .powered-by-panes {
     font-size: 10px;
-    color: rgba(255, 255, 255, 0.3);
+    color: var(--text-tertiary);
     letter-spacing: 0.3px;
+  }
+  
+  /* Light theme: Remove text shadows for powered-by-panes */
+  :root[data-theme="light"] .powered-by-panes,
+  :root[data-theme="light"] .powered-by-panes a {
+    text-shadow: none;
+  }
+  
+  /* Dark theme: Keep text shadows for powered-by-panes */
+  :root[data-theme="dark"] .powered-by-panes,
+  :root:not([data-theme]) .powered-by-panes {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+  
+  :root[data-theme="dark"] .powered-by-panes a,
+  :root:not([data-theme]) .powered-by-panes a {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+  
+  :root[data-theme="dark"] .powered-by-panes a:hover,
+  :root:not([data-theme]) .powered-by-panes a:hover {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
   }
 
   /* Integrations section styles */
   .integrations-section {
     margin-top: 25px;
     padding-top: 20px;
-    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    border-top: 1px solid var(--border-primary);
   }
 
   .integrations-title {
     font-size: 16px;
     font-weight: 600;
-    color: rgba(255, 255, 255, 0.9);
+    color: var(--text-accent);
     margin: 0 0 15px 0;
     text-align: center;
     letter-spacing: 0.5px;
     text-transform: uppercase;
-    background: linear-gradient(135deg, #8338ec 0%, #3a86ff 100%);
+    background: var(--accent-gradient-alt);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
@@ -1545,8 +1762,8 @@ html {
     align-items: center;
     gap: 8px;
     padding: 12px 8px;
-    background: rgba(255, 255, 255, 0.05);
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: var(--bg-accent);
+    border: 1px solid var(--border-primary);
     border-radius: 12px;
     transition: all 0.3s ease;
     backdrop-filter: blur(5px);
@@ -1554,10 +1771,10 @@ html {
   }
 
   .integration-item:hover {
-    background: rgba(255, 255, 255, 0.08);
-    border-color: rgba(131, 56, 236, 0.3);
+    background: var(--bg-accent-hover);
+    border-color: var(--border-accent);
     transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(131, 56, 236, 0.2);
+    box-shadow: 0 4px 12px var(--shadow-secondary);
   }
 
   .integration-icon {
@@ -1567,15 +1784,15 @@ html {
     display: flex;
     align-items: center;
     justify-content: center;
-    background: linear-gradient(135deg, rgba(131, 56, 236, 0.2) 0%, rgba(58, 134, 255, 0.2) 100%);
+    background: var(--bg-accent-hover);
     border-radius: 8px;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 1px solid var(--border-primary);
   }
 
   .integration-name {
     font-size: 11px;
     font-weight: 500;
-    color: rgba(255, 255, 255, 0.8);
+    color: var(--text-secondary);
     text-align: center;
     letter-spacing: 0.3px;
     line-height: 1.2;
@@ -1583,10 +1800,20 @@ html {
 
   .integrations-description {
     font-size: 12px;
-    color: rgba(255, 255, 255, 0.7);
+    color: var(--text-secondary);
     text-align: center;
     line-height: 1.4;
     margin: 0;
+  }
+  
+  /* Light theme: Remove text shadow for integrations description */
+  :root[data-theme="light"] .integrations-description {
+    text-shadow: none;
+  }
+  
+  /* Dark theme: Keep text shadow for integrations description */
+  :root[data-theme="dark"] .integrations-description,
+  :root:not([data-theme]) .integrations-description {
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
   }
 

@@ -23,8 +23,9 @@ async function buildEntry(format, includeModules) {
   if (isESM) filename += `.esm`;
 
   // Bundle
-  new Promise(async(resolve, reject) => {
-    let bundle = await rollup.rollup({
+  return new Promise(async(resolve, reject) => {
+    try {
+      let bundle = await rollup.rollup({
       input: './src/index.ts',
       plugins: [
         replace({
@@ -38,7 +39,8 @@ async function buildEntry(format, includeModules) {
         }),
         typescript({
           useTsconfigDeclarationDir: true,
-          cacheRoot: process.cwd() + `/.rpt2_cache/${filename}`,
+          cacheRoot: process.cwd() + `/.rpt2_cache/shared`,
+          clean: isDev, // Clean cache in dev mode to prevent memory buildup
         })
       ],
     });
@@ -52,8 +54,8 @@ async function buildEntry(format, includeModules) {
       file: `./${outputDir}/${filename}.js`,
     });
 
-    // Build types only once
-    if (isESM) {
+    // Build types only in production mode to save memory
+    if (isESM && isProd) {
       let typings = await rollup.rollup({
         input: './src/public-api.ts',
         plugins: [
@@ -68,7 +70,8 @@ async function buildEntry(format, includeModules) {
     }
 
     if (isDev) {
-      return resolve();
+      resolve();
+      return;
     };
 
     const result = bundle.output[0];
@@ -89,7 +92,10 @@ async function buildEntry(format, includeModules) {
     await fs.writeFile(`./${outputDir}/${filename}.min.js`, code);
     await fs.writeFile(`./${outputDir}/${filename}.min.js.map`, map);
 
-    return resolve();
+    resolve();
+    } catch (error) {
+      reject(error);
+    }
   });
 }
 

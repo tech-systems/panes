@@ -85,7 +85,7 @@ declare class Events {
      * Touch End Event
      * @param t
      */
-    touchEndCb: (t: any) => void;
+    touchEndCb: (t: any) => Promise<void>;
     private touchEnd;
     /**
      * Click Event

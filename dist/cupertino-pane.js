@@ -545,70 +545,84 @@
         }
         touchEnd(t) {
             var _a, _b;
-            if (this.instance.disableDragEvents)
-                return;
-            // Cancel any pending animation frame
-            if (this.rafId) {
-                cancelAnimationFrame(this.rafId);
-                this.rafId = null;
-                // Apply any pending move data immediately before ending
-                if (this.pendingMoveData) {
-                    this.applyMoveUpdate();
+            return __awaiter(this, void 0, void 0, function* () {
+                if (this.instance.disableDragEvents)
+                    return;
+                // Cancel any pending animation frame
+                if (this.rafId) {
+                    cancelAnimationFrame(this.rafId);
+                    this.rafId = null;
+                    // Apply any pending move data immediately before ending
+                    if (this.pendingMoveData) {
+                        this.applyMoveUpdate();
+                    }
                 }
-            }
-            // Desktop fixes
-            if (t.type === 'mouseleave' && !this.mouseDown)
-                return;
-            if (t.type === 'mouseup' || t.type === 'mouseleave')
-                this.mouseDown = false;
-            // Determinate nearest point
-            let closest = this.breakpoints.getClosestBreakY();
-            // Swipe - next (if differ > 10)
-            let fastSwipeClose;
-            if (this.fastSwipeNext('Y')) {
-                closest = this.instance.swipeNextPoint(((_a = this.steps[this.steps.length - 1]) === null || _a === void 0 ? void 0 : _a.posY) - ((_b = this.steps[this.steps.length - 2]) === null || _b === void 0 ? void 0 : _b.posY), //diff
-                this.swipeNextSensivity, closest);
-                fastSwipeClose = this.settings.fastSwipeClose
-                    && this.breakpoints.currentBreakpoint < closest;
-            }
-            // update currentBreakpoint once `closest` is known so it's available in emitted events
-            this.breakpoints.currentBreakpoint = closest;
-            // blur tap event
-            let blurTapEvent = false;
-            if ((this.isFormElement(document.activeElement))
-                && !(this.isFormElement(t.target))
-                && this.steps.length === 2) {
-                blurTapEvent = true;
-            }
-            // Event emitter
-            this.instance.emit('onDragEnd', t);
-            // Clear
-            this.steps = [];
-            delete this.startPointOverTop;
-            // touchend with allowClick === tapped event (no move triggered)
-            // skip next functions
-            if (this.allowClick || blurTapEvent) {
-                return;
-            }
-            // Fast swipe toward bottom - close
-            if (fastSwipeClose) {
-                this.instance.destroy({ animate: true });
-                return;
-            }
-            this.instance.checkOpacityAttr(closest);
-            this.instance.checkOverflowAttr(closest);
-            this.instance.setGrabCursor(true, false);
-            // Bottom closable
-            if (this.settings.bottomClose
-                && closest === this.breakpoints.breaks['bottom']) {
-                this.instance.destroy({ animate: true });
-                return;
-            }
-            // Simulationiusly emit event when touchend exact with next position (top)
-            if (this.instance.getPanelTransformY() === closest) {
-                this.instance.emit('onTransitionEnd', { target: this.instance.paneEl });
-            }
-            this.transitions.doTransition({ type: 'end', translateY: closest });
+                // Desktop fixes
+                if (t.type === 'mouseleave' && !this.mouseDown)
+                    return;
+                if (t.type === 'mouseup' || t.type === 'mouseleave') {
+                    this.mouseDown = false;
+                    let buildedTransition = this.transitions.buildTransitionValue(false, this.settings.animationDuration);
+                    this.instance.paneEl.style.setProperty('transition', buildedTransition);
+                    // Hack trick to ensure transform styles are applied
+                    // Browser limitations, probably might be fixed in future
+                    // When linear transition changed to anything else e.g. 300ms ease,
+                    // When drag event followed by breakpoint event,
+                    // css property has no time to apply transition to paneEl 
+                    // it's browser bug / limitation. 
+                    yield new Promise(resolve => requestAnimationFrame(resolve));
+                    yield new Promise(resolve => requestAnimationFrame(resolve));
+                    yield new Promise(resolve => requestAnimationFrame(resolve));
+                }
+                // Determinate nearest point
+                let closest = this.breakpoints.getClosestBreakY();
+                // Swipe - next (if differ > 10)
+                let fastSwipeClose;
+                if (this.fastSwipeNext('Y')) {
+                    closest = this.instance.swipeNextPoint(((_a = this.steps[this.steps.length - 1]) === null || _a === void 0 ? void 0 : _a.posY) - ((_b = this.steps[this.steps.length - 2]) === null || _b === void 0 ? void 0 : _b.posY), //diff
+                    this.swipeNextSensivity, closest);
+                    fastSwipeClose = this.settings.fastSwipeClose
+                        && this.breakpoints.currentBreakpoint < closest;
+                }
+                // update currentBreakpoint once `closest` is known so it's available in emitted events
+                this.breakpoints.currentBreakpoint = closest;
+                // blur tap event
+                let blurTapEvent = false;
+                if ((this.isFormElement(document.activeElement))
+                    && !(this.isFormElement(t.target))
+                    && this.steps.length === 2) {
+                    blurTapEvent = true;
+                }
+                // Event emitter
+                this.instance.emit('onDragEnd', t);
+                // Clear
+                this.steps = [];
+                delete this.startPointOverTop;
+                // touchend with allowClick === tapped event (no move triggered)
+                // skip next functions
+                if (this.allowClick || blurTapEvent) {
+                    return;
+                }
+                // Fast swipe toward bottom - close
+                if (fastSwipeClose) {
+                    this.instance.destroy({ animate: true });
+                    return;
+                }
+                this.instance.checkOpacityAttr(closest);
+                this.instance.checkOverflowAttr(closest);
+                this.instance.setGrabCursor(true, false);
+                // Bottom closable
+                if (this.settings.bottomClose
+                    && closest === this.breakpoints.breaks['bottom']) {
+                    this.instance.destroy({ animate: true });
+                    return;
+                }
+                // Simulationiusly emit event when touchend exact with next position (top)
+                if (this.instance.getPanelTransformY() === closest) {
+                    this.instance.emit('onTransitionEnd', { target: this.instance.paneEl });
+                }
+                this.transitions.doTransition({ type: 'end', translateY: closest });
+            });
         }
         onScroll(t) {
             return __awaiter(this, void 0, void 0, function* () {

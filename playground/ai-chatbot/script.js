@@ -1,3 +1,39 @@
+// Theme management
+function initializeTheme() {
+  // Check for saved theme preference or default to 'dark'
+  const savedTheme = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', savedTheme);
+  updateThemeIcon();
+}
+
+function toggleTheme() {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+  
+  document.documentElement.setAttribute('data-theme', newTheme);
+  localStorage.setItem('theme', newTheme);
+  updateThemeIcon();
+  
+  // Add a subtle animation effect
+  const themeButton = document.getElementById('themeToggle');
+  if (themeButton) {
+    themeButton.style.transform = 'scale(1.2)';
+    setTimeout(() => {
+      themeButton.style.transform = '';
+    }, 150);
+  }
+}
+
+function updateThemeIcon() {
+  const currentTheme = document.documentElement.getAttribute('data-theme');
+  const themeIcon = document.getElementById('themeIcon');
+  
+  if (themeIcon) {
+    // The CSS will handle the icon content based on the data-theme attribute
+    themeIcon.setAttribute('aria-label', currentTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
+  }
+}
+
 // Function to determine if horizontal mode should be enabled
 function shouldEnableHorizontal() {
   const screenWidth = window.innerWidth;
@@ -131,6 +167,9 @@ let voiceRecordingOverlay = null;
 let messageInput = null;
 
 window.onload = async function () {
+  // Initialize theme before anything else
+  initializeTheme();
+  
   // Set random assistant on load
   setRandomAssistant();
   

@@ -438,7 +438,7 @@ export class Events {
    * @param t 
    */
   public touchEndCb = (t) => this.touchEnd(t);
-  private touchEnd(t) {
+  private async touchEnd(t) {
     if (this.instance.disableDragEvents) return;
 
     // Cancel any pending animation frame
@@ -454,7 +454,22 @@ export class Events {
 
     // Desktop fixes
     if (t.type === 'mouseleave' && !this.mouseDown) return;
-    if (t.type === 'mouseup' || t.type === 'mouseleave') this.mouseDown = false;
+    if (t.type === 'mouseup' || t.type === 'mouseleave') {
+      this.mouseDown = false;
+
+      let buildedTransition = this.transitions.buildTransitionValue(false, this.settings.animationDuration);
+      this.instance.paneEl.style.setProperty('transition', buildedTransition);
+
+     // Hack trick to ensure transform styles are applied
+     // Browser limitations, probably might be fixed in future
+     // When linear transition changed to anything else e.g. 300ms ease,
+     // When drag event followed by breakpoint event,
+     // css property has no time to apply transition to paneEl 
+     // it's browser bug / limitation. 
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      await new Promise(resolve => requestAnimationFrame(resolve));
+      await new Promise(resolve => requestAnimationFrame(resolve));
+    }
 
     // Determinate nearest point
     let closest = this.breakpoints.getClosestBreakY();

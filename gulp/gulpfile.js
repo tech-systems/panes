@@ -12,9 +12,11 @@ const buildModules = require('./build-modules.js');
 
 // js bundle
 gulp.task('js', (cb) => {
-  buildBundle(cb);
-
-  if (env === 'production') {
+  // In development mode, only build main bundle to save memory
+  if (env === 'development') {
+    buildBundle(cb);
+  } else {
+    buildBundle(cb);
     buildCore(cb);
     buildModules(cb);
   }
@@ -46,8 +48,28 @@ gulp.task('prod-source-sourcemap-fix-paths', (cb) => {
 
 gulp.task('build', gulp.series(['js', 'prod-source-sourcemap-fix-paths']));
 
+// Debounced watch to prevent memory spikes from rapid rebuilds
+let watchTimeout;
+let reloadTimeout;
+
 gulp.task('watch', () => {
-  gulp.watch('./src/**/**/*.ts', gulp.series('js'));
+  // Watch TypeScript source files - triggers build + reload
+  gulp.watch('./src/**/**/*.ts', (cb) => {
+    clearTimeout(watchTimeout);
+    watchTimeout = setTimeout(() => {
+      gulp.series('js')(cb);
+    }, 300); // 300ms debounce
+  });
+
+  // Watch playground files - triggers reload only (no build needed)
+  gulp.watch(['./playground/**/*.html', './playground/**/*.css', './playground/**/*.js'], (cb) => {
+    clearTimeout(reloadTimeout);
+    reloadTimeout = setTimeout(() => {
+      gulp.src('./playground/**/*')
+        .pipe(connect.reload());
+      cb();
+    }, 100); // 100ms debounce for faster playground updates
+  });
 });
 
 gulp.task('connect', () => {
@@ -61,6 +83,21 @@ gulp.task('connect', () => {
 
 gulp.task('open', () => {
   gulp.src('./playground/index.html').pipe(gopen({ uri: 'http://localhost:3000/playground/' }));
+});
+
+// Memory cleanup task
+gulp.task('cleanup', (cb) => {
+  const rimraf = require('rimraf');
+  rimraf('.rpt2_cache', cb);
+});
+
+// Force garbage collection if available
+gulp.task('gc', (cb) => {
+  if (global.gc) {
+    global.gc();
+    console.log('Garbage collection triggered');
+  }
+  cb();
 });
 
 gulp.task('server', gulp.parallel(['watch', 'connect', 'open']));
