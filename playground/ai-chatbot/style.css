@@ -737,6 +737,7 @@ html {
     position: relative;
     padding-left: 20px;
     padding-right: 20px;
+    border-bottom: 1px solid transparent;
   }
 
   .cupertino-pane-wrapper .pane.scrolled .chat-header {
@@ -998,7 +999,8 @@ html {
     align-items: center;
     margin: 20px;
     position: relative;
-    background: rgba(25, 25, 27, 0.98);
+    /* background: rgba(25, 25, 27, 0.98); */
+    border-radius: 20px;
   }
 
   /* Mobile fullscreen input container */
@@ -1016,7 +1018,7 @@ html {
     content: "";
     position: absolute;
     pointer-events: none;
-    inset: -1px;
+    inset: -2px;
     border-radius: calc(var(--border-radius) + 1px);
     background: -webkit-linear-gradient(135deg, #ff006e 0, #8338ec 8%, #3a86ff 17%, #667eea 25%, #764ba2 33%, #ffffff 34%, #ffffff 40%, rgba(255, 255, 255, 0.2) 45%, rgba(255, 255, 255, 0.1) 100%);
     background: linear-gradient(-45deg, #ff006e 0, #8338ec 8%, #3a86ff 17%, #667eea 25%, #764ba2 33%, #ffffff 34%, #ffffff 40%, rgba(255, 255, 255, 0.2) 45%, rgba(255, 255, 255, 0.1) 100%);
@@ -1038,7 +1040,7 @@ html {
   .message-input {
     width: 100%;
     background: rgb(28, 28, 29);
-    border: 1px solid rgba(255, 255, 255, 0.2);
+    /* border: 1px solid rgba(255, 255, 255, 0.2); */
     border-radius: var(--border-radius);
     padding: 12px 15px 12px 50px;
     color: #ffffff;
