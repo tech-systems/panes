@@ -223,7 +223,7 @@ export class Events {
         && !this.isDraggableElement(t)) {
       this.startY += this.contentScrollTop;
     }
-    
+
     this.steps.push({posY: this.startY, posX: this.startX, time: Date.now()});
   }
 
@@ -262,12 +262,14 @@ export class Events {
         && this.isElementScrollable(t.target)) {
       return;
     }
- 
+
     if (this.instance.disableDragEvents) {
       this.steps = [];
       return;
     }
+
     if (this.disableDragAngle) return;
+
     if (this.instance.preventedDismiss) return;
 
     if (this.settings.touchMoveStopPropagation) {
@@ -474,9 +476,10 @@ export class Events {
     // Determinate nearest point
     let closest = this.breakpoints.getClosestBreakY();
 
-    // Swipe - next (if differ > 10)
+    // Swipe - next (if differ > 10) — only when there was an actual drag
     let fastSwipeClose;
-    if (this.fastSwipeNext('Y')) {
+    const hadDrag = !this.allowClick && this.steps.length >= 2;
+    if (hadDrag && this.fastSwipeNext('Y')) {
       closest = this.instance.swipeNextPoint(
         this.steps[this.steps.length - 1]?.posY - this.steps[this.steps.length - 2]?.posY, //diff
         this.swipeNextSensivity, 
@@ -487,7 +490,9 @@ export class Events {
     }
     
     // update currentBreakpoint once `closest` is known so it's available in emitted events
-    this.breakpoints.currentBreakpoint = closest;
+    if (hadDrag) {
+      this.breakpoints.currentBreakpoint = closest;
+    }
 
     // blur tap event
     let blurTapEvent = false;
@@ -597,7 +602,15 @@ export class Events {
   }
 
   public fastSwipeNext(axis: 'Y' | 'X'): boolean {
-    const diff = this.steps[this.steps.length - 1]?.['pos' + axis] - this.steps[this.steps.length - 2]?.['pos' + axis];
+    // Only consider fast swipe when an actual drag occurred
+    if (this.allowClick) return false;
+    if (this.steps.length < 2) return false;
+
+    const last = this.steps[this.steps.length - 1];
+    const prev = this.steps[this.steps.length - 2];
+    const diff = (last?.['pos' + axis] ?? 0) - (prev?.['pos' + axis] ?? 0);
+    if (!Number.isFinite(diff)) return false;
+
     return (Math.abs(diff) >= this.swipeNextSensivity);
   }
 

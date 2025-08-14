@@ -335,22 +335,28 @@
         touchStart(t) {
             // Event emitter
             this.instance.emit('onDragStart', t);
+            console.log('[SCENE] touchStart 1');
             // Cancel any pending animation frame
             if (this.rafId) {
                 cancelAnimationFrame(this.rafId);
                 this.rafId = null;
                 this.pendingMoveData = null;
             }
+            console.log('[SCENE] touchStart 2');
             // Allow clicks by default -> disallow on move (allow click with disabled drag)
             this.allowClick = true;
+            console.log('[SCENE] touchStart 3');
             if (this.instance.disableDragEvents)
                 return;
             // Allow touch angle by default, disallow no move with condition
             this.disableDragAngle = false;
+            console.log('[SCENE] touchStart 4');
             // Not scrolling event by default -> on scroll will true
             this.isScrolling = false;
+            console.log('[SCENE] touchStart 5');
             // Allow pereventDismiss by default
             this.instance.preventedDismiss = false;
+            console.log('[SCENE] touchStart 6');
             /**
              * TODO: Switch to pointer events
              */
@@ -358,10 +364,13 @@
             if (!clientY || !clientX) {
                 return;
             }
+            console.log('[SCENE] touchStart 7');
             this.startY = clientY;
             this.startX = clientX;
+            console.log('[SCENE] touchStart 8');
             if (t.type === 'mousedown')
                 this.mouseDown = true;
+            console.log('[SCENE] touchStart 9');
             // if overflow content was scrolled
             // and drag not by draggable
             // increase to scrolled value
@@ -370,10 +379,12 @@
                 && !this.isDraggableElement(t)) {
                 this.startY += this.contentScrollTop;
             }
+            console.log('[SCENE] touchStart 10');
             this.steps.push({ posY: this.startY, posX: this.startX, time: Date.now() });
         }
         touchMove(t) {
             var _a, _b;
+            console.log('[SCENE] touchMove 1');
             /**
              * TODO: Switch to pointer events
              */
@@ -381,34 +392,43 @@
             if (!clientY || !clientX) {
                 return;
             }
+            console.log('[SCENE] touchMove 2');
             // Deskop: check that touchStart() was initiated
             if (t.type === 'mousemove' && !this.mouseDown)
                 return;
+            console.log('[SCENE] touchMove 3');
             // sometimes touchstart is not called 
             // when touchmove is began before initialization
             if (!this.steps.length) {
                 this.steps.push({ posY: clientY, posX: clientX, time: Date.now() });
             }
+            console.log('[SCENE] touchMove 4');
             // Event emitter
             t.delta = ((_a = this.steps[0]) === null || _a === void 0 ? void 0 : _a.posY) - clientY;
+            console.log('[SCENE] touchMove 5');
             // Disallow accidentaly clicks while slide gestures
             this.allowClick = false;
+            console.log('[SCENE] touchMove 6');
             // textarea scrollbar
             if (this.isFormElement(t.target)
                 && this.isElementScrollable(t.target)) {
                 return;
             }
+            console.log('[SCENE] touchMove 7');
             if (this.instance.disableDragEvents) {
                 this.steps = [];
                 return;
             }
+            console.log('[SCENE] touchMove 8');
             if (this.disableDragAngle)
                 return;
+            console.log('[SCENE] touchMove 9');
             if (this.instance.preventedDismiss)
                 return;
             if (this.settings.touchMoveStopPropagation) {
                 t.stopPropagation();
             }
+            console.log('[SCENE] touchMove 10');
             // Block drag when scroll at initial position based on scrollZeroDragBottom setting
             if (this.contentScrollTop === 0
                 && this.instance.overflowEl.style.overflowY === 'auto'
@@ -424,20 +444,25 @@
                     return; // Block upward movement only
                 }
             }
+            console.log('[SCENE] touchMove 11');
             // Delta
             const diffY = clientY - this.steps[this.steps.length - 1].posY;
             const diffX = clientX - this.steps[this.steps.length - 1].posX;
+            console.log('[SCENE] touchMove 12');
             // No Y/X changes
             if (!Math.abs(diffY)
                 && !Math.abs(diffX)) {
                 return;
             }
+            console.log('[SCENE] touchMove 13');
             // Emit event
             this.instance.emit('onDrag', t);
+            console.log('[SCENE] touchMove 14');
             // Has changes in position 
             this.instance.setGrabCursor(true, true);
             let newVal = this.instance.getPanelTransformY() + diffY;
             let newValX = this.instance.getPanelTransformX() + diffX;
+            console.log('[SCENE] touchMove 15');
             // First event after touchmove only
             if (this.steps.length < 2) {
                 // Patch for 'touchmove' first event 
@@ -452,6 +477,7 @@
                     newVal += transitionYDiff;
                 }
             }
+            console.log('[SCENE] touchMove 16');
             // Detect if input was blured
             // TODO: Check that blured from pane child instance
             if (this.steps.length > 2) {
@@ -461,6 +487,7 @@
                     this.keyboardEvents.inputBluredbyMove = true;
                 }
             }
+            console.log('[SCENE] touchMove 17');
             // Touch angle
             // Only for initial gesture with 1 touchstart step
             // Only not for scrolling events (scrolling already checked for angle)
@@ -477,6 +504,7 @@
                     return;
                 }
             }
+            console.log('[SCENE] touchMove 18');
             // Not allow move panel with positive overflow scroll
             // Scroll handler
             if (this.instance.overflowEl.style.overflowY === 'auto'
@@ -484,6 +512,7 @@
                 && !this.isDraggableElement(t)) {
                 return;
             }
+            console.log('[SCENE] touchMove 19');
             // Handle Superposition
             let forceNewVal = this.handleSuperposition({
                 clientX, clientY, newVal,
@@ -498,11 +527,13 @@
             if (forceNewVal === false) {
                 return;
             }
+            console.log('[SCENE] touchMove 20');
             // No changes Y/X
             if (this.instance.getPanelTransformY() === newVal
                 && this.instance.getPanelTransformX() === newValX) {
                 return;
             }
+            console.log('[SCENE] touchMove 21');
             // Prevent Dismiss gesture
             if (!this.instance.preventedDismiss
                 && this.instance.preventDismissEvent && this.settings.bottomClose) {
@@ -517,12 +548,15 @@
                     return;
                 }
             }
+            console.log('[SCENE] touchMove 22');
             // Store the pending move data for requestAnimationFrame
             this.pendingMoveData = { newVal, newValX, clientY, clientX };
+            console.log('[SCENE] touchMove 23');
             // Request animation frame if not already pending
             if (!this.rafId) {
                 this.rafId = requestAnimationFrame(() => this.applyMoveUpdate());
             }
+            console.log('[SCENE] touchMove 24');
             this.steps.push({ posY: clientY, posX: clientX, time: Date.now() });
         }
         /**
@@ -576,16 +610,19 @@
                 }
                 // Determinate nearest point
                 let closest = this.breakpoints.getClosestBreakY();
-                // Swipe - next (if differ > 10)
+                // Swipe - next (if differ > 10) — only when there was an actual drag
                 let fastSwipeClose;
-                if (this.fastSwipeNext('Y')) {
+                const hadDrag = !this.allowClick && this.steps.length >= 2;
+                if (hadDrag && this.fastSwipeNext('Y')) {
                     closest = this.instance.swipeNextPoint(((_a = this.steps[this.steps.length - 1]) === null || _a === void 0 ? void 0 : _a.posY) - ((_b = this.steps[this.steps.length - 2]) === null || _b === void 0 ? void 0 : _b.posY), //diff
                     this.swipeNextSensivity, closest);
                     fastSwipeClose = this.settings.fastSwipeClose
                         && this.breakpoints.currentBreakpoint < closest;
                 }
                 // update currentBreakpoint once `closest` is known so it's available in emitted events
-                this.breakpoints.currentBreakpoint = closest;
+                if (hadDrag) {
+                    this.breakpoints.currentBreakpoint = closest;
+                }
                 // blur tap event
                 let blurTapEvent = false;
                 if ((this.isFormElement(document.activeElement))
@@ -638,15 +675,18 @@
             });
         }
         onClick(t) {
+            console.log('[SCENE] click');
             // Prevent accidental unwanted clicks events during swiping
             if (!this.allowClick) {
                 if (this.settings.preventClicks) {
                     t.preventDefault();
                     t.stopPropagation();
                     t.stopImmediatePropagation();
+                    console.log('[SCENE] click prevent');
                 }
                 return;
             }
+            console.log('[SCENE] click allow');
             // Android Multiple Re-focus on PWA
             // with resize keyboard handler
             if (!this.device.cordova
@@ -655,6 +695,7 @@
                 this.keyboardEvents.onKeyboardShowCb({ keyboardHeight: this.instance.screen_height - window.innerHeight });
                 return;
             }
+            console.log('[SCENE] click allow');
             // Click to bottom - open middle
             if (this.settings.clickBottomOpen) {
                 if (this.isFormElement(document.activeElement)) {
@@ -668,13 +709,23 @@
                     if (this.settings.breaks['middle'].enabled) {
                         closest = 'middle';
                     }
+                    console.log('[SCENE] click bottom open moveToBreak', closest);
                     this.instance.moveToBreak(closest);
                 }
             }
         }
         fastSwipeNext(axis) {
             var _a, _b;
-            const diff = ((_a = this.steps[this.steps.length - 1]) === null || _a === void 0 ? void 0 : _a['pos' + axis]) - ((_b = this.steps[this.steps.length - 2]) === null || _b === void 0 ? void 0 : _b['pos' + axis]);
+            // Only consider fast swipe when an actual drag occurred
+            if (this.allowClick)
+                return false;
+            if (this.steps.length < 2)
+                return false;
+            const last = this.steps[this.steps.length - 1];
+            const prev = this.steps[this.steps.length - 2];
+            const diff = ((_a = last === null || last === void 0 ? void 0 : last['pos' + axis]) !== null && _a !== void 0 ? _a : 0) - ((_b = prev === null || prev === void 0 ? void 0 : prev['pos' + axis]) !== null && _b !== void 0 ? _b : 0);
+            if (!Number.isFinite(diff))
+                return false;
             return (Math.abs(diff) >= this.swipeNextSensivity);
         }
         /**
@@ -2938,4 +2989,3 @@
     return CupertinoPane;
 
 }));
-//# sourceMappingURL=cupertino-pane.js.map
