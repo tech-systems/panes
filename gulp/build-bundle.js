@@ -25,6 +25,8 @@ async function buildEntry(format, includeModules) {
   // Bundle
   return new Promise(async(resolve, reject) => {
     try {
+      const cacheRoot = process.cwd() + `/.rpt2_cache/${isUMD ? 'umd' : 'esm'}`;
+      await fs.ensureDir(cacheRoot);
       let bundle = await rollup.rollup({
       input: './src/index.ts',
       plugins: [
@@ -39,7 +41,7 @@ async function buildEntry(format, includeModules) {
         }),
         typescript({
           useTsconfigDeclarationDir: true,
-          cacheRoot: process.cwd() + `/.rpt2_cache/shared`,
+          cacheRoot,
           clean: isDev, // Clean cache in dev mode to prevent memory buildup
         })
       ],

@@ -11,19 +11,21 @@ const buildCore = require('./build-core.js');
 const buildModules = require('./build-modules.js');
 
 // js bundle
-gulp.task('js', (cb) => {
-  // In development mode, only build main bundle to save memory
-  if (env === 'development') {
-    buildBundle(cb);
-  } else {
-    buildBundle(cb);
-    buildCore(cb);
-    buildModules(cb);
-  }
+gulp.task('js', () => {
+  // Ensure builds run in sequence and avoid shared cache contention
+  const runBuilds = () => {
+    if (env === 'development') {
+      return buildBundle();
+    }
+    return buildBundle()
+      .then(() => buildCore())
+      .then(() => buildModules());
+  };
 
-  return gulp
-    .src('./src/**/*.ts')
-    .pipe(connect.reload());
+  return runBuilds().then(() =>
+    gulp.src('./src/**/*.ts')
+      .pipe(connect.reload())
+  );
 });
 
 // in prod builds, adjust sourcemap paths to actual src location

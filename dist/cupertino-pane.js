@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: July 19, 2025
+ * Released on: August 14, 2025
  */
 
 (function (global, factory) {
@@ -2938,3 +2938,4 @@
     return CupertinoPane;
 
 }));
+//# sourceMappingURL=cupertino-pane.js.map

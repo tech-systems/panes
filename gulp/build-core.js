@@ -20,6 +20,8 @@ async function buildEntry(format) {
   // Bundle
   return new Promise(async(resolve, reject) => {
     try {
+      const cacheRoot = process.cwd() + `/.rpt2_cache/core`;
+      await fs.ensureDir(cacheRoot);
       let bundle = await rollup.rollup({
         input: './src/index.ts',
         plugins: [
@@ -32,7 +34,7 @@ async function buildEntry(format) {
           }),
                   typescript({
           useTsconfigDeclarationDir: true,
-          cacheRoot: process.cwd() + `/.rpt2_cache/shared`,
+          cacheRoot,
           clean: env === 'development',
         })
         ],
