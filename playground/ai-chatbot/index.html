@@ -48,8 +48,10 @@
     </div>
   </div>
   
-  <div class="robot-collapsed" id="robotCollapsed" onclick="expandChat()">
-    <span>🤖</span>
+  <div class="robot-collapsed" id="robotCollapsed" onclick="toggleRobotButton()" aria-label="Toggle chat">
+    <span>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path></svg>
+    </span>
   </div>
 
   <div class="app-container">
@@ -66,8 +68,10 @@
             <button class="pane-header-btn pane-maximize-btn" onclick="toggleMaximize()" title="Maximize/Minimize">
               <span class="icon-expand" id="maximizeIcon"></span>
             </button>
-            <button class="pane-header-btn pane-minimize-btn" onclick="collapseChat()" title="Minimize">
-              <span class="icon-minimize"></span>
+            <button class="pane-header-btn pane-minimize-btn" title="Minimize" aria-label="Minimize">
+              <span class="minimize-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path></svg>
+              </span>
             </button>
           </div>
         </div>

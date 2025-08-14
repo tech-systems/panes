@@ -1,3 +1,21 @@
+/* =================================
+   AI CHATBOT DEMO - STYLESHEET
+   =================================
+   This CSS file provides styling for the AI Chatbot demo that showcases
+   the Cupertino Pane library with a modern, feature-rich chat interface.
+   
+   Features include:
+   - Dark/Light theme switching
+   - Voice recording capabilities
+   - Responsive design for mobile and desktop
+   - Smooth animations and transitions
+   - Integration with Cupertino Pane library
+   - Modern UI with gradient accents
+*/
+
+/* =================================
+   RESET & BASE STYLES
+   ================================= */
 /* CSS Reset and Normalization */
 *, *::before, *::after {
   box-sizing: border-box;
@@ -8,7 +26,11 @@
   padding: 0;
 }
 
-/* CSS Variables for theming */
+/* =================================
+   CSS VARIABLES FOR THEMING
+   =================================
+   CSS custom properties for consistent theming across light and dark modes.
+   Variables are organized by category for easy maintenance. */
 :root {
   /* Dark theme (default) */
   --bg-primary: linear-gradient(180deg, #0a0a0a 0%, #1a0a2e 100%);
@@ -48,7 +70,11 @@
   --focus-outline: rgba(131, 56, 236, 0.5);
 }
 
-/* Light theme */
+/* =================================
+   LIGHT THEME OVERRIDES
+   =================================
+   Override CSS variables for light mode theme. These provide a clean,
+   accessible light alternative to the default dark theme. */
 :root[data-theme="light"] {
   --bg-primary: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
   --bg-secondary: rgba(255, 255, 255, 0.95);
@@ -121,6 +147,10 @@
   border-color: rgba(131, 56, 236, 0.4);
 }
 
+/* =================================
+   HTML & BODY BASE STYLES
+   =================================
+   Base typography and layout styles for the document. */
 html {
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
   -webkit-font-smoothing: antialiased;
@@ -154,6 +184,10 @@ body {
   font-family: inherit;
 }
 
+/* =================================
+   IONIC REPLACEMENT STYLES
+   =================================
+   Styles that replace default Ionic components for custom implementation. */
 /* Replace ion-app */
 .app-container {
   display: flex;
@@ -172,6 +206,10 @@ body {
   background: transparent;
 }
 
+/* =================================
+   FORM ELEMENT RESETS
+   =================================
+   Remove default browser styling from buttons and inputs for consistent appearance. */
 /* Button reset */
 button {
   font-family: inherit;
@@ -190,6 +228,11 @@ input {
   background: transparent;
 }
 
+/* =================================
+   ICON STYLES
+   =================================
+   CSS-based icons to replace ion-icons. Provides consistent iconography
+   without requiring external icon libraries. */
 /* Icon styles - CSS-based icons to replace ion-icons */
 .icon-refresh::before {
   content: "↻";
@@ -222,13 +265,35 @@ input {
 
 .icon-send::before {
   content: "";
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
   display: block;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' class='ionicon' viewBox='0 0 512 512'%3E%3Cpath d='M53.12 199.94l400-151.39a8 8 0 0110.33 10.33l-151.39 400a8 8 0 01-15-.34l-67.4-166.09a16 16 0 00-10.11-10.11L53.46 215a8 8 0 01-.34-15.06zM460 52L227 285' fill='none' stroke='%23ffffff' stroke-linecap='round' stroke-linejoin='round' stroke-width='32'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14'/%3E%3Cpath d='M12 5l7 7-7 7'/%3E%3C/svg%3E");
   background-size: contain;
   background-repeat: no-repeat;
   background-position: center;
+}
+
+/* Position context for layered arrow effect */
+.icon-send {
+  position: relative;
+}
+
+/* Ghost trail for futuristic look */
+.icon-send::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 22px;
+  height: 22px;
+  transform: translate(-50%, -50%) translateX(-3px) scale(0.96);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14'/%3E%3Cpath d='M12 5l7 7-7 7'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.35;
+  transition: transform 0.2s ease, opacity 0.2s ease;
 }
 
 .icon-theme::before {
@@ -257,6 +322,22 @@ input {
 /* Ensure send button icon is always white */
 .send-button .icon-send::before {
   filter: brightness(0) invert(1); /* Make SVG white regardless of original color */
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.send-button .icon-send::after {
+  filter: brightness(0) invert(1);
+}
+
+/* Futuristic hover motion and glow */
+.send-button:hover .icon-send::before {
+  transform: translateX(1px);
+  filter: brightness(0) invert(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 8px rgba(131, 56, 236, 0.5));
+}
+
+.send-button:hover .icon-send::after {
+  transform: translate(-50%, -50%) translateX(-1px) scale(0.98);
+  opacity: 0;
 }
 
 /* Alternative SVG-style icons (uncomment if you prefer these) */
@@ -336,6 +417,10 @@ input {
   height: 100%;
 }
 
+/* =================================
+   TYPOGRAPHY
+   =================================
+   Typography improvements and text styling. */
 /* Typography improvements */
 h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
@@ -346,6 +431,10 @@ p {
   line-height: 1.5;
 }
 
+/* =================================
+   ACCESSIBILITY & INTERACTION
+   =================================
+   Focus styles and selection colors for improved accessibility. */
 /* Improved focus styles */
 button:focus-visible,
 input:focus-visible {
@@ -364,6 +453,10 @@ html {
   color: var(--text-primary);
 }
 
+/* =================================
+   BACKGROUND EFFECTS
+   =================================
+   Synthwave grid background and animated effects for visual appeal. */
   .synthwave-grid {
     position: fixed;
     top: 0;
@@ -399,6 +492,11 @@ html {
     100% { background-position: 0% 50%; }
   }
 
+/* =================================
+   ROBOT COLLAPSED BUTTON
+   =================================
+   Floating robot button that appears when chat is collapsed.
+   Provides quick access to the chat interface. */
   .robot-collapsed {
     position: fixed;
     bottom: 30px;
@@ -412,7 +510,7 @@ html {
     justify-content: center;
     font-size: 28px;
     cursor: pointer;
-    z-index: 1000;
+    z-index: 10000;
     border: 1px solid var(--border-primary);
     box-shadow: 0 4px 12px var(--shadow-primary);
     opacity: 0;
@@ -456,6 +554,21 @@ html {
     pointer-events: none;
   }
   
+  .robot-collapsed svg {
+    display: block;
+    pointer-events: none;
+    width: 20px;
+    height: 20px;
+  }
+  
+  .robot-collapsed.minimized svg {
+    margin-top: 0px;
+  }
+  
+  .robot-collapsed.maximized svg {
+    margin-top: 3px;
+  }
+
   /* Light theme: Simplified robot icon styling */
   :root[data-theme="light"] .robot-collapsed span {
     text-shadow: none;
@@ -483,8 +596,6 @@ html {
       drop-shadow(0 -1px 1px rgba(255, 255, 255, 0.2));
   }
 
-
-
   .robot-collapsed.hidden {
     opacity: 0;
     pointer-events: none;
@@ -492,6 +603,11 @@ html {
     filter: blur(5px);
   }
 
+/* =================================
+   CUPERTINO PANE INTEGRATION
+   =================================
+   Styles for integrating with the Cupertino Pane library.
+   These styles override library defaults to match our custom theme. */
   /* Use library's CSS variables instead of direct overrides */
   .cupertino-pane-wrapper .pane {
     width: auto !important;
@@ -653,20 +769,25 @@ html {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: all 0.2s ease;
     font-size: 16px;
     outline: none;
     flex-shrink: 0;
   }
 
+  /* Smaller chevron icon for header minimize button */
+  .pane-header-btn.pane-minimize-btn .minimize-icon svg {
+    width: 16px;
+    height: 16px;
+    margin-top: 5px;
+  }
+
   .pane-header-btn:hover {
     background: var(--bg-accent-hover);
     color: var(--text-accent);
-    transform: scale(1.05);
   }
 
   .pane-header-btn:active {
-    transform: scale(0.95);
+    background: var(--bg-accent-active);
   }
 
   .pane-header-btn ion-icon {
@@ -687,6 +808,10 @@ html {
     color: var(--accent-tertiary);
   }
 
+/* =================================
+   CHAT CONTAINER
+   =================================
+   Main chat interface container with responsive sizing. */
   .chat-container {
     display: block;
     margin-top:0;
@@ -731,6 +856,10 @@ html {
     overflow-y: auto !important;
   }
 
+/* =================================
+   CHAT HEADER
+   =================================
+   Chat header with avatar, title, and subtitle. */
   .chat-header {
     text-align: left;
     padding-bottom: 20px;
@@ -824,6 +953,10 @@ html {
     line-height: 1.2;
   }
 
+/* =================================
+   CHAT MESSAGES
+   =================================
+   Message display area with custom scrollbar and message styling. */
   .chat-messages {
     /* height: calc(100% - 120px); */
     max-height: 50vh; /* 2/3 of screen height */
@@ -993,6 +1126,10 @@ html {
     }
   }
 
+/* =================================
+   INPUT CONTAINER
+   =================================
+   Message input area with voice recording and send button. */
   .input-container {
     display: flex;
     gap: 10px;
@@ -1004,9 +1141,7 @@ html {
   }
 
   /* Mobile fullscreen input container */
-  .cupertino-pane-wrapper .pane.mobile-fullscreen .input-container {
-    /* margin: 15px 20px 25px 20px !important; */
-  }
+  /* Removed empty ruleset to satisfy linter */
 
   .input-wrapper {
     flex: 1;
@@ -1126,6 +1261,10 @@ html {
     --background: transparent;
   }
 
+/* =================================
+   TOP CONTENT SECTION
+   =================================
+   Hero section with titles and description at the top of the page. */
   /* Top content section */
   .top-content {
     position: absolute;
@@ -1268,6 +1407,10 @@ html {
     }
   }
 
+/* =================================
+   VOICE RECORDING
+   =================================
+   Voice recording functionality with visual feedback and overlays. */
   /* Voice recording button styles - positioned inside input */
   .voice-button {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -1330,8 +1473,6 @@ html {
     background: linear-gradient(135deg, #ff006e 0%, #dc2626 100%);
     box-shadow: 0 2px 8px rgba(255, 0, 110, 0.3);
   }
-
-
 
   /* Voice status indicator */
   .voice-status {
@@ -1667,6 +1808,10 @@ html {
     }
   }
 
+/* =================================
+   FOOTER & BRANDING
+   =================================
+   Powered by Panes link and attribution section. */
   /* Powered by Panes link */
   .powered-by-panes {
     position: relative;
@@ -1728,6 +1873,10 @@ html {
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
   }
 
+/* =================================
+   INTEGRATIONS SECTION
+   =================================
+   Section showcasing platform integrations with AI services. */
   /* Integrations section styles */
   .integrations-section {
     margin-top: 25px;

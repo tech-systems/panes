@@ -80,6 +80,10 @@ function getPaneConfig() {
   return config;
 }
 
+document.querySelector('.pane-header-btn.pane-minimize-btn').addEventListener('click', async () => {
+  await collapseChat();
+});
+
 // Initialize pane with responsive configuration
 let chatPane = new CupertinoPane('chat-pane', getPaneConfig());
 
@@ -109,6 +113,59 @@ const aiResponses = [
 
 let messageCount = 0;
 
+// UI sounds: only hover and final-message (local preferred with remote fallback)
+const SOUND_SOURCES = {
+  hover: {
+    local: 'sounds/ui-hover.mp3',
+    remote: 'https://assets.mixkit.co/sfx/preview/mixkit-select-click-1109.mp3'
+  },
+  final: {
+    local: 'sounds/ui-final-message.mp3',
+    remote: 'https://assets.mixkit.co/sfx/preview/mixkit-long-pop-2358.mp3'
+  }
+};
+
+let hoverSound = null;
+let finalSound = null;
+
+function createAudioWithFallback(source, volume = 0.26) {
+  const audio = new Audio();
+  audio.preload = 'auto';
+  audio.volume = volume;
+  audio.src = source.local;
+  audio.onerror = () => {
+    audio.src = source.remote;
+    audio.load();
+  };
+  return audio;
+}
+
+function initUiSounds() {
+  hoverSound = createAudioWithFallback(SOUND_SOURCES.hover, 0.18);
+  finalSound = createAudioWithFallback(SOUND_SOURCES.final, 0.24);
+
+  // Unlock audio on first user interaction (Safari/iOS policies)
+  const unlock = () => {
+    [hoverSound, finalSound].forEach(a => {
+      try {
+        a.play().then(() => { a.pause(); a.currentTime = 0; }).catch(() => {});
+      } catch (e) {}
+    });
+    window.removeEventListener('touchstart', unlock);
+    window.removeEventListener('click', unlock, true);
+  };
+  window.addEventListener('touchstart', unlock, { once: true, passive: true });
+  window.addEventListener('click', unlock, { once: true, capture: true });
+}
+
+function playSound(audio) {
+  if (!audio) return;
+  try {
+    audio.currentTime = 0;
+    audio.play();
+  } catch (e) {}
+}
+
 // Function to get current assistant
 function getCurrentAssistant() {
   return assistants[currentAssistantIndex];
@@ -130,11 +187,7 @@ function setRandomAssistant() {
 function updateAssistantDisplay() {
   const assistant = getCurrentAssistant();
   
-  // Update robot collapsed icon
-  const robotCollapsed = document.getElementById('robotCollapsed');
-  if (robotCollapsed) {
-    robotCollapsed.innerHTML = `<span>${assistant.emoji}</span>`;
-  }
+  // Keep robot button icon managed by chat state (do not override here)
   
   // Update chat header title
   const chatHeaderTitle = document.querySelector('.chat-header h1');
@@ -177,6 +230,14 @@ window.onload = async function () {
   
   // Initialize voice recording
   initVoiceRecording();
+
+  // Initialize UI sounds and bind events
+  initUiSounds();
+  const sendBtn = document.querySelector('.send-button');
+  if (sendBtn) {
+    sendBtn.addEventListener('mouseenter', () => playSound(hoverSound));
+    sendBtn.addEventListener('touchstart', () => playSound(hoverSound), { passive: true });
+  }
   
   // Add click listener to AI avatar
   const aiAvatar = document.querySelector('.ai-avatar');
@@ -187,6 +248,9 @@ window.onload = async function () {
 
   // Position robot button based on current horizontal break and show with fade-in
   positionRobotButton();
+
+  // Ensure correct icon at startup (pane is presented on load)
+  updateRobotIcon();
 
   // Handle window resize for mobile/desktop mode switching
   window.addEventListener('resize', handleWindowResize);
@@ -519,6 +583,12 @@ function addMessage(text, sender, messageType = 'text', isAgentWorkflow = false)
   // Scroll to bottom
   messagesContainer.scrollTop = messagesContainer.scrollHeight;
   
+  // Play final message feedback when assistant posts the final response
+  // (Skip workflow steps; they set isAgentWorkflow=true)
+  if (sender === 'ai' && !isAgentWorkflow) {
+    playSound(finalSound);
+  }
+  
   if (!isAgentWorkflow) {
     messageCount++;
   }
@@ -652,6 +722,31 @@ let isMobileMaximized = false;
 let isAnimating = false;
 let originalMobileDimensions = null; // Store original dimensions before maximizing
 const robotCollapsed = document.getElementById('robotCollapsed');
+
+// Icons for robot button states
+const ROBOT_ICON_MINIMIZED = `
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><g transform="translate(24, 0) scale(-1, 1)"><path fill-rule="evenodd" d="M5.337 21.718a6.707 6.707 0 01-.533-.074.75.75 0 01-.44-1.223 3.73 3.73 0 00.814-1.686c.023-.115-.022-.317-.254-.543C3.274 16.587 2.25 14.41 2.25 12c0-5.03 4.428-9 9.75-9s9.75 3.97 9.75 9c0 5.03-4.428 9-9.75 9-.833 0-1.643-.097-2.417-.279a6.721 6.721 0 01-4.246.997z" clip-rule="evenodd"></path></g></svg>
+`;
+const ROBOT_ICON_MAXIMIZED = `
+  <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path></svg>
+`;
+
+function updateRobotIcon() {
+  if (!robotCollapsed) return;
+  const icon = isCollapsed ? ROBOT_ICON_MINIMIZED : ROBOT_ICON_MAXIMIZED;
+  robotCollapsed.innerHTML = `<span>${icon}</span>`;
+  // Toggle state classes for styling adjustments
+  robotCollapsed.classList.toggle('minimized', isCollapsed);
+  robotCollapsed.classList.toggle('maximized', !isCollapsed);
+}
+
+async function toggleRobotButton() {
+  if (isCollapsed) {
+    expandChat();
+  } else {
+    await collapseChat();
+  }
+}
 
 function toggleMaximize() {
   // Prevent overlapping operations
@@ -869,16 +964,9 @@ function toggleDesktopMaximize(pane, maximizeIcon, chatContainer) {
 
 function expandChat() {
   if (isCollapsed) {
-    // Fade out the button
-    robotCollapsed.classList.remove('show');
-    
-    // Wait for fade-out animation, then present pane
-    setTimeout(() => {
-      chatPane.present({animate: true});
-      robotCollapsed.style.display = 'none';
-      robotCollapsed.classList.add('hidden');
-      isCollapsed = false;
-    }, 150);
+    chatPane.present({animate: true});
+    isCollapsed = false;
+    updateRobotIcon();
   }
 }
 
@@ -891,56 +979,80 @@ function positionRobotButton() {
   const robotCollapsed = document.getElementById('robotCollapsed');
   if (!robotCollapsed) return;
 
-  // Check if horizontal mode is enabled
-  if (shouldEnableHorizontal() && chatPane.modules && chatPane.modules.horizontal) {
-    const currentBreak = chatPane.modules.horizontal.getCurrentHorizontalBreak();
-    
-    // Remove existing corner classes
-    robotCollapsed.classList.remove('left-corner', 'right-corner');
-    
-    // Add appropriate corner class
-    if (currentBreak === 'left') {
-      robotCollapsed.classList.add('left-corner');
-    } else {
-      robotCollapsed.classList.add('right-corner');
-    }
-  }
-
-  // Show with fade-in transition
-  setTimeout(() => {
-    robotCollapsed.classList.add('show');
-  }, 100);
-}
-
-function collapseChat() {
-  chatPane.hide();
+  // Always pin to right corner
+  robotCollapsed.classList.remove('left-corner');
+  robotCollapsed.classList.add('right-corner');
+  // Ensure visible
   robotCollapsed.style.display = 'flex';
   robotCollapsed.classList.remove('hidden');
-  isCollapsed = true;
-  
-  // Position and show with fade-in
-  positionRobotButton();
+  robotCollapsed.classList.add('show');
 }
 
-// Set initial state
-robotCollapsed.style.display = 'none';
-robotCollapsed.classList.remove('show');
+async function collapseChat() {
+  await hideChatPaneSmoothly();
+}
+
+// Set initial state: always visible button in right corner
+robotCollapsed.style.display = 'flex';
+robotCollapsed.classList.add('right-corner');
+robotCollapsed.classList.add('show');
+robotCollapsed.classList.remove('hidden');
+updateRobotIcon();
 
 // Configure pane events directly
 document.addEventListener('cupertinoPanelDidDismiss', function() {
-  robotCollapsed.style.display = 'flex';
   isCollapsed = true;
+  updateRobotIcon();
   positionRobotButton();
 });
 
 document.addEventListener('cupertinoPanelWillPresent', function() {
-  robotCollapsed.style.display = 'none';
   isCollapsed = false;
+  updateRobotIcon();
 });
 
 // Listen for horizontal break changes
 document.addEventListener('cupertinoPanelBreakpointChange', function() {
-  if (isCollapsed) {
-    positionRobotButton();
-  }
+  positionRobotButton();
 }); 
+
+// Unified smooth hide routine used by both header minimize and robot toggle
+async function hideChatPaneSmoothly() {
+  const pane = document.querySelector('.pane');
+  const maximizeIcon = document.getElementById('maximizeIcon');
+  const chatContainer = document.querySelector('.chat-container');
+
+  if (!pane) {
+    await chatPane.hide();
+    isCollapsed = true;
+    updateRobotIcon();
+    positionRobotButton();
+    return;
+  }
+
+  // If maximized, restore to normal first, then hide
+  if (isMobile() && isMobileMaximized) {
+    toggleMobileMaximize(pane, maximizeIcon, chatContainer);
+    await chatPane.hide();
+    isCollapsed = true;
+    updateRobotIcon();
+    positionRobotButton();
+    return;
+  }
+
+  if (!isMobile() && isMaximized) {
+    toggleDesktopMaximize(pane, maximizeIcon, chatContainer);
+    // Give layout a moment to apply width/transform reset
+    await chatPane.hide();
+    isCollapsed = true;
+    updateRobotIcon();
+    positionRobotButton();
+    return;
+  }
+
+  // Default: hide immediately with library animation
+  await chatPane.hide();
+  isCollapsed = true;
+  updateRobotIcon();
+  positionRobotButton();
+}
