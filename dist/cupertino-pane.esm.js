@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: August 14, 2025
+ * Released on: August 15, 2025
  */
 
 /******************************************************************************
@@ -567,15 +567,9 @@ class Events {
                 this.mouseDown = false;
                 let buildedTransition = this.transitions.buildTransitionValue(false, this.settings.animationDuration);
                 this.instance.paneEl.style.setProperty('transition', buildedTransition);
-                // Hack trick to ensure transform styles are applied
-                // Browser limitations, probably might be fixed in future
-                // When linear transition changed to anything else e.g. 300ms ease,
-                // When drag event followed by breakpoint event,
-                // css property has no time to apply transition to paneEl 
-                // it's browser bug / limitation. 
-                yield new Promise(resolve => requestAnimationFrame(resolve));
-                yield new Promise(resolve => requestAnimationFrame(resolve));
-                yield new Promise(resolve => requestAnimationFrame(resolve));
+                // Force style and layout flush once to ensure transition gets applied
+                // Avoid multiple RAFs to reduce end-lag
+                void this.instance.paneEl.offsetHeight;
             }
             // Determinate nearest point
             let closest = this.breakpoints.getClosestBreakY();
@@ -1328,7 +1322,13 @@ class Transitions {
         }));
     }
     setPaneElTransform(params) {
-        this.instance.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
+        this.instance.currentTranslateY = params.translateY;
+        if (typeof params.translateX === 'number') {
+            this.instance.currentTranslateX = params.translateX;
+        }
+        // Keep X cached even if undefined to avoid stale values
+        const x = typeof this.instance.currentTranslateX === 'number' ? this.instance.currentTranslateX : 0;
+        this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateX(${x}px) translateZ(0px)`;
     }
     buildTransitionValue(bounce, duration) {
         if (bounce) {
@@ -2044,6 +2044,7 @@ class HorizontalModule {
         this.instance = instance;
         this.initialBreakX = 'left'; // Default horizontal position
         this.initialBreakY = 'middle'; // Default vertical position
+        this.recalcScheduled = false;
         this.settings = this.instance.settings;
         this.transitions = this.instance.transitions;
         this.events = this.instance.events;
@@ -2055,7 +2056,7 @@ class HorizontalModule {
         // Override transitions setPaneElTransform
         this.transitions['setPaneElTransform'] = (params) => this.setPaneElTransform(params);
         this.instance.on('beforeBreakHeightApplied', (ev) => {
-            this.calcHorizontalBreaks();
+            this.scheduleCalcHorizontalBreaks();
         });
         // Override initial positioning
         this.instance.on('beforePresentTransition', () => {
@@ -2102,6 +2103,7 @@ class HorizontalModule {
         }
     }
     calcHorizontalBreaks() {
+        var _a;
         return __awaiter(this, void 0, void 0, function* () {
             const rect = this.instance.paneEl.getBoundingClientRect();
             const paneWidth = rect.width;
@@ -2113,10 +2115,20 @@ class HorizontalModule {
                 left: originalCenteredLeft,
                 right: originalCenteredLeft + paneWidth
             };
+            const offset = (_a = this.settings.horizontalOffset) !== null && _a !== void 0 ? _a : 0;
             this.horizontalBreaks = {
-                left: -this.defaultRect.left + this.settings.horizontalOffset,
-                right: window.innerWidth - this.defaultRect.left - this.defaultRect.width - this.settings.horizontalOffset
+                left: Math.round(-this.defaultRect.left + offset),
+                right: Math.round(window.innerWidth - this.defaultRect.left - this.defaultRect.width - offset)
             };
+        });
+    }
+    scheduleCalcHorizontalBreaks() {
+        if (this.recalcScheduled)
+            return;
+        this.recalcScheduled = true;
+        requestAnimationFrame(() => {
+            this.recalcScheduled = false;
+            this.calcHorizontalBreaks();
         });
     }
     overrideInitialPositioning() {
@@ -2130,17 +2142,23 @@ class HorizontalModule {
         const isAnimatedPresent = currentTransform.includes(`${this.instance.screenHeightOffset}px`);
         if (isAnimatedPresent) {
             // For animated presentations, only set X position, keep Y at screen height offset
-            this.instance.paneEl.style.transform = `translateX(${xPosition}px) translateY(${this.instance.screenHeightOffset}px) translateZ(0px)`;
+            this.instance.currentTranslateX = xPosition;
+            this.instance.currentTranslateY = this.instance.screenHeightOffset;
+            this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateX(${this.instance.currentTranslateX}px) translateZ(0px)`;
         }
         else {
             // For non-animated presentations, set both X and Y to final positions
-            this.instance.paneEl.style.transform = `translateX(${xPosition}px) translateY(${yPosition}px) translateZ(0px)`;
+            this.instance.currentTranslateX = xPosition;
+            this.instance.currentTranslateY = yPosition;
+            this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateX(${this.instance.currentTranslateX}px) translateZ(0px)`;
         }
         // Update currentBreakpoint to reflect actual position
         this.currentBreakpoint = this.initialBreakX;
         this.instance.breakpoints.currentBreakpoint = yPosition;
     }
     setPaneElTransform(params) {
+        if (!this.horizontalBreaks)
+            this.calcHorizontalBreaks();
         let closestY = params.translateY;
         let closestX = params.translateX || this.instance.getPanelTransformX();
         // resize event for x-axis
@@ -2167,10 +2185,14 @@ class HorizontalModule {
             this.currentBreakpoint = closestX === this.horizontalBreaks.left ? 'left' : 'right';
             this.instance.breakpoints.currentBreakpoint = closestY;
         }
-        // Apply combined transform
-        this.instance.paneEl.style.transform = `translateX(${closestX || 0}px) translateY(${closestY || 0}px) translateZ(0px)`;
+        // Apply combined transform and sync cache
+        this.instance.currentTranslateX = closestX || 0;
+        this.instance.currentTranslateY = closestY || 0;
+        this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateX(${this.instance.currentTranslateX}px) translateZ(0px)`;
     }
     getClosestBreakX() {
+        if (!this.horizontalBreaks)
+            this.calcHorizontalBreaks();
         const currentX = this.instance.getPanelTransformX();
         return Math.abs(this.horizontalBreaks.left - currentX) < Math.abs(this.horizontalBreaks.right - currentX)
             ? this.horizontalBreaks.left
@@ -2183,7 +2205,9 @@ class HorizontalModule {
         }
         const currentY = this.instance.getPanelTransformY();
         const targetX = this.horizontalBreaks[breakX];
-        this.instance.paneEl.style.transform = `translateX(${targetX}px) translateY(${currentY}px) translateZ(0px)`;
+        this.instance.currentTranslateX = targetX;
+        this.instance.currentTranslateY = currentY;
+        this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateX(${this.instance.currentTranslateX}px) translateZ(0px)`;
         this.currentBreakpoint = breakX;
     }
     // Get current horizontal breakpoint
@@ -2379,6 +2403,8 @@ class CupertinoPane {
         this.preventDismissEvent = false;
         this.preventedDismiss = false;
         this.rendered = false;
+        this.currentTranslateY = 0;
+        this.currentTranslateX = 0;
         this.settings = (new Settings()).instance;
         this.device = new Device();
         this.modules = {};
@@ -2395,47 +2421,37 @@ class CupertinoPane {
             }
         };
         this.swipeNextPoint = (diff, maxDiff, closest) => {
-            let { brs, settingsBreaks } = this.prepareBreaksSwipeNextPoint();
-            if (this.breakpoints.currentBreakpoint === brs['top']) {
+            var _a, _b, _c, _d, _e, _f;
+            const brs = this.breakpoints.breaks;
+            const settingsBreaks = this.settings.breaks;
+            const curr = this.breakpoints.currentBreakpoint;
+            const topY = brs['top'];
+            const midY = brs['middle'];
+            const botY = brs['bottom'];
+            if (curr === topY) {
                 if (diff > maxDiff) {
-                    if (settingsBreaks['middle'].enabled) {
-                        return brs['middle'];
-                    }
-                    if (settingsBreaks['bottom'].enabled) {
-                        if (brs['middle'] < closest) {
-                            return closest;
-                        }
-                        return brs['bottom'];
-                    }
+                    if ((_a = settingsBreaks['middle']) === null || _a === void 0 ? void 0 : _a.enabled)
+                        return midY;
+                    if ((_b = settingsBreaks['bottom']) === null || _b === void 0 ? void 0 : _b.enabled)
+                        return botY;
                 }
-                return brs['top'];
+                return topY;
             }
-            if (this.breakpoints.currentBreakpoint === brs['middle']) {
-                if (diff < -maxDiff) {
-                    if (settingsBreaks['top'].enabled) {
-                        return brs['top'];
-                    }
-                }
-                if (diff > maxDiff) {
-                    if (settingsBreaks['bottom'].enabled) {
-                        return brs['bottom'];
-                    }
-                }
-                return brs['middle'];
+            if (curr === midY) {
+                if (diff < -maxDiff && ((_c = settingsBreaks['top']) === null || _c === void 0 ? void 0 : _c.enabled))
+                    return topY;
+                if (diff > maxDiff && ((_d = settingsBreaks['bottom']) === null || _d === void 0 ? void 0 : _d.enabled))
+                    return botY;
+                return midY;
             }
-            if (this.breakpoints.currentBreakpoint === brs['bottom']) {
+            if (curr === botY) {
                 if (diff < -maxDiff) {
-                    if (settingsBreaks['middle'].enabled) {
-                        if (brs['middle'] > closest) {
-                            return closest;
-                        }
-                        return brs['middle'];
-                    }
-                    if (settingsBreaks['top'].enabled) {
-                        return brs['top'];
-                    }
+                    if ((_e = settingsBreaks['middle']) === null || _e === void 0 ? void 0 : _e.enabled)
+                        return midY;
+                    if ((_f = settingsBreaks['top']) === null || _f === void 0 ? void 0 : _f.enabled)
+                        return topY;
                 }
-                return brs['bottom'];
+                return botY;
             }
             return closest;
         };
@@ -2515,6 +2531,8 @@ class CupertinoPane {
         // Panel (appying transform ASAP, avoid timeouts for animate:true)
         this.paneEl = document.createElement('div');
         this.paneEl.style.transform = `translateY(${this.screenHeightOffset}px) translateZ(0px)`;
+        this.currentTranslateY = this.screenHeightOffset;
+        this.currentTranslateX = 0;
         this.paneEl.classList.add('pane');
         internalStyles += `
       .cupertino-pane-wrapper .pane {
@@ -2715,7 +2733,8 @@ class CupertinoPane {
             }
             else {
                 this.breakpoints.prevBreakpoint = this.settings.initialBreak;
-                this.paneEl.style.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+                this.currentTranslateY = this.breakpoints.breaks[this.settings.initialBreak];
+                this.paneEl.style.transform = `translateY(${this.currentTranslateY}px) translateX(${this.currentTranslateX}px) translateZ(0px)`;
             }
             /****** Attach Events *******/
             this.events.attachAllEvents();
@@ -2805,14 +2824,11 @@ class CupertinoPane {
      * Public user methods
      */
     getPanelTransformY() {
-        const translateYRegex = /\.*translateY\((.*)px\)/i;
-        return parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
+        return this.currentTranslateY;
     }
     // TODO: merge to 1 function above
     getPanelTransformX() {
-        const translateYRegex = /\.*translateX\((.*)px\)/i;
-        let translateExec = translateYRegex.exec(this.paneEl.style.transform);
-        return translateExec ? parseFloat(translateExec[1]) : 0;
+        return this.currentTranslateX;
     }
     /**
      * Prevent dismiss event

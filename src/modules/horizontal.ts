@@ -27,6 +27,7 @@ export class HorizontalModule {
   private fastSwipeNext: boolean;
   private initialBreakX: string = 'left'; // Default horizontal position
   private initialBreakY: string = 'middle'; // Default vertical position
+  private recalcScheduled: boolean = false;
 
   private settings: CupertinoSettings;
   private transitions: Transitions;
@@ -48,7 +49,7 @@ export class HorizontalModule {
     this.transitions['setPaneElTransform'] = (params) => this.setPaneElTransform(params);
 
     this.instance.on('beforeBreakHeightApplied', (ev) => {
-        this.calcHorizontalBreaks();
+        this.scheduleCalcHorizontalBreaks();
     });
 
     // Override initial positioning
@@ -115,10 +116,20 @@ export class HorizontalModule {
       right: originalCenteredLeft + paneWidth
     };
     
+    const offset = this.settings.horizontalOffset ?? 0;
     this.horizontalBreaks = {
-      left: -this.defaultRect.left + this.settings.horizontalOffset,
-      right: window.innerWidth - this.defaultRect.left - this.defaultRect.width - this.settings.horizontalOffset
+      left: Math.round(-this.defaultRect.left + offset),
+      right: Math.round(window.innerWidth - this.defaultRect.left - this.defaultRect.width - offset)
     };
+  }
+
+  private scheduleCalcHorizontalBreaks() {
+    if (this.recalcScheduled) return;
+    this.recalcScheduled = true;
+    requestAnimationFrame(() => {
+      this.recalcScheduled = false;
+      this.calcHorizontalBreaks();
+    });
   }
 
   private overrideInitialPositioning() {
@@ -135,10 +146,14 @@ export class HorizontalModule {
     
     if (isAnimatedPresent) {
       // For animated presentations, only set X position, keep Y at screen height offset
-      this.instance.paneEl.style.transform = `translateX(${xPosition}px) translateY(${this.instance.screenHeightOffset}px) translateZ(0px)`;
+      this.instance.currentTranslateX = xPosition;
+      this.instance.currentTranslateY = this.instance.screenHeightOffset;
+      this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateX(${this.instance.currentTranslateX}px) translateZ(0px)`;
     } else {
       // For non-animated presentations, set both X and Y to final positions
-      this.instance.paneEl.style.transform = `translateX(${xPosition}px) translateY(${yPosition}px) translateZ(0px)`;
+      this.instance.currentTranslateX = xPosition;
+      this.instance.currentTranslateY = yPosition;
+      this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateX(${this.instance.currentTranslateX}px) translateZ(0px)`;
     }
     
     // Update currentBreakpoint to reflect actual position
@@ -147,6 +162,7 @@ export class HorizontalModule {
   }
 
   public setPaneElTransform(params) {
+    if (!this.horizontalBreaks) this.calcHorizontalBreaks();
     let closestY = params.translateY;
     let closestX = params.translateX || this.instance.getPanelTransformX();
 
@@ -179,11 +195,14 @@ export class HorizontalModule {
       this.instance.breakpoints.currentBreakpoint = closestY;
     }
 
-    // Apply combined transform
-    this.instance.paneEl.style.transform = `translateX(${closestX || 0}px) translateY(${closestY || 0}px) translateZ(0px)`;
+    // Apply combined transform and sync cache
+    this.instance.currentTranslateX = closestX || 0;
+    this.instance.currentTranslateY = closestY || 0;
+    this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateX(${this.instance.currentTranslateX}px) translateZ(0px)`;
   }
 
   private getClosestBreakX(): number {
+    if (!this.horizontalBreaks) this.calcHorizontalBreaks();
     const currentX = this.instance.getPanelTransformX();
     return Math.abs(this.horizontalBreaks.left - currentX) < Math.abs(this.horizontalBreaks.right - currentX)
       ? this.horizontalBreaks.left
@@ -199,7 +218,9 @@ export class HorizontalModule {
     const currentY = this.instance.getPanelTransformY();
     const targetX = this.horizontalBreaks[breakX];
     
-    this.instance.paneEl.style.transform = `translateX(${targetX}px) translateY(${currentY}px) translateZ(0px)`;
+    this.instance.currentTranslateX = targetX;
+    this.instance.currentTranslateY = currentY;
+    this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateX(${this.instance.currentTranslateX}px) translateZ(0px)`;
     this.currentBreakpoint = breakX;
   }
 

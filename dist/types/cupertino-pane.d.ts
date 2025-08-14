@@ -21,6 +21,8 @@ export declare class CupertinoPane {
     ionApp: HTMLElement;
     draggableEl: HTMLDivElement;
     moveEl: HTMLDivElement;
+    currentTranslateY: number;
+    currentTranslateX: number;
     private styleEl;
     private destroyButtonEl;
     private lastHideOnBottom?;

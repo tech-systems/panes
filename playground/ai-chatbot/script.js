@@ -80,7 +80,18 @@ function getPaneConfig() {
 }
 
 document.querySelector('.pane-header-btn.pane-minimize-btn').addEventListener('click', async () => {
-  await collapseChat();
+  const pane = document.querySelector('.pane');
+  const maximizeIcon = document.getElementById('maximizeIcon');
+  const chatContainer = document.querySelector('.chat-container');
+
+  if (!isMobile() && isMaximized) {
+    // If desktop maximized, minimize first, then hide on next frame for smoothness
+    toggleDesktopMaximize(pane, maximizeIcon, chatContainer);
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    await chatPane.hide();
+  } else {
+    await collapseChat();
+  }
 });
 
 // Initialize pane with responsive configuration
@@ -255,6 +266,17 @@ window.onload = async function () {
   window.addEventListener('resize', handleWindowResize);
 }
 
+// Helper: sync library caches and DOM transform
+function setPaneTransform(x, y) {
+  if (!chatPane) return;
+  chatPane.currentTranslateX = x;
+  chatPane.currentTranslateY = y;
+  const el = chatPane.paneEl;
+  if (el) {
+    el.style.transform = `translateY(${y}px) translateX(${x}px) translateZ(0px)`;
+  }
+}
+
 function handleWindowResize() {
   const pane = document.querySelector('.pane');
   if (!pane) return;
@@ -282,11 +304,8 @@ function handleWindowResize() {
     pane.style.removeProperty('right');
     pane.style.removeProperty('bottom');
     
-    // Reset pane positioning
-    const paneElement = chatPane.paneEl;
-    if (paneElement) {
-      paneElement.style.transform = '';
-    }
+    // Reset pane positioning and caches
+    setPaneTransform(0, chatPane.getPanelTransformY());
     
     // Update maximize icon
     const maximizeIcon = document.getElementById('maximizeIcon');
@@ -313,11 +332,8 @@ function handleWindowResize() {
     pane.style.removeProperty('max-width');
     pane.style.removeProperty('width');
     
-    // Reset pane positioning
-    const paneElement = chatPane.paneEl;
-    if (paneElement) {
-      paneElement.style.transform = '';
-    }
+    // Reset pane positioning and caches
+    setPaneTransform(0, chatPane.getPanelTransformY());
     
     // Update maximize icon
     const maximizeIcon = document.getElementById('maximizeIcon');
@@ -808,10 +824,13 @@ function toggleMobileMaximize(pane, maximizeIcon, chatContainer) {
       pane.style.setProperty('right', originalMobileDimensions.right, 'important');
       pane.style.setProperty('bottom', originalMobileDimensions.bottom, 'important');
       
-      // Restore original transform
+      // Restore original transform and sync caches
       const paneElement = chatPane.paneEl;
       if (paneElement && originalMobileDimensions.transform) {
-        paneElement.style.transform = originalMobileDimensions.transform;
+        setPaneTransform(
+          originalMobileDimensions.originalX ?? chatPane.getPanelTransformX(),
+          originalMobileDimensions.originalY ?? chatPane.getPanelTransformY()
+        );
       }
     } else {
       // Fallback: remove properties if no original dimensions stored
@@ -845,7 +864,14 @@ function toggleMobileMaximize(pane, maximizeIcon, chatContainer) {
           
           const paneElement = chatPane.paneEl;
           if (paneElement) {
-            paneElement.style.transform = originalMobileDimensions.transform || '';
+            if (originalMobileDimensions.transform) {
+              setPaneTransform(
+                originalMobileDimensions.originalX ?? chatPane.getPanelTransformX(),
+                originalMobileDimensions.originalY ?? chatPane.getPanelTransformY()
+              );
+            } else {
+              paneElement.style.transform = '';
+            }
           }
           
           originalMobileDimensions = null; // Clear stored dimensions
@@ -871,7 +897,9 @@ function toggleMobileMaximize(pane, maximizeIcon, chatContainer) {
       left: pane.style.left || computedStyle.left,
       right: pane.style.right || computedStyle.right,
       bottom: pane.style.bottom || computedStyle.bottom,
-      transform: paneElement ? paneElement.style.transform : ''
+      transform: paneElement ? paneElement.style.transform : '',
+      originalX: chatPane.getPanelTransformX(),
+      originalY: chatPane.getPanelTransformY()
     };
     
     // Enter mobile fullscreen with transition
@@ -897,7 +925,7 @@ function toggleMobileMaximize(pane, maximizeIcon, chatContainer) {
     
     // Position the pane element to cover full screen
     if (paneElement) {
-      paneElement.style.transform = 'translateX(0px) translateY(0px)';
+      setPaneTransform(0, 0);
     }
     
     // Clear transition after maximize animation completes
@@ -919,7 +947,10 @@ function toggleDesktopMaximize(pane, maximizeIcon, chatContainer) {
   const currentWidth = parseInt(window.getComputedStyle(pane).width);
   
   // Get the original pane width from the rendered element (could be set by CSS, React, etc.)
-  const originalPaneWidth = parseInt(window.getComputedStyle(pane).maxWidth) || 380;
+  // Respect current responsive max-width from CSS (420px desktop), fallback to 380
+  const computed = window.getComputedStyle(pane);
+  const maxWidthCss = parseInt(computed.maxWidth);
+  const originalPaneWidth = (Number.isFinite(maxWidthCss) && maxWidthCss > 0) ? maxWidthCss : 380;
   
   let targetWidth, widthDifference;
   
@@ -956,11 +987,8 @@ function toggleDesktopMaximize(pane, maximizeIcon, chatContainer) {
   
   // Apply position changes instantly if needed
   if (Math.abs(widthDifference) > 0 && chatPane.modules.horizontal) {
-    // Use direct transform for instant positioning
-    const paneElement = chatPane.paneEl;
-    if (paneElement) {
-      paneElement.style.transform = `translateX(${newTransformX}px) translateY(${currentY}px)`;
-    }
+    // Instant positioning: sync caches and DOM
+    setPaneTransform(newTransformX, currentY);
   }
   
   // Trigger resize event to recalculate all positioning after width change
@@ -1020,23 +1048,19 @@ robotCollapsed.classList.add('right-corner');
 hideRobotButton();
 updateRobotIcon();
 
-// Configure pane events directly
-document.addEventListener('cupertinoPanelDidDismiss', function() {
-  isCollapsed = true;
-  updateRobotIcon();
-  showRobotButton();
+// Listen to pane transitions to toggle robot button strictly after animations
+chatPane.on('onTransitionEnd', (ev) => {
+  if (ev?.type === 'hide') {
+    isCollapsed = true;
+    updateRobotIcon();
+    showRobotButton();
+  }
+  if (ev?.type === 'present') {
+    isCollapsed = false;
+    updateRobotIcon();
+    hideRobotButton();
+  }
 });
-
-document.addEventListener('cupertinoPanelWillPresent', function() {
-  isCollapsed = false;
-  updateRobotIcon();
-  hideRobotButton();
-});
-
-// Listen for horizontal break changes
-document.addEventListener('cupertinoPanelBreakpointChange', function() {
-  positionRobotButton();
-}); 
 
 // Unified smooth hide routine used by both header minimize and robot toggle
 async function hideChatPaneSmoothly() {
@@ -1065,6 +1089,8 @@ async function hideChatPaneSmoothly() {
   if (!isMobile() && isMaximized) {
     toggleDesktopMaximize(pane, maximizeIcon, chatContainer);
     // Give layout a moment to apply width/transform reset
+    await new Promise(resolve => requestAnimationFrame(resolve));
+    await new Promise(resolve => requestAnimationFrame(resolve));
     await chatPane.hide();
     isCollapsed = true;
     updateRobotIcon();

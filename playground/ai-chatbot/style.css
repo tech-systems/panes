@@ -750,12 +750,12 @@ html {
     margin: 0 !important;
   }
 
-  /* ATTENTION: BE CAREFUL WITH THIS ONE DRAGGABLE TRANSITIONS -> ON CHROME IT WILL INTERFERE PANE TRANSITION AND BUGGY */
+  /* ATTENTION: BE CAREFUL WITH THIS ONE DRAGGABLE TRANSITIONS -> ON CHROME IT WILL INTERFERE PANE TRANSITION AND BUGGY
   .cupertino-pane-wrapper .draggable:hover .move {
-    /* background: var(--bg-accent-hover) !important; */
-    /* width: 50px !important; */
-    /* transform: scaleY(1.2) !important; */
-  }
+    background: var(--bg-accent-hover) !important;
+    width: 50px !important;
+    transform: scaleY(1.2) !important;
+  } */
 
   /* ATTENTION: BE CAREFUL WITH THIS ONE DRAGGABLE TRANSITIONS -> ON CHROME IT WILL INTERFERE PANE TRANSITION AND BUGGY
   .cupertino-pane-wrapper .draggable.over .move {

@@ -12,12 +12,14 @@ export declare class HorizontalModule {
     private fastSwipeNext;
     private initialBreakX;
     private initialBreakY;
+    private recalcScheduled;
     private settings;
     private transitions;
     private events;
     constructor(instance: CupertinoPane);
     private parseInitialBreak;
     private calcHorizontalBreaks;
+    private scheduleCalcHorizontalBreaks;
     private overrideInitialPositioning;
     setPaneElTransform(params: any): void;
     private getClosestBreakX;

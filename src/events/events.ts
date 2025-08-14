@@ -473,15 +473,9 @@ export class Events {
       let buildedTransition = this.transitions.buildTransitionValue(false, this.settings.animationDuration);
       this.instance.paneEl.style.setProperty('transition', buildedTransition);
 
-     // Hack trick to ensure transform styles are applied
-     // Browser limitations, probably might be fixed in future
-     // When linear transition changed to anything else e.g. 300ms ease,
-     // When drag event followed by breakpoint event,
-     // css property has no time to apply transition to paneEl 
-     // it's browser bug / limitation. 
-      await new Promise(resolve => requestAnimationFrame(resolve));
-      await new Promise(resolve => requestAnimationFrame(resolve));
-      await new Promise(resolve => requestAnimationFrame(resolve));
+      // Force style and layout flush once to ensure transition gets applied
+      // Avoid multiple RAFs to reduce end-lag
+      void this.instance.paneEl.offsetHeight;
     }
 
     // Determinate nearest point

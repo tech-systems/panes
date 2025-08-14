@@ -146,7 +146,13 @@ export class Transitions {
   }
 
   private setPaneElTransform(params) {
-    this.instance.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
+    this.instance.currentTranslateY = params.translateY;
+    if (typeof params.translateX === 'number') {
+      this.instance.currentTranslateX = params.translateX;
+    }
+    // Keep X cached even if undefined to avoid stale values
+    const x = typeof this.instance.currentTranslateX === 'number' ? this.instance.currentTranslateX : 0;
+    this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateX(${x}px) translateZ(0px)`;
   }
 
   public buildTransitionValue(bounce: boolean, duration?: number): string {

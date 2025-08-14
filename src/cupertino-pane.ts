@@ -26,6 +26,8 @@ export class CupertinoPane {
   public ionApp: HTMLElement;
   public draggableEl: HTMLDivElement;
   public moveEl: HTMLDivElement;
+  public currentTranslateY: number = 0;
+  public currentTranslateX: number = 0;
   private styleEl: HTMLStyleElement;
   private destroyButtonEl: HTMLDivElement;
   private lastHideOnBottom?: boolean;
@@ -149,6 +151,8 @@ export class CupertinoPane {
     // Panel (appying transform ASAP, avoid timeouts for animate:true)
     this.paneEl = document.createElement('div');
     this.paneEl.style.transform = `translateY(${this.screenHeightOffset}px) translateZ(0px)`;
+    this.currentTranslateY = this.screenHeightOffset;
+    this.currentTranslateX = 0;
     this.paneEl.classList.add('pane');
     internalStyles += `
       .cupertino-pane-wrapper .pane {
@@ -376,7 +380,8 @@ export class CupertinoPane {
         });
       } else {
         this.breakpoints.prevBreakpoint = this.settings.initialBreak;
-        this.paneEl.style.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+        this.currentTranslateY = this.breakpoints.breaks[this.settings.initialBreak];
+        this.paneEl.style.transform = `translateY(${this.currentTranslateY}px) translateX(${this.currentTranslateX}px) translateZ(0px)`;
       }
 
       /****** Attach Events *******/
@@ -461,42 +466,34 @@ export class CupertinoPane {
   }
 
   public swipeNextPoint = (diff, maxDiff, closest) => {
-    let { brs, settingsBreaks }  = this.prepareBreaksSwipeNextPoint();
+    const brs: any = this.breakpoints.breaks;
+    const settingsBreaks: any = this.settings.breaks;
 
-    if (this.breakpoints.currentBreakpoint === brs['top']) {
-        if (diff > maxDiff) {
-          if (settingsBreaks['middle'].enabled) { return brs['middle']; }
-          if (settingsBreaks['bottom'].enabled) { 
-            if (brs['middle'] < closest) {
-              return closest;
-            }
-            return brs['bottom']; 
-          }
-        }
-        return brs['top'];
+    const curr = this.breakpoints.currentBreakpoint;
+    const topY = brs['top'];
+    const midY = brs['middle'];
+    const botY = brs['bottom'];
+
+    if (curr === topY) {
+      if (diff > maxDiff) {
+        if (settingsBreaks['middle']?.enabled) return midY;
+        if (settingsBreaks['bottom']?.enabled) return botY;
+      }
+      return topY;
     }
 
-    if (this.breakpoints.currentBreakpoint === brs['middle']) {
-        if (diff < -maxDiff) {
-          if (settingsBreaks['top'].enabled) { return brs['top']; }
-        }
-        if (diff > maxDiff) {
-          if (settingsBreaks['bottom'].enabled) { return brs['bottom']; }
-        }
-        return brs['middle'];
+    if (curr === midY) {
+      if (diff < -maxDiff && settingsBreaks['top']?.enabled) return topY;
+      if (diff > maxDiff && settingsBreaks['bottom']?.enabled) return botY;
+      return midY;
     }
 
-    if (this.breakpoints.currentBreakpoint === brs['bottom']) {
-        if (diff < -maxDiff) {
-          if (settingsBreaks['middle'].enabled) { 
-            if (brs['middle'] > closest) {
-              return closest;
-            }
-            return brs['middle']; 
-          }
-          if (settingsBreaks['top'].enabled) { return brs['top']; }
-        }
-        return brs['bottom'];
+    if (curr === botY) {
+      if (diff < -maxDiff) {
+        if (settingsBreaks['middle']?.enabled) return midY;
+        if (settingsBreaks['top']?.enabled) return topY;
+      }
+      return botY;
     }
 
     return closest;
@@ -520,15 +517,12 @@ export class CupertinoPane {
 
 
   public getPanelTransformY():number {
-    const translateYRegex = /\.*translateY\((.*)px\)/i;
-    return parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
+    return this.currentTranslateY;
   }
 
   // TODO: merge to 1 function above
   public getPanelTransformX():number {
-    const translateYRegex = /\.*translateX\((.*)px\)/i;
-    let translateExec = translateYRegex.exec(this.paneEl.style.transform);
-    return translateExec ? parseFloat(translateExec[1]) : 0;
+    return this.currentTranslateX;
   }
 
 
