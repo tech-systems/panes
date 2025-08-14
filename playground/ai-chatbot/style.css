@@ -741,36 +741,34 @@ html {
   }
 
   /* Override library's move background with our themed version */
+  
   .cupertino-pane-wrapper .move {
     background: var(--cupertino-pane-move-background) !important;
     width: 36px !important;
     height: 4px !important;
     border-radius: 2px !important;
     margin: 0 !important;
-    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    -webkit-transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
   }
 
+  /* ATTENTION: BE CAREFUL WITH THIS ONE DRAGGABLE TRANSITIONS -> ON CHROME IT WILL INTERFERE PANE TRANSITION AND BUGGY */
   .cupertino-pane-wrapper .draggable:hover .move {
-    background: var(--bg-accent-hover) !important;
-    width: 50px !important;
-    transform: scaleY(1.2) !important;
-    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    -webkit-transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    /* background: var(--bg-accent-hover) !important; */
+    /* width: 50px !important; */
+    /* transform: scaleY(1.2) !important; */
   }
 
+  /* ATTENTION: BE CAREFUL WITH THIS ONE DRAGGABLE TRANSITIONS -> ON CHROME IT WILL INTERFERE PANE TRANSITION AND BUGGY
   .cupertino-pane-wrapper .draggable.over .move {
     background: var(--bg-accent-hover) !important;
     width: 45px !important;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-    -webkit-transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
-  }
+  } */
 
+  /* ATTENTION: BE CAREFUL WITH THIS ONE DRAGGABLE TRANSITIONS -> ON CHROME IT WILL INTERFERE PANE TRANSITION AND BUGGY
   .cupertino-pane-wrapper .draggable.over:hover .move {
     background: var(--bg-button-hover) !important;
     width: 55px !important;
     transform: scaleY(1.2) !important;
-  }
+  } */
 
   .pane-header-buttons {
     display: flex;
