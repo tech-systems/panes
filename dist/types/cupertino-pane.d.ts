@@ -23,6 +23,8 @@ export declare class CupertinoPane {
     moveEl: HTMLDivElement;
     private styleEl;
     private destroyButtonEl;
+    private lastHideOnBottom?;
+    private lastOverflowAuto?;
     settings: CupertinoSettings;
     device: Device;
     keyboardEvents: KeyboardEvents;

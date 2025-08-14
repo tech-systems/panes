@@ -329,28 +329,22 @@ class Events {
     touchStart(t) {
         // Event emitter
         this.instance.emit('onDragStart', t);
-        console.log('[SCENE] touchStart 1');
         // Cancel any pending animation frame
         if (this.rafId) {
             cancelAnimationFrame(this.rafId);
             this.rafId = null;
             this.pendingMoveData = null;
         }
-        console.log('[SCENE] touchStart 2');
         // Allow clicks by default -> disallow on move (allow click with disabled drag)
         this.allowClick = true;
-        console.log('[SCENE] touchStart 3');
         if (this.instance.disableDragEvents)
             return;
         // Allow touch angle by default, disallow no move with condition
         this.disableDragAngle = false;
-        console.log('[SCENE] touchStart 4');
         // Not scrolling event by default -> on scroll will true
         this.isScrolling = false;
-        console.log('[SCENE] touchStart 5');
         // Allow pereventDismiss by default
         this.instance.preventedDismiss = false;
-        console.log('[SCENE] touchStart 6');
         /**
          * TODO: Switch to pointer events
          */
@@ -358,13 +352,10 @@ class Events {
         if (!clientY || !clientX) {
             return;
         }
-        console.log('[SCENE] touchStart 7');
         this.startY = clientY;
         this.startX = clientX;
-        console.log('[SCENE] touchStart 8');
         if (t.type === 'mousedown')
             this.mouseDown = true;
-        console.log('[SCENE] touchStart 9');
         // if overflow content was scrolled
         // and drag not by draggable
         // increase to scrolled value
@@ -373,56 +364,52 @@ class Events {
             && !this.isDraggableElement(t)) {
             this.startY += this.contentScrollTop;
         }
-        console.log('[SCENE] touchStart 10');
         this.steps.push({ posY: this.startY, posX: this.startX, time: Date.now() });
     }
     touchMove(t) {
         var _a, _b;
-        console.log('[SCENE] touchMove 1');
         /**
          * TODO: Switch to pointer events
          */
+        // If drag is disabled, skip all processing ASAP (before any coordinate/layout work)
+        if (this.instance.disableDragEvents) {
+            this.steps = [];
+            return;
+        }
         const { clientY, clientX, velocityY } = this.getEventClientYX(t, 'touchmove');
         if (!clientY || !clientX) {
             return;
         }
-        console.log('[SCENE] touchMove 2');
         // Deskop: check that touchStart() was initiated
         if (t.type === 'mousemove' && !this.mouseDown)
             return;
-        console.log('[SCENE] touchMove 3');
+        // If drag is disabled, skip all further processing ASAP
+        if (this.instance.disableDragEvents) {
+            this.steps = [];
+            return;
+        }
         // sometimes touchstart is not called 
         // when touchmove is began before initialization
         if (!this.steps.length) {
             this.steps.push({ posY: clientY, posX: clientX, time: Date.now() });
         }
-        console.log('[SCENE] touchMove 4');
         // Event emitter
         t.delta = ((_a = this.steps[0]) === null || _a === void 0 ? void 0 : _a.posY) - clientY;
-        console.log('[SCENE] touchMove 5');
         // Disallow accidentaly clicks while slide gestures
         this.allowClick = false;
-        console.log('[SCENE] touchMove 6');
         // textarea scrollbar
         if (this.isFormElement(t.target)
             && this.isElementScrollable(t.target)) {
             return;
         }
-        console.log('[SCENE] touchMove 7');
-        if (this.instance.disableDragEvents) {
-            this.steps = [];
-            return;
-        }
-        console.log('[SCENE] touchMove 8');
+        // drag is enabled at this point
         if (this.disableDragAngle)
             return;
-        console.log('[SCENE] touchMove 9');
         if (this.instance.preventedDismiss)
             return;
         if (this.settings.touchMoveStopPropagation) {
             t.stopPropagation();
         }
-        console.log('[SCENE] touchMove 10');
         // Block drag when scroll at initial position based on scrollZeroDragBottom setting
         if (this.contentScrollTop === 0
             && this.instance.overflowEl.style.overflowY === 'auto'
@@ -438,40 +425,36 @@ class Events {
                 return; // Block upward movement only
             }
         }
-        console.log('[SCENE] touchMove 11');
         // Delta
         const diffY = clientY - this.steps[this.steps.length - 1].posY;
         const diffX = clientX - this.steps[this.steps.length - 1].posX;
-        console.log('[SCENE] touchMove 12');
         // No Y/X changes
         if (!Math.abs(diffY)
             && !Math.abs(diffX)) {
             return;
         }
-        console.log('[SCENE] touchMove 13');
         // Emit event
         this.instance.emit('onDrag', t);
-        console.log('[SCENE] touchMove 14');
         // Has changes in position 
         this.instance.setGrabCursor(true, true);
-        let newVal = this.instance.getPanelTransformY() + diffY;
-        let newValX = this.instance.getPanelTransformX() + diffX;
-        console.log('[SCENE] touchMove 15');
+        const prevY = this.instance.getPanelTransformY();
+        const prevX = this.instance.getPanelTransformX();
+        let newVal = prevY + diffY;
+        let newValX = prevX + diffX;
         // First event after touchmove only
         if (this.steps.length < 2) {
             // Patch for 'touchmove' first event 
             // when start slowly events with small velocity
             if (velocityY < 1) {
-                newVal = this.instance.getPanelTransformY() + (diffY * velocityY);
+                newVal = prevY + (diffY * velocityY);
             }
             // Move while transition patch next transitions
             let computedTranslateY = new WebKitCSSMatrix(window.getComputedStyle(this.instance.paneEl).transform).m42;
-            let transitionYDiff = computedTranslateY - this.instance.getPanelTransformY();
+            let transitionYDiff = computedTranslateY - prevY;
             if (Math.abs(transitionYDiff)) {
                 newVal += transitionYDiff;
             }
         }
-        console.log('[SCENE] touchMove 16');
         // Detect if input was blured
         // TODO: Check that blured from pane child instance
         if (this.steps.length > 2) {
@@ -481,7 +464,6 @@ class Events {
                 this.keyboardEvents.inputBluredbyMove = true;
             }
         }
-        console.log('[SCENE] touchMove 17');
         // Touch angle
         // Only for initial gesture with 1 touchstart step
         // Only not for scrolling events (scrolling already checked for angle)
@@ -498,7 +480,6 @@ class Events {
                 return;
             }
         }
-        console.log('[SCENE] touchMove 18');
         // Not allow move panel with positive overflow scroll
         // Scroll handler
         if (this.instance.overflowEl.style.overflowY === 'auto'
@@ -506,7 +487,6 @@ class Events {
             && !this.isDraggableElement(t)) {
             return;
         }
-        console.log('[SCENE] touchMove 19');
         // Handle Superposition
         let forceNewVal = this.handleSuperposition({
             clientX, clientY, newVal,
@@ -521,18 +501,16 @@ class Events {
         if (forceNewVal === false) {
             return;
         }
-        console.log('[SCENE] touchMove 20');
         // No changes Y/X
-        if (this.instance.getPanelTransformY() === newVal
-            && this.instance.getPanelTransformX() === newValX) {
+        if (prevY === newVal
+            && prevX === newValX) {
             return;
         }
-        console.log('[SCENE] touchMove 21');
         // Prevent Dismiss gesture
         if (!this.instance.preventedDismiss
             && this.instance.preventDismissEvent && this.settings.bottomClose) {
-            let differKoef = ((-this.breakpoints.topper + this.breakpoints.topper - this.instance.getPanelTransformY()) / this.breakpoints.topper) / -8;
-            newVal = this.instance.getPanelTransformY() + (diffY * (0.5 - differKoef));
+            let differKoef = ((-this.breakpoints.topper + this.breakpoints.topper - prevY) / this.breakpoints.topper) / -8;
+            newVal = prevY + (diffY * (0.5 - differKoef));
             let mousePointY = (clientY - 220 - this.instance.screen_height) * -1;
             if (mousePointY <= this.instance.screen_height - this.breakpoints.bottomer) {
                 this.instance.preventedDismiss = true;
@@ -542,15 +520,12 @@ class Events {
                 return;
             }
         }
-        console.log('[SCENE] touchMove 22');
         // Store the pending move data for requestAnimationFrame
         this.pendingMoveData = { newVal, newValX, clientY, clientX };
-        console.log('[SCENE] touchMove 23');
         // Request animation frame if not already pending
         if (!this.rafId) {
             this.rafId = requestAnimationFrame(() => this.applyMoveUpdate());
         }
-        console.log('[SCENE] touchMove 24');
         this.steps.push({ posY: clientY, posX: clientX, time: Date.now() });
     }
     /**
@@ -669,18 +644,15 @@ class Events {
         });
     }
     onClick(t) {
-        console.log('[SCENE] click');
         // Prevent accidental unwanted clicks events during swiping
         if (!this.allowClick) {
             if (this.settings.preventClicks) {
                 t.preventDefault();
                 t.stopPropagation();
                 t.stopImmediatePropagation();
-                console.log('[SCENE] click prevent');
             }
             return;
         }
-        console.log('[SCENE] click allow');
         // Android Multiple Re-focus on PWA
         // with resize keyboard handler
         if (!this.device.cordova
@@ -689,7 +661,6 @@ class Events {
             this.keyboardEvents.onKeyboardShowCb({ keyboardHeight: this.instance.screen_height - window.innerHeight });
             return;
         }
-        console.log('[SCENE] click allow');
         // Click to bottom - open middle
         if (this.settings.clickBottomOpen) {
             if (this.isFormElement(document.activeElement)) {
@@ -703,7 +674,6 @@ class Events {
                 if (this.settings.breaks['middle'].enabled) {
                     closest = 'middle';
                 }
-                console.log('[SCENE] click bottom open moveToBreak', closest);
                 this.instance.moveToBreak(closest);
             }
         }
@@ -1266,7 +1236,9 @@ class Transitions {
             if (params.type === CupertinoTransition.Move) {
                 // System event
                 this.instance.emit('onMoveTransitionStart', { translateY: params.translateY });
-                this.instance.paneEl.style.transition = 'all 0ms linear 0ms';
+                if (this.instance.paneEl.style.transition !== 'all 0ms linear 0ms') {
+                    this.instance.paneEl.style.transition = 'all 0ms linear 0ms';
+                }
                 this.setPaneElTransform(params);
                 return resolve(true);
             }
@@ -1760,6 +1732,8 @@ class FitHeightModule {
         });
         this.instance.on('onTransitionEnd', () => {
             this.instance.paneEl.style.height = `unset`;
+            // Refresh cursor after fit-height transitions
+            this.instance.setGrabCursor(true, false);
         });
         // Pass our code into function buildBreakpoints()
         this.instance.on('onWillPresent', () => {
@@ -2780,17 +2754,27 @@ class CupertinoPane {
         let attrElements = this.el.querySelectorAll('[hide-on-bottom]');
         if (!attrElements.length)
             return;
+        const shouldHide = (val >= this.breakpoints.breaks['bottom']);
+        if (this.lastHideOnBottom === shouldHide)
+            return;
         attrElements.forEach((item) => {
             item.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-            item.style.opacity = (val >= this.breakpoints.breaks['bottom']) ? '0' : '1';
+            item.style.opacity = shouldHide ? '0' : '1';
         });
+        this.lastHideOnBottom = shouldHide;
     }
     checkOverflowAttr(val) {
         if (!this.settings.topperOverflow
             || !this.overflowEl) {
             return;
         }
-        this.overflowEl.style.overflowY = (val <= this.breakpoints.topper) ? 'auto' : 'hidden';
+        const shouldAuto = (val <= this.breakpoints.topper);
+        if (this.lastOverflowAuto === shouldAuto)
+            return;
+        this.overflowEl.style.overflowY = shouldAuto ? 'auto' : 'hidden';
+        this.lastOverflowAuto = shouldAuto;
+        // Update cursor immediately when scrollability changes
+        this.setGrabCursor(true, false);
     }
     // TODO: replace with body.contains()
     isPanePresented() {
@@ -2843,7 +2827,27 @@ class CupertinoPane {
         if (!this.device.desktop) {
             return;
         }
-        this.paneEl.style.cursor = enable ? (moving ? 'grabbing' : 'grab') : '';
+        const handleCursor = enable ? (moving ? 'grabbing' : 'grab') : '';
+        const isScrollableVisible = !!this.overflowEl
+            && this.overflowEl.style.overflowY === 'auto'
+            && this.overflowEl.scrollHeight > this.overflowEl.clientHeight;
+        if (!enable) {
+            this.paneEl.style.cursor = '';
+            if (this.draggableEl)
+                this.draggableEl.style.cursor = '';
+            return;
+        }
+        // When content is scrollable, only the draggable handle shows grab/grabbing
+        if (isScrollableVisible) {
+            this.paneEl.style.cursor = '';
+            if (this.draggableEl)
+                this.draggableEl.style.cursor = handleCursor;
+            return;
+        }
+        // Default behavior: set cursor on the whole pane (and handle)
+        this.paneEl.style.cursor = handleCursor;
+        if (this.draggableEl)
+            this.draggableEl.style.cursor = handleCursor;
     }
     /**
      * Disable pane drag events

@@ -39,6 +39,8 @@ export class FitHeightModule {
 
     this.instance.on('onTransitionEnd', () => {
       this.instance.paneEl.style.height = `unset`;
+      // Refresh cursor after fit-height transitions
+      this.instance.setGrabCursor(true, false);
     });
 
     // Pass our code into function buildBreakpoints()

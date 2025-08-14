@@ -237,6 +237,12 @@ export class Events {
     /**
      * TODO: Switch to pointer events
      */
+    // If drag is disabled, skip all processing ASAP (before any coordinate/layout work)
+    if (this.instance.disableDragEvents) {
+      this.steps = [];
+      return;
+    }
+
     const { clientY, clientX, velocityY } = this.getEventClientYX(t, 'touchmove');
     if (!clientY || !clientX) {
       return;
@@ -244,6 +250,12 @@ export class Events {
 
     // Deskop: check that touchStart() was initiated
     if(t.type === 'mousemove' && !this.mouseDown) return;
+
+    // If drag is disabled, skip all further processing ASAP
+    if (this.instance.disableDragEvents) {
+      this.steps = [];
+      return;
+    }
 
     // sometimes touchstart is not called 
     // when touchmove is began before initialization
@@ -263,10 +275,7 @@ export class Events {
       return;
     }
 
-    if (this.instance.disableDragEvents) {
-      this.steps = [];
-      return;
-    }
+    // drag is enabled at this point
 
     if (this.disableDragAngle) return;
 
@@ -310,22 +319,24 @@ export class Events {
 
     // Has changes in position 
     this.instance.setGrabCursor(true, true);
-    let newVal = this.instance.getPanelTransformY() + diffY;
-    let newValX = this.instance.getPanelTransformX() + diffX;
+    const prevY = this.instance.getPanelTransformY();
+    const prevX = this.instance.getPanelTransformX();
+    let newVal = prevY + diffY;
+    let newValX = prevX + diffX;
     
     // First event after touchmove only
     if (this.steps.length < 2) {
       // Patch for 'touchmove' first event 
       // when start slowly events with small velocity
       if (velocityY < 1) {
-        newVal = this.instance.getPanelTransformY() + (diffY * velocityY);
+        newVal = prevY + (diffY * velocityY);
       }
 
       // Move while transition patch next transitions
       let computedTranslateY = new WebKitCSSMatrix(
         window.getComputedStyle(this.instance.paneEl).transform
       ).m42;
-      let transitionYDiff = computedTranslateY - this.instance.getPanelTransformY();
+      let transitionYDiff = computedTranslateY - prevY;
       if (Math.abs(transitionYDiff)) {
         newVal += transitionYDiff;
       }
@@ -380,16 +391,16 @@ export class Events {
     }
 
     // No changes Y/X
-    if (this.instance.getPanelTransformY() === newVal 
-        && this.instance.getPanelTransformX() === newValX ) {
+    if (prevY === newVal 
+        && prevX === newValX ) {
       return;
     }
 
     // Prevent Dismiss gesture
     if (!this.instance.preventedDismiss
           && this.instance.preventDismissEvent && this.settings.bottomClose) {
-      let differKoef = ((-this.breakpoints.topper + this.breakpoints.topper - this.instance.getPanelTransformY()) / this.breakpoints.topper) / -8;
-      newVal = this.instance.getPanelTransformY() + (diffY * (0.5 - differKoef));
+      let differKoef = ((-this.breakpoints.topper + this.breakpoints.topper - prevY) / this.breakpoints.topper) / -8;
+      newVal = prevY + (diffY * (0.5 - differKoef));
       
       let mousePointY = (clientY - 220 - this.instance.screen_height) * -1;
       if (mousePointY <= this.instance.screen_height - this.breakpoints.bottomer) {

@@ -37,7 +37,9 @@ export class Transitions {
       if (params.type === CupertinoTransition.Move) {
         // System event
         this.instance.emit('onMoveTransitionStart', {translateY: params.translateY});
-        this.instance.paneEl.style.transition = 'all 0ms linear 0ms';
+        if (this.instance.paneEl.style.transition !== 'all 0ms linear 0ms') {
+          this.instance.paneEl.style.transition = 'all 0ms linear 0ms';
+        }
         this.setPaneElTransform(params);
         return resolve(true);
       }

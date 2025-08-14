@@ -62,7 +62,6 @@ function getPaneConfig() {
     bottomClose: false,
     buttonDestroy: false,
     showDraggable: true,
-    draggableOver: true,
     upperThanTop: true,
     bottomOffset: mobile ? 10 : 30, // Reduced bottom offset for mobile
     clickBottomOpen: false,
@@ -628,7 +627,7 @@ async function executeAgenticWorkflow(userMessage, messageType) {
   });
 
   // Step 4: Final Response
-  setTimeout(() => {
+  setTimeout(async () => {
     const response = getAIResponse(userMessage, messageType);
     addMessage(response, 'ai');
     
@@ -636,6 +635,9 @@ async function executeAgenticWorkflow(userMessage, messageType) {
     if (messageCount > 3) {
       chatPane.moveToBreak('top');
     }
+
+    // Ensure height fits after the last message in sequence
+    chatPane.calcFitHeight(false);
   }, 700);
 }
 

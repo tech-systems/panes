@@ -28,6 +28,8 @@ export class CupertinoPane {
   public moveEl: HTMLDivElement;
   private styleEl: HTMLStyleElement;
   private destroyButtonEl: HTMLDivElement;
+  private lastHideOnBottom?: boolean;
+  private lastOverflowAuto?: boolean;
 
   public settings: CupertinoSettings = (new Settings()).instance;
   public device: Device = new Device();
@@ -419,10 +421,13 @@ export class CupertinoPane {
   public checkOpacityAttr(val) {
     let attrElements = this.el.querySelectorAll('[hide-on-bottom]');
     if (!attrElements.length) return;
+    const shouldHide = (val >= this.breakpoints.breaks['bottom']);
+    if (this.lastHideOnBottom === shouldHide) return;
     attrElements.forEach((item) => {
       (<HTMLElement>item).style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-      (<HTMLElement>item).style.opacity = (val >= this.breakpoints.breaks['bottom']) ? '0' : '1';
+      (<HTMLElement>item).style.opacity = shouldHide ? '0' : '1';
     });
+    this.lastHideOnBottom = shouldHide;
   }
 
   public checkOverflowAttr(val) {
@@ -431,7 +436,13 @@ export class CupertinoPane {
       return;
     }
 
-    this.overflowEl.style.overflowY = (val <= this.breakpoints.topper) ? 'auto' : 'hidden';
+    const shouldAuto = (val <= this.breakpoints.topper);
+    if (this.lastOverflowAuto === shouldAuto) return;
+    this.overflowEl.style.overflowY = shouldAuto ? 'auto' : 'hidden';
+    this.lastOverflowAuto = shouldAuto;
+    
+    // Update cursor immediately when scrollability changes
+    this.setGrabCursor(true, false);
   }
 
   // TODO: replace with body.contains()
@@ -535,7 +546,27 @@ export class CupertinoPane {
     if (!this.device.desktop) {
       return;
     }
-    this.paneEl.style.cursor = enable ? (moving ? 'grabbing' : 'grab'): '';
+    const handleCursor = enable ? (moving ? 'grabbing' : 'grab') : '';
+    const isScrollableVisible = !!this.overflowEl 
+      && this.overflowEl.style.overflowY === 'auto'
+      && this.overflowEl.scrollHeight > this.overflowEl.clientHeight;
+
+    if (!enable) {
+      this.paneEl.style.cursor = '';
+      if (this.draggableEl) this.draggableEl.style.cursor = '';
+      return;
+    }
+
+    // When content is scrollable, only the draggable handle shows grab/grabbing
+    if (isScrollableVisible) {
+      this.paneEl.style.cursor = '';
+      if (this.draggableEl) this.draggableEl.style.cursor = handleCursor;
+      return;
+    }
+
+    // Default behavior: set cursor on the whole pane (and handle)
+    this.paneEl.style.cursor = handleCursor;
+    if (this.draggableEl) this.draggableEl.style.cursor = handleCursor;
   }
 
   /**
