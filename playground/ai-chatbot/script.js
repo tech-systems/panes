@@ -733,8 +733,11 @@ const ROBOT_ICON_MAXIMIZED = `
 
 function updateRobotIcon() {
   if (!robotCollapsed) return;
-  const icon = isCollapsed ? ROBOT_ICON_MINIMIZED : ROBOT_ICON_MAXIMIZED;
-  robotCollapsed.innerHTML = `<span>${icon}</span>`;
+  // Keep a single bubble icon and avoid swapping to preserve CSS transitions
+  if (!robotCollapsed.dataset.iconInitialized) {
+    robotCollapsed.innerHTML = `<span>${ROBOT_ICON_MINIMIZED}</span>`;
+    robotCollapsed.dataset.iconInitialized = 'true';
+  }
   // Toggle state classes for styling adjustments
   robotCollapsed.classList.toggle('minimized', isCollapsed);
   robotCollapsed.classList.toggle('maximized', !isCollapsed);
@@ -964,6 +967,8 @@ function toggleDesktopMaximize(pane, maximizeIcon, chatContainer) {
 
 function expandChat() {
   if (isCollapsed) {
+    // Hide robot button immediately when expanding
+    hideRobotButton();
     chatPane.present({animate: true});
     isCollapsed = false;
     updateRobotIcon();
@@ -976,39 +981,54 @@ function onAvatarClick() {
 }
 
 function positionRobotButton() {
-  const robotCollapsed = document.getElementById('robotCollapsed');
-  if (!robotCollapsed) return;
+  const robotCollapsedEl = document.getElementById('robotCollapsed');
+  if (!robotCollapsedEl) return;
 
-  // Always pin to right corner
-  robotCollapsed.classList.remove('left-corner');
-  robotCollapsed.classList.add('right-corner');
-  // Ensure visible
-  robotCollapsed.style.display = 'flex';
-  robotCollapsed.classList.remove('hidden');
-  robotCollapsed.classList.add('show');
+  // Always pin to right corner (no visibility changes here)
+  robotCollapsedEl.classList.remove('left-corner');
+  robotCollapsedEl.classList.add('right-corner');
+}
+
+function showRobotButton() {
+  const btn = document.getElementById('robotCollapsed');
+  if (!btn) return;
+  positionRobotButton();
+  btn.style.display = 'flex';
+  btn.classList.remove('hidden');
+  // Force reflow to ensure transition triggers
+  void btn.offsetWidth;
+  btn.classList.add('show');
+}
+
+function hideRobotButton() {
+  const btn = document.getElementById('robotCollapsed');
+  if (!btn) return;
+  btn.classList.remove('show');
+  btn.classList.add('hidden');
+  // Immediate hide
+  btn.style.display = 'none';
 }
 
 async function collapseChat() {
   await hideChatPaneSmoothly();
 }
 
-// Set initial state: always visible button in right corner
-robotCollapsed.style.display = 'flex';
+// Initial state: keep hidden while pane is presented on load
 robotCollapsed.classList.add('right-corner');
-robotCollapsed.classList.add('show');
-robotCollapsed.classList.remove('hidden');
+hideRobotButton();
 updateRobotIcon();
 
 // Configure pane events directly
 document.addEventListener('cupertinoPanelDidDismiss', function() {
   isCollapsed = true;
   updateRobotIcon();
-  positionRobotButton();
+  showRobotButton();
 });
 
 document.addEventListener('cupertinoPanelWillPresent', function() {
   isCollapsed = false;
   updateRobotIcon();
+  hideRobotButton();
 });
 
 // Listen for horizontal break changes
@@ -1026,7 +1046,7 @@ async function hideChatPaneSmoothly() {
     await chatPane.hide();
     isCollapsed = true;
     updateRobotIcon();
-    positionRobotButton();
+    showRobotButton();
     return;
   }
 
@@ -1036,7 +1056,7 @@ async function hideChatPaneSmoothly() {
     await chatPane.hide();
     isCollapsed = true;
     updateRobotIcon();
-    positionRobotButton();
+    showRobotButton();
     return;
   }
 
@@ -1046,7 +1066,7 @@ async function hideChatPaneSmoothly() {
     await chatPane.hide();
     isCollapsed = true;
     updateRobotIcon();
-    positionRobotButton();
+    showRobotButton();
     return;
   }
 
@@ -1054,5 +1074,5 @@ async function hideChatPaneSmoothly() {
   await chatPane.hide();
   isCollapsed = true;
   updateRobotIcon();
-  positionRobotButton();
+  showRobotButton();
 }

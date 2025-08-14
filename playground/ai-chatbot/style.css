@@ -518,11 +518,12 @@ html {
     -webkit-user-select: none;
     -moz-user-select: none;
     -ms-user-select: none;
-    transition: opacity 0.2s ease;
+    transition: opacity 280ms ease, transform 280ms ease;
   }
 
   .robot-collapsed.show {
     opacity: 1;
+    transform: scale(1);
   }
 
   .robot-collapsed.left-corner {
@@ -566,7 +567,26 @@ html {
   }
   
   .robot-collapsed.maximized svg {
-    margin-top: 3px;
+    margin-top: 0px;
+  }
+
+  /* Slightly larger icon when shown minimized in the right corner */
+  .robot-collapsed.right-corner.show.minimized svg {
+    transform: scale(1);
+  }
+
+  /* Smooth scale-in animation baseline */
+  .robot-collapsed.right-corner svg {
+    width: 24px;
+    height: 24px;
+    transform: scale(0.92);
+    transform-origin: 50% 50%;
+    transition: transform 220ms cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+
+  /* Scale down when chat is maximized (pane visible) */
+  .robot-collapsed.right-corner.show.maximized svg {
+    transform: scale(0.86);
   }
 
   /* Light theme: Simplified robot icon styling */
@@ -599,8 +619,8 @@ html {
   .robot-collapsed.hidden {
     opacity: 0;
     pointer-events: none;
-    transform: scale(0.8) translateY(10px);
-    filter: blur(5px);
+    transform: scale(0.9) translateY(6px);
+    filter: blur(4px);
   }
 
 /* =================================
