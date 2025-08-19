@@ -27,12 +27,11 @@
 }
 
 /* =================================
-   CSS VARIABLES FOR THEMING
+   CSS VARIABLES
    =================================
-   CSS custom properties for consistent theming across light and dark modes.
+   CSS custom properties for consistent theming.
    Variables are organized by category for easy maintenance. */
 :root {
-  /* Dark theme (default) */
   --bg-primary: linear-gradient(180deg, #0a0a0a 0%, #1a0a2e 100%);
   --bg-secondary: rgba(28, 28, 29, 0.8);
   --bg-tertiary: rgba(25, 25, 27, 0.95);
@@ -70,52 +69,8 @@
   --focus-outline: rgba(131, 56, 236, 0.5);
 }
 
-/* =================================
-   LIGHT THEME OVERRIDES
-   =================================
-   Override CSS variables for light mode theme. These provide a clean,
-   accessible light alternative to the default dark theme. */
-:root[data-theme="light"] {
-  --bg-primary: linear-gradient(180deg, #ffffff 0%, #f8f9fa 100%);
-  --bg-secondary: rgba(255, 255, 255, 0.95);
-  --bg-tertiary: rgba(255, 255, 255, 0.98);
-  --bg-accent: rgba(131, 56, 236, 0.12);
-  --bg-accent-hover: rgba(131, 56, 236, 0.18);
-  --bg-button: rgba(131, 56, 236, 0.12);
-  --bg-button-hover: rgba(131, 56, 236, 0.20);
-  --bg-robot: rgba(255, 255, 255, 0.95);
-  --bg-robot-hover: rgba(248, 249, 250, 1);
-  --bg-robot-active: rgba(233, 236, 239, 1);
-  
-  --text-primary: #1a1a1a;
-  --text-secondary: rgba(26, 26, 26, 0.7);
-  --text-tertiary: rgba(26, 26, 26, 0.5);
-  --text-accent: rgba(26, 26, 26, 0.9);
-  
-  --border-primary: rgba(0, 0, 0, 0.20);
-  --border-secondary: rgba(0, 0, 0, 0.15);
-  --border-accent: rgba(131, 56, 236, 0.7);
-  
-  --accent-primary: #d63384;
-  --accent-secondary: #6f42c1;
-  --accent-tertiary: #0d6efd;
-  --accent-gradient: linear-gradient(135deg, #e91e63 0%, #9c27b0 50%, #3f51b5 100%);
-  --accent-gradient-alt: linear-gradient(135deg, #6366f1 0%, #8b5cf6 100%);
-  
-  --shadow-primary: rgba(0, 0, 0, 0.1);
-  --shadow-secondary: rgba(0, 0, 0, 0.05);
-  --shadow-accent: 0 4px 16px rgba(0, 0, 0, 0.08);
-  
-  --grid-color: rgba(131, 56, 236, 0.2);
-  --grid-overlay: radial-gradient(circle at center, transparent 0%, rgba(248, 249, 250, 0.95) 100%);
-  
-  --selection-bg: rgba(131, 56, 236, 0.2);
-  --focus-outline: rgba(131, 56, 236, 0.6);
-  
-  /* 
-   * Light Theme: Override Cupertino Pane CSS Variables
-   * Ensure the library's pane components adapt to the light theme
-   */
+/* Cupertino Pane CSS Variables */
+:root {
   --cupertino-pane-icon-close-color: var(--text-secondary);
   --cupertino-pane-background: var(--bg-tertiary);
   --cupertino-pane-color: var(--text-primary);
@@ -123,28 +78,6 @@
   --cupertino-pane-border-radius: 28px;
   --cupertino-pane-move-background: var(--bg-button);
   --cupertino-pane-destroy-button-background: var(--bg-button);
-}
-
-/* 
- * Light Theme: Input and Send Button Overrides
- * Override the hardcoded input and send button styles for light mode
- */
-:root[data-theme="light"] .input-container {
-  background: rgba(255, 255, 255, 0.98);
-}
-
-:root[data-theme="light"] .message-input {
-  background: rgb(255, 255, 255);
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  color: #1a1a1a;
-}
-
-:root[data-theme="light"] .message-input::placeholder {
-  color: rgba(26, 26, 26, 0.6);
-}
-
-:root[data-theme="light"] .message-input:focus {
-  border-color: rgba(131, 56, 236, 0.4);
 }
 
 /* =================================

@@ -1,37 +1,6 @@
-// Theme management
+// Set dark theme permanently
 function initializeTheme() {
-  // Check for saved theme preference or default to 'dark'
-  const savedTheme = localStorage.getItem('theme') || 'dark';
-  document.documentElement.setAttribute('data-theme', savedTheme);
-  updateThemeIcon();
-}
-
-function toggleTheme() {
-  const currentTheme = document.documentElement.getAttribute('data-theme');
-  const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-  
-  document.documentElement.setAttribute('data-theme', newTheme);
-  localStorage.setItem('theme', newTheme);
-  updateThemeIcon();
-  
-  // Add a subtle animation effect
-  const themeButton = document.getElementById('themeToggle');
-  if (themeButton) {
-    themeButton.style.transform = 'scale(1.2)';
-    setTimeout(() => {
-      themeButton.style.transform = '';
-    }, 150);
-  }
-}
-
-function updateThemeIcon() {
-  const currentTheme = document.documentElement.getAttribute('data-theme');
-  const themeIcon = document.getElementById('themeIcon');
-  
-  if (themeIcon) {
-    // The CSS will handle the icon content based on the data-theme attribute
-    themeIcon.setAttribute('aria-label', currentTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode');
-  }
+  document.documentElement.setAttribute('data-theme', 'dark');
 }
 
 // Function to determine if horizontal mode should be enabled
@@ -84,7 +53,20 @@ document.querySelector('.pane-header-btn.pane-minimize-btn').addEventListener('c
   const maximizeIcon = document.getElementById('maximizeIcon');
   const chatContainer = document.querySelector('.chat-container');
 
-  if (!isMobile() && isMaximized) {
+  // Mobile-specific behavior
+  if (isMobile()) {
+    if (isMobileMaximized) {
+      // If mobile and maximized: behave like clicking maximize (untoggle maximize)
+      toggleMobileMaximize(pane, maximizeIcon, chatContainer);
+    } else {
+      // If not maximized on mobile: collapse as usual
+      await collapseChat();
+    }
+    return;
+  }
+
+  // Desktop behavior
+  if (isMaximized) {
     // If desktop maximized, minimize first, then hide on next frame for smoothness
     toggleDesktopMaximize(pane, maximizeIcon, chatContainer);
     await new Promise(resolve => requestAnimationFrame(resolve));
