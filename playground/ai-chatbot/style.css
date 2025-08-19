@@ -833,7 +833,7 @@ html {
   .header-content {
     display: flex;
     align-items: center;
-    gap: 25px;
+    gap: 18px;
   }
 
   .header-text {
@@ -855,6 +855,7 @@ html {
   }
 
   .ai-avatar {
+    --avatar-radius: 15px;
     width: 50px;
     height: 50px;
     margin: 0;
@@ -863,35 +864,48 @@ html {
     justify-content: center;
     align-items: center;
     font-size: 24px;
-    background: var(--bg-robot);
-    border-radius: 15px;
-    box-shadow: 
-      inset 0 1px 3px var(--shadow-primary),
-      0 2px 8px var(--shadow-secondary);
+    border-radius: var(--avatar-radius);
+    /* Gradient border with solid inner fill */
+    /* background: 
+      linear-gradient(var(--bg-robot), var(--bg-robot)) padding-box,
+      var(--accent-gradient) border-box; */
+    border: 1px solid #2f2d2d;
+    background-clip: padding-box, border-box;
+    color: var(--text-primary);
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0px 0px var(--shadow-primary), inset 0 4px 2px rgba(255, 255, 255, 0.06), 0 0 0 2px rgb(70 40 110);
+    filter: saturate(1.1);
     cursor: pointer;
-    transition: all 0.2s ease;
     flex-shrink: 0;
   }
 
-  .ai-avatar:hover {
-    transform: scale(1.05);
-    box-shadow: 
-      inset 0 1px 3px var(--shadow-primary),
-      0 3px 12px var(--shadow-primary);
-  }
 
-  .ai-avatar:active {
-    transform: scale(0.95);
-  }
 
   .ai-avatar::before {
     content: '';
     position: absolute;
-    inset: -2px;
-    background: var(--accent-gradient);
-    border-radius: 17px;
-    opacity: 0.5;
+    inset: 2px;
+    border-radius: calc(var(--avatar-radius) - 2px);
+    background:
+      radial-gradient(40% 40% at 25% 20%, rgba(255, 255, 255, 0.14), transparent 60%),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0.06));
+    pointer-events: none;
     z-index: -1;
+  }
+
+  /* Online status dot */
+  .ai-avatar::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    right: -1px;
+    bottom: -1px;
+    background: #2ecc71; /* online */
+    border: 2px solid var(--bg-robot);
+    box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.25);
+    pointer-events: none;
   }
 
   .header-subtitle {
