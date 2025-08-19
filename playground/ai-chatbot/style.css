@@ -50,7 +50,9 @@
   
   --border-primary: rgba(255, 255, 255, 0.1);
   --border-secondary: rgba(255, 255, 255, 0.08);
-  --border-accent: rgba(131, 56, 236, 0.3);
+  --assistant-color-rgb: 131 56 236;
+  --assistant-color-rgb-commas: 131, 56, 236;
+  --border-accent: rgba(var(--assistant-color-rgb-commas), 0.3);
   
   --accent-primary: #ff006e;
   --accent-secondary: #8338ec;
@@ -575,6 +577,11 @@ html {
     border-top: 2px solid var(--border-accent) !important;
     border-radius: var(--cupertino-pane-border-radius) !important;
     /* Enhanced shadow using library variable as base */
+    /* Fallback first (applies if the next declaration is invalid in some browsers) */
+    box-shadow: 
+      var(--cupertino-pane-shadow),
+      0 -5px 20px var(--shadow-primary) !important;
+    /* Preferred (adds inset accent when supported) */
     box-shadow: 
       var(--cupertino-pane-shadow),
       0 -5px 20px var(--shadow-primary),
@@ -633,24 +640,6 @@ html {
   /* Mobile fullscreen pane header */
   .cupertino-pane-wrapper .pane.mobile-fullscreen .pane-header {
     padding: 10px 20px !important;
-  }
-  
-  .cupertino-pane-wrapper .pane::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background: linear-gradient(
-      90deg,
-      transparent 0%,
-      var(--border-primary) 20%,
-      var(--border-accent) 50%,
-      var(--border-primary) 80%,
-      transparent 100%
-    );
-    opacity: 0.5;
   }
 
   .pane-header {
@@ -873,7 +862,8 @@ html {
     background-clip: padding-box, border-box;
     color: var(--text-primary);
     text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
-    box-shadow: 0 0px 0px var(--shadow-primary), inset 0 4px 2px rgba(255, 255, 255, 0.06), 0 0 0 2px rgb(70 40 110);
+    box-shadow: 0 0px 0px var(--shadow-primary), inset 0 1px 2px rgba(255, 255, 255, 0.06), 0 0 0 2px rgba(var(--assistant-color-rgb-commas), 0.5);
+    
     filter: saturate(1.1);
     cursor: pointer;
     flex-shrink: 0;

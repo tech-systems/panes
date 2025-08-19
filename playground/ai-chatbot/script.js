@@ -79,13 +79,13 @@ document.querySelector('.pane-header-btn.pane-minimize-btn').addEventListener('c
 // Initialize pane with responsive configuration
 let chatPane = new CupertinoPane('chat-pane', getPaneConfig());
 
-// Assistant profiles with tied emojis and names
+// Assistant profiles with tied emojis, names, and signature colors (RGB space-separated)
 const assistants = [
-  { emoji: '🚀', name: 'Elon' },
-  { emoji: '🗿', name: 'Bill' },
-  { emoji: '🍎', name: 'Steve' },
-  { emoji: '🤖', name: 'Sam' },
-  { emoji: '🤓', name: 'Mark' }
+  { emoji: '\uD83D\uDE80', name: 'Elon', colorRgb: '0 192 255' },      // cyan
+  { emoji: '\uD83D\uDDFF', name: 'Bill', colorRgb: '66 133 244' },     // blue
+  { emoji: '\uD83C\uDF4E', name: 'Steve', colorRgb: '255 140 0' },     // orange
+  { emoji: '\uD83E\uDD16', name: 'Sam', colorRgb: '131 56 236' },      // purple (default)
+  { emoji: '\uD83E\uDD13', name: 'Mark', colorRgb: '76 175 80' }       // green
 ];
 
 let currentAssistantIndex = 0;
@@ -181,6 +181,14 @@ function updateAssistantDisplay() {
   
   // Keep robot button icon managed by chat state (do not override here)
   
+  // Sync assistant accent color across UI (avatar ring, pane borders, etc.)
+  if (assistant && assistant.colorRgb) {
+    document.documentElement.style.setProperty('--assistant-color-rgb', assistant.colorRgb);
+    // Provide comma-separated variant for rgba(var(--x), a) usage
+    const commaRgb = assistant.colorRgb.replace(/\s+/g, ', ');
+    document.documentElement.style.setProperty('--assistant-color-rgb-commas', commaRgb);
+  }
+
   // Update chat header title
   const chatHeaderTitle = document.querySelector('.chat-header h1');
   if (chatHeaderTitle) {
@@ -215,8 +223,10 @@ window.onload = async function () {
   // Initialize theme before anything else
   initializeTheme();
   
-  // Set random assistant on load
-  setRandomAssistant();
+  // Set default assistant (Sam) on load
+  currentAssistantIndex = assistants.findIndex(a => a.name === 'Sam');
+  if (currentAssistantIndex < 0) currentAssistantIndex = 3; // fallback to Sam's index
+  updateAssistantDisplay();
   
   await chatPane.present({animate: true});
   
