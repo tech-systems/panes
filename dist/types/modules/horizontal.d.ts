@@ -25,5 +25,6 @@ export declare class HorizontalModule {
     private getClosestBreakX;
     moveToHorizontalBreak(breakX: 'left' | 'right'): void;
     getCurrentHorizontalBreak(): 'left' | 'right';
+    private applyMoveUpdate;
     moveToWidth(translateX: number, translateY: number): Promise<any>;
 }

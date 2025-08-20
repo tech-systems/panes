@@ -47,6 +47,9 @@ export class HorizontalModule {
 
     // Override transitions setPaneElTransform
     this.transitions['setPaneElTransform'] = (params) => this.setPaneElTransform(params);
+    
+    // Override events applyMoveUpdate to include X-axis data when moving
+    this.events['applyMoveUpdate'] = () => this.applyMoveUpdate();
 
     this.instance.on('beforeBreakHeightApplied', (ev) => {
         this.scheduleCalcHorizontalBreaks();
@@ -227,6 +230,28 @@ export class HorizontalModule {
   // Get current horizontal breakpoint
   public getCurrentHorizontalBreak(): 'left' | 'right' {
     return this.currentBreakpoint as 'left' | 'right';
+  }
+
+  // Override applyMoveUpdate to include X-axis data for horizontal dragging
+  private applyMoveUpdate() {
+    const pendingMoveData = this.events['pendingMoveData'];
+    if (!pendingMoveData) {
+      this.events['rafId'] = null;
+      return;
+    }
+
+    const { newVal, newValX } = pendingMoveData;
+
+    // Apply the opacity and overflow attributes
+    this.instance.checkOpacityAttr(newVal);
+    this.instance.checkOverflowAttr(newVal);
+    
+    // Apply the transition with both X and Y axis for horizontal module
+    this.transitions.doTransition({type: 'move', translateY: newVal, translateX: newValX});
+
+    // Clear the pending data and animation frame ID
+    this.events['pendingMoveData'] = null;
+    this.events['rafId'] = null;
   }
 
   // Public method to move to specified X,Y coordinates with smooth transition

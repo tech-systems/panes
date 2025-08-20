@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: August 15, 2025
+ * Released on: August 20, 2025
  */
 
 (function (global, factory) {
@@ -546,8 +546,8 @@
             // Apply the opacity and overflow attributes
             this.instance.checkOpacityAttr(newVal);
             this.instance.checkOverflowAttr(newVal);
-            // Apply the transition
-            this.transitions.doTransition({ type: 'move', translateY: newVal, translateX: newValX });
+            // Apply the transition (core only handles Y-axis, modules can override)
+            this.transitions.doTransition({ type: 'move', translateY: newVal });
             // Clear the pending data and animation frame ID
             this.pendingMoveData = null;
             this.rafId = null;
@@ -1329,12 +1329,7 @@
         }
         setPaneElTransform(params) {
             this.instance.currentTranslateY = params.translateY;
-            if (typeof params.translateX === 'number') {
-                this.instance.currentTranslateX = params.translateX;
-            }
-            // Keep X cached even if undefined to avoid stale values
-            const x = typeof this.instance.currentTranslateX === 'number' ? this.instance.currentTranslateX : 0;
-            this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateX(${x}px) translateZ(0px)`;
+            this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateZ(0px)`;
         }
         buildTransitionValue(bounce, duration) {
             if (bounce) {
@@ -2061,6 +2056,8 @@
             this.parseInitialBreak();
             // Override transitions setPaneElTransform
             this.transitions['setPaneElTransform'] = (params) => this.setPaneElTransform(params);
+            // Override events applyMoveUpdate to include X-axis data when moving
+            this.events['applyMoveUpdate'] = () => this.applyMoveUpdate();
             this.instance.on('beforeBreakHeightApplied', (ev) => {
                 this.scheduleCalcHorizontalBreaks();
             });
@@ -2219,6 +2216,23 @@
         // Get current horizontal breakpoint
         getCurrentHorizontalBreak() {
             return this.currentBreakpoint;
+        }
+        // Override applyMoveUpdate to include X-axis data for horizontal dragging
+        applyMoveUpdate() {
+            const pendingMoveData = this.events['pendingMoveData'];
+            if (!pendingMoveData) {
+                this.events['rafId'] = null;
+                return;
+            }
+            const { newVal, newValX } = pendingMoveData;
+            // Apply the opacity and overflow attributes
+            this.instance.checkOpacityAttr(newVal);
+            this.instance.checkOverflowAttr(newVal);
+            // Apply the transition with both X and Y axis for horizontal module
+            this.transitions.doTransition({ type: 'move', translateY: newVal, translateX: newValX });
+            // Clear the pending data and animation frame ID
+            this.events['pendingMoveData'] = null;
+            this.events['rafId'] = null;
         }
         // Public method to move to specified X,Y coordinates with smooth transition
         moveToWidth(translateX, translateY) {

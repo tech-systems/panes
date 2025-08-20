@@ -438,8 +438,8 @@ export class Events {
     this.instance.checkOpacityAttr(newVal);
     this.instance.checkOverflowAttr(newVal);
     
-    // Apply the transition
-    this.transitions.doTransition({type: 'move', translateY: newVal, translateX: newValX});
+    // Apply the transition (core only handles Y-axis, modules can override)
+    this.transitions.doTransition({type: 'move', translateY: newVal});
 
     // Clear the pending data and animation frame ID
     this.pendingMoveData = null;
