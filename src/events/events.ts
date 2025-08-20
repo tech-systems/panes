@@ -322,7 +322,7 @@ export class Events {
     const prevY = this.instance.getPanelTransformY();
     const prevX = this.instance.getPanelTransformX();
     let newVal = prevY + diffY;
-    let newValX = prevX + diffX;
+    let newValX = prevX;
     
     // First event after touchmove only
     if (this.steps.length < 2) {

@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.5.0
+ * Cupertino Pane 1.5.1
  * Cupertino Panes is multi-functional modals, cards & panes with touch technologies.
  * https://panejs.com
  *
@@ -446,7 +446,7 @@
             const prevY = this.instance.getPanelTransformY();
             const prevX = this.instance.getPanelTransformX();
             let newVal = prevY + diffY;
-            let newValX = prevX + diffX;
+            let newValX = prevX;
             // First event after touchmove only
             if (this.steps.length < 2) {
                 // Patch for 'touchmove' first event 
