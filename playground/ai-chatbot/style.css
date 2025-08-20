@@ -17,6 +17,37 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
 
 /* =================================
+   WEBKIT TOP NOTCH / STATUS BAR
+   =================================
+   Dynamic color scheme for WebKit status bar and notch area */
+:root {
+  color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+}
+
+:root[data-theme="dark"], 
+:root:not([data-theme]) {
+  color-scheme: dark;
+}
+
+/* Additional WebKit specific enforcement */
+html {
+  color-scheme: dark;
+}
+
+html[data-theme="light"] {
+  color-scheme: light;
+}
+
+html[data-theme="dark"],
+html:not([data-theme]) {
+  color-scheme: dark;
+}
+
+/* =================================
    RESET & BASE STYLES
    ================================= */
 /* CSS Reset and Normalization */
@@ -1368,7 +1399,7 @@ html {
 @media (max-width: 480px) {
   .top-content {
     width: calc(100% - 30px);
-    top: 20px;
+    top: 70px;
   }
   
   .demo-titles h1 {
