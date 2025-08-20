@@ -142,8 +142,11 @@ export class Breakpoints {
   }
 
   public getClosestBreakY(): number {
-    return this.brs.reduce((prev, curr) => {
-      return (Math.abs(curr - this.instance.getPanelTransformY()) < Math.abs(prev - this.instance.getPanelTransformY()) ? curr : prev);
+    const currentY = this.instance.getPanelTransformY();
+    const closest = this.brs.reduce((prev, curr) => {
+      return (Math.abs(curr - currentY) < Math.abs(prev - currentY) ? curr : prev);
     });
+    
+    return closest;
   }
 }

@@ -455,8 +455,8 @@
                     newVal = prevY + (diffY * velocityY);
                 }
                 // Move while transition patch next transitions
-                let computedTranslateY = new WebKitCSSMatrix(window.getComputedStyle(this.instance.paneEl).transform).m42;
-                let transitionYDiff = computedTranslateY - prevY;
+                let computedTranslate = this.instance.parseTransform3d(this.instance.paneEl);
+                let transitionYDiff = computedTranslate.y - prevY;
                 if (Math.abs(transitionYDiff)) {
                     newVal += transitionYDiff;
                 }
@@ -546,8 +546,12 @@
             // Apply the opacity and overflow attributes
             this.instance.checkOpacityAttr(newVal);
             this.instance.checkOverflowAttr(newVal);
-            // Apply the transition (core only handles Y-axis, modules can override)
-            this.transitions.doTransition({ type: 'move', translateY: newVal });
+            // Apply the transition - PASS BOTH X AND Y for modules that need it
+            this.transitions.doTransition({
+                type: 'move',
+                translateY: newVal,
+                translateX: newValX
+            });
             // Clear the pending data and animation frame ID
             this.pendingMoveData = null;
             this.rafId = null;
@@ -627,7 +631,13 @@
                 if (this.instance.getPanelTransformY() === closest) {
                     this.instance.emit('onTransitionEnd', { target: this.instance.paneEl });
                 }
-                this.transitions.doTransition({ type: 'end', translateY: closest });
+                // Preserve current X position for modules that need it (like modal)
+                const currentX = this.instance.getPanelTransformX();
+                this.transitions.doTransition({
+                    type: 'end',
+                    translateY: closest,
+                    translateX: currentX
+                });
             });
         }
         onScroll(t) {
@@ -1199,9 +1209,11 @@
             return null;
         }
         getClosestBreakY() {
-            return this.brs.reduce((prev, curr) => {
-                return (Math.abs(curr - this.instance.getPanelTransformY()) < Math.abs(prev - this.instance.getPanelTransformY()) ? curr : prev);
+            const currentY = this.instance.getPanelTransformY();
+            const closest = this.brs.reduce((prev, curr) => {
+                return (Math.abs(curr - currentY) < Math.abs(prev - currentY) ? curr : prev);
             });
+            return closest;
         }
     }
 
@@ -1314,7 +1326,8 @@
                      */
                     if (subTransition.to) {
                         if (!subTransition.to.transform) {
-                            subTransition.to.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+                            const initialBreakY = this.breakpoints.breaks[this.settings.initialBreak];
+                            subTransition.to.transform = this.instance.buildTransform3d(0, initialBreakY, 0);
                         }
                         Object.assign(this.instance.paneEl.style, subTransition.to);
                     }
@@ -1329,7 +1342,12 @@
         }
         setPaneElTransform(params) {
             this.instance.currentTranslateY = params.translateY;
-            this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateZ(0px)`;
+            // Handle X-axis if provided (used by horizontal and modal modules)
+            if (params.translateX !== undefined) {
+                this.instance.currentTranslateX = params.translateX;
+            }
+            const transform = this.instance.buildTransform3d(this.instance.currentTranslateX, this.instance.currentTranslateY, 0);
+            this.instance.paneEl.style.transform = transform;
         }
         buildTransitionValue(bounce, duration) {
             if (bounce) {
@@ -1455,7 +1473,7 @@
             // Accumulated styles from each pusher to pushed
             const setStyles = (scale, y, contrast, border) => {
                 let exponentAngle = Math.pow(scale, this.settings.zStack.stackZAngle / 100);
-                pushElement.style.transform = `translateY(${y * (exponentAngle / scale)}px) scale(${scale})`;
+                pushElement.style.transform = this.instance.buildTransform3dWithScale(0, y * (exponentAngle / scale), 0, scale);
                 pushElement.style.borderRadius = `${border}px`;
                 pushElement.style.filter = `contrast(${contrast})`;
                 // When destroy transition and last item moved we reduce multiplicators
@@ -1539,13 +1557,13 @@
                 }
                 this.followerEl = document.querySelector(this.settings.followerElement);
                 this.followerEl.style.willChange = 'transform, border-radius';
-                this.followerEl.style.transform = `translateY(0px) translateZ(0px)`;
+                this.followerEl.style.transform = this.instance.buildTransform3d(0, 0, 0);
                 this.followerEl.style.transition = this.transitions.buildTransitionValue((_a = this.settings.breaks[this.instance.currentBreak()]) === null || _a === void 0 ? void 0 : _a.bounce);
             });
             // Move transition same for follower element (minus pane height)
             this.instance.on('onMoveTransitionStart', (ev) => {
                 this.followerEl.style.transition = 'all 0ms linear 0ms';
-                this.followerEl.style.transform = `translateY(${ev.translateY - this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+                this.followerEl.style.transform = this.instance.buildTransform3d(0, ev.translateY - this.breakpoints.breaks[this.settings.initialBreak], 0);
             });
             // Reset transition same as for pane element
             this.instance.on('onMoveTransitionStart', (ev) => {
@@ -1553,7 +1571,7 @@
             });
             this.instance.on('onTransitionStart', (ev) => {
                 this.followerEl.style.transition = ev.transition;
-                this.followerEl.style.transform = `translateY(${ev.translateY.new - this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+                this.followerEl.style.transform = this.instance.buildTransform3d(0, ev.translateY.new - this.breakpoints.breaks[this.settings.initialBreak], 0);
             });
         }
     }
@@ -1891,10 +1909,18 @@
             this.instance['checkOpacityAttr'] = () => { };
             this.instance['checkOverflowAttr'] = (val) => this.checkOverflowAttr(val);
             this.instance['prepareBreaksSwipeNextPoint'] = () => this.prepareBreaksSwipeNextPoint();
+            // Override swipe logic for inverse coordinates
+            this.instance['swipeNextPoint'] = (diff, maxDiff, closest) => this.swipeNextPoint(diff, maxDiff, closest);
+            // Override fastSwipeNext to invert direction detection for inverse mode
+            this.events['fastSwipeNext'] = (axis) => this.fastSwipeNext(axis);
             // re-bind events functions
             this.events['handleSuperposition'] = (coords) => this.handleSuperposition(coords);
             this.events['scrollPreventDrag'] = (t) => this.scrollPreventDrag(t);
             this.events['onScroll'] = () => this.onScroll();
+            // Override transitions to block X movement in inverse mode
+            this.instance.transitions['setPaneElTransform'] = (params) => this.setPaneElTransform(params);
+            // Ensure X coordinate is always 0 in inverse mode
+            this.instance.currentTranslateX = 0;
             // Class to wrapper
             this.instance.on('DOMElementsReady', () => {
                 this.instance.wrapperEl.classList.add('inverse');
@@ -1928,13 +1954,39 @@
       `);
             });
             this.instance.on('buildBreakpointsCompleted', () => {
-                this.breakpoints.topper = this.breakpoints.bottomer;
+                // Fix inverse coordinate calculation
+                // In inverse mode, panel starts from top, so we need to recalculate positions
+                const originalBreaks = Object.assign({}, this.breakpoints.breaks);
+                const screenHeight = this.instance.screen_height;
+                ['top', 'middle', 'bottom'].forEach((breakName) => {
+                    var _a;
+                    if (originalBreaks[breakName] !== undefined && ((_a = this.settings.breaks[breakName]) === null || _a === void 0 ? void 0 : _a.enabled)) {
+                        // In inverse mode, calculate position from top of screen
+                        // height = how much content is visible
+                        // position = screen_height - height (how far down from top)
+                        const contentHeight = this.settings.breaks[breakName].height;
+                        const positionFromTop = screenHeight - contentHeight - this.settings.bottomOffset;
+                        this.breakpoints.breaks[breakName] = positionFromTop;
+                    }
+                });
+                // Get all converted breakpoint values  
+                const breakValues = Object.values(this.breakpoints.breaks).filter(v => typeof v === 'number');
+                // In inverse mode:
+                // - Smallest Y value (top of screen) = topper = most content visible
+                // - Largest Y value (bottom of screen) = bottomer = least content visible  
+                const smallestY = Math.min(...breakValues); // Topper (top of screen, most content)
+                const largestY = Math.max(...breakValues); // Bottomer (bottom of screen, least content)
+                this.breakpoints.topper = smallestY;
+                this.breakpoints.bottomer = largestY;
+                // CRITICAL: Update the brs array with converted values for getClosestBreakY()
+                this.breakpoints.brs = breakValues;
                 // Re-calc top after setBreakpoints();
-                this.instance.paneEl.style.top = `-${this.breakpoints.bottomer - this.settings.bottomOffset}px`;
+                this.instance.paneEl.style.top = `-${Math.abs(this.breakpoints.bottomer) - this.settings.bottomOffset}px`;
             });
             this.instance.on('onWillPresent', () => {
                 this.breakpoints.beforeBuildBreakpoints = () => this.beforeBuildBreakpoints();
             });
+            // Initial positioning will be handled by the corrected breakpoint calculations
         }
         getPaneHeight() {
             return this.breakpoints.bottomer - this.settings.bottomOffset;
@@ -1957,15 +2009,12 @@
             this.instance.overflowEl.style.overflowY = (val >= this.breakpoints.bottomer) ? 'auto' : 'hidden';
         }
         prepareBreaksSwipeNextPoint() {
-            let brs = {};
-            let settingsBreaks = {};
-            brs['top'] = this.breakpoints.breaks['bottom'];
-            brs['middle'] = this.breakpoints.breaks['middle'];
-            brs['bottom'] = this.breakpoints.breaks['top'];
-            settingsBreaks['top'] = Object.assign({}, this.settings.breaks['bottom']);
-            settingsBreaks['middle'] = Object.assign({}, this.settings.breaks['middle']);
-            settingsBreaks['bottom'] = Object.assign({}, this.settings.breaks['top']);
-            return { brs, settingsBreaks };
+            // Since we override swipeNextPoint completely, no need to swap here
+            // Just return the normal breakpoints structure
+            return {
+                brs: Object.assign({}, this.breakpoints.breaks),
+                settingsBreaks: Object.assign({}, this.settings.breaks)
+            };
         }
         /**
          * Topper Than Top
@@ -1973,27 +2022,40 @@
          * Otherwise don't changes
          */
         handleSuperposition(coords) {
-            // Inverse gestures
-            // Allow drag topper than top point
-            if (this.settings.upperThanTop
-                && ((coords.newVal >= this.breakpoints.topper)
-                    || this.events.startPointOverTop)) {
-                // check that finger reach same position before enable normal swipe mode
-                if (!this.events.startPointOverTop) {
-                    this.events.startPointOverTop = coords.clientY;
-                }
-                if (this.events.startPointOverTop > coords.clientY) {
-                    delete this.events.startPointOverTop;
-                }
-                const screenDelta = this.instance.screen_height - this.instance.screenHeightOffset;
-                const differKoef = (screenDelta - this.instance.getPanelTransformY()) / (screenDelta - this.breakpoints.topper) / 8;
-                return { y: this.instance.getPanelTransformY() + (coords.diffY * differKoef) };
-            }
-            // Disallow drag topper than top point
-            if (!this.settings.upperThanTop
-                && (coords.newVal >= this.breakpoints.topper)) {
+            // Inverse gestures - coordinate system starts from top of screen
+            // topper = smallest Y (top of screen, most content visible, e.g., 100)
+            // bottomer = largest Y (bottom of screen, least content visible, e.g., 900)
+            // ALWAYS enforce boundaries in inverse mode for proper UI behavior
+            // Working with positive coordinate system where smaller Y = more content (top of screen)
+            // FIRST: Check topper boundary (dragging too far up/small Y = too much content)
+            if (coords.newVal <= this.breakpoints.topper) {
                 return { y: this.breakpoints.topper };
             }
+            // SECOND: Check bottomer boundary (dragging too far down/large Y = too little content)
+            if (coords.newVal >= this.breakpoints.bottomer) {
+                return { y: this.breakpoints.bottomer };
+            }
+            // THIRD: Check upperThanTop setting for resistance beyond topper
+            if (coords.newVal <= this.breakpoints.topper) {
+                if (this.settings.upperThanTop) {
+                    // Allow drag beyond topper with resistance
+                    if (!this.events.startPointOverTop) {
+                        this.events.startPointOverTop = coords.clientY;
+                    }
+                    if (this.events.startPointOverTop > coords.clientY) {
+                        delete this.events.startPointOverTop;
+                    }
+                    const screenDelta = this.instance.screen_height - this.instance.screenHeightOffset;
+                    const differKoef = (screenDelta - Math.abs(this.instance.getPanelTransformY())) / (screenDelta - Math.abs(this.breakpoints.topper)) / 8;
+                    const resultY = this.instance.getPanelTransformY() + (coords.diffY * differKoef);
+                    return { y: resultY };
+                }
+                else {
+                    // In inverse mode, ALWAYS respect top boundary  
+                    return { y: this.breakpoints.topper };
+                }
+            }
+            return undefined; // Allow normal movement
         }
         scrollPreventDrag(t) {
             let prevention = false;
@@ -2021,14 +2083,91 @@
                 this.events.isScrolling = true;
             });
         }
-        beforeBuildBreakpoints() {
-            // Set custom inverse values BEFORE main calculation starts
-            ['top', 'middle', 'bottom'].forEach((breakName) => {
-                var _a;
-                if ((_a = this.settings.breaks[breakName]) === null || _a === void 0 ? void 0 : _a.enabled) {
-                    this.breakpoints.breaks[breakName] = 2 * (this.settings.breaks[breakName].height + this.settings.bottomOffset);
+        /**
+         * Override setPaneElTransform to block X movement in inverse mode
+         * Inverse panes should only move vertically (Y-axis)
+         */
+        setPaneElTransform(params) {
+            // Update Y coordinate as normal (breakpoints are already calculated correctly)
+            this.instance.currentTranslateY = params.translateY;
+            // NEVER update X coordinate in inverse mode - keep it at 0
+            this.instance.currentTranslateX = 0;
+            // Apply transform with Y movement only, X always stays at 0
+            const transform = this.instance.buildTransform3d(0, this.instance.currentTranslateY, 0);
+            this.instance.paneEl.style.transform = transform;
+        }
+        /**
+         * Override fastSwipeNext for inverse mode
+         * Need to detect fast swipe but pass inverted diff to swipeNextPoint
+         */
+        fastSwipeNext(axis) {
+            var _a, _b;
+            // Only consider fast swipe when an actual drag occurred
+            if (this.events['allowClick'])
+                return false;
+            if (this.events['steps'].length < 2)
+                return false;
+            const last = this.events['steps'][this.events['steps'].length - 1];
+            const prev = this.events['steps'][this.events['steps'].length - 2];
+            const diff = ((_a = last === null || last === void 0 ? void 0 : last['pos' + axis]) !== null && _a !== void 0 ? _a : 0) - ((_b = prev === null || prev === void 0 ? void 0 : prev['pos' + axis]) !== null && _b !== void 0 ? _b : 0);
+            if (!Number.isFinite(diff))
+                return false;
+            return (Math.abs(diff) >= this.events.swipeNextSensivity);
+        }
+        /**
+         * Override swipeNextPoint for inverse coordinate system
+         * In inverse mode, we need to handle the direction properly
+         */
+        swipeNextPoint(diff, maxDiff, closest) {
+            var _a, _b, _c, _d, _e, _f;
+            const brs = this.breakpoints.breaks;
+            const settingsBreaks = this.settings.breaks;
+            const curr = this.instance.breakpoints.currentBreakpoint;
+            const topY = brs['top']; // Smallest Y (most content, top of screen)
+            const midY = brs['middle']; // Middle Y
+            const botY = brs['bottom']; // Largest Y (least content, bottom of screen)
+            // In inverse mode:
+            // diff > 0 (finger down) = show LESS content = move to larger Y (towards bottom breakpoint)
+            // diff < 0 (finger up) = show MORE content = move to smaller Y (towards top breakpoint)
+            // From top position (most content visible, smallest Y)
+            if (curr === topY) {
+                if (diff > maxDiff) { // Finger down → show less content
+                    if ((_a = settingsBreaks['middle']) === null || _a === void 0 ? void 0 : _a.enabled) {
+                        return midY;
+                    }
+                    if ((_b = settingsBreaks['bottom']) === null || _b === void 0 ? void 0 : _b.enabled) {
+                        return botY;
+                    }
                 }
-            });
+                return topY;
+            }
+            // From middle position
+            if (curr === midY) {
+                if (diff < -maxDiff && ((_c = settingsBreaks['top']) === null || _c === void 0 ? void 0 : _c.enabled)) { // Finger up → show more content
+                    return topY;
+                }
+                if (diff > maxDiff && ((_d = settingsBreaks['bottom']) === null || _d === void 0 ? void 0 : _d.enabled)) { // Finger down → show less content
+                    return botY;
+                }
+                return midY;
+            }
+            // From bottom position (least content visible, largest Y)
+            if (curr === botY) {
+                if (diff < -maxDiff) { // Finger up → show more content
+                    if ((_e = settingsBreaks['middle']) === null || _e === void 0 ? void 0 : _e.enabled) {
+                        return midY;
+                    }
+                    if ((_f = settingsBreaks['top']) === null || _f === void 0 ? void 0 : _f.enabled) {
+                        return topY;
+                    }
+                }
+                return botY;
+            }
+            return closest;
+        }
+        beforeBuildBreakpoints() {
+            // Don't override breaks here - let normal calculation happen first
+            // We'll convert to inverse coordinates in buildBreakpointsCompleted
         }
     }
 
@@ -2147,13 +2286,13 @@
                 // For animated presentations, only set X position, keep Y at screen height offset
                 this.instance.currentTranslateX = xPosition;
                 this.instance.currentTranslateY = this.instance.screenHeightOffset;
-                this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateX(${this.instance.currentTranslateX}px) translateZ(0px)`;
+                this.instance.paneEl.style.transform = this.instance.buildTransform3d(this.instance.currentTranslateX, this.instance.currentTranslateY, 0);
             }
             else {
                 // For non-animated presentations, set both X and Y to final positions
                 this.instance.currentTranslateX = xPosition;
                 this.instance.currentTranslateY = yPosition;
-                this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateX(${this.instance.currentTranslateX}px) translateZ(0px)`;
+                this.instance.paneEl.style.transform = this.instance.buildTransform3d(this.instance.currentTranslateX, this.instance.currentTranslateY, 0);
             }
             // Update currentBreakpoint to reflect actual position
             this.currentBreakpoint = this.initialBreakX;
@@ -2191,7 +2330,7 @@
             // Apply combined transform and sync cache
             this.instance.currentTranslateX = closestX || 0;
             this.instance.currentTranslateY = closestY || 0;
-            this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateX(${this.instance.currentTranslateX}px) translateZ(0px)`;
+            this.instance.paneEl.style.transform = this.instance.buildTransform3d(this.instance.currentTranslateX, this.instance.currentTranslateY, 0);
         }
         getClosestBreakX() {
             if (!this.horizontalBreaks)
@@ -2210,7 +2349,7 @@
             const targetX = this.horizontalBreaks[breakX];
             this.instance.currentTranslateX = targetX;
             this.instance.currentTranslateY = currentY;
-            this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateX(${this.instance.currentTranslateX}px) translateZ(0px)`;
+            this.instance.paneEl.style.transform = this.instance.buildTransform3d(this.instance.currentTranslateX, this.instance.currentTranslateY, 0);
             this.currentBreakpoint = breakX;
         }
         // Get current horizontal breakpoint
@@ -2336,8 +2475,22 @@
             });
         }
         setPaneElTransform(params) {
-            let closest = params.type === 'end' ? 0 : params.translateX;
-            this.instance.paneEl.style.transform = `translateX(${closest || 0}px) translateY(${params.translateY}px) translateZ(0px)`;
+            let closestX;
+            let closestY = params.translateY;
+            // Modal X behavior: allow movement during drag, but reset to center on end
+            if (params.type === 'end') {
+                closestX = 0; // Reset to center on touchEnd
+            }
+            else {
+                // During drag ('move'), use provided X or preserve current
+                closestX = params.translateX !== undefined
+                    ? params.translateX
+                    : this.instance.getPanelTransformX();
+            }
+            // Update tracked position
+            this.instance.currentTranslateX = closestX;
+            this.instance.currentTranslateY = closestY;
+            this.instance.paneEl.style.transform = this.instance.buildTransform3d(this.instance.currentTranslateX, this.instance.currentTranslateY, 0);
         }
         /**
          * Private class methods
@@ -2361,8 +2514,8 @@
                 }));
             }
             if (conf.fromCurrentPosition) {
-                let computedTranslate = new WebKitCSSMatrix(window.getComputedStyle(this.instance.paneEl).transform);
-                transition.to.transform = `translateY(${computedTranslate.m42}px) translateX(${computedTranslate.m41}px) translateZ(0px)`;
+                let computedTranslate = this.instance.parseTransform3d(this.instance.paneEl);
+                transition.to.transform = this.instance.buildTransform3d(computedTranslate.x, computedTranslate.y, 0);
             }
             return this.instance['customDestroy'](Object.assign(Object.assign({}, conf), { transition }));
         }
@@ -2550,7 +2703,7 @@
     `;
             // Panel (appying transform ASAP, avoid timeouts for animate:true)
             this.paneEl = document.createElement('div');
-            this.paneEl.style.transform = `translateY(${this.screenHeightOffset}px) translateZ(0px)`;
+            this.paneEl.style.transform = this.buildTransform3d(0, this.screenHeightOffset, 0);
             this.currentTranslateY = this.screenHeightOffset;
             this.currentTranslateX = 0;
             this.paneEl.classList.add('pane');
@@ -2702,7 +2855,7 @@
                     ? JSON.parse(JSON.stringify(conf.transition.from)) : null;
                 if (customTransitionFrom) {
                     if (!customTransitionFrom.transform) {
-                        customTransitionFrom.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+                        customTransitionFrom.transform = this.buildTransform3d(0, this.breakpoints.breaks[this.settings.initialBreak], 0);
                     }
                     Object.assign(this.paneEl.style, customTransitionFrom);
                 }
@@ -2754,7 +2907,7 @@
                 else {
                     this.breakpoints.prevBreakpoint = this.settings.initialBreak;
                     this.currentTranslateY = this.breakpoints.breaks[this.settings.initialBreak];
-                    this.paneEl.style.transform = `translateY(${this.currentTranslateY}px) translateX(${this.currentTranslateX}px) translateZ(0px)`;
+                    this.paneEl.style.transform = this.buildTransform3d(this.currentTranslateX, this.currentTranslateY, 0);
                 }
                 /****** Attach Events *******/
                 this.events.attachAllEvents();
@@ -2837,6 +2990,65 @@
             this.styleEl.textContent += styleString.replace(/\s\s+/g, ' ');
         }
         ;
+        /**
+         * Utility function to build transform3d string for better performance
+         * @param {number} x - X translation in pixels
+         * @param {number} y - Y translation in pixels
+         * @param {number} z - Z translation in pixels (defaults to 0)
+         */
+        buildTransform3d(x = 0, y = 0, z = 0) {
+            return `translate3d(${x}px, ${y}px, ${z}px)`;
+        }
+        /**
+         * Utility function to build transform3d with scale for better performance
+         * @param {number} x - X translation in pixels
+         * @param {number} y - Y translation in pixels
+         * @param {number} z - Z translation in pixels (defaults to 0)
+         * @param {number} scale - Scale factor (defaults to 1)
+         */
+        buildTransform3dWithScale(x = 0, y = 0, z = 0, scale = 1) {
+            return `translate3d(${x}px, ${y}px, ${z}px) scale(${scale})`;
+        }
+        /**
+         * Modern utility to parse transform3d values from computed style
+         * Replaces WebKitCSSMatrix for better performance
+         * @param {HTMLElement} element - Element to get transform from
+         * @returns {object} Object with x, y, z translation values
+         */
+        parseTransform3d(element) {
+            const transform = window.getComputedStyle(element).transform;
+            if (transform === 'none' || !transform) {
+                return { x: 0, y: 0, z: 0 };
+            }
+            // Handle matrix3d() format
+            if (transform.startsWith('matrix3d(')) {
+                const values = transform.slice(9, -1).split(',').map(v => parseFloat(v.trim()));
+                return {
+                    x: values[12] || 0,
+                    y: values[13] || 0,
+                    z: values[14] || 0
+                };
+            }
+            // Handle matrix() format (2D)
+            if (transform.startsWith('matrix(')) {
+                const values = transform.slice(7, -1).split(',').map(v => parseFloat(v.trim()));
+                return {
+                    x: values[4] || 0,
+                    y: values[5] || 0,
+                    z: 0
+                };
+            }
+            // Fallback for translate3d() format
+            const translate3dMatch = transform.match(/translate3d\(([^,]+),\s*([^,]+),\s*([^)]+)\)/);
+            if (translate3dMatch) {
+                return {
+                    x: parseFloat(translate3dMatch[1]) || 0,
+                    y: parseFloat(translate3dMatch[2]) || 0,
+                    z: parseFloat(translate3dMatch[3]) || 0
+                };
+            }
+            return { x: 0, y: 0, z: 0 };
+        }
         getModuleRef(className) {
             return (className.charAt(0).toLowerCase() + className.slice(1)).replace('Module', '');
         }

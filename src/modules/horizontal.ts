@@ -151,12 +151,12 @@ export class HorizontalModule {
       // For animated presentations, only set X position, keep Y at screen height offset
       this.instance.currentTranslateX = xPosition;
       this.instance.currentTranslateY = this.instance.screenHeightOffset;
-      this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateX(${this.instance.currentTranslateX}px) translateZ(0px)`;
+      this.instance.paneEl.style.transform = this.instance.buildTransform3d(this.instance.currentTranslateX, this.instance.currentTranslateY, 0);
     } else {
       // For non-animated presentations, set both X and Y to final positions
       this.instance.currentTranslateX = xPosition;
       this.instance.currentTranslateY = yPosition;
-      this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateX(${this.instance.currentTranslateX}px) translateZ(0px)`;
+      this.instance.paneEl.style.transform = this.instance.buildTransform3d(this.instance.currentTranslateX, this.instance.currentTranslateY, 0);
     }
     
     // Update currentBreakpoint to reflect actual position
@@ -201,7 +201,7 @@ export class HorizontalModule {
     // Apply combined transform and sync cache
     this.instance.currentTranslateX = closestX || 0;
     this.instance.currentTranslateY = closestY || 0;
-    this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateX(${this.instance.currentTranslateX}px) translateZ(0px)`;
+    this.instance.paneEl.style.transform = this.instance.buildTransform3d(this.instance.currentTranslateX, this.instance.currentTranslateY, 0);
   }
 
   private getClosestBreakX(): number {
@@ -223,7 +223,7 @@ export class HorizontalModule {
     
     this.instance.currentTranslateX = targetX;
     this.instance.currentTranslateY = currentY;
-    this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateX(${this.instance.currentTranslateX}px) translateZ(0px)`;
+    this.instance.paneEl.style.transform = this.instance.buildTransform3d(this.instance.currentTranslateX, this.instance.currentTranslateY, 0);
     this.currentBreakpoint = breakX;
   }
 

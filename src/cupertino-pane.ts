@@ -150,7 +150,7 @@ export class CupertinoPane {
 
     // Panel (appying transform ASAP, avoid timeouts for animate:true)
     this.paneEl = document.createElement('div');
-    this.paneEl.style.transform = `translateY(${this.screenHeightOffset}px) translateZ(0px)`;
+    this.paneEl.style.transform = this.buildTransform3d(0, this.screenHeightOffset, 0);
     this.currentTranslateY = this.screenHeightOffset;
     this.currentTranslateX = 0;
     this.paneEl.classList.add('pane');
@@ -318,7 +318,7 @@ export class CupertinoPane {
         ? JSON.parse(JSON.stringify(conf.transition.from)) : null; 
       if (customTransitionFrom) {
         if (!customTransitionFrom.transform) {
-          customTransitionFrom.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+          customTransitionFrom.transform = this.buildTransform3d(0, this.breakpoints.breaks[this.settings.initialBreak], 0);
         }
         Object.assign(this.paneEl.style, customTransitionFrom);
       }
@@ -381,7 +381,7 @@ export class CupertinoPane {
       } else {
         this.breakpoints.prevBreakpoint = this.settings.initialBreak;
         this.currentTranslateY = this.breakpoints.breaks[this.settings.initialBreak];
-        this.paneEl.style.transform = `translateY(${this.currentTranslateY}px) translateX(${this.currentTranslateX}px) translateZ(0px)`;
+        this.paneEl.style.transform = this.buildTransform3d(this.currentTranslateX, this.currentTranslateY, 0);
       }
 
       /****** Attach Events *******/
@@ -506,6 +506,72 @@ export class CupertinoPane {
   public addStyle(styleString): void {
     this.styleEl.textContent += styleString.replace(/\s\s+/g, ' ');
   };
+
+  /**
+   * Utility function to build transform3d string for better performance
+   * @param {number} x - X translation in pixels
+   * @param {number} y - Y translation in pixels
+   * @param {number} z - Z translation in pixels (defaults to 0)
+   */
+  public buildTransform3d(x: number = 0, y: number = 0, z: number = 0): string {
+    return `translate3d(${x}px, ${y}px, ${z}px)`;
+  }
+
+  /**
+   * Utility function to build transform3d with scale for better performance
+   * @param {number} x - X translation in pixels
+   * @param {number} y - Y translation in pixels
+   * @param {number} z - Z translation in pixels (defaults to 0)
+   * @param {number} scale - Scale factor (defaults to 1)
+   */
+  public buildTransform3dWithScale(x: number = 0, y: number = 0, z: number = 0, scale: number = 1): string {
+    return `translate3d(${x}px, ${y}px, ${z}px) scale(${scale})`;
+  }
+
+  /**
+   * Modern utility to parse transform3d values from computed style
+   * Replaces WebKitCSSMatrix for better performance
+   * @param {HTMLElement} element - Element to get transform from
+   * @returns {object} Object with x, y, z translation values
+   */
+  public parseTransform3d(element: HTMLElement): {x: number, y: number, z: number} {
+    const transform = window.getComputedStyle(element).transform;
+    if (transform === 'none' || !transform) {
+      return {x: 0, y: 0, z: 0};
+    }
+    
+    // Handle matrix3d() format
+    if (transform.startsWith('matrix3d(')) {
+      const values = transform.slice(9, -1).split(',').map(v => parseFloat(v.trim()));
+      return {
+        x: values[12] || 0,
+        y: values[13] || 0, 
+        z: values[14] || 0
+      };
+    }
+    
+    // Handle matrix() format (2D)
+    if (transform.startsWith('matrix(')) {
+      const values = transform.slice(7, -1).split(',').map(v => parseFloat(v.trim()));
+      return {
+        x: values[4] || 0,
+        y: values[5] || 0,
+        z: 0
+      };
+    }
+    
+    // Fallback for translate3d() format
+    const translate3dMatch = transform.match(/translate3d\(([^,]+),\s*([^,]+),\s*([^)]+)\)/);
+    if (translate3dMatch) {
+      return {
+        x: parseFloat(translate3dMatch[1]) || 0,
+        y: parseFloat(translate3dMatch[2]) || 0,
+        z: parseFloat(translate3dMatch[3]) || 0
+      };
+    }
+    
+    return {x: 0, y: 0, z: 0};
+  }
 
   private getModuleRef(className): string {
     return (className.charAt(0).toLowerCase() + className.slice(1)).replace('Module','');

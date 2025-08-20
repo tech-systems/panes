@@ -1244,7 +1244,7 @@ html {
 
 /* Demo titles container - no card styling */
 .demo-titles {
-  margin-bottom: 20px;
+  margin-bottom: 35px;
 }
 
 .demo-titles h1 {
@@ -1274,6 +1274,7 @@ html {
 
 /* Demo description */
 .demo-description {
+  margin-top: 20px;
   margin-bottom: 25px;
 }
 
@@ -1287,6 +1288,13 @@ html {
   line-height: 1.6;
   max-width: 400px;
   text-shadow: 0 1px 4px var(--shadow-primary);
+}
+
+.demo-description p.small-uppercase {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 500;
 }
 
 /* Technology logos - simplified design */
@@ -1376,6 +1384,13 @@ html {
   .demo-description p {
     font-size: 13px;
     max-width: 320px;
+  }
+  .tech-logos {
+    width: calc(100% - 80px);
+  }
+
+  .demo-description p.small-uppercase {
+    font-size: 12px;
   }
   
   .tech-logos {

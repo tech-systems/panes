@@ -133,8 +133,28 @@ export class ModalModule {
   }
 
   public setPaneElTransform(params) {
-    let closest = params.type === 'end' ? 0 : params.translateX;
-    this.instance.paneEl.style.transform = `translateX(${closest || 0}px) translateY(${params.translateY}px) translateZ(0px)`;
+    let closestX: number;
+    let closestY = params.translateY;
+    
+    // Modal X behavior: allow movement during drag, but reset to center on end
+    if (params.type === 'end') {
+      closestX = 0; // Reset to center on touchEnd
+    } else {
+      // During drag ('move'), use provided X or preserve current
+      closestX = params.translateX !== undefined 
+        ? params.translateX 
+        : this.instance.getPanelTransformX();
+    }
+    
+    // Update tracked position
+    this.instance.currentTranslateX = closestX;
+    this.instance.currentTranslateY = closestY;
+    
+    this.instance.paneEl.style.transform = this.instance.buildTransform3d(
+      this.instance.currentTranslateX, 
+      this.instance.currentTranslateY, 
+      0
+    );
   }
 
   /**
@@ -164,8 +184,8 @@ export class ModalModule {
     }
 
     if (conf.fromCurrentPosition) {
-      let computedTranslate = new WebKitCSSMatrix(window.getComputedStyle(this.instance.paneEl).transform);
-      transition.to.transform = `translateY(${computedTranslate.m42}px) translateX(${computedTranslate.m41}px) translateZ(0px)`;
+      let computedTranslate = this.instance.parseTransform3d(this.instance.paneEl);
+      transition.to.transform = this.instance.buildTransform3d(computedTranslate.x, computedTranslate.y, 0);
     }
 
     return this.instance['customDestroy']({...conf, transition });
@@ -190,6 +210,7 @@ export class ModalModule {
     let hardness = 8;
     const differKoefY = this.instance.getPanelTransformY() / this.breakpoints.topper / hardness;
     const differKoefX = this.instance.getPanelTransformX() / this.breakpoints.topper / hardness;
+    
     return { 
       y: this.instance.getPanelTransformY() + (coords.diffY * (differKoefY + differKoefX)),
       x: this.instance.getPanelTransformX() + (coords.diffX * (differKoefY + differKoefX))

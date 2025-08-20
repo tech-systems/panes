@@ -129,7 +129,8 @@ export class Transitions {
          */
         if (subTransition.to) {
           if (!subTransition.to.transform) {
-            subTransition.to.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+            const initialBreakY = this.breakpoints.breaks[this.settings.initialBreak];
+            subTransition.to.transform = this.instance.buildTransform3d(0, initialBreakY, 0);
           }
           Object.assign(this.instance.paneEl.style, subTransition.to);
         }
@@ -147,7 +148,19 @@ export class Transitions {
 
   private setPaneElTransform(params) {
     this.instance.currentTranslateY = params.translateY;
-    this.instance.paneEl.style.transform = `translateY(${this.instance.currentTranslateY}px) translateZ(0px)`;
+    
+    // Handle X-axis if provided (used by horizontal and modal modules)
+    if (params.translateX !== undefined) {
+      this.instance.currentTranslateX = params.translateX;
+    }
+    
+    const transform = this.instance.buildTransform3d(
+      this.instance.currentTranslateX, 
+      this.instance.currentTranslateY, 
+      0
+    );
+    
+    this.instance.paneEl.style.transform = transform;
   }
 
   public buildTransitionValue(bounce: boolean, duration?: number): string {

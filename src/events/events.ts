@@ -333,10 +333,8 @@ export class Events {
       }
 
       // Move while transition patch next transitions
-      let computedTranslateY = new WebKitCSSMatrix(
-        window.getComputedStyle(this.instance.paneEl).transform
-      ).m42;
-      let transitionYDiff = computedTranslateY - prevY;
+      let computedTranslate = this.instance.parseTransform3d(this.instance.paneEl);
+      let transitionYDiff = computedTranslate.y - prevY;
       if (Math.abs(transitionYDiff)) {
         newVal += transitionYDiff;
       }
@@ -382,6 +380,7 @@ export class Events {
         clientX, clientY, newVal,
         newValX, diffY, diffX
     });
+    
     if (forceNewVal) {
       if (!isNaN(forceNewVal.y)) newVal = forceNewVal.y;
       if (!isNaN(forceNewVal.x)) newValX = forceNewVal.x;
@@ -438,8 +437,12 @@ export class Events {
     this.instance.checkOpacityAttr(newVal);
     this.instance.checkOverflowAttr(newVal);
     
-    // Apply the transition (core only handles Y-axis, modules can override)
-    this.transitions.doTransition({type: 'move', translateY: newVal});
+    // Apply the transition - PASS BOTH X AND Y for modules that need it
+    this.transitions.doTransition({
+      type: 'move', 
+      translateY: newVal,
+      translateX: newValX
+    });
 
     // Clear the pending data and animation frame ID
     this.pendingMoveData = null;
@@ -542,7 +545,14 @@ export class Events {
       this.instance.emit('onTransitionEnd', {target: this.instance.paneEl});
     }
 
-    this.transitions.doTransition({type: 'end', translateY: closest});
+    // Preserve current X position for modules that need it (like modal)
+    const currentX = this.instance.getPanelTransformX();
+
+    this.transitions.doTransition({
+      type: 'end', 
+      translateY: closest,
+      translateX: currentX
+    });
   }
 
   /**
