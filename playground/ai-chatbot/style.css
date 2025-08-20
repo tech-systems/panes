@@ -13,6 +13,9 @@
    - Modern UI with gradient accents
 */
 
+/* Import JetBrains Mono font */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
 /* =================================
    RESET & BASE STYLES
    ================================= */
@@ -1219,148 +1222,189 @@ html {
 /* =================================
    TOP CONTENT SECTION
    =================================
-   Hero section with titles and description at the top of the page. */
-  /* Top content section */
-  .top-content {
-    position: absolute;
-    top: 20px;
-    width: calc(100% - 40px);
-    max-width: 390px;
-    left: 0;
-    right: 0;
-    margin-left: auto;
-    margin-right: auto;
-    height: auto;
-    justify-content: space-between;
-    display: flex;
-    flex-direction: column;
-    z-index: 0;
-  }
+   Demo scene header with titles and technology showcase. */
 
-  .titles {
-    background: var(--bg-secondary);
-    border-radius: 20px;
-    padding: 25px;
-    border: 1px solid var(--border-primary);
-    box-shadow: 0 4px 16px var(--shadow-primary);
+/* Top content section */
+.top-content {
+  position: absolute;
+  top: 30px;
+  width: calc(100% - 40px);
+  max-width: 600px;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 0;
+  text-align: center;
+}
+
+/* Demo titles container - no card styling */
+.demo-titles {
+  margin-bottom: 20px;
+}
+
+.demo-titles h1 {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 56px;
+  font-weight: 700;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 8px 0;
+  letter-spacing: -2px;
+  text-shadow: 0 0 20px rgba(131, 56, 236, 0.3);
+}
+
+.demo-titles h2.subtitle {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text-accent);
+  margin: 0;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.9;
+  text-shadow: 0 2px 10px var(--shadow-primary);
+}
+
+/* Demo description */
+.demo-description {
+  margin-bottom: 25px;
+}
+
+.demo-description p {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin: 0;
+  letter-spacing: 0.5px;
+  line-height: 1.6;
+  max-width: 400px;
+  text-shadow: 0 1px 4px var(--shadow-primary);
+}
+
+/* Technology logos - simplified design */
+.tech-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.tech-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  cursor: default;
+}
+
+.tech-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  max-width: 70px;
+  width: auto;
+  filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.1));
+}
+
+.tech-icon img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: invert(1) brightness(0.6) contrast(0.8) sepia(0.1);
+}
+
+/* Specific size adjustments for Grok and CrewAI logos */
+.tech-item:nth-child(4) .tech-icon img, /* Grok */
+.tech-item:nth-child(6) .tech-icon img { /* CrewAI */
+  max-width: 85%;
+  max-height: 85%;
+}
+
+
+
+/* Light theme adjustments */
+:root[data-theme="light"] .demo-titles h1 {
+  text-shadow: 0 0 20px rgba(131, 56, 236, 0.2);
+}
+
+:root[data-theme="light"] .demo-titles h2.subtitle {
+  text-shadow: none;
+}
+
+:root[data-theme="light"] .demo-description p {
+  text-shadow: none;
+}
+
+:root[data-theme="light"] .tech-icon {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+:root[data-theme="light"] .tech-icon img {
+  filter: none;
+  opacity: 0.85;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 480px) {
+  .top-content {
+    width: calc(100% - 30px);
+    top: 20px;
   }
   
-  /* Light theme: Enhanced background for better visibility */
-  :root[data-theme="light"] .titles {
-    background: rgba(255, 255, 255, 0.85);
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    box-shadow: 
-      0 4px 16px rgba(0, 0, 0, 0.08),
-      0 1px 3px rgba(0, 0, 0, 0.1);
-  }
-
-  .titles h1 {
+  .demo-titles h1 {
     font-size: 42px;
-    font-weight: 700;
-    background: var(--accent-gradient);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 10px;
-    margin-top: 0;
     letter-spacing: -1px;
   }
-
-  .titles h2.subtitle {
-    font-size: 20px;
-    font-weight: 600;
-    color: var(--text-accent);
-    margin-top: 0;
-    margin-bottom: 0;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+  
+  .demo-titles h2.subtitle {
+    font-size: 16px;
+    letter-spacing: 1.5px;
   }
   
-  /* Light theme: Remove text shadow for subtitle */
-  :root[data-theme="light"] .titles h2.subtitle {
-    text-shadow: none;
+  .demo-description p {
+    font-size: 13px;
+    max-width: 320px;
   }
   
-  /* Dark theme: Keep text shadow for subtitle */
-  :root[data-theme="dark"] .titles h2.subtitle,
-  :root:not([data-theme]) .titles h2.subtitle {
-    text-shadow: 0 2px 10px var(--shadow-primary);
+  .tech-logos {
+    gap: 12px;
   }
-
-  .container-text {
-    display: flex;
-    margin-left: 0;
-    margin-top: 20px;
+  
+  .tech-icon {
+    min-width: 25px;
+    max-width: 60px;
+    width: auto;
   }
+  
 
-  .container-text .icon {
-    flex-shrink: 0;
-    display: block;
-    width: 40px;
-    height: 40px;
-    margin-top: 5px;
-    background: var(--bg-accent);
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    border: 1px solid var(--border-primary);
+}
+
+@media (max-width: 360px) {
+  .demo-titles h1 {
+    font-size: 36px;
   }
-
-  .ai-icon {
-    font-size: 24px;
-    filter: drop-shadow(0 2px 8px var(--shadow-primary));
-  }
-
-  .container-text .right {
-    display: flex;
-    flex-direction: column;
-    margin-left: 15px;
-    margin-right: 0;
-  }
-
-  .container-text .right small {
-    margin-top: 0px;
-    color: var(--text-secondary);
-    display: block;
+  
+  .demo-titles h2.subtitle {
     font-size: 14px;
-    line-height: 20px;
+    letter-spacing: 1px;
   }
   
-  /* Light theme: Remove text shadow for small text */
-  :root[data-theme="light"] .container-text .right small {
-    text-shadow: none;
+  .tech-logos {
+    gap: 10px;
   }
-  
-  /* Dark theme: Keep text shadow for small text */
-  :root[data-theme="dark"] .container-text .right small,
-  :root:not([data-theme]) .container-text .right small {
-    text-shadow: 0 1px 4px var(--shadow-primary);
-  }
-
-  @media (max-width: 480px) {
-    .top-content {
-      width: calc(100% - 30px);
-      top: 15px;
-    }
-    
-    .titles {
-      padding: 20px;
-    }
-    
-    .titles h1 {
-      font-size: 36px;
-    }
-    
-    .titles h2.subtitle {
-      font-size: 18px;
-    }
-    
-    .container-text .right small {
-      font-size: 13px;
-      line-height: 18px;
-    }
-  }
+}
 
 /* =================================
    VOICE RECORDING
@@ -1828,130 +1872,4 @@ html {
     text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
   }
 
-/* =================================
-   INTEGRATIONS SECTION
-   =================================
-   Section showcasing platform integrations with AI services. */
-  /* Integrations section styles */
-  .integrations-section {
-    margin-top: 25px;
-    padding-top: 20px;
-    border-top: 1px solid var(--border-primary);
-  }
 
-  .integrations-title {
-    font-size: 16px;
-    font-weight: 600;
-    color: var(--text-accent);
-    margin: 0 0 15px 0;
-    text-align: center;
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    background: var(--accent-gradient-alt);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-
-  .integrations-grid {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 12px;
-    margin-bottom: 15px;
-  }
-
-  .integration-item {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    padding: 12px 8px;
-    background: var(--bg-accent);
-    border: 1px solid var(--border-primary);
-    border-radius: 12px;
-    transition: all 0.3s ease;
-    backdrop-filter: blur(5px);
-    -webkit-backdrop-filter: blur(5px);
-  }
-
-  .integration-item:hover {
-    background: var(--bg-accent-hover);
-    border-color: var(--border-accent);
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px var(--shadow-secondary);
-  }
-
-  .integration-icon {
-    font-size: 20px;
-    width: 32px;
-    height: 32px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--bg-accent-hover);
-    border-radius: 8px;
-    border: 1px solid var(--border-primary);
-  }
-
-  .integration-name {
-    font-size: 11px;
-    font-weight: 500;
-    color: var(--text-secondary);
-    text-align: center;
-    letter-spacing: 0.3px;
-    line-height: 1.2;
-  }
-
-  .integrations-description {
-    font-size: 12px;
-    color: var(--text-secondary);
-    text-align: center;
-    line-height: 1.4;
-    margin: 0;
-  }
-  
-  /* Light theme: Remove text shadow for integrations description */
-  :root[data-theme="light"] .integrations-description {
-    text-shadow: none;
-  }
-  
-  /* Dark theme: Keep text shadow for integrations description */
-  :root[data-theme="dark"] .integrations-description,
-  :root:not([data-theme]) .integrations-description {
-    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
-  }
-
-  /* Mobile responsive adjustments */
-  @media (max-width: 480px) {
-    .integrations-section {
-      margin-top: 20px;
-      padding-top: 15px;
-    }
-    
-    .integrations-title {
-      font-size: 14px;
-      margin-bottom: 12px;
-    }
-    
-    .integrations-grid {
-      gap: 10px;
-    }
-    
-    .integration-item {
-      padding: 10px 6px;
-    }
-    
-    .integration-icon {
-      font-size: 18px;
-      width: 28px;
-      height: 28px;
-    }
-    
-    .integration-name {
-      font-size: 10px;
-    }
-    
-    .integrations-description {
-      font-size: 11px;
-    }
-  }
