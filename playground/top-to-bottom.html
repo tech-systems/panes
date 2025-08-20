@@ -65,10 +65,11 @@
     var element = document.querySelector('ion-drawer');
     var drawer = new CupertinoPane(element, { 
         inverse: true,
+        initialBreakpoint: 'middle',
         breaks: {
-          top: { enabled: true, height: screen.height * 0.65 },
-          middle: { enabled: true, height: 300 },
-          bottom: { enabled: true, height: screen.height * 0.1 },
+          top: { enabled: true, height: screen.height - 100 },
+          middle: { enabled: true, height: 600 },
+          bottom: { enabled: true, height: 400 },
         },
         // clickBottomOpen: false,
         // lowerThanBottom: false,

@@ -127,41 +127,36 @@ export class KeyboardEvents {
   }
 
   /**
-   * Window resize event
-   * We handle here keyboard event as well
+   * Detect and handle keyboard events from window resize
+   * Public method to be called by resize handler
    * @param e
    */
-  public onWindowResizeCb = (e) => this.onWindowResize(e);
-  private async onWindowResize(e) {
-
-      /**
-       * Keyboard event detection
-       * We should separate keyboard and resize events
-       */
-      if (this.isFormElement(document.activeElement)) {
-        // Only for non-cordova
-        if (!this.device.cordova) {
-          this.onKeyboardShow({keyboardHeight: this.instance.screen_height - window.innerHeight});
-        }
-        return;
+  public handleKeyboardFromResize(e): boolean {
+    /**
+     * Keyboard event detection
+     * We should separate keyboard and resize events
+     */
+    if (this.isFormElement(document.activeElement)) {
+      // Only for non-cordova
+      if (!this.device.cordova) {
+        this.onKeyboardShow({keyboardHeight: this.instance.screen_height - window.innerHeight});
       }
+      return true; // Keyboard event was handled
+    }
 
-      if (this.keyboardVisibleResize) {
-        this.keyboardVisibleResize = false;
+    if (this.keyboardVisibleResize) {
+      this.keyboardVisibleResize = false;
 
-        // Only for non-cordova
-        if (!this.device.cordova) {
-          this.onKeyboardWillHide({});
-        }
-        return;
+      // Only for non-cordova
+      if (!this.device.cordova) {
+        this.onKeyboardWillHide({});
       }
+      return true; // Keyboard event was handled
+    }
 
-    await new Promise((resolve) => setTimeout(() => resolve(true), 150));
-    this.instance.updateScreenHeights();
-    this.breakpoints.buildBreakpoints(JSON.parse(this.breakpoints.lockedBreakpoints));
+    return false; // No keyboard event, proceed with resize
   }
 
- 
   /**
    * Private class methods
    */

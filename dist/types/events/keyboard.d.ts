@@ -26,12 +26,11 @@ export declare class KeyboardEvents {
     onKeyboardWillHideCb: (e: any) => void;
     private onKeyboardWillHide;
     /**
-     * Window resize event
-     * We handle here keyboard event as well
+     * Detect and handle keyboard events from window resize
+     * Public method to be called by resize handler
      * @param e
      */
-    onWindowResizeCb: (e: any) => Promise<void>;
-    private onWindowResize;
+    handleKeyboardFromResize(e: any): boolean;
     /**
      * Private class methods
      */

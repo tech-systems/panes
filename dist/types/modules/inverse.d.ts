@@ -22,4 +22,20 @@ export declare class InverseModule {
     scrollPreventDrag(t: any): boolean;
     private isOverflowEl;
     private onScroll;
+    /**
+     * Override setPaneElTransform to block X movement in inverse mode
+     * Inverse panes should only move vertically (Y-axis)
+     */
+    setPaneElTransform(params: any): void;
+    /**
+     * Override fastSwipeNext for inverse mode
+     * Need to detect fast swipe but pass inverted diff to swipeNextPoint
+     */
+    fastSwipeNext(axis: 'Y' | 'X'): boolean;
+    /**
+     * Override swipeNextPoint for inverse coordinate system
+     * In inverse mode, we need to handle the direction properly
+     */
+    swipeNextPoint(diff: number, maxDiff: number, closest: number): number;
+    private beforeBuildBreakpoints;
 }

@@ -17,40 +17,47 @@ async function buildEntry(file) {
   const filename = file.replace('.ts', '');
 
   // Bundle
-  new Promise(async(resolve, reject) => {
-    let bundle = await rollup.rollup({
-      input: `./src/modules/${file}`,
-      plugins: [
-        replace({
-          delimiters: ['', ''],
-          preventAssignment: true
-        }),
-        typescript({
-          useTsconfigDeclarationDir: true,
-          cacheRoot: process.cwd() + `/.rpt2_cache/modules.${filename}`,
-        })
-      ],
-    });
+  return new Promise(async(resolve, reject) => {
+    try {
+      const cacheRoot = process.cwd() + `/.rpt2_cache/modules/${filename}`;
+      await fs.ensureDir(cacheRoot);
+      let bundle = await rollup.rollup({
+        input: `./src/modules/${file}`,
+        plugins: [
+          replace({
+            delimiters: ['', ''],
+            preventAssignment: true
+          }),
+          typescript({
+            useTsconfigDeclarationDir: true,
+            cacheRoot,
+            clean: env === 'development',
+          })
+        ],
+      });
 
-    bundle = await bundle.write({
-      name: `${filename}Module`,
-      format: 'esm', 
-      banner,
-      strict: true,
-      exports: 'named',
-      file: `./${outputDir}/${filename}.js`,
-    });
+      bundle = await bundle.write({
+        name: `${filename}Module`,
+        format: 'esm', 
+        banner,
+        strict: true,
+        exports: 'named',
+        file: `./${outputDir}/${filename}.js`,
+      });
 
-    const result = bundle.output[0];
-    const { code } = await Terser.minify(result.code, {
-      output: { preamble: banner },
-    }).catch((err) => {
-      console.error(`Terser failed on file ${filename}: ${err.toString()}`);
-      return reject();
-    });
+      const result = bundle.output[0];
+      const { code } = await Terser.minify(result.code, {
+        output: { preamble: banner },
+      }).catch((err) => {
+        console.error(`Terser failed on file ${filename}: ${err.toString()}`);
+        return reject(err);
+      });
 
-    await fs.writeFile(`./${outputDir}/${filename}.js`, code);
-    return resolve();
+      await fs.writeFile(`./${outputDir}/${filename}.js`, code);
+      resolve();
+    } catch (error) {
+      reject(error);
+    }
   });
 }
 

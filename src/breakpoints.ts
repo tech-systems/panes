@@ -32,7 +32,7 @@ export class Breakpoints {
    * @param conf breakpoints
    */  
   public async buildBreakpoints(conf?: PaneBreaks, bottomOffset: number = 0, animated: boolean = true) {
-    this.breaks = {};
+    this.breaks = Object.create(null);
     this.conf = conf;
     this.settings.bottomOffset = bottomOffset || this.settings.bottomOffset;
 
@@ -55,7 +55,7 @@ export class Breakpoints {
 
       // Apply initial breaks
       if (this.settings.breaks[val]?.enabled) {
-        this.breaks[val] = this.breaks[val] || this.instance.screenHeightOffset;
+        this.breaks[val] = this.instance.screenHeightOffset;
         this.breaks[val] -= this.settings.bottomOffset;
         this.breaks[val] -= this.settings.breaks[val].height;
       }
@@ -142,8 +142,11 @@ export class Breakpoints {
   }
 
   public getClosestBreakY(): number {
-    return this.brs.reduce((prev, curr) => {
-      return (Math.abs(curr - this.instance.getPanelTransformY()) < Math.abs(prev - this.instance.getPanelTransformY()) ? curr : prev);
+    const currentY = this.instance.getPanelTransformY();
+    const closest = this.brs.reduce((prev, curr) => {
+      return (Math.abs(curr - currentY) < Math.abs(prev - currentY) ? curr : prev);
     });
+    
+    return closest;
   }
 }

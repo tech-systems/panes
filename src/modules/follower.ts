@@ -34,14 +34,14 @@ export class FollowerModule {
         this.settings.followerElement
       );
       this.followerEl.style.willChange = 'transform, border-radius';
-      this.followerEl.style.transform = `translateY(0px) translateZ(0px)`;
+      this.followerEl.style.transform = this.instance.buildTransform3d(0, 0, 0);
       this.followerEl.style.transition = this.transitions.buildTransitionValue(this.settings.breaks[this.instance.currentBreak()]?.bounce);
     });
 
     // Move transition same for follower element (minus pane height)
     this.instance.on('onMoveTransitionStart', (ev) => {
       this.followerEl.style.transition = 'all 0ms linear 0ms';
-      this.followerEl.style.transform = `translateY(${ev.translateY - this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+      this.followerEl.style.transform = this.instance.buildTransform3d(0, ev.translateY - this.breakpoints.breaks[this.settings.initialBreak], 0);
     });
 
     // Reset transition same as for pane element
@@ -51,7 +51,7 @@ export class FollowerModule {
 
     this.instance.on('onTransitionStart', (ev) => {
       this.followerEl.style.transition = ev.transition;
-      this.followerEl.style.transform = `translateY(${ev.translateY.new - this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+      this.followerEl.style.transform = this.instance.buildTransform3d(0, ev.translateY.new - this.breakpoints.breaks[this.settings.initialBreak], 0);
     });
   }  
 }

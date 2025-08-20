@@ -21,11 +21,14 @@ export declare class Events {
     isScrolling: boolean;
     startPointOverTop: number;
     swipeNextSensivity: number;
+    private rafId;
+    private pendingMoveData;
     private settings;
     private device;
     private breakpoints;
     private transitions;
     private keyboardEvents;
+    private resizeEvents;
     constructor(instance: CupertinoPane);
     private getTouchEvents;
     attachAllEvents(): void;
@@ -50,10 +53,14 @@ export declare class Events {
     touchMoveCb: (t: any) => void;
     private touchMove;
     /**
+     * Apply the pending move update in animation frame for smoother performance
+     */
+    private applyMoveUpdate;
+    /**
      * Touch End Event
      * @param t
      */
-    touchEndCb: (t: any) => void;
+    touchEndCb: (t: any) => Promise<void>;
     private touchEnd;
     /**
      * Click Event

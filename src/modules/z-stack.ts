@@ -111,7 +111,7 @@ export class ZStackModule {
     // Accumulated styles from each pusher to pushed
     const setStyles = (scale, y, contrast, border) => {
         let exponentAngle = Math.pow(scale, this.settings.zStack.stackZAngle / 100);
-        pushElement.style.transform = `translateY(${y * (exponentAngle/scale)}px) scale(${scale})`;
+        pushElement.style.transform = this.instance.buildTransform3dWithScale(0, y * (exponentAngle/scale), 0, scale);
         pushElement.style.borderRadius = `${border}px`;
         pushElement.style.filter = `contrast(${contrast})`;
 

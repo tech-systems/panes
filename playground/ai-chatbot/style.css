@@ -1,0 +1,1890 @@
+/* =================================
+   AI CHATBOT DEMO - STYLESHEET
+   =================================
+   This CSS file provides styling for the AI Chatbot demo that showcases
+   the Cupertino Pane library with a modern, feature-rich chat interface.
+   
+   Features include:
+   - Dark/Light theme switching
+   - Voice recording capabilities
+   - Responsive design for mobile and desktop
+   - Smooth animations and transitions
+   - Integration with Cupertino Pane library
+   - Modern UI with gradient accents
+*/
+
+/* Import JetBrains Mono font */
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&display=swap');
+
+/* =================================
+   RESET & BASE STYLES
+   ================================= */
+/* CSS Reset and Normalization */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+}
+
+/* =================================
+   CSS VARIABLES
+   =================================
+   CSS custom properties for consistent theming.
+   Variables are organized by category for easy maintenance. */
+:root {
+  --bg-primary: linear-gradient(180deg, #0a0a0a 0%, #1a0a2e 100%);
+  --bg-secondary: rgba(28, 28, 29, 0.8);
+  --bg-tertiary: rgba(25, 25, 27, 0.95);
+  --bg-accent: rgba(255, 255, 255, 0.08);
+  --bg-accent-hover: rgba(255, 255, 255, 0.12);
+  --bg-button: rgba(255, 255, 255, 0.08);
+  --bg-button-hover: rgba(255, 255, 255, 0.12);
+  --bg-robot: rgba(28, 28, 29, 0.9);
+  --bg-robot-hover: rgba(28, 28, 29, 1);
+  --bg-robot-active: rgba(20, 20, 21, 1);
+  
+  --text-primary: #ffffff;
+  --text-secondary: rgba(255, 255, 255, 0.6);
+  --text-tertiary: rgba(255, 255, 255, 0.4);
+  --text-accent: rgba(255, 255, 255, 0.9);
+  
+  --border-primary: rgba(255, 255, 255, 0.1);
+  --border-secondary: rgba(255, 255, 255, 0.08);
+  --assistant-color-rgb: 131 56 236;
+  --assistant-color-rgb-commas: 131, 56, 236;
+  --border-accent: rgba(var(--assistant-color-rgb-commas), 0.3);
+  
+  --accent-primary: #ff006e;
+  --accent-secondary: #8338ec;
+  --accent-tertiary: #3a86ff;
+  --accent-gradient: linear-gradient(135deg, #ff006e 0%, #8338ec 50%, #3a86ff 100%);
+  --accent-gradient-alt: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  
+  --shadow-primary: rgba(0, 0, 0, 0.3);
+  --shadow-secondary: rgba(0, 0, 0, 0.12);
+  --shadow-accent: 0 4px 16px rgba(0, 0, 0, 0.12);
+  
+  --grid-color: rgba(147, 0, 211, 0.3);
+  --grid-overlay: radial-gradient(circle at center, transparent 0%, rgba(10, 10, 10, 0.8) 100%);
+  
+  --selection-bg: rgba(131, 56, 236, 0.3);
+  --focus-outline: rgba(131, 56, 236, 0.5);
+}
+
+/* Cupertino Pane CSS Variables */
+:root {
+  --cupertino-pane-icon-close-color: var(--text-secondary);
+  --cupertino-pane-background: var(--bg-tertiary);
+  --cupertino-pane-color: var(--text-primary);
+  --cupertino-pane-shadow: var(--shadow-accent);
+  --cupertino-pane-border-radius: 28px;
+  --cupertino-pane-move-background: var(--bg-button);
+  --cupertino-pane-destroy-button-background: var(--bg-button);
+}
+
+/* =================================
+   HTML & BODY BASE STYLES
+   =================================
+   Base typography and layout styles for the document. */
+html {
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji", "Segoe UI Symbol";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  font-size: 16px;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background: var(--bg-primary);
+  overflow: hidden;
+  
+  /* 
+   * Cupertino Pane Library Integration
+   * These CSS variables are provided by the @cupertino-pane library and allow us to theme
+   * the pane components without overriding their internal styles.
+   * We connect them to our custom theming system for seamless light/dark mode switching.
+   */
+  --cupertino-pane-icon-close-color: var(--text-secondary);
+  --cupertino-pane-background: var(--bg-tertiary);
+  --cupertino-pane-color: var(--text-primary);
+  --cupertino-pane-shadow: var(--shadow-accent);
+  --cupertino-pane-border-radius: 28px;
+  --cupertino-pane-move-background: var(--bg-accent);
+  --cupertino-pane-destroy-button-background: var(--bg-button);
+  
+  min-height: 100vh;
+  width: 100%;
+  color: var(--text-primary);
+  font-family: inherit;
+}
+
+/* =================================
+   IONIC REPLACEMENT STYLES
+   =================================
+   Styles that replace default Ionic components for custom implementation. */
+/* Replace ion-app */
+.app-container {
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  height: 100vh;
+  background: transparent;
+}
+
+/* Replace ion-content */
+.content-container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background: transparent;
+}
+
+/* =================================
+   FORM ELEMENT RESETS
+   =================================
+   Remove default browser styling from buttons and inputs for consistent appearance. */
+/* Button reset */
+button {
+  font-family: inherit;
+  background: none;
+  border: none;
+  cursor: pointer;
+  outline: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Input reset */
+input {
+  font-family: inherit;
+  outline: none;
+  border: none;
+  background: transparent;
+}
+
+/* =================================
+   ICON STYLES
+   =================================
+   CSS-based icons to replace ion-icons. Provides consistent iconography
+   without requiring external icon libraries. */
+/* Icon styles - CSS-based icons to replace ion-icons */
+.icon-refresh::before {
+  content: "↻";
+  font-size: 16px;
+  display: block;
+  line-height: 1;
+}
+
+.icon-expand::before {
+  content: "⛶";
+  font-size: 14px;
+  display: block;
+  line-height: 1;
+}
+
+.icon-minimize::before {
+  content: "−";
+  font-size: 16px;
+  display: block;
+  line-height: 1;
+  font-weight: bold;
+}
+
+.icon-mic::before {
+  content: "🎤";
+  font-size: 16px;
+  display: block;
+  line-height: 1;
+}
+
+.icon-send::before {
+  content: "";
+  width: 22px;
+  height: 22px;
+  display: block;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14'/%3E%3Cpath d='M12 5l7 7-7 7'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+/* Position context for layered arrow effect */
+.icon-send {
+  position: relative;
+}
+
+/* Ghost trail for futuristic look */
+.icon-send::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 22px;
+  height: 22px;
+  transform: translate(-50%, -50%) translateX(-3px) scale(0.96);
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ffffff' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 12h14'/%3E%3Cpath d='M12 5l7 7-7 7'/%3E%3C/svg%3E");
+  background-size: contain;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.35;
+  transition: transform 0.2s ease, opacity 0.2s ease;
+}
+
+.icon-theme::before {
+  content: "☀";
+  font-size: 16px;
+  display: block;
+  line-height: 1;
+  transition: transform 0.3s ease;
+}
+
+/* Light theme icon */
+:root[data-theme="light"] .icon-theme::before {
+  content: "🌙";
+}
+
+/* Theme toggle button special styling */
+.theme-toggle-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.theme-toggle-btn:hover .icon-theme::before {
+  transform: rotate(180deg);
+}
+
+/* Ensure send button icon is always white */
+.send-button .icon-send::before {
+  filter: brightness(0) invert(1); /* Make SVG white regardless of original color */
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
+
+.send-button .icon-send::after {
+  filter: brightness(0) invert(1);
+}
+
+/* Futuristic hover motion and glow */
+.send-button:hover .icon-send::before {
+  transform: translateX(1px);
+  filter: brightness(0) invert(1) drop-shadow(0 0 5px rgba(255, 255, 255, 0.6)) drop-shadow(0 0 8px rgba(131, 56, 236, 0.5));
+}
+
+.send-button:hover .icon-send::after {
+  transform: translate(-50%, -50%) translateX(-1px) scale(0.98);
+  opacity: 0;
+}
+
+/* Alternative SVG-style icons (uncomment if you prefer these) */
+/*
+.icon-refresh::before {
+  content: "";
+  display: block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+  border-top-color: transparent;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.icon-expand::before {
+  content: "";
+  display: block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-radius: 2px;
+}
+
+.icon-minimize::before {
+  content: "";
+  display: block;
+  width: 16px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+}
+
+.icon-mic::before {
+  content: "";
+  display: block;
+  width: 12px;
+  height: 16px;
+  border: 2px solid currentColor;
+  border-radius: 12px 12px 0 0;
+  position: relative;
+}
+
+.icon-mic::after {
+  content: "";
+  position: absolute;
+  bottom: -4px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 20px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+}
+
+.icon-send::before {
+  content: "";
+  display: block;
+  width: 0;
+  height: 0;
+  border-left: 10px solid currentColor;
+  border-top: 6px solid transparent;
+  border-bottom: 6px solid transparent;
+}
+*/
+
+/* Ensure icons are centered */
+[class*="icon-"] {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+}
+
+/* =================================
+   TYPOGRAPHY
+   =================================
+   Typography improvements and text styling. */
+/* Typography improvements */
+h1, h2, h3, h4, h5, h6 {
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+p {
+  line-height: 1.5;
+}
+
+/* =================================
+   ACCESSIBILITY & INTERACTION
+   =================================
+   Focus styles and selection colors for improved accessibility. */
+/* Improved focus styles */
+button:focus-visible,
+input:focus-visible {
+  outline: 2px solid var(--focus-outline);
+  outline-offset: 2px;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Selection colors */
+::selection {
+  background: var(--selection-bg);
+  color: var(--text-primary);
+}
+
+/* =================================
+   BACKGROUND EFFECTS
+   =================================
+   Synthwave grid background and animated effects for visual appeal. */
+  .synthwave-grid {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-image: 
+      linear-gradient(var(--grid-color) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-color) 1px, transparent 1px);
+    background-size: 50px 50px;
+    animation: gridMove 20s linear infinite;
+    z-index: -1;
+  }
+
+  @keyframes gridMove {
+    0% { transform: translate(0, 0); }
+    100% { transform: translate(50px, 50px); }
+  }
+
+  .synthwave-grid::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--grid-overlay);
+  }
+  
+  @keyframes gradient {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+  }
+
+/* =================================
+   ROBOT COLLAPSED BUTTON
+   =================================
+   Floating robot button that appears when chat is collapsed.
+   Provides quick access to the chat interface. */
+  .robot-collapsed {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 64px;
+    height: 64px;
+    background: var(--bg-robot);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+    cursor: pointer;
+    z-index: 10000;
+    border: 1px solid var(--border-primary);
+    box-shadow: 0 4px 12px var(--shadow-primary);
+    opacity: 0;
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    transition: opacity 280ms ease, transform 280ms ease;
+  }
+
+  .robot-collapsed.show {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  .robot-collapsed.left-corner {
+    right: auto;
+    left: 30px;
+  }
+
+  .robot-collapsed.right-corner {
+    left: auto;
+    right: 30px;
+  }
+
+  .robot-collapsed:hover {
+    background: var(--bg-robot-hover);
+  }
+
+  .robot-collapsed:active {
+    background: var(--bg-robot-active);
+  }
+
+  .robot-collapsed span {
+    position: relative;
+    z-index: 2;
+    font-size: 0.85em; /* Make icon smaller */
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    pointer-events: none;
+  }
+  
+  .robot-collapsed svg {
+    display: block;
+    pointer-events: none;
+    width: 20px;
+    height: 20px;
+  }
+  
+  .robot-collapsed.minimized svg {
+    margin-top: 0px;
+  }
+  
+  .robot-collapsed.maximized svg {
+    margin-top: 0px;
+  }
+
+  /* Slightly larger icon when shown minimized in the right corner */
+  .robot-collapsed.right-corner.show.minimized svg {
+    transform: scale(1);
+  }
+
+  /* Smooth scale-in animation baseline */
+  .robot-collapsed.right-corner svg {
+    width: 24px;
+    height: 24px;
+    transform: scale(0.92);
+    transform-origin: 50% 50%;
+    transition: transform 220ms cubic-bezier(0.2, 0.7, 0.3, 1);
+  }
+
+  /* Scale down when chat is maximized (pane visible) */
+  .robot-collapsed.right-corner.show.maximized svg {
+    transform: scale(0.86);
+  }
+
+  /* Light theme: Simplified robot icon styling */
+  :root[data-theme="light"] .robot-collapsed span {
+    text-shadow: none;
+    background: none;
+    -webkit-background-clip: unset;
+    -webkit-text-fill-color: unset;
+    background-clip: unset;
+    filter: none;
+    color: var(--text-primary);
+  }
+  
+  /* Dark theme: Complex robot icon styling */
+  :root[data-theme="dark"] .robot-collapsed span,
+  :root:not([data-theme]) .robot-collapsed span {
+    text-shadow: 
+      0 1px 2px rgba(0, 0, 0, 0.8),
+      0 -1px 1px rgba(255, 255, 255, 0.3),
+      inset 0 1px 2px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(135deg, #ffffff 0%, #e0e0e0 50%, #cccccc 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    filter: 
+      drop-shadow(0 1px 1px rgba(0, 0, 0, 0.5))
+      drop-shadow(0 -1px 1px rgba(255, 255, 255, 0.2));
+  }
+
+  .robot-collapsed.hidden {
+    opacity: 0;
+    pointer-events: none;
+    transform: scale(0.9) translateY(6px);
+    filter: blur(4px);
+  }
+
+/* =================================
+   CUPERTINO PANE INTEGRATION
+   =================================
+   Styles for integrating with the Cupertino Pane library.
+   These styles override library defaults to match our custom theme. */
+  /* Use library's CSS variables instead of direct overrides */
+  .cupertino-pane-wrapper .pane {
+    width: auto !important;
+    max-width: 410px !important; /* Mobile default */
+    min-width: 320px !important;
+    margin: auto !important;
+    left: 0 !important;
+    right: 0 !important;
+    height: auto !important;
+    border: 1px solid var(--border-secondary) !important;
+    overflow: visible !important;
+    border-top: 2px solid var(--border-accent) !important;
+    border-radius: var(--cupertino-pane-border-radius) !important;
+    /* Enhanced shadow using library variable as base */
+    /* Fallback first (applies if the next declaration is invalid in some browsers) */
+    box-shadow: 
+      var(--cupertino-pane-shadow),
+      0 -5px 20px var(--shadow-primary) !important;
+    /* Preferred (adds inset accent when supported) */
+    box-shadow: 
+      var(--cupertino-pane-shadow),
+      0 -5px 20px var(--shadow-primary),
+      inset 0 1px 0 var(--border-accent) !important;
+  }
+
+  /* Desktop max-width */
+  @media (min-width: 768px) {
+    .cupertino-pane-wrapper .pane {
+      max-width: 420px !important;
+    }
+  }
+
+  /* Mobile fullscreen mode - Override library defaults for fullscreen */
+  .cupertino-pane-wrapper .pane.mobile-fullscreen {
+    border-radius: 0 !important;
+    border: none !important;
+    box-shadow: none !important;
+    margin: 0 !important;
+    /* Use library variable but ensure full opacity for fullscreen */
+    background: var(--cupertino-pane-background) !important;
+    position: fixed !important;
+    z-index: 9999 !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: 100vw !important;
+    min-width: 100vw !important;
+    max-height: 100vh !important;
+    min-height: 100vh !important;
+  }
+  
+  /* Add a container for clipping content but not header */
+  chat-pane {
+    display: flex;
+    flex-direction: column;
+    border-radius: var(--cupertino-pane-border-radius);
+    overflow: hidden;
+    height: 100%;
+  }
+
+  /* Mobile fullscreen chat-pane */
+  .cupertino-pane-wrapper .pane.mobile-fullscreen chat-pane {
+    border-radius: 0 !important;
+    height: 100vh !important;
+  }
+
+  /* Remove gradient line in mobile fullscreen */
+  .cupertino-pane-wrapper .pane.mobile-fullscreen::before {
+    display: none !important;
+  }
+
+  /* Mobile fullscreen pane header */
+  .cupertino-pane-wrapper .pane.mobile-fullscreen .pane-header {
+    padding: 10px 20px !important;
+  }
+
+  .pane-header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding: 5px 25px 8px;
+    background: transparent;
+  }
+
+  /* Style the built-in Cupertino Pane draggable - Enhanced version using library variables */
+  .cupertino-pane-wrapper .draggable {
+    z-index: 5 !important;
+    padding: 8px !important;
+    height: 24px !important;
+    top: 5px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  /* Override library's move background with our themed version */
+  
+  .cupertino-pane-wrapper .move {
+    background: var(--cupertino-pane-move-background) !important;
+    width: 36px !important;
+    height: 4px !important;
+    border-radius: 2px !important;
+    margin: 0 !important;
+  }
+
+  /* ATTENTION: BE CAREFUL WITH THIS ONE DRAGGABLE TRANSITIONS -> ON CHROME IT WILL INTERFERE PANE TRANSITION AND BUGGY
+  .cupertino-pane-wrapper .draggable:hover .move {
+    background: var(--bg-accent-hover) !important;
+    width: 50px !important;
+    transform: scaleY(1.2) !important;
+  } */
+
+  /* ATTENTION: BE CAREFUL WITH THIS ONE DRAGGABLE TRANSITIONS -> ON CHROME IT WILL INTERFERE PANE TRANSITION AND BUGGY
+  .cupertino-pane-wrapper .draggable.over .move {
+    background: var(--bg-accent-hover) !important;
+    width: 45px !important;
+  } */
+
+  /* ATTENTION: BE CAREFUL WITH THIS ONE DRAGGABLE TRANSITIONS -> ON CHROME IT WILL INTERFERE PANE TRANSITION AND BUGGY
+  .cupertino-pane-wrapper .draggable.over:hover .move {
+    background: var(--bg-button-hover) !important;
+    width: 55px !important;
+    transform: scaleY(1.2) !important;
+  } */
+
+  .pane-header-buttons {
+    display: flex;
+    gap: 8px;
+    z-index: 10;
+  }
+
+  .pane-header-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    background: var(--bg-accent);
+    border: 1px solid var(--border-primary);
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 16px;
+    outline: none;
+    flex-shrink: 0;
+  }
+
+  /* Smaller chevron icon for header minimize button */
+  .pane-header-btn.pane-minimize-btn .minimize-icon svg {
+    width: 16px;
+    height: 16px;
+    margin-top: 5px;
+  }
+
+  .pane-header-btn:hover {
+    background: var(--bg-accent-hover);
+    color: var(--text-accent);
+  }
+
+  .pane-header-btn:active {
+    background: var(--bg-accent-active);
+  }
+
+  .pane-header-btn ion-icon {
+    pointer-events: none;
+  }
+
+  /* Special styling for minimize button */
+  .pane-minimize-btn:hover {
+    background: rgba(255, 0, 110, 0.1);
+    border-color: rgba(255, 0, 110, 0.3);
+    color: var(--accent-primary);
+  }
+
+  /* Special styling for maximize button */
+  .pane-maximize-btn:hover {
+    background: rgba(58, 134, 255, 0.1);
+    border-color: rgba(58, 134, 255, 0.3);
+    color: var(--accent-tertiary);
+  }
+
+/* =================================
+   CHAT CONTAINER
+   =================================
+   Main chat interface container with responsive sizing. */
+  .chat-container {
+    display: block;
+    margin-top:0;
+    margin-bottom: 20px;
+    margin-left: 0;
+    margin-right: 0;
+    padding-bottom: 0px;
+    position: relative;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    /* min-height: 358px; */
+  }
+
+  .chat-container.maximized {
+    height: calc(100vh - 186px);
+  }
+
+  /* Desktop maximized mode */
+  .chat-container.desktop-maximized {
+    height: calc(100vh - 393px);
+  }
+
+  /* Mobile fullscreen chat container */
+  .pane.mobile-fullscreen .chat-container {
+    margin: 0 !important;
+    padding-bottom: 0px !important;
+    flex: 1 !important;
+    display: flex !important;
+    flex-direction: column !important;
+  }
+
+  .pane.mobile-fullscreen .chat-container.maximized {
+    flex: 1 !important;
+  }
+
+  /* Mobile fullscreen chat messages */
+  .cupertino-pane-wrapper .pane.mobile-fullscreen .chat-messages {
+    flex: 1 !important;
+    max-height: none !important;
+    margin-bottom: 0 !important;
+    overflow-y: auto !important;
+  }
+
+/* =================================
+   CHAT HEADER
+   =================================
+   Chat header with avatar, title, and subtitle. */
+  .chat-header {
+    text-align: left;
+    padding-bottom: 20px;
+    position: relative;
+    padding-left: 20px;
+    padding-right: 20px;
+    border-bottom: 1px solid transparent;
+  }
+
+  .cupertino-pane-wrapper .pane.scrolled .chat-header {
+    border-bottom: 1px solid var(--border-secondary);
+  }
+
+  /* Show subtle border-bottom when content is scrollable */
+  .chat-header.scrollable {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 25px;
+  }
+
+  .header-content {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+  }
+
+  .header-text {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .chat-header h1 {
+    margin: 0;
+    background: linear-gradient(135deg, var(--text-primary) 0%, var(--text-secondary) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-size: 22px;
+    font-weight: 600;
+    letter-spacing: -0.5px;
+  }
+
+  .ai-avatar {
+    --avatar-radius: 15px;
+    width: 50px;
+    height: 50px;
+    margin: 0;
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 24px;
+    border-radius: var(--avatar-radius);
+    /* Gradient border with solid inner fill */
+    /* background: 
+      linear-gradient(var(--bg-robot), var(--bg-robot)) padding-box,
+      var(--accent-gradient) border-box; */
+    border: 1px solid #2f2d2d;
+    background-clip: padding-box, border-box;
+    color: var(--text-primary);
+    text-shadow: 0 1px 1px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 0px 0px var(--shadow-primary), inset 0 1px 2px rgba(255, 255, 255, 0.06), 0 0 0 2px rgba(var(--assistant-color-rgb-commas), 0.5);
+    
+    filter: saturate(1.1);
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+
+
+  .ai-avatar::before {
+    content: '';
+    position: absolute;
+    inset: 2px;
+    border-radius: calc(var(--avatar-radius) - 2px);
+    background:
+      radial-gradient(40% 40% at 25% 20%, rgba(255, 255, 255, 0.14), transparent 60%),
+      linear-gradient(to bottom, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0.06));
+    pointer-events: none;
+    z-index: -1;
+  }
+
+  /* Online status dot */
+  .ai-avatar::after {
+    content: '';
+    position: absolute;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    right: -1px;
+    bottom: -1px;
+    background: #2ecc71; /* online */
+    border: 2px solid var(--bg-robot);
+    box-shadow: 0 0 0 2px rgba(46, 204, 113, 0.25);
+    pointer-events: none;
+  }
+
+  .header-subtitle {
+    color: var(--text-tertiary);
+    font-size: 12px;
+    margin: 0;
+    font-weight: 400;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    line-height: 1.2;
+  }
+
+/* =================================
+   CHAT MESSAGES
+   =================================
+   Message display area with custom scrollbar and message styling. */
+  .chat-messages {
+    /* height: calc(100% - 120px); */
+    max-height: 50vh; /* 2/3 of screen height */
+    margin-bottom: 0;
+    padding: 8px 25px;
+    /* padding-right: 16px; */
+    /* padding-bottom: 90px; */
+    /* scroll-behavior: smooth; */
+    /* border-radius: 16px; */
+    /* transition: all 0.3s ease; */
+    position: relative;
+    overflow-y: auto;
+    flex: 1;
+    scrollbar-gutter: stable; 
+  }
+
+  .chat-messages::-webkit-scrollbar {
+    width: 4px; 
+  }
+
+  .chat-messages::-webkit-scrollbar-track {
+    background: var(--bg-accent);
+    /* border-radius: 2px; */
+  }
+
+  .chat-messages::-webkit-scrollbar-thumb {
+    background: var(--bg-button);
+    /* border-radius: 2px; */
+    /* transition: background 0.3s ease; */
+  }
+
+  .chat-messages::-webkit-scrollbar-thumb:hover {
+    background: var(--bg-button-hover);
+  } 
+
+  .message {
+    margin-bottom: 16px;
+    display: flex;
+    align-items: flex-end;
+    animation: messageSlide 0.3s ease-out;
+  }
+
+  @keyframes messageSlide {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .message.user {
+    flex-direction: row-reverse;
+  }
+
+  .message-bubble {
+    max-width: 75%;
+    padding: 14px 18px;
+    font-size: 15px;
+    line-height: 1.5;
+    position: relative;
+  }
+
+  .message.user .message-bubble {
+    background: var(--accent-gradient);
+    color: white;
+    border-radius: 24px 24px 4px 24px;
+    box-shadow: 
+      0 2px 8px var(--border-accent),
+      0 4px 16px var(--shadow-secondary);
+    margin-left: 10px;
+  }
+
+  .message.ai .message-bubble {
+    background: var(--bg-accent-hover);
+    color: var(--text-accent);
+    border: 1px solid var(--border-primary);
+    border-radius: 24px 24px 24px 4px;
+    box-shadow: 0 2px 8px var(--shadow-secondary);
+    margin-right: 10px;
+  }
+
+  .typing-indicator {
+    display: flex;
+    align-items: center;
+    padding: 14px 18px;
+    background: var(--bg-accent-hover);
+    border: 1px solid var(--border-primary);
+    border-radius: 24px 24px 24px 4px;
+    max-width: 70px;
+    box-shadow: 0 2px 8px var(--shadow-secondary);
+  }
+
+  /* Agent workflow message styles */
+  .agent-workflow {
+    background: linear-gradient(135deg, rgba(131, 56, 236, 0.25) 0%, rgba(88, 28, 135, 0.2) 100%) !important;
+    border: 1px solid rgba(131, 56, 236, 0.4) !important;
+    border-left: 3px solid rgba(131, 56, 236, 0.8) !important;
+    color: rgba(255, 255, 255, 0.95) !important;
+    font-family: 'SF Mono', 'Monaco', 'Consolas', monospace;
+    font-size: 13px !important;
+    font-weight: 500;
+    border-radius: 8px 16px 16px 8px !important;
+    position: relative;
+    box-shadow: 0 2px 8px rgba(131, 56, 236, 0.2);
+  }
+
+  .agent-workflow {
+    display: flex !important;
+    align-items: flex-start;
+    gap: 10px;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .agent-workflow .agent-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+    background: rgba(131, 56, 236, 0.3);
+    border-radius: 4px;
+    font-size: 11px;
+    border: 1px solid rgba(131, 56, 236, 0.5);
+    margin-top: 1px;
+  }
+
+  .agent-workflow .agent-text {
+    flex: 1;
+    letter-spacing: 0.3px;
+    line-height: 1.4;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+  }
+
+  .typing-dots {
+    display: flex;
+    gap: 5px;
+    align-items: center;
+  }
+
+  .typing-dot {
+    width: 6px;
+    height: 6px;
+    background: linear-gradient(135deg, #8338ec 0%, #ff006e 100%);
+    border-radius: 50%;
+    animation: typing 1.5s infinite ease-in-out;
+    opacity: 0.3;
+  }
+
+  .typing-dot:nth-child(1) { animation-delay: 0s; }
+  .typing-dot:nth-child(2) { animation-delay: 0.2s; }
+  .typing-dot:nth-child(3) { animation-delay: 0.4s; }
+
+  @keyframes typing {
+    0%, 60%, 100% { 
+      opacity: 0.3;
+      transform: scale(0.8) translateY(0);
+    }
+    30% { 
+      opacity: 1;
+      transform: scale(1.2) translateY(-3px);
+    }
+  }
+
+/* =================================
+   INPUT CONTAINER
+   =================================
+   Message input area with voice recording and send button. */
+  .input-container {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    margin: 20px;
+    position: relative;
+    /* background: rgba(25, 25, 27, 0.98); */
+    border-radius: 20px;
+  }
+
+  /* Mobile fullscreen input container */
+  /* Removed empty ruleset to satisfy linter */
+
+  .input-wrapper {
+    flex: 1;
+    position: relative;
+    --border-radius: 20px;
+  }
+  
+  .input-wrapper::before {
+    content: "";
+    position: absolute;
+    pointer-events: none;
+    inset: -2px;
+    border-radius: calc(var(--border-radius) + 1px);
+    background: -webkit-linear-gradient(135deg, #ff006e 0, #8338ec 8%, #3a86ff 17%, #667eea 25%, #764ba2 33%, #ffffff 34%, #ffffff 40%, rgba(255, 255, 255, 0.2) 45%, rgba(255, 255, 255, 0.1) 100%);
+    background: linear-gradient(-45deg, #ff006e 0, #8338ec 8%, #3a86ff 17%, #667eea 25%, #764ba2 33%, #ffffff 34%, #ffffff 40%, rgba(255, 255, 255, 0.2) 45%, rgba(255, 255, 255, 0.1) 100%);
+    background-size: 400% 200%;
+    background-position: 0 0;
+    -webkit-transition: background-position 1s ease;
+    transition: background-position 1s ease;
+    -webkit-transition-delay: 0s;
+    transition-delay: 0s;
+    -webkit-animation-fill-mode: backwards;
+    animation-fill-mode: backwards;
+    z-index: -1;
+  }
+  
+  .input-wrapper:focus-within::before {
+    background-position: 100% 100%;
+  }
+
+  .message-input {
+    width: 100%;
+    background: rgb(28, 28, 29);
+    /* border: 1px solid rgba(255, 255, 255, 0.2); */
+    border-radius: var(--border-radius);
+    padding: 12px 15px 12px 50px;
+    color: #ffffff;
+    font-size: 16px;
+    outline: none !important; /* Remove outline specifically */
+    transition: all 0.3s ease;
+    position: relative;
+    z-index: 2;
+  }
+  
+  .message-input::placeholder {
+    color: rgba(255, 255, 255, 0.6);
+  }
+  
+  .message-input:focus {
+    outline: none !important;
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  /* Override any focus-visible styles for inputs */
+  input:focus-visible {
+    outline: none !important;
+  }
+
+  .send-button {
+    background: linear-gradient(135deg, #ff006e 0%, #8338ec 50%, #3a86ff 100%);
+    border: none;
+    border-radius: 50%;
+    height: 46px;
+    width: 46px;
+    margin: 0;
+    padding: 0;
+    position: relative;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+  }
+  
+  /* Ensure all child elements don't block hover */
+  .send-button * {
+    pointer-events: none;
+  }
+  
+  .send-button:focus-visible {
+    outline: 2px solid rgba(131, 56, 236, 0.5);
+    outline-offset: 3px;
+  }
+
+  .send-button:hover {
+    background: linear-gradient(135deg, #ff1a7a 0%, #9448f0 50%, #4a92ff 100%);
+    transform: scale(1.05) rotate(3deg);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  }
+  
+  .send-button:active {
+    background: linear-gradient(135deg, #e6005e 0%, #7531d9 50%, #2e75e6 100%);
+    transform: scale(0.95) rotate(1deg);
+  }
+  
+  .send-button ion-icon {
+    font-size: 20px;
+    color: #ffffff;
+    filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
+    transition: all 0.3s ease;
+    position: relative;
+  }
+  
+  .send-button:hover ion-icon {
+    transform: translateX(2px);
+    filter: drop-shadow(0 0 6px rgba(255, 255, 255, 0.8));
+  }
+  
+  .send-button:active ion-icon {
+    transform: translateX(0);
+  }
+
+  ion-content {
+    --background: transparent;
+  }
+
+/* =================================
+   TOP CONTENT SECTION
+   =================================
+   Demo scene header with titles and technology showcase. */
+
+/* Top content section */
+.top-content {
+  position: absolute;
+  top: 30px;
+  width: calc(100% - 40px);
+  max-width: 600px;
+  left: 0;
+  right: 0;
+  margin-left: auto;
+  margin-right: auto;
+  height: auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  z-index: 0;
+  text-align: center;
+}
+
+/* Demo titles container - no card styling */
+.demo-titles {
+  margin-bottom: 35px;
+}
+
+.demo-titles h1 {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 56px;
+  font-weight: 700;
+  background: var(--accent-gradient);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin: 0 0 8px 0;
+  letter-spacing: -2px;
+  text-shadow: 0 0 20px rgba(131, 56, 236, 0.3);
+}
+
+.demo-titles h2.subtitle {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text-accent);
+  margin: 0;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  opacity: 0.9;
+  text-shadow: 0 2px 10px var(--shadow-primary);
+}
+
+/* Demo description */
+.demo-description {
+  margin-top: 20px;
+  margin-bottom: 25px;
+}
+
+.demo-description p {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text-secondary);
+  margin: 0;
+  letter-spacing: 0.5px;
+  line-height: 1.6;
+  max-width: 400px;
+  text-shadow: 0 1px 4px var(--shadow-primary);
+}
+
+.demo-description p.small-uppercase {
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  font-weight: 500;
+}
+
+/* Technology logos - simplified design */
+.tech-logos {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.tech-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 4px;
+  cursor: default;
+}
+
+.tech-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 30px;
+  max-width: 70px;
+  width: auto;
+  filter: drop-shadow(0 2px 4px rgba(255, 255, 255, 0.1));
+}
+
+.tech-icon img {
+  max-width: 100%;
+  max-height: 100%;
+  width: auto;
+  height: auto;
+  object-fit: contain;
+  filter: invert(1) brightness(0.6) contrast(0.8) sepia(0.1);
+}
+
+/* Specific size adjustments for Grok and CrewAI logos */
+.tech-item:nth-child(4) .tech-icon img, /* Grok */
+.tech-item:nth-child(6) .tech-icon img { /* CrewAI */
+  max-width: 85%;
+  max-height: 85%;
+}
+
+
+
+/* Light theme adjustments */
+:root[data-theme="light"] .demo-titles h1 {
+  text-shadow: 0 0 20px rgba(131, 56, 236, 0.2);
+}
+
+:root[data-theme="light"] .demo-titles h2.subtitle {
+  text-shadow: none;
+}
+
+:root[data-theme="light"] .demo-description p {
+  text-shadow: none;
+}
+
+:root[data-theme="light"] .tech-icon {
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.2));
+}
+
+:root[data-theme="light"] .tech-icon img {
+  filter: none;
+  opacity: 0.85;
+}
+
+/* Mobile responsive adjustments */
+@media (max-width: 480px) {
+  .top-content {
+    width: calc(100% - 30px);
+    top: 20px;
+  }
+  
+  .demo-titles h1 {
+    font-size: 42px;
+    letter-spacing: -1px;
+  }
+  
+  .demo-titles h2.subtitle {
+    font-size: 16px;
+    letter-spacing: 1.5px;
+  }
+  
+  .demo-description p {
+    font-size: 13px;
+    max-width: 320px;
+  }
+  .tech-logos {
+    width: calc(100% - 80px);
+  }
+
+  .demo-description p.small-uppercase {
+    font-size: 12px;
+  }
+  
+  .tech-logos {
+    gap: 12px;
+  }
+  
+  .tech-icon {
+    min-width: 25px;
+    max-width: 60px;
+    width: auto;
+  }
+  
+
+}
+
+@media (max-width: 360px) {
+  .demo-titles h1 {
+    font-size: 36px;
+  }
+  
+  .demo-titles h2.subtitle {
+    font-size: 14px;
+    letter-spacing: 1px;
+  }
+  
+  .tech-logos {
+    gap: 10px;
+  }
+}
+
+/* =================================
+   VOICE RECORDING
+   =================================
+   Voice recording functionality with visual feedback and overlays. */
+  /* Voice recording button styles - positioned inside input */
+  .voice-button {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border: none;
+    border-radius: 50%;
+    height: 32px;
+    width: 32px;
+    margin: 0;
+    padding: 0;
+    position: absolute;
+    left: 8px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s ease;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
+    -webkit-tap-highlight-color: transparent;
+    outline: none;
+    z-index: 20;
+  }
+
+  .voice-button * {
+    pointer-events: none;
+  }
+
+  .voice-button:focus-visible {
+    outline: 2px solid rgba(102, 126, 234, 0.5);
+    outline-offset: 2px;
+  }
+
+  /* Light theme: Voice button focus override */
+  :root[data-theme="light"] .voice-button:focus-visible {
+    outline: 2px solid rgba(102, 126, 234, 0.6);
+  }
+
+  .voice-button:hover {
+    background: linear-gradient(135deg, #7a8af2 0%, #8456b0 100%);
+  }
+
+  .voice-button:active {
+    background: linear-gradient(135deg, #5d6ee2 0%, #6e4a98 100%);
+  }
+
+  .voice-button ion-icon {
+    font-size: 16px;
+    color: #ffffff;
+    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.5));
+    transition: all 0.3s ease;
+  }
+
+  .voice-button:hover ion-icon {
+    filter: drop-shadow(0 0 4px rgba(255, 255, 255, 0.8));
+  }
+
+  /* Recording state */
+  .voice-button.recording {
+    background: linear-gradient(135deg, #ff006e 0%, #dc2626 100%);
+    box-shadow: 0 2px 8px rgba(255, 0, 110, 0.3);
+  }
+
+  /* Voice status indicator */
+  .voice-status {
+    position: absolute;
+    bottom: -35px;
+    left: 20px;
+    background: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    color: white;
+    padding: 6px 12px;
+    border-radius: 12px;
+    font-size: 12px;
+    white-space: nowrap;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    pointer-events: none;
+    z-index: 1000;
+  }
+
+  .voice-status.show {
+    opacity: 1;
+  }
+
+  /* Remove the small voice representation styles and add full recording overlay */
+  .voice-representation {
+    display: none; /* Hide the small version */
+  }
+
+  /* Full recording waveform overlay */
+  .recording-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 0, 110, 0.15);
+    border: 2px solid rgba(255, 0, 110, 0.4);
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    z-index: 15;
+    box-shadow: 0 2px 8px rgba(255, 0, 110, 0.3);
+  }
+
+  .recording-overlay.show {
+    opacity: 1;
+  }
+
+  .recording-wave {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+  }
+
+  .recording-wave-bar {
+    width: 4px;
+    height: 20px;
+    background: linear-gradient(135deg, #ff006e 0%, #dc2626 100%);
+    border-radius: 2px;
+    animation: recordingWave 1s ease-in-out infinite;
+    transform-origin: center;
+  }
+
+  .recording-wave-bar:nth-child(1) { animation-delay: 0s; }
+  .recording-wave-bar:nth-child(2) { animation-delay: 0.1s; }
+  .recording-wave-bar:nth-child(3) { animation-delay: 0.2s; }
+  .recording-wave-bar:nth-child(4) { animation-delay: 0.3s; }
+  .recording-wave-bar:nth-child(5) { animation-delay: 0.4s; }
+  .recording-wave-bar:nth-child(6) { animation-delay: 0.5s; }
+  .recording-wave-bar:nth-child(7) { animation-delay: 0.6s; }
+  .recording-wave-bar:nth-child(8) { animation-delay: 0.7s; }
+  .recording-wave-bar:nth-child(9) { animation-delay: 0.8s; }
+  .recording-wave-bar:nth-child(10) { animation-delay: 0.9s; }
+
+  @keyframes recordingWave {
+    0%, 60%, 100% { 
+      height: 8px;
+      opacity: 0.5;
+    }
+    30% { 
+      height: 35px;
+      opacity: 1;
+    }
+  }
+
+  .recording-text {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    font-weight: 600;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .recording-dot {
+    width: 8px;
+    height: 8px;
+    background: #ff006e;
+    border-radius: 50%;
+    animation: recordingDot 1s ease-in-out infinite;
+  }
+
+  @keyframes recordingDot {
+    0%, 50%, 100% { opacity: 1; }
+    25%, 75% { opacity: 0.3; }
+  }
+
+  /* Hide input during recording */
+  .message-input.recording {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  /* Responsive pane styles */
+  /* @media (max-width: 759px) {
+    .pane {
+      max-width: none !important;
+      min-width: none !important;
+      width: calc(100vw - 40px) !important;
+      margin: 0 auto !important;
+    }
+    
+    .chat-container {
+      margin: 20px;
+      margin-top: 10px;
+    }
+  }
+
+  @media (min-width: 760px) {
+    .pane {
+      max-width: 380px !important;
+      min-width: 320px !important;
+      width: auto !important;
+      margin: auto !important;
+    }
+  } */
+
+  /* Voice recording captured overlay */
+  .voice-recording-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(102, 126, 234, 0.2) 0%, rgba(118, 75, 162, 0.2) 100%);
+    border: 2px solid rgba(102, 126, 234, 0.4);
+    border-radius: var(--border-radius);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 12px;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+    pointer-events: none;
+    z-index: 25;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+  }
+
+  .voice-recording-overlay.show {
+    opacity: 1;
+    pointer-events: auto;
+  }
+
+  .voice-recording-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.95);
+    font-size: 15px;
+    font-weight: 600;
+    flex: 1;
+  }
+
+  .voice-recording-icon {
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    box-shadow: 0 2px 6px rgba(102, 126, 234, 0.3);
+    flex-shrink: 0;
+  }
+
+  .voice-recording-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .voice-recording-title {
+    font-size: 15px;
+    font-weight: 600;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.5);
+  }
+
+  .voice-recording-subtitle {
+    font-size: 12px;
+    font-weight: 400;
+    color: rgba(255, 255, 255, 0.7);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .voice-recording-close {
+    position: absolute;
+    top: 50%;
+    right: 8px;
+    transform: translateY(-50%);
+    width: 20px;
+    height: 20px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    padding-bottom: 2px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 14px;
+    font-weight: bold;
+    color: rgba(255, 255, 255, 0.7);
+    line-height: 1;
+  }
+
+  .voice-recording-close:hover {
+    background: rgba(255, 255, 255, 0.15);
+    color: rgba(255, 255, 255, 0.9);
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  /* Hide input when voice recording overlay is shown */
+  .message-input.voice-captured {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  /* Voice message bubble styling */
+  .voice-message-bubble {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 
+      0 2px 8px rgba(102, 126, 234, 0.3),
+      0 4px 16px rgba(118, 75, 162, 0.2),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15) !important;
+  }
+
+  .voice-message-content {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: rgba(255, 255, 255, 0.95);
+  }
+
+  .voice-message-icon {
+    font-size: 20px;
+    filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    animation: voiceMessagePulse 2s ease-in-out infinite;
+  }
+
+  @keyframes voiceMessagePulse {
+    0%, 100% { 
+      transform: scale(1);
+      filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+    }
+    50% { 
+      transform: scale(1.1);
+      filter: drop-shadow(0 2px 6px rgba(0, 0, 0, 0.4)) drop-shadow(0 0 8px rgba(255, 255, 255, 0.3));
+    }
+  }
+
+  .voice-message-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .voice-message-title {
+    font-weight: 600;
+    font-size: 15px;
+    color: rgba(255, 255, 255, 0.95);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .voice-message-subtitle {
+    font-size: 12px;
+    font-style: italic;
+    color: rgba(255, 255, 255, 0.7);
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+
+  .voice-message-waveform {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-left: auto;
+  }
+
+  .voice-wave-bar {
+    width: 2px;
+    height: 12px;
+    background: rgba(255, 255, 255, 0.6);
+    border-radius: 1px;
+    animation: voiceWaveAnimation 1.5s ease-in-out infinite;
+  }
+
+  .voice-wave-bar:nth-child(1) { animation-delay: 0s; height: 8px; }
+  .voice-wave-bar:nth-child(2) { animation-delay: 0.1s; height: 14px; }
+  .voice-wave-bar:nth-child(3) { animation-delay: 0.2s; height: 10px; }
+  .voice-wave-bar:nth-child(4) { animation-delay: 0.3s; height: 16px; }
+  .voice-wave-bar:nth-child(5) { animation-delay: 0.4s; height: 12px; }
+  .voice-wave-bar:nth-child(6) { animation-delay: 0.5s; height: 8px; }
+
+  @keyframes voiceWaveAnimation {
+    0%, 60%, 100% { 
+      opacity: 0.4;
+      transform: scaleY(0.5);
+    }
+    30% { 
+      opacity: 1;
+      transform: scaleY(1);
+    }
+  }
+
+/* =================================
+   FOOTER & BRANDING
+   =================================
+   Powered by Panes link and attribution section. */
+  /* Powered by Panes link */
+  .powered-by-panes {
+    position: relative;
+    bottom: 0;
+    left: 0;
+    transform: none;
+    z-index: 10;
+    text-align: center;
+    white-space: nowrap;
+    padding-bottom: 25px;
+  }
+
+
+  .powered-by-panes a {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    text-decoration: none;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    /* transition: all 0.2s ease; */
+  }
+
+  .powered-by-panes a:hover {
+    color: var(--text-secondary);
+    transform: translateY(-1px);
+  }
+
+  .powered-by-panes a:active {
+    transform: translateY(0);
+    color: var(--text-tertiary);
+  }
+
+  /* Style the separator bullet */
+  .powered-by-panes {
+    font-size: 10px;
+    color: var(--text-tertiary);
+    letter-spacing: 0.3px;
+  }
+  
+  /* Light theme: Remove text shadows for powered-by-panes */
+  :root[data-theme="light"] .powered-by-panes,
+  :root[data-theme="light"] .powered-by-panes a {
+    text-shadow: none;
+  }
+  
+  /* Dark theme: Keep text shadows for powered-by-panes */
+  :root[data-theme="dark"] .powered-by-panes,
+  :root:not([data-theme]) .powered-by-panes {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+  
+  :root[data-theme="dark"] .powered-by-panes a,
+  :root:not([data-theme]) .powered-by-panes a {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  }
+  
+  :root[data-theme="dark"] .powered-by-panes a:hover,
+  :root:not([data-theme]) .powered-by-panes a:hover {
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+  }
+
+

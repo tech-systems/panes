@@ -39,6 +39,8 @@ export class FitHeightModule {
 
     this.instance.on('onTransitionEnd', () => {
       this.instance.paneEl.style.height = `unset`;
+      // Refresh cursor after fit-height transitions
+      this.instance.setGrabCursor(true, false);
     });
 
     // Pass our code into function buildBreakpoints()
@@ -71,8 +73,8 @@ export class FitHeightModule {
           this.settings.upperThanTop = false;
         } else {
           if (this.instance.overflowEl && !this.settings.maxFitHeight) {
-            this.settings.topperOverflow = false;
-            this.instance.overflowEl.style.overflowY = 'hidden';
+            // this.settings.topperOverflow = false;
+            // this.instance.overflowEl.style.overflowY = 'hidden';
           }
         }
       }
@@ -82,14 +84,14 @@ export class FitHeightModule {
   private async beforeBuildBreakpoints(): Promise<void> {
     this.settings.fitScreenHeight = false;
     this.settings.initialBreak = 'top';
-    this.settings.topperOverflow = false;
+    // this.settings.topperOverflow = false;
     let height = await this.getPaneFitHeight();
     
     // maxFitHeight
     if (this.settings.maxFitHeight 
       && height > this.settings.maxFitHeight) {
         height = this.settings.maxFitHeight;
-        this.settings.topperOverflow = true;
+        // this.settings.topperOverflow = true;
     }
 
     this.breakpoints.conf = {

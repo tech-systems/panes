@@ -1,0 +1,174 @@
+<!DOCTYPE html>
+<html dir="ltr">
+<head>
+  <meta charset="UTF-8">
+  <title>Panes - AI Chatbot Demo</title>
+  <meta name="viewport" content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <script src="../../dist/cupertino-pane.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="synthwave-grid"></div>
+  
+  <!-- Top content with titles -->
+  <div class="top-content">
+    <div class="demo-titles">
+      <h1>DIGITAL WORKER</h1>
+      <h2 class="subtitle">ASSISTANT • AGENT • HELPER</h2>
+    </div>
+
+    <!-- Technology logos -->
+    <div class="tech-logos">
+      <div class="tech-item">
+        <div class="tech-icon">
+          <img src="images/open-ai.svg" alt="OpenAI" />
+        </div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-icon">
+          <img src="images/anthropic.svg" alt="Anthropic" />
+        </div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-icon">
+          <img src="images/gemini.svg" alt="Gemini" />
+        </div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-icon">
+          <img src="images/grok.svg" alt="Grok" />
+        </div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-icon">
+          <img src="images/lang-graph.svg" alt="LangGraph" />
+        </div>
+      </div>
+      <div class="tech-item">
+        <div class="tech-icon">
+          <img src="images/crewai.svg" alt="CrewAI" />
+        </div>
+      </div>
+    </div>
+    
+    <div class="demo-description">
+      <p class="small-uppercase">CONNECT & SYNC WITH ANY AG-UI COMPATIBLE AI AGENTS OR LLM</p>
+    </div>
+  </div>
+  
+  <div class="robot-collapsed" id="robotCollapsed" onclick="toggleRobotButton()" aria-label="Toggle chat">
+    <span>
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path></svg>
+    </span>
+  </div>
+
+  <div class="app-container">
+    <div class="content-container">
+      <chat-pane>
+        <div class="pane-header">
+          <div class="pane-header-buttons">
+            <button class="pane-header-btn" onclick="clearChat()" title="Clear chat">
+              <span class="icon-refresh"></span>
+            </button>
+            <button class="pane-header-btn pane-maximize-btn" onclick="toggleMaximize()" title="Maximize/Minimize">
+              <span class="icon-expand" id="maximizeIcon"></span>
+            </button>
+            <button class="pane-header-btn pane-minimize-btn" title="Minimize" aria-label="Minimize">
+              <span class="minimize-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" width="24" height="24"><path stroke-linecap="round" stroke-linejoin="round" d="M19.5 8.25l-7.5 7.5-7.5-7.5"></path></svg>
+              </span>
+            </button>
+          </div>
+        </div>
+        <div class="chat-container">
+          <div class="chat-header">
+            <div class="header-content">
+              <div class="ai-avatar"></div>
+              <div class="header-text">
+                <h1>Assistant</h1>
+                <p class="header-subtitle">
+                  Digital Assistant • Here to help 24/7
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <div class="chat-messages" id="chatMessages" overflow-y>
+            <div class="message ai">
+              <div class="message-bubble" id="initialMessage">
+                👋 Hello! I'm your AI assistant. I can help you learn about Cupertino Panes, answer questions, or just have a chat. What would you like to know?
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="input-container">
+          <div class="input-wrapper">
+            <button class="voice-button" id="voiceButton" onclick="toggleVoiceRecording()" type="button">
+              <span class="icon-mic" id="voiceIcon"></span>
+            </button>
+            <div class="voice-status" id="voiceStatus"></div>
+            
+            <!-- Full recording overlay -->
+            <div class="recording-overlay" id="recordingOverlay">
+              <div class="recording-wave">
+                <div class="recording-wave-bar"></div>
+                <div class="recording-wave-bar"></div>
+                <div class="recording-wave-bar"></div>
+                <div class="recording-wave-bar"></div>
+                <div class="recording-wave-bar"></div>
+                <div class="recording-wave-bar"></div>
+                <div class="recording-wave-bar"></div>
+                <div class="recording-wave-bar"></div>
+                <div class="recording-wave-bar"></div>
+                <div class="recording-wave-bar"></div>
+              </div>
+              <div class="recording-text" id="recordingText">
+                <div class="recording-dot"></div>
+                Recording...
+              </div>
+            </div>
+            
+            <!-- Voice recording captured overlay -->
+            <div class="voice-recording-overlay" id="voiceRecordingOverlay">
+              <div class="voice-recording-close" onclick="clearVoiceRecording()" title="Clear voice recording">
+                ×
+              </div>
+              <div class="voice-recording-content">
+                <div class="voice-recording-icon">🎤</div>
+                <div class="voice-recording-text">
+                  <div class="voice-recording-title">Voice Recording</div>
+                  <div class="voice-recording-subtitle">Ready to send</div>
+                </div>
+              </div>
+            </div>
+            
+            <input 
+              id="messageInput" 
+              type="text"
+              placeholder="Type your message..." 
+              onkeydown="handleKeyPress(event)"
+              class="message-input"
+              autocomplete="off"
+              autocapitalize="off"
+              autocorrect="off"
+              spellcheck="false"
+              data-form-type="other">
+          </div>
+          <button class="send-button" onclick="sendMessage()" type="button">
+            <span class="icon-send"></span>
+          </button>
+        </div>
+        
+        <!-- Powered by Panes link -->
+        <div class="powered-by-panes">
+          <a href="https://panejs.com" target="_blank" rel="noopener noreferrer">Powered by Panes</a> • 
+          <a href="https://github.com/roman-rr" target="_blank" rel="noopener noreferrer">Created by Roman</a>
+        </div>
+      </chat-pane>
+    </div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html> 

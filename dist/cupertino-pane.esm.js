@@ -3,11 +3,11 @@
  * Cupertino Panes is multi-functional modals, cards & panes with touch technologies.
  * https://panejs.com
  *
- * Copyright 2019-2024 Roman Antonov (roman-rr)
+ * Copyright 2019-2025 Roman Antonov (roman-rr)
  *
  * Released under the MIT License
  *
- * Released on: October 7, 2024
+ * Released on: August 21, 2025
  */
 
 /******************************************************************************
@@ -189,6 +189,9 @@ class Events {
         this.contentScrollTop = 0;
         this.steps = [];
         this.isScrolling = false;
+        // RequestAnimationFrame properties for smoother touch move
+        this.rafId = null;
+        this.pendingMoveData = null;
         /**
          * Touch Start Event
          * @param t
@@ -219,6 +222,7 @@ class Events {
         this.breakpoints = this.instance.breakpoints;
         this.transitions = this.instance.transitions;
         this.keyboardEvents = this.instance.keyboardEvents;
+        this.resizeEvents = this.instance.resizeEvents;
         this.touchEvents = this.getTouchEvents();
         // Set sensivity lower for web
         this.swipeNextSensivity = window.hasOwnProperty('cordova')
@@ -269,7 +273,7 @@ class Events {
             });
         }
         // Orientation change + window resize
-        window.addEventListener('resize', this.keyboardEvents.onWindowResizeCb);
+        window.addEventListener('resize', this.resizeEvents.onWindowResizeCb);
     }
     detachAllEvents() {
         if (!this.settings.dragBy) {
@@ -292,7 +296,7 @@ class Events {
             window.removeEventListener('keyboardWillHide', this.keyboardEvents.onKeyboardWillHideCb);
         }
         // Orientation change + window resize
-        window.removeEventListener('resize', this.keyboardEvents.onWindowResizeCb);
+        window.removeEventListener('resize', this.resizeEvents.onWindowResizeCb);
     }
     resetEvents() {
         this.detachAllEvents();
@@ -325,6 +329,12 @@ class Events {
     touchStart(t) {
         // Event emitter
         this.instance.emit('onDragStart', t);
+        // Cancel any pending animation frame
+        if (this.rafId) {
+            cancelAnimationFrame(this.rafId);
+            this.rafId = null;
+            this.pendingMoveData = null;
+        }
         // Allow clicks by default -> disallow on move (allow click with disabled drag)
         this.allowClick = true;
         if (this.instance.disableDragEvents)
@@ -357,10 +367,15 @@ class Events {
         this.steps.push({ posY: this.startY, posX: this.startX, time: Date.now() });
     }
     touchMove(t) {
-        var _a;
+        var _a, _b;
         /**
          * TODO: Switch to pointer events
          */
+        // If drag is disabled, skip all processing ASAP (before any coordinate/layout work)
+        if (this.instance.disableDragEvents) {
+            this.steps = [];
+            return;
+        }
         const { clientY, clientX, velocityY } = this.getEventClientYX(t, 'touchmove');
         if (!clientY || !clientX) {
             return;
@@ -368,6 +383,11 @@ class Events {
         // Deskop: check that touchStart() was initiated
         if (t.type === 'mousemove' && !this.mouseDown)
             return;
+        // If drag is disabled, skip all further processing ASAP
+        if (this.instance.disableDragEvents) {
+            this.steps = [];
+            return;
+        }
         // sometimes touchstart is not called 
         // when touchmove is began before initialization
         if (!this.steps.length) {
@@ -382,16 +402,28 @@ class Events {
             && this.isElementScrollable(t.target)) {
             return;
         }
-        if (this.instance.disableDragEvents) {
-            this.steps = [];
-            return;
-        }
+        // drag is enabled at this point
         if (this.disableDragAngle)
             return;
         if (this.instance.preventedDismiss)
             return;
         if (this.settings.touchMoveStopPropagation) {
             t.stopPropagation();
+        }
+        // Block drag when scroll at initial position based on scrollZeroDragBottom setting
+        if (this.contentScrollTop === 0
+            && this.instance.overflowEl.style.overflowY === 'auto'
+            && this.isElementScrollable(this.instance.overflowEl)
+            && !this.isDraggableElement(t)) {
+            const diffY = clientY - ((_b = this.steps[this.steps.length - 1]) === null || _b === void 0 ? void 0 : _b.posY) || 0;
+            // If scrollZeroDragBottom is false, prevent any movement when scroll at initial position
+            if (!this.settings.scrollZeroDragBottom) {
+                return; // Block all movement when scroll at initial position
+            }
+            // If scrollZeroDragBottom is true, only prevent upward movement (negative diffY) when scroll at initial position
+            if (diffY < 0) {
+                return; // Block upward movement only
+            }
         }
         // Delta
         const diffY = clientY - this.steps[this.steps.length - 1].posY;
@@ -405,18 +437,20 @@ class Events {
         this.instance.emit('onDrag', t);
         // Has changes in position 
         this.instance.setGrabCursor(true, true);
-        let newVal = this.instance.getPanelTransformY() + diffY;
-        let newValX = this.instance.getPanelTransformX() + diffX;
+        const prevY = this.instance.getPanelTransformY();
+        const prevX = this.instance.getPanelTransformX();
+        let newVal = prevY + diffY;
+        let newValX = prevX + diffX;
         // First event after touchmove only
         if (this.steps.length < 2) {
             // Patch for 'touchmove' first event 
             // when start slowly events with small velocity
             if (velocityY < 1) {
-                newVal = this.instance.getPanelTransformY() + (diffY * velocityY);
+                newVal = prevY + (diffY * velocityY);
             }
             // Move while transition patch next transitions
-            let computedTranslateY = new WebKitCSSMatrix(window.getComputedStyle(this.instance.paneEl).transform).m42;
-            let transitionYDiff = computedTranslateY - this.instance.getPanelTransformY();
+            let computedTranslate = this.instance.parseTransform3d(this.instance.paneEl);
+            let transitionYDiff = computedTranslate.y - prevY;
             if (Math.abs(transitionYDiff)) {
                 newVal += transitionYDiff;
             }
@@ -468,15 +502,15 @@ class Events {
             return;
         }
         // No changes Y/X
-        if (this.instance.getPanelTransformY() === newVal
-            && this.instance.getPanelTransformX() === newValX) {
+        if (prevY === newVal
+            && prevX === newValX) {
             return;
         }
         // Prevent Dismiss gesture
         if (!this.instance.preventedDismiss
             && this.instance.preventDismissEvent && this.settings.bottomClose) {
-            let differKoef = ((-this.breakpoints.topper + this.breakpoints.topper - this.instance.getPanelTransformY()) / this.breakpoints.topper) / -8;
-            newVal = this.instance.getPanelTransformY() + (diffY * (0.5 - differKoef));
+            let differKoef = ((-this.breakpoints.topper + this.breakpoints.topper - prevY) / this.breakpoints.topper) / -8;
+            newVal = prevY + (diffY * (0.5 - differKoef));
             let mousePointY = (clientY - 220 - this.instance.screen_height) * -1;
             if (mousePointY <= this.instance.screen_height - this.breakpoints.bottomer) {
                 this.instance.preventedDismiss = true;
@@ -486,73 +520,131 @@ class Events {
                 return;
             }
         }
+        // Store the pending move data for requestAnimationFrame
+        this.pendingMoveData = { newVal, newValX, clientY, clientX };
+        // Request animation frame if not already pending
+        if (!this.rafId) {
+            this.rafId = requestAnimationFrame(() => this.applyMoveUpdate());
+        }
+        this.steps.push({ posY: clientY, posX: clientX, time: Date.now() });
+    }
+    /**
+     * Apply the pending move update in animation frame for smoother performance
+     */
+    applyMoveUpdate() {
+        if (!this.pendingMoveData) {
+            this.rafId = null;
+            return;
+        }
+        const { newVal, newValX } = this.pendingMoveData;
+        // Apply the opacity and overflow attributes
         this.instance.checkOpacityAttr(newVal);
         this.instance.checkOverflowAttr(newVal);
-        this.transitions.doTransition({ type: 'move', translateY: newVal, translateX: newValX });
-        this.steps.push({ posY: clientY, posX: clientX, time: Date.now() });
+        // Apply the transition - PASS BOTH X AND Y for modules that need it
+        this.transitions.doTransition({
+            type: 'move',
+            translateY: newVal,
+            translateX: newValX
+        });
+        // Clear the pending data and animation frame ID
+        this.pendingMoveData = null;
+        this.rafId = null;
     }
     touchEnd(t) {
         var _a, _b;
-        if (this.instance.disableDragEvents)
-            return;
-        // Desktop fixes
-        if (t.type === 'mouseleave' && !this.mouseDown)
-            return;
-        if (t.type === 'mouseup' || t.type === 'mouseleave')
-            this.mouseDown = false;
-        // Determinate nearest point
-        let closest = this.breakpoints.getClosestBreakY();
-        // Swipe - next (if differ > 10)
-        let fastSwipeClose;
-        if (this.fastSwipeNext('Y')) {
-            closest = this.instance.swipeNextPoint(((_a = this.steps[this.steps.length - 1]) === null || _a === void 0 ? void 0 : _a.posY) - ((_b = this.steps[this.steps.length - 2]) === null || _b === void 0 ? void 0 : _b.posY), //diff
-            this.swipeNextSensivity, closest);
-            fastSwipeClose = this.settings.fastSwipeClose
-                && this.breakpoints.currentBreakpoint < closest;
-        }
-        // update currentBreakpoint once `closest` is known so it's available in emitted events
-        this.breakpoints.currentBreakpoint = closest;
-        // blur tap event
-        let blurTapEvent = false;
-        if ((this.isFormElement(document.activeElement))
-            && !(this.isFormElement(t.target))
-            && this.steps.length === 2) {
-            blurTapEvent = true;
-        }
-        // Event emitter
-        this.instance.emit('onDragEnd', t);
-        // Clear
-        this.steps = [];
-        delete this.startPointOverTop;
-        // touchend with allowClick === tapped event (no move triggered)
-        // skip next functions
-        if (this.allowClick || blurTapEvent) {
-            return;
-        }
-        // Fast swipe toward bottom - close
-        if (fastSwipeClose) {
-            this.instance.destroy({ animate: true });
-            return;
-        }
-        this.instance.checkOpacityAttr(closest);
-        this.instance.checkOverflowAttr(closest);
-        this.instance.setGrabCursor(true, false);
-        // Bottom closable
-        if (this.settings.bottomClose
-            && closest === this.breakpoints.breaks['bottom']) {
-            this.instance.destroy({ animate: true });
-            return;
-        }
-        // Simulationiusly emit event when touchend exact with next position (top)
-        if (this.instance.getPanelTransformY() === closest) {
-            this.instance.emit('onTransitionEnd', { target: this.instance.paneEl });
-        }
-        this.transitions.doTransition({ type: 'end', translateY: closest });
+        return __awaiter(this, void 0, void 0, function* () {
+            if (this.instance.disableDragEvents)
+                return;
+            // Cancel any pending animation frame
+            if (this.rafId) {
+                cancelAnimationFrame(this.rafId);
+                this.rafId = null;
+                // Apply any pending move data immediately before ending
+                if (this.pendingMoveData) {
+                    this.applyMoveUpdate();
+                }
+            }
+            // Desktop fixes
+            if (t.type === 'mouseleave' && !this.mouseDown)
+                return;
+            if (t.type === 'mouseup' || t.type === 'mouseleave') {
+                this.mouseDown = false;
+                let buildedTransition = this.transitions.buildTransitionValue(false, this.settings.animationDuration);
+                this.instance.paneEl.style.setProperty('transition', buildedTransition);
+                // Force style and layout flush once to ensure transition gets applied
+                // Avoid multiple RAFs to reduce end-lag
+                void this.instance.paneEl.offsetHeight;
+            }
+            // Determinate nearest point
+            let closest = this.breakpoints.getClosestBreakY();
+            // Swipe - next (if differ > 10) — only when there was an actual drag
+            let fastSwipeClose;
+            const hadDrag = !this.allowClick && this.steps.length >= 2;
+            if (hadDrag && this.fastSwipeNext('Y')) {
+                closest = this.instance.swipeNextPoint(((_a = this.steps[this.steps.length - 1]) === null || _a === void 0 ? void 0 : _a.posY) - ((_b = this.steps[this.steps.length - 2]) === null || _b === void 0 ? void 0 : _b.posY), //diff
+                this.swipeNextSensivity, closest);
+                fastSwipeClose = this.settings.fastSwipeClose
+                    && this.breakpoints.currentBreakpoint < closest;
+            }
+            // update currentBreakpoint once `closest` is known so it's available in emitted events
+            if (hadDrag) {
+                this.breakpoints.currentBreakpoint = closest;
+            }
+            // blur tap event
+            let blurTapEvent = false;
+            if ((this.isFormElement(document.activeElement))
+                && !(this.isFormElement(t.target))
+                && this.steps.length === 2) {
+                blurTapEvent = true;
+            }
+            // Event emitter
+            this.instance.emit('onDragEnd', t);
+            // Clear
+            this.steps = [];
+            delete this.startPointOverTop;
+            // touchend with allowClick === tapped event (no move triggered)
+            // skip next functions
+            if (this.allowClick || blurTapEvent) {
+                return;
+            }
+            // Fast swipe toward bottom - close
+            if (fastSwipeClose) {
+                this.instance.destroy({ animate: true });
+                return;
+            }
+            this.instance.checkOpacityAttr(closest);
+            this.instance.checkOverflowAttr(closest);
+            this.instance.setGrabCursor(true, false);
+            // Bottom closable
+            if (this.settings.bottomClose
+                && closest === this.breakpoints.breaks['bottom']) {
+                this.instance.destroy({ animate: true });
+                return;
+            }
+            // Simulationiusly emit event when touchend exact with next position (top)
+            if (this.instance.getPanelTransformY() === closest) {
+                this.instance.emit('onTransitionEnd', { target: this.instance.paneEl });
+            }
+            // Preserve current X position for modules that need it (like modal)
+            const currentX = this.instance.getPanelTransformX();
+            this.transitions.doTransition({
+                type: 'end',
+                translateY: closest,
+                translateX: currentX
+            });
+        });
     }
     onScroll(t) {
         return __awaiter(this, void 0, void 0, function* () {
             this.isScrolling = true;
             this.contentScrollTop = t.target.scrollTop;
+            // Add/remove scroll class directly to overflow element
+            if (this.contentScrollTop > 0) {
+                this.instance.paneEl.classList.add('scrolled');
+            }
+            else {
+                this.instance.paneEl.classList.remove('scrolled');
+            }
         });
     }
     onClick(t) {
@@ -592,7 +684,16 @@ class Events {
     }
     fastSwipeNext(axis) {
         var _a, _b;
-        const diff = ((_a = this.steps[this.steps.length - 1]) === null || _a === void 0 ? void 0 : _a['pos' + axis]) - ((_b = this.steps[this.steps.length - 2]) === null || _b === void 0 ? void 0 : _b['pos' + axis]);
+        // Only consider fast swipe when an actual drag occurred
+        if (this.allowClick)
+            return false;
+        if (this.steps.length < 2)
+            return false;
+        const last = this.steps[this.steps.length - 1];
+        const prev = this.steps[this.steps.length - 2];
+        const diff = ((_a = last === null || last === void 0 ? void 0 : last['pos' + axis]) !== null && _a !== void 0 ? _a : 0) - ((_b = prev === null || prev === void 0 ? void 0 : prev['pos' + axis]) !== null && _b !== void 0 ? _b : 0);
+        if (!Number.isFinite(diff))
+            return false;
         return (Math.abs(diff) >= this.swipeNextSensivity);
     }
     /**
@@ -704,12 +805,6 @@ class KeyboardEvents {
          * @param e
          */
         this.onKeyboardWillHideCb = (e) => this.onKeyboardWillHide(e);
-        /**
-         * Window resize event
-         * We handle here keyboard event as well
-         * @param e
-         */
-        this.onWindowResizeCb = (e) => this.onWindowResize(e);
         this.device = this.instance.device;
         this.breakpoints = this.instance.breakpoints;
     }
@@ -788,31 +883,32 @@ class KeyboardEvents {
         }
         this.instance.moveToBreak(this.breakpoints.prevBreakpoint);
     }
-    onWindowResize(e) {
-        return __awaiter(this, void 0, void 0, function* () {
-            /**
-             * Keyboard event detection
-             * We should separate keyboard and resize events
-             */
-            if (this.isFormElement(document.activeElement)) {
-                // Only for non-cordova
-                if (!this.device.cordova) {
-                    this.onKeyboardShow({ keyboardHeight: this.instance.screen_height - window.innerHeight });
-                }
-                return;
+    /**
+     * Detect and handle keyboard events from window resize
+     * Public method to be called by resize handler
+     * @param e
+     */
+    handleKeyboardFromResize(e) {
+        /**
+         * Keyboard event detection
+         * We should separate keyboard and resize events
+         */
+        if (this.isFormElement(document.activeElement)) {
+            // Only for non-cordova
+            if (!this.device.cordova) {
+                this.onKeyboardShow({ keyboardHeight: this.instance.screen_height - window.innerHeight });
             }
-            if (this.keyboardVisibleResize) {
-                this.keyboardVisibleResize = false;
-                // Only for non-cordova
-                if (!this.device.cordova) {
-                    this.onKeyboardWillHide({});
-                }
-                return;
+            return true; // Keyboard event was handled
+        }
+        if (this.keyboardVisibleResize) {
+            this.keyboardVisibleResize = false;
+            // Only for non-cordova
+            if (!this.device.cordova) {
+                this.onKeyboardWillHide({});
             }
-            yield new Promise((resolve) => setTimeout(() => resolve(true), 150));
-            this.instance.updateScreenHeights();
-            this.breakpoints.buildBreakpoints(JSON.parse(this.breakpoints.lockedBreakpoints));
-        });
+            return true; // Keyboard event was handled
+        }
+        return false; // No keyboard event, proceed with resize
     }
     /**
      * Private class methods
@@ -891,6 +987,55 @@ class KeyboardEvents {
     }
 }
 
+/**
+ * Window resize, Orientation change
+ */
+class ResizeEvents {
+    constructor(instance) {
+        this.instance = instance;
+        this.rafId = null;
+        /**
+         * Window resize event handler
+         * Handles orientation changes and window resize
+         * @param e
+         */
+        this.onWindowResizeCb = (e) => this.onWindowResize(e);
+        this.device = this.instance.device;
+        this.breakpoints = this.instance.breakpoints;
+    }
+    onWindowResize(e) {
+        return __awaiter(this, void 0, void 0, function* () {
+            // Handle keyboard detection first
+            this.instance.keyboardEvents.handleKeyboardFromResize(e);
+            // Update screen heights immediately
+            this.instance.updateScreenHeights();
+            // Cancel previous RAF and schedule new one to to frequent calls
+            if (this.rafId) {
+                cancelAnimationFrame(this.rafId);
+            }
+            this.rafId = requestAnimationFrame(() => {
+                this.breakpoints.buildBreakpoints(JSON.parse(this.breakpoints.lockedBreakpoints));
+                this.rafId = null;
+            });
+        });
+    }
+    /**
+     * Check if element is a form element
+     * Shared utility method for form element detection
+     */
+    isFormElement(el) {
+        const formElements = [
+            'input', 'select', 'option',
+            'textarea', 'button', 'label'
+        ];
+        if (el && el.tagName
+            && formElements.includes(el.tagName.toLowerCase())) {
+            return true;
+        }
+        return false;
+    }
+}
+
 class Settings {
     constructor() {
         this.instance = {
@@ -930,6 +1075,7 @@ class Settings {
             passiveListeners: true,
             touchMoveStopPropagation: false,
             touchAngle: 45,
+            scrollZeroDragBottom: true,
             breaks: {},
             modal: null,
             zStack: null,
@@ -962,7 +1108,7 @@ class Breakpoints {
     buildBreakpoints(conf, bottomOffset = 0, animated = true) {
         var _a, _b;
         return __awaiter(this, void 0, void 0, function* () {
-            this.breaks = {};
+            this.breaks = Object.create(null);
             this.conf = conf;
             this.settings.bottomOffset = bottomOffset || this.settings.bottomOffset;
             // Async hook for modules injections
@@ -981,7 +1127,7 @@ class Breakpoints {
                 this.instance.emit('beforeBreakHeightApplied', { break: val });
                 // Apply initial breaks
                 if ((_a = this.settings.breaks[val]) === null || _a === void 0 ? void 0 : _a.enabled) {
-                    this.breaks[val] = this.breaks[val] || this.instance.screenHeightOffset;
+                    this.breaks[val] = this.instance.screenHeightOffset;
                     this.breaks[val] -= this.settings.bottomOffset;
                     this.breaks[val] -= this.settings.breaks[val].height;
                 }
@@ -1057,9 +1203,11 @@ class Breakpoints {
         return null;
     }
     getClosestBreakY() {
-        return this.brs.reduce((prev, curr) => {
-            return (Math.abs(curr - this.instance.getPanelTransformY()) < Math.abs(prev - this.instance.getPanelTransformY()) ? curr : prev);
+        const currentY = this.instance.getPanelTransformY();
+        const closest = this.brs.reduce((prev, curr) => {
+            return (Math.abs(curr - currentY) < Math.abs(prev - currentY) ? curr : prev);
         });
+        return closest;
     }
 }
 
@@ -1094,7 +1242,9 @@ class Transitions {
             if (params.type === CupertinoTransition.Move) {
                 // System event
                 this.instance.emit('onMoveTransitionStart', { translateY: params.translateY });
-                this.instance.paneEl.style.transition = 'all 0ms linear 0ms';
+                if (this.instance.paneEl.style.transition !== 'all 0ms linear 0ms') {
+                    this.instance.paneEl.style.transition = 'all 0ms linear 0ms';
+                }
                 this.setPaneElTransform(params);
                 return resolve(true);
             }
@@ -1149,6 +1299,13 @@ class Transitions {
                 // transition style
                 let buildedTransition = this.buildTransitionValue(bounce, subTransition.duration);
                 this.instance.paneEl.style.setProperty('transition', buildedTransition);
+                // ------------------------------------------------------------------------------
+                // IMPORTANT!
+                // When transition is changed from 0ms linear to anything else e.g. 300ms ease,
+                // When drag event followed by breakpoint event,
+                // css property has no time to apply transition to paneEl 
+                // it's browser bug / limitation. 
+                // ------------------------------------------------------------------------------
                 // Main transitions
                 // Emit event
                 this.instance.emit('onTransitionStart', {
@@ -1163,7 +1320,8 @@ class Transitions {
                  */
                 if (subTransition.to) {
                     if (!subTransition.to.transform) {
-                        subTransition.to.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+                        const initialBreakY = this.breakpoints.breaks[this.settings.initialBreak];
+                        subTransition.to.transform = this.instance.buildTransform3d(0, initialBreakY, 0);
                     }
                     Object.assign(this.instance.paneEl.style, subTransition.to);
                 }
@@ -1177,7 +1335,13 @@ class Transitions {
         }));
     }
     setPaneElTransform(params) {
-        this.instance.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
+        this.instance.currentTranslateY = params.translateY;
+        // Handle X-axis if provided (used by horizontal and modal modules)
+        if (params.translateX !== undefined) {
+            this.instance.currentTranslateX = params.translateX;
+        }
+        const transform = this.instance.buildTransform3d(this.instance.currentTranslateX, this.instance.currentTranslateY, 0);
+        this.instance.paneEl.style.transform = transform;
     }
     buildTransitionValue(bounce, duration) {
         if (bounce) {
@@ -1303,7 +1467,7 @@ class ZStackModule {
         // Accumulated styles from each pusher to pushed
         const setStyles = (scale, y, contrast, border) => {
             let exponentAngle = Math.pow(scale, this.settings.zStack.stackZAngle / 100);
-            pushElement.style.transform = `translateY(${y * (exponentAngle / scale)}px) scale(${scale})`;
+            pushElement.style.transform = this.instance.buildTransform3dWithScale(0, y * (exponentAngle / scale), 0, scale);
             pushElement.style.borderRadius = `${border}px`;
             pushElement.style.filter = `contrast(${contrast})`;
             // When destroy transition and last item moved we reduce multiplicators
@@ -1387,13 +1551,13 @@ class FollowerModule {
             }
             this.followerEl = document.querySelector(this.settings.followerElement);
             this.followerEl.style.willChange = 'transform, border-radius';
-            this.followerEl.style.transform = `translateY(0px) translateZ(0px)`;
+            this.followerEl.style.transform = this.instance.buildTransform3d(0, 0, 0);
             this.followerEl.style.transition = this.transitions.buildTransitionValue((_a = this.settings.breaks[this.instance.currentBreak()]) === null || _a === void 0 ? void 0 : _a.bounce);
         });
         // Move transition same for follower element (minus pane height)
         this.instance.on('onMoveTransitionStart', (ev) => {
             this.followerEl.style.transition = 'all 0ms linear 0ms';
-            this.followerEl.style.transform = `translateY(${ev.translateY - this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+            this.followerEl.style.transform = this.instance.buildTransform3d(0, ev.translateY - this.breakpoints.breaks[this.settings.initialBreak], 0);
         });
         // Reset transition same as for pane element
         this.instance.on('onMoveTransitionStart', (ev) => {
@@ -1401,7 +1565,7 @@ class FollowerModule {
         });
         this.instance.on('onTransitionStart', (ev) => {
             this.followerEl.style.transition = ev.transition;
-            this.followerEl.style.transform = `translateY(${ev.translateY.new - this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+            this.followerEl.style.transform = this.instance.buildTransform3d(0, ev.translateY.new - this.breakpoints.breaks[this.settings.initialBreak], 0);
         });
     }
 }
@@ -1581,6 +1745,8 @@ class FitHeightModule {
         });
         this.instance.on('onTransitionEnd', () => {
             this.instance.paneEl.style.height = `unset`;
+            // Refresh cursor after fit-height transitions
+            this.instance.setGrabCursor(true, false);
         });
         // Pass our code into function buildBreakpoints()
         this.instance.on('onWillPresent', () => {
@@ -1610,10 +1776,7 @@ class FitHeightModule {
                     this.settings.upperThanTop = false;
                 }
                 else {
-                    if (this.instance.overflowEl && !this.settings.maxFitHeight) {
-                        this.settings.topperOverflow = false;
-                        this.instance.overflowEl.style.overflowY = 'hidden';
-                    }
+                    if (this.instance.overflowEl && !this.settings.maxFitHeight) ;
                 }
             }
         }, true);
@@ -1623,13 +1786,13 @@ class FitHeightModule {
         return __awaiter(this, void 0, void 0, function* () {
             this.settings.fitScreenHeight = false;
             this.settings.initialBreak = 'top';
-            this.settings.topperOverflow = false;
+            // this.settings.topperOverflow = false;
             let height = yield this.getPaneFitHeight();
             // maxFitHeight
             if (this.settings.maxFitHeight
                 && height > this.settings.maxFitHeight) {
                 height = this.settings.maxFitHeight;
-                this.settings.topperOverflow = true;
+                // this.settings.topperOverflow = true;
             }
             this.breakpoints.conf = {
                 top: { enabled: true, height },
@@ -1740,10 +1903,18 @@ class InverseModule {
         this.instance['checkOpacityAttr'] = () => { };
         this.instance['checkOverflowAttr'] = (val) => this.checkOverflowAttr(val);
         this.instance['prepareBreaksSwipeNextPoint'] = () => this.prepareBreaksSwipeNextPoint();
+        // Override swipe logic for inverse coordinates
+        this.instance['swipeNextPoint'] = (diff, maxDiff, closest) => this.swipeNextPoint(diff, maxDiff, closest);
+        // Override fastSwipeNext to invert direction detection for inverse mode
+        this.events['fastSwipeNext'] = (axis) => this.fastSwipeNext(axis);
         // re-bind events functions
         this.events['handleSuperposition'] = (coords) => this.handleSuperposition(coords);
         this.events['scrollPreventDrag'] = (t) => this.scrollPreventDrag(t);
         this.events['onScroll'] = () => this.onScroll();
+        // Override transitions to block X movement in inverse mode
+        this.instance.transitions['setPaneElTransform'] = (params) => this.setPaneElTransform(params);
+        // Ensure X coordinate is always 0 in inverse mode
+        this.instance.currentTranslateX = 0;
         // Class to wrapper
         this.instance.on('DOMElementsReady', () => {
             this.instance.wrapperEl.classList.add('inverse');
@@ -1776,17 +1947,40 @@ class InverseModule {
         }
       `);
         });
-        this.instance.on('beforeBreakHeightApplied', (ev) => {
-            var _a;
-            if ((_a = this.settings.breaks[ev.break]) === null || _a === void 0 ? void 0 : _a.enabled) {
-                this.breakpoints.breaks[ev.break] = 2 * (this.settings.breaks[ev.break].height + this.settings.bottomOffset);
-            }
-        }, false);
         this.instance.on('buildBreakpointsCompleted', () => {
-            this.breakpoints.topper = this.breakpoints.bottomer;
+            // Fix inverse coordinate calculation
+            // In inverse mode, panel starts from top, so we need to recalculate positions
+            const originalBreaks = Object.assign({}, this.breakpoints.breaks);
+            const screenHeight = this.instance.screen_height;
+            ['top', 'middle', 'bottom'].forEach((breakName) => {
+                var _a;
+                if (originalBreaks[breakName] !== undefined && ((_a = this.settings.breaks[breakName]) === null || _a === void 0 ? void 0 : _a.enabled)) {
+                    // In inverse mode, calculate position from top of screen
+                    // height = how much content is visible
+                    // position = screen_height - height (how far down from top)
+                    const contentHeight = this.settings.breaks[breakName].height;
+                    const positionFromTop = screenHeight - contentHeight - this.settings.bottomOffset;
+                    this.breakpoints.breaks[breakName] = positionFromTop;
+                }
+            });
+            // Get all converted breakpoint values  
+            const breakValues = Object.values(this.breakpoints.breaks).filter(v => typeof v === 'number');
+            // In inverse mode:
+            // - Smallest Y value (top of screen) = topper = most content visible
+            // - Largest Y value (bottom of screen) = bottomer = least content visible  
+            const smallestY = Math.min(...breakValues); // Topper (top of screen, most content)
+            const largestY = Math.max(...breakValues); // Bottomer (bottom of screen, least content)
+            this.breakpoints.topper = smallestY;
+            this.breakpoints.bottomer = largestY;
+            // CRITICAL: Update the brs array with converted values for getClosestBreakY()
+            this.breakpoints.brs = breakValues;
             // Re-calc top after setBreakpoints();
-            this.instance.paneEl.style.top = `-${this.breakpoints.bottomer - this.settings.bottomOffset}px`;
+            this.instance.paneEl.style.top = `-${Math.abs(this.breakpoints.bottomer) - this.settings.bottomOffset}px`;
         });
+        this.instance.on('onWillPresent', () => {
+            this.breakpoints.beforeBuildBreakpoints = () => this.beforeBuildBreakpoints();
+        });
+        // Initial positioning will be handled by the corrected breakpoint calculations
     }
     getPaneHeight() {
         return this.breakpoints.bottomer - this.settings.bottomOffset;
@@ -1809,15 +2003,12 @@ class InverseModule {
         this.instance.overflowEl.style.overflowY = (val >= this.breakpoints.bottomer) ? 'auto' : 'hidden';
     }
     prepareBreaksSwipeNextPoint() {
-        let brs = {};
-        let settingsBreaks = {};
-        brs['top'] = this.breakpoints.breaks['bottom'];
-        brs['middle'] = this.breakpoints.breaks['middle'];
-        brs['bottom'] = this.breakpoints.breaks['top'];
-        settingsBreaks['top'] = Object.assign({}, this.settings.breaks['bottom']);
-        settingsBreaks['middle'] = Object.assign({}, this.settings.breaks['middle']);
-        settingsBreaks['bottom'] = Object.assign({}, this.settings.breaks['top']);
-        return { brs, settingsBreaks };
+        // Since we override swipeNextPoint completely, no need to swap here
+        // Just return the normal breakpoints structure
+        return {
+            brs: Object.assign({}, this.breakpoints.breaks),
+            settingsBreaks: Object.assign({}, this.settings.breaks)
+        };
     }
     /**
      * Topper Than Top
@@ -1825,27 +2016,40 @@ class InverseModule {
      * Otherwise don't changes
      */
     handleSuperposition(coords) {
-        // Inverse gestures
-        // Allow drag topper than top point
-        if (this.settings.upperThanTop
-            && ((coords.newVal >= this.breakpoints.topper)
-                || this.events.startPointOverTop)) {
-            // check that finger reach same position before enable normal swipe mode
-            if (!this.events.startPointOverTop) {
-                this.events.startPointOverTop = coords.clientY;
-            }
-            if (this.events.startPointOverTop > coords.clientY) {
-                delete this.events.startPointOverTop;
-            }
-            const screenDelta = this.instance.screen_height - this.instance.screenHeightOffset;
-            const differKoef = (screenDelta - this.instance.getPanelTransformY()) / (screenDelta - this.breakpoints.topper) / 8;
-            return { y: this.instance.getPanelTransformY() + (coords.diffY * differKoef) };
-        }
-        // Disallow drag topper than top point
-        if (!this.settings.upperThanTop
-            && (coords.newVal >= this.breakpoints.topper)) {
+        // Inverse gestures - coordinate system starts from top of screen
+        // topper = smallest Y (top of screen, most content visible, e.g., 100)
+        // bottomer = largest Y (bottom of screen, least content visible, e.g., 900)
+        // ALWAYS enforce boundaries in inverse mode for proper UI behavior
+        // Working with positive coordinate system where smaller Y = more content (top of screen)
+        // FIRST: Check topper boundary (dragging too far up/small Y = too much content)
+        if (coords.newVal <= this.breakpoints.topper) {
             return { y: this.breakpoints.topper };
         }
+        // SECOND: Check bottomer boundary (dragging too far down/large Y = too little content)
+        if (coords.newVal >= this.breakpoints.bottomer) {
+            return { y: this.breakpoints.bottomer };
+        }
+        // THIRD: Check upperThanTop setting for resistance beyond topper
+        if (coords.newVal <= this.breakpoints.topper) {
+            if (this.settings.upperThanTop) {
+                // Allow drag beyond topper with resistance
+                if (!this.events.startPointOverTop) {
+                    this.events.startPointOverTop = coords.clientY;
+                }
+                if (this.events.startPointOverTop > coords.clientY) {
+                    delete this.events.startPointOverTop;
+                }
+                const screenDelta = this.instance.screen_height - this.instance.screenHeightOffset;
+                const differKoef = (screenDelta - Math.abs(this.instance.getPanelTransformY())) / (screenDelta - Math.abs(this.breakpoints.topper)) / 8;
+                const resultY = this.instance.getPanelTransformY() + (coords.diffY * differKoef);
+                return { y: resultY };
+            }
+            else {
+                // In inverse mode, ALWAYS respect top boundary  
+                return { y: this.breakpoints.topper };
+            }
+        }
+        return undefined; // Allow normal movement
     }
     scrollPreventDrag(t) {
         let prevention = false;
@@ -1873,6 +2077,92 @@ class InverseModule {
             this.events.isScrolling = true;
         });
     }
+    /**
+     * Override setPaneElTransform to block X movement in inverse mode
+     * Inverse panes should only move vertically (Y-axis)
+     */
+    setPaneElTransform(params) {
+        // Update Y coordinate as normal (breakpoints are already calculated correctly)
+        this.instance.currentTranslateY = params.translateY;
+        // NEVER update X coordinate in inverse mode - keep it at 0
+        this.instance.currentTranslateX = 0;
+        // Apply transform with Y movement only, X always stays at 0
+        const transform = this.instance.buildTransform3d(0, this.instance.currentTranslateY, 0);
+        this.instance.paneEl.style.transform = transform;
+    }
+    /**
+     * Override fastSwipeNext for inverse mode
+     * Need to detect fast swipe but pass inverted diff to swipeNextPoint
+     */
+    fastSwipeNext(axis) {
+        var _a, _b;
+        // Only consider fast swipe when an actual drag occurred
+        if (this.events['allowClick'])
+            return false;
+        if (this.events['steps'].length < 2)
+            return false;
+        const last = this.events['steps'][this.events['steps'].length - 1];
+        const prev = this.events['steps'][this.events['steps'].length - 2];
+        const diff = ((_a = last === null || last === void 0 ? void 0 : last['pos' + axis]) !== null && _a !== void 0 ? _a : 0) - ((_b = prev === null || prev === void 0 ? void 0 : prev['pos' + axis]) !== null && _b !== void 0 ? _b : 0);
+        if (!Number.isFinite(diff))
+            return false;
+        return (Math.abs(diff) >= this.events.swipeNextSensivity);
+    }
+    /**
+     * Override swipeNextPoint for inverse coordinate system
+     * In inverse mode, we need to handle the direction properly
+     */
+    swipeNextPoint(diff, maxDiff, closest) {
+        var _a, _b, _c, _d, _e, _f;
+        const brs = this.breakpoints.breaks;
+        const settingsBreaks = this.settings.breaks;
+        const curr = this.instance.breakpoints.currentBreakpoint;
+        const topY = brs['top']; // Smallest Y (most content, top of screen)
+        const midY = brs['middle']; // Middle Y
+        const botY = brs['bottom']; // Largest Y (least content, bottom of screen)
+        // In inverse mode:
+        // diff > 0 (finger down) = show LESS content = move to larger Y (towards bottom breakpoint)
+        // diff < 0 (finger up) = show MORE content = move to smaller Y (towards top breakpoint)
+        // From top position (most content visible, smallest Y)
+        if (curr === topY) {
+            if (diff > maxDiff) { // Finger down → show less content
+                if ((_a = settingsBreaks['middle']) === null || _a === void 0 ? void 0 : _a.enabled) {
+                    return midY;
+                }
+                if ((_b = settingsBreaks['bottom']) === null || _b === void 0 ? void 0 : _b.enabled) {
+                    return botY;
+                }
+            }
+            return topY;
+        }
+        // From middle position
+        if (curr === midY) {
+            if (diff < -maxDiff && ((_c = settingsBreaks['top']) === null || _c === void 0 ? void 0 : _c.enabled)) { // Finger up → show more content
+                return topY;
+            }
+            if (diff > maxDiff && ((_d = settingsBreaks['bottom']) === null || _d === void 0 ? void 0 : _d.enabled)) { // Finger down → show less content
+                return botY;
+            }
+            return midY;
+        }
+        // From bottom position (least content visible, largest Y)
+        if (curr === botY) {
+            if (diff < -maxDiff) { // Finger up → show more content
+                if ((_e = settingsBreaks['middle']) === null || _e === void 0 ? void 0 : _e.enabled) {
+                    return midY;
+                }
+                if ((_f = settingsBreaks['top']) === null || _f === void 0 ? void 0 : _f.enabled) {
+                    return topY;
+                }
+            }
+            return botY;
+        }
+        return closest;
+    }
+    beforeBuildBreakpoints() {
+        // Don't override breaks here - let normal calculation happen first
+        // We'll convert to inverse coordinates in buildBreakpointsCompleted
+    }
 }
 
 /**
@@ -1886,16 +2176,30 @@ class HorizontalModule {
     }
     constructor(instance) {
         this.instance = instance;
+        this.initialBreakX = 'left'; // Default horizontal position
+        this.initialBreakY = 'middle'; // Default vertical position
+        this.recalcScheduled = false;
         this.settings = this.instance.settings;
         this.transitions = this.instance.transitions;
         this.events = this.instance.events;
         if (!this.settings.horizontal) {
             return null;
         }
-        // re-bind functions
+        // Parse combined initialBreak pattern
+        this.parseInitialBreak();
+        // Override transitions setPaneElTransform
         this.transitions['setPaneElTransform'] = (params) => this.setPaneElTransform(params);
-        // Calculate horizontal breakpoints on left-right edges
-        // On present or window resized when transformX = 0
+        // Override events applyMoveUpdate to include X-axis data when moving
+        this.events['applyMoveUpdate'] = () => this.applyMoveUpdate();
+        this.instance.on('beforeBreakHeightApplied', (ev) => {
+            this.scheduleCalcHorizontalBreaks();
+        });
+        // Override initial positioning
+        this.instance.on('beforePresentTransition', () => {
+            this.calcHorizontalBreaks();
+            this.overrideInitialPositioning();
+        });
+        // Calculate horizontal breakpoints when needed
         this.instance.on('onTransitionEnd', (ev) => {
             if ((ev.type === 'breakpoint' || ev.type === 'present')
                 && !this.instance.getPanelTransformX()) {
@@ -1911,38 +2215,172 @@ class HorizontalModule {
             this.fastSwipeNext = this.events.fastSwipeNext('X');
         });
     }
+    parseInitialBreak() {
+        const breakParts = this.settings.initialBreak.split(' ');
+        if (breakParts.length === 1) {
+            // Single break like 'middle' - use for Y, default X to left
+            this.initialBreakY = breakParts[0];
+            this.initialBreakX = 'left';
+        }
+        else if (breakParts.length === 2) {
+            // Combined break like 'middle right'
+            this.initialBreakY = breakParts[0]; // top/middle/bottom
+            this.initialBreakX = breakParts[1]; // left/right
+        }
+        // Validate Y break
+        if (!['top', 'middle', 'bottom'].includes(this.initialBreakY)) {
+            console.warn(`Cupertino Pane: Invalid Y breakpoint "${this.initialBreakY}", using "middle"`);
+            this.initialBreakY = 'middle';
+        }
+        // Validate X break
+        if (!['left', 'right'].includes(this.initialBreakX)) {
+            console.warn(`Cupertino Pane: Invalid X breakpoint "${this.initialBreakX}", using "left"`);
+            this.initialBreakX = 'left';
+        }
+    }
     calcHorizontalBreaks() {
-        this.defaultRect = {
-            width: this.instance.paneEl.getBoundingClientRect().width,
-            left: this.instance.paneEl.getBoundingClientRect().left,
-            right: this.instance.paneEl.getBoundingClientRect().right
-        };
-        this.horizontalBreaks = [
-            -this.defaultRect.left + this.settings.horizontalOffset,
-            window.innerWidth - this.defaultRect.left - this.defaultRect.width - this.settings.horizontalOffset
-        ];
+        var _a;
+        return __awaiter(this, void 0, void 0, function* () {
+            const rect = this.instance.paneEl.getBoundingClientRect();
+            const paneWidth = rect.width;
+            // Calculate the original centered position (not the transformed position)
+            // The pane is centered using CSS: margin-left: auto; margin-right: auto
+            const originalCenteredLeft = (window.innerWidth - paneWidth) / 2;
+            this.defaultRect = {
+                width: paneWidth,
+                left: originalCenteredLeft,
+                right: originalCenteredLeft + paneWidth
+            };
+            const offset = (_a = this.settings.horizontalOffset) !== null && _a !== void 0 ? _a : 0;
+            this.horizontalBreaks = {
+                left: Math.round(-this.defaultRect.left + offset),
+                right: Math.round(window.innerWidth - this.defaultRect.left - this.defaultRect.width - offset)
+            };
+        });
+    }
+    scheduleCalcHorizontalBreaks() {
+        if (this.recalcScheduled)
+            return;
+        this.recalcScheduled = true;
+        requestAnimationFrame(() => {
+            this.recalcScheduled = false;
+            this.calcHorizontalBreaks();
+        });
+    }
+    overrideInitialPositioning() {
+        // Get Y position from breakpoints
+        const yPosition = this.instance.breakpoints.breaks[this.initialBreakY];
+        // Get X position from horizontal breaks  
+        const xPosition = this.horizontalBreaks[this.initialBreakX];
+        // Check if we're in an animated presentation
+        // If so, we should start from the screen height offset for the animation
+        const currentTransform = this.instance.paneEl.style.transform;
+        const isAnimatedPresent = currentTransform.includes(`${this.instance.screenHeightOffset}px`);
+        if (isAnimatedPresent) {
+            // For animated presentations, only set X position, keep Y at screen height offset
+            this.instance.currentTranslateX = xPosition;
+            this.instance.currentTranslateY = this.instance.screenHeightOffset;
+            this.instance.paneEl.style.transform = this.instance.buildTransform3d(this.instance.currentTranslateX, this.instance.currentTranslateY, 0);
+        }
+        else {
+            // For non-animated presentations, set both X and Y to final positions
+            this.instance.currentTranslateX = xPosition;
+            this.instance.currentTranslateY = yPosition;
+            this.instance.paneEl.style.transform = this.instance.buildTransform3d(this.instance.currentTranslateX, this.instance.currentTranslateY, 0);
+        }
+        // Update currentBreakpoint to reflect actual position
+        this.currentBreakpoint = this.initialBreakX;
+        this.instance.breakpoints.currentBreakpoint = yPosition;
     }
     setPaneElTransform(params) {
-        let closest = params.translateX;
+        if (!this.horizontalBreaks)
+            this.calcHorizontalBreaks();
+        let closestY = params.translateY;
+        let closestX = params.translateX || this.instance.getPanelTransformX();
+        // resize event for x-axis
+        if (params.type === 'breakpoint' && !params.translateX) {
+            closestX = this.horizontalBreaks[this.currentBreakpoint];
+        }
         if (params.type === 'end') {
-            closest = this.getClosestBreakX();
+            // Get closest Y breakpoint (existing logic)
+            closestY = this.instance.breakpoints.getClosestBreakY();
+            // Get closest X breakpoint
+            closestX = this.getClosestBreakX();
+            // Handle fast swipe in X direction
             if (this.fastSwipeNext) {
                 if (this.currentBreakpoint === 'left'
-                    && this.instance.getPanelTransformX() > this.horizontalBreaks[0]) {
-                    closest = this.horizontalBreaks[1];
+                    && this.instance.getPanelTransformX() > this.horizontalBreaks.left) {
+                    closestX = this.horizontalBreaks.right;
                 }
                 if (this.currentBreakpoint === 'right'
-                    && this.instance.getPanelTransformX() < this.horizontalBreaks[1]) {
-                    closest = this.horizontalBreaks[0];
+                    && this.instance.getPanelTransformX() < this.horizontalBreaks.right) {
+                    closestX = this.horizontalBreaks.left;
                 }
             }
-            this.currentBreakpoint = closest === this.horizontalBreaks[0] ? 'left' : 'right';
+            // Update current breakpoint
+            this.currentBreakpoint = closestX === this.horizontalBreaks.left ? 'left' : 'right';
+            this.instance.breakpoints.currentBreakpoint = closestY;
         }
-        this.instance.paneEl.style.transform = `translateX(${closest || 0}px) translateY(${params.translateY}px) translateZ(0px)`;
+        // Apply combined transform and sync cache
+        this.instance.currentTranslateX = closestX || 0;
+        this.instance.currentTranslateY = closestY || 0;
+        this.instance.paneEl.style.transform = this.instance.buildTransform3d(this.instance.currentTranslateX, this.instance.currentTranslateY, 0);
     }
     getClosestBreakX() {
-        return this.horizontalBreaks.reduce((prev, curr) => {
-            return (Math.abs(curr - this.instance.getPanelTransformX()) < Math.abs(prev - this.instance.getPanelTransformX()) ? curr : prev);
+        if (!this.horizontalBreaks)
+            this.calcHorizontalBreaks();
+        const currentX = this.instance.getPanelTransformX();
+        return Math.abs(this.horizontalBreaks.left - currentX) < Math.abs(this.horizontalBreaks.right - currentX)
+            ? this.horizontalBreaks.left
+            : this.horizontalBreaks.right;
+    }
+    // Public method to move to specific horizontal break
+    moveToHorizontalBreak(breakX) {
+        if (!this.horizontalBreaks) {
+            this.calcHorizontalBreaks();
+        }
+        const currentY = this.instance.getPanelTransformY();
+        const targetX = this.horizontalBreaks[breakX];
+        this.instance.currentTranslateX = targetX;
+        this.instance.currentTranslateY = currentY;
+        this.instance.paneEl.style.transform = this.instance.buildTransform3d(this.instance.currentTranslateX, this.instance.currentTranslateY, 0);
+        this.currentBreakpoint = breakX;
+    }
+    // Get current horizontal breakpoint
+    getCurrentHorizontalBreak() {
+        return this.currentBreakpoint;
+    }
+    // Override applyMoveUpdate to include X-axis data for horizontal dragging
+    applyMoveUpdate() {
+        const pendingMoveData = this.events['pendingMoveData'];
+        if (!pendingMoveData) {
+            this.events['rafId'] = null;
+            return;
+        }
+        const { newVal, newValX } = pendingMoveData;
+        // Apply the opacity and overflow attributes
+        this.instance.checkOpacityAttr(newVal);
+        this.instance.checkOverflowAttr(newVal);
+        // Apply the transition with both X and Y axis for horizontal module
+        this.transitions.doTransition({ type: 'move', translateY: newVal, translateX: newValX });
+        // Clear the pending data and animation frame ID
+        this.events['pendingMoveData'] = null;
+        this.events['rafId'] = null;
+    }
+    // Public method to move to specified X,Y coordinates with smooth transition
+    moveToWidth(translateX, translateY) {
+        return __awaiter(this, void 0, void 0, function* () {
+            if (!this.instance.isPanePresented()) {
+                console.warn(`Cupertino Pane: Present pane before call moveToWidth()`);
+                return null;
+            }
+            // Use the library's transition system for smooth positioning
+            yield this.instance.transitions.doTransition({
+                type: 'breakpoint',
+                translateX: translateX,
+                translateY: translateY
+            });
+            return Promise.resolve(true);
         });
     }
 }
@@ -2031,8 +2469,22 @@ class ModalModule {
         });
     }
     setPaneElTransform(params) {
-        let closest = params.type === 'end' ? 0 : params.translateX;
-        this.instance.paneEl.style.transform = `translateX(${closest || 0}px) translateY(${params.translateY}px) translateZ(0px)`;
+        let closestX;
+        let closestY = params.translateY;
+        // Modal X behavior: allow movement during drag, but reset to center on end
+        if (params.type === 'end') {
+            closestX = 0; // Reset to center on touchEnd
+        }
+        else {
+            // During drag ('move'), use provided X or preserve current
+            closestX = params.translateX !== undefined
+                ? params.translateX
+                : this.instance.getPanelTransformX();
+        }
+        // Update tracked position
+        this.instance.currentTranslateX = closestX;
+        this.instance.currentTranslateY = closestY;
+        this.instance.paneEl.style.transform = this.instance.buildTransform3d(this.instance.currentTranslateX, this.instance.currentTranslateY, 0);
     }
     /**
      * Private class methods
@@ -2056,8 +2508,8 @@ class ModalModule {
             }));
         }
         if (conf.fromCurrentPosition) {
-            let computedTranslate = new WebKitCSSMatrix(window.getComputedStyle(this.instance.paneEl).transform);
-            transition.to.transform = `translateY(${computedTranslate.m42}px) translateX(${computedTranslate.m41}px) translateZ(0px)`;
+            let computedTranslate = this.instance.parseTransform3d(this.instance.paneEl);
+            transition.to.transform = this.instance.buildTransform3d(computedTranslate.x, computedTranslate.y, 0);
         }
         return this.instance['customDestroy'](Object.assign(Object.assign({}, conf), { transition }));
     }
@@ -2118,6 +2570,8 @@ class CupertinoPane {
         this.preventDismissEvent = false;
         this.preventedDismiss = false;
         this.rendered = false;
+        this.currentTranslateY = 0;
+        this.currentTranslateX = 0;
         this.settings = (new Settings()).instance;
         this.device = new Device();
         this.modules = {};
@@ -2134,47 +2588,37 @@ class CupertinoPane {
             }
         };
         this.swipeNextPoint = (diff, maxDiff, closest) => {
-            let { brs, settingsBreaks } = this.prepareBreaksSwipeNextPoint();
-            if (this.breakpoints.currentBreakpoint === brs['top']) {
+            var _a, _b, _c, _d, _e, _f;
+            const brs = this.breakpoints.breaks;
+            const settingsBreaks = this.settings.breaks;
+            const curr = this.breakpoints.currentBreakpoint;
+            const topY = brs['top'];
+            const midY = brs['middle'];
+            const botY = brs['bottom'];
+            if (curr === topY) {
                 if (diff > maxDiff) {
-                    if (settingsBreaks['middle'].enabled) {
-                        return brs['middle'];
-                    }
-                    if (settingsBreaks['bottom'].enabled) {
-                        if (brs['middle'] < closest) {
-                            return closest;
-                        }
-                        return brs['bottom'];
-                    }
+                    if ((_a = settingsBreaks['middle']) === null || _a === void 0 ? void 0 : _a.enabled)
+                        return midY;
+                    if ((_b = settingsBreaks['bottom']) === null || _b === void 0 ? void 0 : _b.enabled)
+                        return botY;
                 }
-                return brs['top'];
+                return topY;
             }
-            if (this.breakpoints.currentBreakpoint === brs['middle']) {
-                if (diff < -maxDiff) {
-                    if (settingsBreaks['top'].enabled) {
-                        return brs['top'];
-                    }
-                }
-                if (diff > maxDiff) {
-                    if (settingsBreaks['bottom'].enabled) {
-                        return brs['bottom'];
-                    }
-                }
-                return brs['middle'];
+            if (curr === midY) {
+                if (diff < -maxDiff && ((_c = settingsBreaks['top']) === null || _c === void 0 ? void 0 : _c.enabled))
+                    return topY;
+                if (diff > maxDiff && ((_d = settingsBreaks['bottom']) === null || _d === void 0 ? void 0 : _d.enabled))
+                    return botY;
+                return midY;
             }
-            if (this.breakpoints.currentBreakpoint === brs['bottom']) {
+            if (curr === botY) {
                 if (diff < -maxDiff) {
-                    if (settingsBreaks['middle'].enabled) {
-                        if (brs['middle'] > closest) {
-                            return closest;
-                        }
-                        return brs['middle'];
-                    }
-                    if (settingsBreaks['top'].enabled) {
-                        return brs['top'];
-                    }
+                    if ((_e = settingsBreaks['middle']) === null || _e === void 0 ? void 0 : _e.enabled)
+                        return midY;
+                    if ((_f = settingsBreaks['top']) === null || _f === void 0 ? void 0 : _f.enabled)
+                        return topY;
                 }
-                return brs['bottom'];
+                return botY;
             }
             return closest;
         };
@@ -2219,10 +2663,11 @@ class CupertinoPane {
         if (this.settings.events) {
             Object.keys(this.settings.events).forEach(name => this.on(name, this.settings.events[name]));
         }
-        // Core classes
+        // Core classes - Order matters! ResizeEvents needs to be before Events
         this.breakpoints = new Breakpoints(this);
         this.transitions = new Transitions(this);
         this.keyboardEvents = new KeyboardEvents(this);
+        this.resizeEvents = new ResizeEvents(this);
         this.events = new Events(this);
         // Install modules
         modules.forEach((module) => this.modules[this.getModuleRef(module.name)] = new module(this));
@@ -2252,7 +2697,9 @@ class CupertinoPane {
     `;
         // Panel (appying transform ASAP, avoid timeouts for animate:true)
         this.paneEl = document.createElement('div');
-        this.paneEl.style.transform = `translateY(${this.screenHeightOffset}px) translateZ(0px)`;
+        this.paneEl.style.transform = this.buildTransform3d(0, this.screenHeightOffset, 0);
+        this.currentTranslateY = this.screenHeightOffset;
+        this.currentTranslateX = 0;
         this.paneEl.classList.add('pane');
         internalStyles += `
       .cupertino-pane-wrapper .pane {
@@ -2402,7 +2849,7 @@ class CupertinoPane {
                 ? JSON.parse(JSON.stringify(conf.transition.from)) : null;
             if (customTransitionFrom) {
                 if (!customTransitionFrom.transform) {
-                    customTransitionFrom.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+                    customTransitionFrom.transform = this.buildTransform3d(0, this.breakpoints.breaks[this.settings.initialBreak], 0);
                 }
                 Object.assign(this.paneEl.style, customTransitionFrom);
             }
@@ -2453,7 +2900,8 @@ class CupertinoPane {
             }
             else {
                 this.breakpoints.prevBreakpoint = this.settings.initialBreak;
-                this.paneEl.style.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+                this.currentTranslateY = this.breakpoints.breaks[this.settings.initialBreak];
+                this.paneEl.style.transform = this.buildTransform3d(this.currentTranslateX, this.currentTranslateY, 0);
             }
             /****** Attach Events *******/
             this.events.attachAllEvents();
@@ -2479,10 +2927,6 @@ class CupertinoPane {
             this.overflowEl.style.overflowX = 'hidden';
         }
         this.overflowEl.style.overscrollBehavior = 'none';
-        if (this.settings.topperOverflow
-            && this.settings.upperThanTop) {
-            console.warn('Cupertino Pane: "upperThanTop" allowed for disabled "topperOverflow"');
-        }
         this.setOverflowHeight();
     }
     setOverflowHeight(offset = 0) {
@@ -2496,17 +2940,27 @@ class CupertinoPane {
         let attrElements = this.el.querySelectorAll('[hide-on-bottom]');
         if (!attrElements.length)
             return;
+        const shouldHide = (val >= this.breakpoints.breaks['bottom']);
+        if (this.lastHideOnBottom === shouldHide)
+            return;
         attrElements.forEach((item) => {
             item.style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-            item.style.opacity = (val >= this.breakpoints.breaks['bottom']) ? '0' : '1';
+            item.style.opacity = shouldHide ? '0' : '1';
         });
+        this.lastHideOnBottom = shouldHide;
     }
     checkOverflowAttr(val) {
         if (!this.settings.topperOverflow
             || !this.overflowEl) {
             return;
         }
-        this.overflowEl.style.overflowY = (val <= this.breakpoints.topper) ? 'auto' : 'hidden';
+        const shouldAuto = (val <= this.breakpoints.topper);
+        if (this.lastOverflowAuto === shouldAuto)
+            return;
+        this.overflowEl.style.overflowY = shouldAuto ? 'auto' : 'hidden';
+        this.lastOverflowAuto = shouldAuto;
+        // Update cursor immediately when scrollability changes
+        this.setGrabCursor(true, false);
     }
     // TODO: replace with body.contains()
     isPanePresented() {
@@ -2530,6 +2984,65 @@ class CupertinoPane {
         this.styleEl.textContent += styleString.replace(/\s\s+/g, ' ');
     }
     ;
+    /**
+     * Utility function to build transform3d string for better performance
+     * @param {number} x - X translation in pixels
+     * @param {number} y - Y translation in pixels
+     * @param {number} z - Z translation in pixels (defaults to 0)
+     */
+    buildTransform3d(x = 0, y = 0, z = 0) {
+        return `translate3d(${x}px, ${y}px, ${z}px)`;
+    }
+    /**
+     * Utility function to build transform3d with scale for better performance
+     * @param {number} x - X translation in pixels
+     * @param {number} y - Y translation in pixels
+     * @param {number} z - Z translation in pixels (defaults to 0)
+     * @param {number} scale - Scale factor (defaults to 1)
+     */
+    buildTransform3dWithScale(x = 0, y = 0, z = 0, scale = 1) {
+        return `translate3d(${x}px, ${y}px, ${z}px) scale(${scale})`;
+    }
+    /**
+     * Modern utility to parse transform3d values from computed style
+     * Replaces WebKitCSSMatrix for better performance
+     * @param {HTMLElement} element - Element to get transform from
+     * @returns {object} Object with x, y, z translation values
+     */
+    parseTransform3d(element) {
+        const transform = window.getComputedStyle(element).transform;
+        if (transform === 'none' || !transform) {
+            return { x: 0, y: 0, z: 0 };
+        }
+        // Handle matrix3d() format
+        if (transform.startsWith('matrix3d(')) {
+            const values = transform.slice(9, -1).split(',').map(v => parseFloat(v.trim()));
+            return {
+                x: values[12] || 0,
+                y: values[13] || 0,
+                z: values[14] || 0
+            };
+        }
+        // Handle matrix() format (2D)
+        if (transform.startsWith('matrix(')) {
+            const values = transform.slice(7, -1).split(',').map(v => parseFloat(v.trim()));
+            return {
+                x: values[4] || 0,
+                y: values[5] || 0,
+                z: 0
+            };
+        }
+        // Fallback for translate3d() format
+        const translate3dMatch = transform.match(/translate3d\(([^,]+),\s*([^,]+),\s*([^)]+)\)/);
+        if (translate3dMatch) {
+            return {
+                x: parseFloat(translate3dMatch[1]) || 0,
+                y: parseFloat(translate3dMatch[2]) || 0,
+                z: parseFloat(translate3dMatch[3]) || 0
+            };
+        }
+        return { x: 0, y: 0, z: 0 };
+    }
     getModuleRef(className) {
         return (className.charAt(0).toLowerCase() + className.slice(1)).replace('Module', '');
     }
@@ -2537,14 +3050,11 @@ class CupertinoPane {
      * Public user methods
      */
     getPanelTransformY() {
-        const translateYRegex = /\.*translateY\((.*)px\)/i;
-        return parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
+        return this.currentTranslateY;
     }
     // TODO: merge to 1 function above
     getPanelTransformX() {
-        const translateYRegex = /\.*translateX\((.*)px\)/i;
-        let translateExec = translateYRegex.exec(this.paneEl.style.transform);
-        return translateExec ? parseFloat(translateExec[1]) : 0;
+        return this.currentTranslateX;
     }
     /**
      * Prevent dismiss event
@@ -2559,7 +3069,27 @@ class CupertinoPane {
         if (!this.device.desktop) {
             return;
         }
-        this.paneEl.style.cursor = enable ? (moving ? 'grabbing' : 'grab') : '';
+        const handleCursor = enable ? (moving ? 'grabbing' : 'grab') : '';
+        const isScrollableVisible = !!this.overflowEl
+            && this.overflowEl.style.overflowY === 'auto'
+            && this.overflowEl.scrollHeight > this.overflowEl.clientHeight;
+        if (!enable) {
+            this.paneEl.style.cursor = '';
+            if (this.draggableEl)
+                this.draggableEl.style.cursor = '';
+            return;
+        }
+        // When content is scrollable, only the draggable handle shows grab/grabbing
+        if (isScrollableVisible) {
+            this.paneEl.style.cursor = '';
+            if (this.draggableEl)
+                this.draggableEl.style.cursor = handleCursor;
+            return;
+        }
+        // Default behavior: set cursor on the whole pane (and handle)
+        this.paneEl.style.cursor = handleCursor;
+        if (this.draggableEl)
+            this.draggableEl.style.cursor = handleCursor;
     }
     /**
      * Disable pane drag events

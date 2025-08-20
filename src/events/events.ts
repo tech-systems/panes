@@ -5,6 +5,7 @@ import { Support } from '../support';
 import { Breakpoints } from '../breakpoints';
 import { Transitions } from '../transitions';
 import { KeyboardEvents } from './keyboard';
+import { ResizeEvents } from './resize';
 
 /**
  * Touch start, Touch move, Touch end
@@ -33,17 +34,28 @@ export class Events {
   public startPointOverTop: number;
   public swipeNextSensivity: number;
 
+  // RequestAnimationFrame properties for smoother touch move
+  private rafId: number | null = null;
+  private pendingMoveData: {
+    newVal: number;
+    newValX: number;
+    clientY: number;
+    clientX: number;
+  } | null = null;
+
   private settings: CupertinoSettings;
   private device: Device;
   private breakpoints: Breakpoints;
   private transitions: Transitions;
   private keyboardEvents: KeyboardEvents;
+  private resizeEvents: ResizeEvents;
   constructor(private instance: CupertinoPane) {
     this.settings = this.instance.settings;
     this.device = this.instance.device;
     this.breakpoints = this.instance.breakpoints;
     this.transitions = this.instance.transitions;
     this.keyboardEvents = this.instance.keyboardEvents;
+    this.resizeEvents = this.instance.resizeEvents;
     this.touchEvents = this.getTouchEvents();
 
     // Set sensivity lower for web
@@ -102,7 +114,7 @@ export class Events {
     }
 
     // Orientation change + window resize
-    window.addEventListener('resize', this.keyboardEvents.onWindowResizeCb);
+    window.addEventListener('resize', this.resizeEvents.onWindowResizeCb);
   }
 
   public detachAllEvents() {
@@ -127,7 +139,7 @@ export class Events {
     }
 
     // Orientation change + window resize
-    window.removeEventListener('resize', this.keyboardEvents.onWindowResizeCb);
+    window.removeEventListener('resize', this.resizeEvents.onWindowResizeCb);
   }
 
   public resetEvents() {
@@ -169,6 +181,13 @@ export class Events {
     // Event emitter
     this.instance.emit('onDragStart', (t as CustomEvent));
 
+    // Cancel any pending animation frame
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+      this.pendingMoveData = null;
+    }
+
     // Allow clicks by default -> disallow on move (allow click with disabled drag)
     this.allowClick = true;
 
@@ -204,7 +223,7 @@ export class Events {
         && !this.isDraggableElement(t)) {
       this.startY += this.contentScrollTop;
     }
-    
+
     this.steps.push({posY: this.startY, posX: this.startX, time: Date.now()});
   }
 
@@ -218,6 +237,12 @@ export class Events {
     /**
      * TODO: Switch to pointer events
      */
+    // If drag is disabled, skip all processing ASAP (before any coordinate/layout work)
+    if (this.instance.disableDragEvents) {
+      this.steps = [];
+      return;
+    }
+
     const { clientY, clientX, velocityY } = this.getEventClientYX(t, 'touchmove');
     if (!clientY || !clientX) {
       return;
@@ -225,6 +250,12 @@ export class Events {
 
     // Deskop: check that touchStart() was initiated
     if(t.type === 'mousemove' && !this.mouseDown) return;
+
+    // If drag is disabled, skip all further processing ASAP
+    if (this.instance.disableDragEvents) {
+      this.steps = [];
+      return;
+    }
 
     // sometimes touchstart is not called 
     // when touchmove is began before initialization
@@ -243,16 +274,34 @@ export class Events {
         && this.isElementScrollable(t.target)) {
       return;
     }
- 
-    if (this.instance.disableDragEvents) {
-      this.steps = [];
-      return;
-    }
+
+    // drag is enabled at this point
+
     if (this.disableDragAngle) return;
+
     if (this.instance.preventedDismiss) return;
 
     if (this.settings.touchMoveStopPropagation) {
       t.stopPropagation();
+    }
+
+    // Block drag when scroll at initial position based on scrollZeroDragBottom setting
+    if (this.contentScrollTop === 0 
+        && this.instance.overflowEl.style.overflowY === 'auto'
+        && this.isElementScrollable(this.instance.overflowEl)
+        && !this.isDraggableElement(t)) {
+      
+      const diffY = clientY - this.steps[this.steps.length - 1]?.posY || 0;
+      
+      // If scrollZeroDragBottom is false, prevent any movement when scroll at initial position
+      if (!this.settings.scrollZeroDragBottom) {
+        return; // Block all movement when scroll at initial position
+      }
+      
+      // If scrollZeroDragBottom is true, only prevent upward movement (negative diffY) when scroll at initial position
+      if (diffY < 0) {
+        return; // Block upward movement only
+      }
     }
 
     // Delta
@@ -270,22 +319,22 @@ export class Events {
 
     // Has changes in position 
     this.instance.setGrabCursor(true, true);
-    let newVal = this.instance.getPanelTransformY() + diffY;
-    let newValX = this.instance.getPanelTransformX() + diffX;
+    const prevY = this.instance.getPanelTransformY();
+    const prevX = this.instance.getPanelTransformX();
+    let newVal = prevY + diffY;
+    let newValX = prevX + diffX;
     
     // First event after touchmove only
     if (this.steps.length < 2) {
       // Patch for 'touchmove' first event 
       // when start slowly events with small velocity
       if (velocityY < 1) {
-        newVal = this.instance.getPanelTransformY() + (diffY * velocityY);
+        newVal = prevY + (diffY * velocityY);
       }
 
       // Move while transition patch next transitions
-      let computedTranslateY = new WebKitCSSMatrix(
-        window.getComputedStyle(this.instance.paneEl).transform
-      ).m42;
-      let transitionYDiff = computedTranslateY - this.instance.getPanelTransformY();
+      let computedTranslate = this.instance.parseTransform3d(this.instance.paneEl);
+      let transitionYDiff = computedTranslate.y - prevY;
       if (Math.abs(transitionYDiff)) {
         newVal += transitionYDiff;
       }
@@ -331,6 +380,7 @@ export class Events {
         clientX, clientY, newVal,
         newValX, diffY, diffX
     });
+    
     if (forceNewVal) {
       if (!isNaN(forceNewVal.y)) newVal = forceNewVal.y;
       if (!isNaN(forceNewVal.x)) newValX = forceNewVal.x;
@@ -340,16 +390,16 @@ export class Events {
     }
 
     // No changes Y/X
-    if (this.instance.getPanelTransformY() === newVal 
-        && this.instance.getPanelTransformX() === newValX ) {
+    if (prevY === newVal 
+        && prevX === newValX ) {
       return;
     }
 
     // Prevent Dismiss gesture
     if (!this.instance.preventedDismiss
           && this.instance.preventDismissEvent && this.settings.bottomClose) {
-      let differKoef = ((-this.breakpoints.topper + this.breakpoints.topper - this.instance.getPanelTransformY()) / this.breakpoints.topper) / -8;
-      newVal = this.instance.getPanelTransformY() + (diffY * (0.5 - differKoef));
+      let differKoef = ((-this.breakpoints.topper + this.breakpoints.topper - prevY) / this.breakpoints.topper) / -8;
+      newVal = prevY + (diffY * (0.5 - differKoef));
       
       let mousePointY = (clientY - 220 - this.instance.screen_height) * -1;
       if (mousePointY <= this.instance.screen_height - this.breakpoints.bottomer) {
@@ -361,10 +411,42 @@ export class Events {
       }
     }
 
+    // Store the pending move data for requestAnimationFrame
+    this.pendingMoveData = { newVal, newValX, clientY, clientX };
+
+    // Request animation frame if not already pending
+    if (!this.rafId) {
+      this.rafId = requestAnimationFrame(() => this.applyMoveUpdate());
+    }
+
+    this.steps.push({posY: clientY, posX: clientX, time: Date.now()});
+  }
+
+  /**
+   * Apply the pending move update in animation frame for smoother performance
+   */
+  private applyMoveUpdate() {
+    if (!this.pendingMoveData) {
+      this.rafId = null;
+      return;
+    }
+
+    const { newVal, newValX } = this.pendingMoveData;
+
+    // Apply the opacity and overflow attributes
     this.instance.checkOpacityAttr(newVal);
     this.instance.checkOverflowAttr(newVal);
-    this.transitions.doTransition({type: 'move', translateY: newVal, translateX: newValX});
-    this.steps.push({posY: clientY, posX: clientX, time: Date.now()});
+    
+    // Apply the transition - PASS BOTH X AND Y for modules that need it
+    this.transitions.doTransition({
+      type: 'move', 
+      translateY: newVal,
+      translateX: newValX
+    });
+
+    // Clear the pending data and animation frame ID
+    this.pendingMoveData = null;
+    this.rafId = null;
   }
 
   /**
@@ -372,19 +454,40 @@ export class Events {
    * @param t 
    */
   public touchEndCb = (t) => this.touchEnd(t);
-  private touchEnd(t) {
+  private async touchEnd(t) {
     if (this.instance.disableDragEvents) return;
+
+    // Cancel any pending animation frame
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+      
+      // Apply any pending move data immediately before ending
+      if (this.pendingMoveData) {
+        this.applyMoveUpdate();
+      }
+    }
 
     // Desktop fixes
     if (t.type === 'mouseleave' && !this.mouseDown) return;
-    if (t.type === 'mouseup' || t.type === 'mouseleave') this.mouseDown = false;
+    if (t.type === 'mouseup' || t.type === 'mouseleave') {
+      this.mouseDown = false;
+
+      let buildedTransition = this.transitions.buildTransitionValue(false, this.settings.animationDuration);
+      this.instance.paneEl.style.setProperty('transition', buildedTransition);
+
+      // Force style and layout flush once to ensure transition gets applied
+      // Avoid multiple RAFs to reduce end-lag
+      void this.instance.paneEl.offsetHeight;
+    }
 
     // Determinate nearest point
     let closest = this.breakpoints.getClosestBreakY();
 
-    // Swipe - next (if differ > 10)
+    // Swipe - next (if differ > 10) — only when there was an actual drag
     let fastSwipeClose;
-    if (this.fastSwipeNext('Y')) {
+    const hadDrag = !this.allowClick && this.steps.length >= 2;
+    if (hadDrag && this.fastSwipeNext('Y')) {
       closest = this.instance.swipeNextPoint(
         this.steps[this.steps.length - 1]?.posY - this.steps[this.steps.length - 2]?.posY, //diff
         this.swipeNextSensivity, 
@@ -395,7 +498,9 @@ export class Events {
     }
     
     // update currentBreakpoint once `closest` is known so it's available in emitted events
-    this.breakpoints.currentBreakpoint = closest;
+    if (hadDrag) {
+      this.breakpoints.currentBreakpoint = closest;
+    }
 
     // blur tap event
     let blurTapEvent = false;
@@ -440,7 +545,14 @@ export class Events {
       this.instance.emit('onTransitionEnd', {target: this.instance.paneEl});
     }
 
-    this.transitions.doTransition({type: 'end', translateY: closest});
+    // Preserve current X position for modules that need it (like modal)
+    const currentX = this.instance.getPanelTransformX();
+
+    this.transitions.doTransition({
+      type: 'end', 
+      translateY: closest,
+      translateX: currentX
+    });
   }
 
   /**
@@ -451,6 +563,13 @@ export class Events {
   private async onScroll(t) {
     this.isScrolling = true;
     this.contentScrollTop = t.target.scrollTop;
+    
+    // Add/remove scroll class directly to overflow element
+    if (this.contentScrollTop > 0) {
+      this.instance.paneEl.classList.add('scrolled');
+    } else {
+      this.instance.paneEl.classList.remove('scrolled');
+    }
   }
 
   /**
@@ -498,7 +617,15 @@ export class Events {
   }
 
   public fastSwipeNext(axis: 'Y' | 'X'): boolean {
-    const diff = this.steps[this.steps.length - 1]?.['pos' + axis] - this.steps[this.steps.length - 2]?.['pos' + axis];
+    // Only consider fast swipe when an actual drag occurred
+    if (this.allowClick) return false;
+    if (this.steps.length < 2) return false;
+
+    const last = this.steps[this.steps.length - 1];
+    const prev = this.steps[this.steps.length - 2];
+    const diff = (last?.['pos' + axis] ?? 0) - (prev?.['pos' + axis] ?? 0);
+    if (!Number.isFinite(diff)) return false;
+
     return (Math.abs(diff) >= this.swipeNextSensivity);
   }
 

@@ -10,11 +10,21 @@ export declare class HorizontalModule {
     private horizontalBreaks;
     private currentBreakpoint;
     private fastSwipeNext;
+    private initialBreakX;
+    private initialBreakY;
+    private recalcScheduled;
     private settings;
     private transitions;
     private events;
     constructor(instance: CupertinoPane);
+    private parseInitialBreak;
     private calcHorizontalBreaks;
+    private scheduleCalcHorizontalBreaks;
+    private overrideInitialPositioning;
     setPaneElTransform(params: any): void;
     private getClosestBreakX;
+    moveToHorizontalBreak(breakX: 'left' | 'right'): void;
+    getCurrentHorizontalBreak(): 'left' | 'right';
+    private applyMoveUpdate;
+    moveToWidth(translateX: number, translateY: number): Promise<any>;
 }

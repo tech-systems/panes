@@ -1,6 +1,6 @@
 import { Support } from './support';
 import { Device } from './device';
-import { Events, KeyboardEvents } from './events';
+import { Events, KeyboardEvents, ResizeEvents } from './events';
 import { CupertinoSettings, PaneBreaks } from './models';
 import { Settings } from './settings';
 import { Breakpoints } from './breakpoints';
@@ -26,12 +26,17 @@ export class CupertinoPane {
   public ionApp: HTMLElement;
   public draggableEl: HTMLDivElement;
   public moveEl: HTMLDivElement;
+  public currentTranslateY: number = 0;
+  public currentTranslateX: number = 0;
   private styleEl: HTMLStyleElement;
   private destroyButtonEl: HTMLDivElement;
+  private lastHideOnBottom?: boolean;
+  private lastOverflowAuto?: boolean;
 
   public settings: CupertinoSettings = (new Settings()).instance;
   public device: Device = new Device();
   public keyboardEvents: KeyboardEvents;
+  public resizeEvents: ResizeEvents;
   public events: Events;
   public breakpoints: Breakpoints;
   public transitions: Transitions;
@@ -106,10 +111,11 @@ export class CupertinoPane {
       );
     }
 
-    // Core classes
+    // Core classes - Order matters! ResizeEvents needs to be before Events
     this.breakpoints = new Breakpoints(this);
     this.transitions = new Transitions(this);
     this.keyboardEvents = new KeyboardEvents(this);
+    this.resizeEvents = new ResizeEvents(this);
     this.events = new Events(this);
 
     // Install modules
@@ -144,7 +150,9 @@ export class CupertinoPane {
 
     // Panel (appying transform ASAP, avoid timeouts for animate:true)
     this.paneEl = document.createElement('div');
-    this.paneEl.style.transform = `translateY(${this.screenHeightOffset}px) translateZ(0px)`;
+    this.paneEl.style.transform = this.buildTransform3d(0, this.screenHeightOffset, 0);
+    this.currentTranslateY = this.screenHeightOffset;
+    this.currentTranslateX = 0;
     this.paneEl.classList.add('pane');
     internalStyles += `
       .cupertino-pane-wrapper .pane {
@@ -310,7 +318,7 @@ export class CupertinoPane {
         ? JSON.parse(JSON.stringify(conf.transition.from)) : null; 
       if (customTransitionFrom) {
         if (!customTransitionFrom.transform) {
-          customTransitionFrom.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+          customTransitionFrom.transform = this.buildTransform3d(0, this.breakpoints.breaks[this.settings.initialBreak], 0);
         }
         Object.assign(this.paneEl.style, customTransitionFrom);
       }
@@ -372,7 +380,8 @@ export class CupertinoPane {
         });
       } else {
         this.breakpoints.prevBreakpoint = this.settings.initialBreak;
-        this.paneEl.style.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+        this.currentTranslateY = this.breakpoints.breaks[this.settings.initialBreak];
+        this.paneEl.style.transform = this.buildTransform3d(this.currentTranslateX, this.currentTranslateY, 0);
       }
 
       /****** Attach Events *******/
@@ -402,11 +411,6 @@ export class CupertinoPane {
       this.overflowEl.style.overflowX = 'hidden';
     }
     this.overflowEl.style.overscrollBehavior = 'none';
-    
-    if (this.settings.topperOverflow 
-        && this.settings.upperThanTop) {   
-      console.warn('Cupertino Pane: "upperThanTop" allowed for disabled "topperOverflow"');
-    }
   
     this.setOverflowHeight(); 
   }
@@ -422,10 +426,13 @@ export class CupertinoPane {
   public checkOpacityAttr(val) {
     let attrElements = this.el.querySelectorAll('[hide-on-bottom]');
     if (!attrElements.length) return;
+    const shouldHide = (val >= this.breakpoints.breaks['bottom']);
+    if (this.lastHideOnBottom === shouldHide) return;
     attrElements.forEach((item) => {
       (<HTMLElement>item).style.transition = `opacity ${this.settings.animationDuration}ms ${this.settings.animationType} 0s`;
-      (<HTMLElement>item).style.opacity = (val >= this.breakpoints.breaks['bottom']) ? '0' : '1';
+      (<HTMLElement>item).style.opacity = shouldHide ? '0' : '1';
     });
+    this.lastHideOnBottom = shouldHide;
   }
 
   public checkOverflowAttr(val) {
@@ -434,7 +441,13 @@ export class CupertinoPane {
       return;
     }
 
-    this.overflowEl.style.overflowY = (val <= this.breakpoints.topper) ? 'auto' : 'hidden';
+    const shouldAuto = (val <= this.breakpoints.topper);
+    if (this.lastOverflowAuto === shouldAuto) return;
+    this.overflowEl.style.overflowY = shouldAuto ? 'auto' : 'hidden';
+    this.lastOverflowAuto = shouldAuto;
+    
+    // Update cursor immediately when scrollability changes
+    this.setGrabCursor(true, false);
   }
 
   // TODO: replace with body.contains()
@@ -453,42 +466,34 @@ export class CupertinoPane {
   }
 
   public swipeNextPoint = (diff, maxDiff, closest) => {
-    let { brs, settingsBreaks }  = this.prepareBreaksSwipeNextPoint();
+    const brs: any = this.breakpoints.breaks;
+    const settingsBreaks: any = this.settings.breaks;
 
-    if (this.breakpoints.currentBreakpoint === brs['top']) {
-        if (diff > maxDiff) {
-          if (settingsBreaks['middle'].enabled) { return brs['middle']; }
-          if (settingsBreaks['bottom'].enabled) { 
-            if (brs['middle'] < closest) {
-              return closest;
-            }
-            return brs['bottom']; 
-          }
-        }
-        return brs['top'];
+    const curr = this.breakpoints.currentBreakpoint;
+    const topY = brs['top'];
+    const midY = brs['middle'];
+    const botY = brs['bottom'];
+
+    if (curr === topY) {
+      if (diff > maxDiff) {
+        if (settingsBreaks['middle']?.enabled) return midY;
+        if (settingsBreaks['bottom']?.enabled) return botY;
+      }
+      return topY;
     }
 
-    if (this.breakpoints.currentBreakpoint === brs['middle']) {
-        if (diff < -maxDiff) {
-          if (settingsBreaks['top'].enabled) { return brs['top']; }
-        }
-        if (diff > maxDiff) {
-          if (settingsBreaks['bottom'].enabled) { return brs['bottom']; }
-        }
-        return brs['middle'];
+    if (curr === midY) {
+      if (diff < -maxDiff && settingsBreaks['top']?.enabled) return topY;
+      if (diff > maxDiff && settingsBreaks['bottom']?.enabled) return botY;
+      return midY;
     }
 
-    if (this.breakpoints.currentBreakpoint === brs['bottom']) {
-        if (diff < -maxDiff) {
-          if (settingsBreaks['middle'].enabled) { 
-            if (brs['middle'] > closest) {
-              return closest;
-            }
-            return brs['middle']; 
-          }
-          if (settingsBreaks['top'].enabled) { return brs['top']; }
-        }
-        return brs['bottom'];
+    if (curr === botY) {
+      if (diff < -maxDiff) {
+        if (settingsBreaks['middle']?.enabled) return midY;
+        if (settingsBreaks['top']?.enabled) return topY;
+      }
+      return botY;
     }
 
     return closest;
@@ -502,6 +507,72 @@ export class CupertinoPane {
     this.styleEl.textContent += styleString.replace(/\s\s+/g, ' ');
   };
 
+  /**
+   * Utility function to build transform3d string for better performance
+   * @param {number} x - X translation in pixels
+   * @param {number} y - Y translation in pixels
+   * @param {number} z - Z translation in pixels (defaults to 0)
+   */
+  public buildTransform3d(x: number = 0, y: number = 0, z: number = 0): string {
+    return `translate3d(${x}px, ${y}px, ${z}px)`;
+  }
+
+  /**
+   * Utility function to build transform3d with scale for better performance
+   * @param {number} x - X translation in pixels
+   * @param {number} y - Y translation in pixels
+   * @param {number} z - Z translation in pixels (defaults to 0)
+   * @param {number} scale - Scale factor (defaults to 1)
+   */
+  public buildTransform3dWithScale(x: number = 0, y: number = 0, z: number = 0, scale: number = 1): string {
+    return `translate3d(${x}px, ${y}px, ${z}px) scale(${scale})`;
+  }
+
+  /**
+   * Modern utility to parse transform3d values from computed style
+   * Replaces WebKitCSSMatrix for better performance
+   * @param {HTMLElement} element - Element to get transform from
+   * @returns {object} Object with x, y, z translation values
+   */
+  public parseTransform3d(element: HTMLElement): {x: number, y: number, z: number} {
+    const transform = window.getComputedStyle(element).transform;
+    if (transform === 'none' || !transform) {
+      return {x: 0, y: 0, z: 0};
+    }
+    
+    // Handle matrix3d() format
+    if (transform.startsWith('matrix3d(')) {
+      const values = transform.slice(9, -1).split(',').map(v => parseFloat(v.trim()));
+      return {
+        x: values[12] || 0,
+        y: values[13] || 0, 
+        z: values[14] || 0
+      };
+    }
+    
+    // Handle matrix() format (2D)
+    if (transform.startsWith('matrix(')) {
+      const values = transform.slice(7, -1).split(',').map(v => parseFloat(v.trim()));
+      return {
+        x: values[4] || 0,
+        y: values[5] || 0,
+        z: 0
+      };
+    }
+    
+    // Fallback for translate3d() format
+    const translate3dMatch = transform.match(/translate3d\(([^,]+),\s*([^,]+),\s*([^)]+)\)/);
+    if (translate3dMatch) {
+      return {
+        x: parseFloat(translate3dMatch[1]) || 0,
+        y: parseFloat(translate3dMatch[2]) || 0,
+        z: parseFloat(translate3dMatch[3]) || 0
+      };
+    }
+    
+    return {x: 0, y: 0, z: 0};
+  }
+
   private getModuleRef(className): string {
     return (className.charAt(0).toLowerCase() + className.slice(1)).replace('Module','');
   }
@@ -512,15 +583,12 @@ export class CupertinoPane {
 
 
   public getPanelTransformY():number {
-    const translateYRegex = /\.*translateY\((.*)px\)/i;
-    return parseFloat(translateYRegex.exec(this.paneEl.style.transform)[1]);
+    return this.currentTranslateY;
   }
 
   // TODO: merge to 1 function above
   public getPanelTransformX():number {
-    const translateYRegex = /\.*translateX\((.*)px\)/i;
-    let translateExec = translateYRegex.exec(this.paneEl.style.transform);
-    return translateExec ? parseFloat(translateExec[1]) : 0;
+    return this.currentTranslateX;
   }
 
 
@@ -538,7 +606,27 @@ export class CupertinoPane {
     if (!this.device.desktop) {
       return;
     }
-    this.paneEl.style.cursor = enable ? (moving ? 'grabbing' : 'grab'): '';
+    const handleCursor = enable ? (moving ? 'grabbing' : 'grab') : '';
+    const isScrollableVisible = !!this.overflowEl 
+      && this.overflowEl.style.overflowY === 'auto'
+      && this.overflowEl.scrollHeight > this.overflowEl.clientHeight;
+
+    if (!enable) {
+      this.paneEl.style.cursor = '';
+      if (this.draggableEl) this.draggableEl.style.cursor = '';
+      return;
+    }
+
+    // When content is scrollable, only the draggable handle shows grab/grabbing
+    if (isScrollableVisible) {
+      this.paneEl.style.cursor = '';
+      if (this.draggableEl) this.draggableEl.style.cursor = handleCursor;
+      return;
+    }
+
+    // Default behavior: set cursor on the whole pane (and handle)
+    this.paneEl.style.cursor = handleCursor;
+    if (this.draggableEl) this.draggableEl.style.cursor = handleCursor;
   }
 
   /**

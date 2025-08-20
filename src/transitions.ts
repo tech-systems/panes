@@ -37,7 +37,9 @@ export class Transitions {
       if (params.type === CupertinoTransition.Move) {
         // System event
         this.instance.emit('onMoveTransitionStart', {translateY: params.translateY});
-        this.instance.paneEl.style.transition = 'all 0ms linear 0ms';
+        if (this.instance.paneEl.style.transition !== 'all 0ms linear 0ms') {
+          this.instance.paneEl.style.transition = 'all 0ms linear 0ms';
+        }
         this.setPaneElTransform(params);
         return resolve(true);
       }
@@ -103,6 +105,13 @@ export class Transitions {
         // transition style
         let buildedTransition = this.buildTransitionValue(bounce, subTransition.duration);
         this.instance.paneEl.style.setProperty('transition', buildedTransition);
+        // ------------------------------------------------------------------------------
+        // IMPORTANT!
+        // When transition is changed from 0ms linear to anything else e.g. 300ms ease,
+        // When drag event followed by breakpoint event,
+        // css property has no time to apply transition to paneEl 
+        // it's browser bug / limitation. 
+        // ------------------------------------------------------------------------------
 
         // Main transitions
         // Emit event
@@ -120,7 +129,8 @@ export class Transitions {
          */
         if (subTransition.to) {
           if (!subTransition.to.transform) {
-            subTransition.to.transform = `translateY(${this.breakpoints.breaks[this.settings.initialBreak]}px) translateZ(0px)`;
+            const initialBreakY = this.breakpoints.breaks[this.settings.initialBreak];
+            subTransition.to.transform = this.instance.buildTransform3d(0, initialBreakY, 0);
           }
           Object.assign(this.instance.paneEl.style, subTransition.to);
         }
@@ -137,7 +147,20 @@ export class Transitions {
   }
 
   private setPaneElTransform(params) {
-    this.instance.paneEl.style.transform = `translateY(${params.translateY}px) translateZ(0px)`;
+    this.instance.currentTranslateY = params.translateY;
+    
+    // Handle X-axis if provided (used by horizontal and modal modules)
+    if (params.translateX !== undefined) {
+      this.instance.currentTranslateX = params.translateX;
+    }
+    
+    const transform = this.instance.buildTransform3d(
+      this.instance.currentTranslateX, 
+      this.instance.currentTranslateY, 
+      0
+    );
+    
+    this.instance.paneEl.style.transform = transform;
   }
 
   public buildTransitionValue(bounce: boolean, duration?: number): string {
