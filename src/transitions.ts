@@ -149,10 +149,7 @@ export class Transitions {
   private setPaneElTransform(params) {
     this.instance.currentTranslateY = params.translateY;
     
-    // Handle X-axis if provided (used by horizontal and modal modules)
-    if (params.translateX !== undefined) {
-      this.instance.currentTranslateX = params.translateX;
-    }
+    // X-axis stays cached (only updated by horizontal module override)
     
     const transform = this.instance.buildTransform3d(
       this.instance.currentTranslateX, 

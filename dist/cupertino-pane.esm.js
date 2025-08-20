@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.5.1
+ * Cupertino Pane 1.5.2
  * Cupertino Panes is multi-functional modals, cards & panes with touch technologies.
  * https://panejs.com
  *
@@ -440,7 +440,7 @@ class Events {
         const prevY = this.instance.getPanelTransformY();
         const prevX = this.instance.getPanelTransformX();
         let newVal = prevY + diffY;
-        let newValX = prevX;
+        let newValX = prevX + diffX;
         // First event after touchmove only
         if (this.steps.length < 2) {
             // Patch for 'touchmove' first event 
@@ -1336,10 +1336,7 @@ class Transitions {
     }
     setPaneElTransform(params) {
         this.instance.currentTranslateY = params.translateY;
-        // Handle X-axis if provided (used by horizontal and modal modules)
-        if (params.translateX !== undefined) {
-            this.instance.currentTranslateX = params.translateX;
-        }
+        // X-axis stays cached (only updated by horizontal module override)
         const transform = this.instance.buildTransform3d(this.instance.currentTranslateX, this.instance.currentTranslateY, 0);
         this.instance.paneEl.style.transform = transform;
     }

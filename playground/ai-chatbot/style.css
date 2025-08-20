@@ -37,7 +37,7 @@
 :root {
   --bg-primary: linear-gradient(180deg, #0a0a0a 0%, #1a0a2e 100%);
   --bg-secondary: rgba(28, 28, 29, 0.8);
-  --bg-tertiary: rgba(25, 25, 27, 0.95);
+  --bg-tertiary: rgba(25, 25, 27, 1);
   --bg-accent: rgba(255, 255, 255, 0.08);
   --bg-accent-hover: rgba(255, 255, 255, 0.12);
   --bg-button: rgba(255, 255, 255, 0.08);
