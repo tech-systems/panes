@@ -1,3 +1,33 @@
+# [1.5.0](https://github.com/tech-systems/panes/compare/1.4.22...1.5.0) (2025-08-21)
+
+### Extra
+
+- AI Chatbot demo in playground with picture-in-picture, collapsible UI, synthwave grid, and directional indicators ([PR #254](https://github.com/tech-systems/panes/pull/254))
+
+### Features
+
+- **core/events:** new `ResizeEvents` to handle window resize and orientation change; adds smooth end handling by cancelling RAF and applying any pending move update; preserves current X on transition end for modules that need it ([PR #254](https://github.com/tech-systems/panes/pull/254))
+- **core/transitions:** unified 3D transform helpers and support for X+Y movement in transition system; `setPaneElTransform` now updates both axes; safer transition switching during drag → breakpoint sequences ([PR #254](https://github.com/tech-systems/panes/pull/254))
+- **settings/models:** new `scrollZeroDragBottom` setting (default: `true`) ([PR #254](https://github.com/tech-systems/panes/pull/254))
+- **modules/horizontal:** modernized horizontal module with X+Y control, combined `initialBreak` syntax like "middle right", accurate left/right break calculations, and new helpers `moveToHorizontalBreak()`, `getCurrentHorizontalBreak()`, and `moveToWidth(x, y)` ([PR #254](https://github.com/tech-systems/panes/pull/254))
+- **modules/modal:** allow horizontal drag during move while auto-centering X on end; destroy-from-current-position respects parsed transforms ([PR #254](https://github.com/tech-systems/panes/pull/254))
+- **modules/inverse:** improved inverse coordinate system with proper boundaries, swipe logic, and vertical-only movement ([PR #254](https://github.com/tech-systems/panes/pull/254))
+
+### Enhancements
+
+- **events:** fast swipe detection now requires an actual drag; scroll handler toggles `scrolled` class on content; improved mouseup/mouseleave handling and layout flush to ensure transitions apply ([PR #254](https://github.com/tech-systems/panes/pull/254))
+- **fitHeight:** restores grab cursor after transitions; avoids forcing overflow hidden during fit-height flows ([PR #254](https://github.com/tech-systems/panes/pull/254))
+- **follower/zStack:** use unified transform builders for consistency and performance ([PR #254](https://github.com/tech-systems/panes/pull/254))
+
+### Bug Fixes
+
+- **events:** prevent swipe-next without real drag steps; ensure pending move data is applied before ending; preserve current breakpoint updates only when dragged ([PR #254](https://github.com/tech-systems/panes/pull/254))
+- **horizontal/inverse/modal:** correct X/Y transform synchronization, breakpoint calculations, and initial positioning across modules ([PR #254](https://github.com/tech-systems/panes/pull/254))
+
+### Docs/Chore
+
+- Add `CLAUDE.md` to guide AI assistants in this repository ([PR #254](https://github.com/tech-systems/panes/pull/254))
+
 # [1.4.0](https://github.com/tech-systems/panes/compare/1.3.0...1.4.0) (2023-09-04)
 
 ### Extra
@@ -135,7 +165,6 @@ Callbacks now can be assigned with `on()` method.
 
 ### BREAKING CHANGES
 - All Z-Stack and 3D Push properties was merged into `zStack` object. [Readme](https://github.com/roman-rr/cupertino-pane/blob/master/README.md#z-stack)
-
 ```js
 let settings = {
   ...
@@ -352,7 +381,7 @@ breaks: {
   parentElement: 'ion-tabs',
   pushElement: 'app-home',
   pushMinHeight: 350
-}
+ }
 ```
 
 ### Bug Fixes
