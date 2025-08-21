@@ -72,12 +72,12 @@ Support this project with your organization. Your logo will show up here with a 
 - [Starbucks](https://panejs.com/demo/starbucks.html)
 
 <div style="display:flex;flex-wrap:wrap;">
+  <img style="width: 200px;" width="200" height="433.59" src="docs/images/ai-chatbot.gif?raw=true" alt="Cupertino Pane - Roman Antonov" >
   <img style="width: 200px;" width="200" height="433.59" src="docs/images/custom-transitions.gif?raw=true" alt="Cupertino Pane - Roman Antonov" >
   <img style="width: 200px;" width="200" src="docs/images/picture-in-picture.gif?raw=true" alt="Cupertino Pane - Roman Antonov" >
   <img style="width: 200px;" width="200" src="docs/images/notifications.gif?raw=true" alt="Cupertino Pane - Roman Antonov" >
   <img style="width: 200px;" width="200" src="docs/images/z-stack.gif?raw=true" alt="Cupertino Pane - Roman Antonov" >
   <img style="width: 200px;" width="200" src="docs/images/overflow.gif?raw=true" alt="Cupertino Pane - Roman Antonov" >
-  <img style="width: 200px;" width="200" src="docs/images/bulletin.gif?raw=true" alt="Cupertino Pane - Roman Antonov" >
 </div>
 
 ## Docs & Guidelines
