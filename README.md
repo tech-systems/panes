@@ -52,6 +52,7 @@ Support this project with your organization. Your logo will show up here with a 
 <a href="https://opencollective.com/cupertino-pane"><img src="https://opencollective.com/cupertino-pane/organizations.svg?width=890"></a>
 
 ## Demonstration
+- [AI Chatbot](https://panejs.com/scene/ai-chatbot/index.html)
 - [Modal](https://panejs.com/demo/modal.html)
 - [Base](https://panejs.com/demo/base.html)
 - [Overflow Top](https://panejs.com/demo/overflow-top.html)
