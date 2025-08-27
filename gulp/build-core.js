@@ -65,7 +65,7 @@ async function buildEntry(format) {
   });
 }
 
-async function build() {
+async function build(cb) {
   elapsed.start('build-core');
   return Promise.all(
     [
@@ -73,6 +73,10 @@ async function build() {
     ]
   ).then(() => {
     elapsed.end('build-core', chalk.green('Rollup core build completed!'));
+    if (cb) cb();
+  }).catch((err) => {
+    console.error('Core build failed:', err);
+    if (cb) cb(err);
   });
 }
 

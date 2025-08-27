@@ -61,7 +61,7 @@ async function buildEntry(file) {
   });
 }
 
-async function build() {
+async function build(cb) {
   elapsed.start('build-modules');
   // Get module files
   let moduleFiles = await fs.readdirSync('./src/modules/', (err, files) => files);
@@ -75,6 +75,10 @@ async function build() {
     moduleFiles.map(file => buildEntry(file)
   )).then(() => {
     elapsed.end('build-modules', chalk.green('Rollup modules build completed!'));
+    if (cb) cb();
+  }).catch((err) => {
+    console.error('Modules build failed:', err);
+    if (cb) cb(err);
   });
 }
 

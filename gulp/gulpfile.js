@@ -11,21 +11,17 @@ const buildCore = require('./build-core.js');
 const buildModules = require('./build-modules.js');
 
 // js bundle
-gulp.task('js', () => {
-  // Ensure builds run in sequence and avoid shared cache contention
-  const runBuilds = () => {
-    if (env === 'development') {
-      return buildBundle();
-    }
-    return buildBundle()
-      .then(() => buildCore())
-      .then(() => buildModules());
-  };
+gulp.task('js', (cb) => {
+  buildBundle(cb);
 
-  return runBuilds().then(() =>
-    gulp.src('./src/**/*.ts')
-      .pipe(connect.reload())
-  );
+  if (env === 'production') {
+    buildCore(cb);
+    buildModules(cb);
+  }
+
+  return gulp
+    .src('./src/**/*.ts')
+    .pipe(connect.reload());
 });
 
 // in prod builds, adjust sourcemap paths to actual src location
@@ -50,28 +46,8 @@ gulp.task('prod-source-sourcemap-fix-paths', (cb) => {
 
 gulp.task('build', gulp.series(['js', 'prod-source-sourcemap-fix-paths']));
 
-// Debounced watch to prevent memory spikes from rapid rebuilds
-let watchTimeout;
-let reloadTimeout;
-
 gulp.task('watch', () => {
-  // Watch TypeScript source files - triggers build + reload
-  gulp.watch('./src/**/**/*.ts', function watchTS(cb) {
-    clearTimeout(watchTimeout);
-    watchTimeout = setTimeout(() => {
-      gulp.series('js')(cb);
-    }, 300); // 300ms debounce
-  });
-
-  // Watch playground files - triggers reload only (no build needed)
-  gulp.watch(['./playground/**/*.html', './playground/**/*.css', './playground/**/*.js'], function watchPlayground(cb) {
-    clearTimeout(reloadTimeout);
-    reloadTimeout = setTimeout(() => {
-      gulp.src('./playground/**/*')
-        .pipe(connect.reload());
-      cb();
-    }, 100); // 100ms debounce for faster playground updates
-  });
+  gulp.watch('./src/**/**/*.ts', gulp.series('js'));
 });
 
 gulp.task('connect', () => {
@@ -85,21 +61,6 @@ gulp.task('connect', () => {
 
 gulp.task('open', () => {
   gulp.src('./playground/index.html').pipe(gopen({ uri: 'http://localhost:3000/playground/' }));
-});
-
-// Memory cleanup task
-gulp.task('cleanup', (cb) => {
-  const rimraf = require('rimraf');
-  rimraf('.rpt2_cache', cb);
-});
-
-// Force garbage collection if available
-gulp.task('gc', (cb) => {
-  if (global.gc) {
-    global.gc();
-    console.log('Garbage collection triggered');
-  }
-  cb();
 });
 
 gulp.task('server', gulp.parallel(['watch', 'connect', 'open']));

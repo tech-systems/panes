@@ -56,8 +56,8 @@ async function buildEntry(format, includeModules) {
       file: `./${outputDir}/${filename}.js`,
     });
 
-    // Build types only in production mode to save memory
-    if (isESM && isProd) {
+    // Build types only once
+    if (isESM) {
       let typings = await rollup.rollup({
         input: './src/public-api.ts',
         plugins: [
@@ -101,7 +101,7 @@ async function buildEntry(format, includeModules) {
   });
 }
 
-async function build() {
+async function build(cb) {
   elapsed.start('bundles');
 
   // Get all modules
@@ -131,6 +131,10 @@ async function build() {
     ]
   ).then(() => {
     elapsed.end('bundles', chalk.green('Rollup bundles build completed!'));
+    if (cb) cb();
+  }).catch((err) => {
+    console.error('Build failed:', err);
+    if (cb) cb(err);
   });
 }
 

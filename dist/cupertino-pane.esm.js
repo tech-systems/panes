@@ -1,5 +1,5 @@
 /**
- * Cupertino Pane 1.5.2
+ * Cupertino Pane 1.5.3
  * Cupertino Panes is multi-functional modals, cards & panes with touch technologies.
  * https://panejs.com
  *
@@ -7,7 +7,7 @@
  *
  * Released under the MIT License
  *
- * Released on: August 21, 2025
+ * Released on: August 27, 2025
  */
 
 /******************************************************************************
